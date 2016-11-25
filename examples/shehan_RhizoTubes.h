@@ -17,9 +17,9 @@ using namespace std;
  */
 SignedDistanceFunction* fieldRhizoTubes(double r)
 {
-  double l = 90; // cm , TODO value correct?
+  double l = 90; // cm tube length
   SDF_PlantContainer* rhizotube = new SDF_PlantContainer(r,r,l,false);
-  SDF_RotateTranslate* rhizoX = new SDF_RotateTranslate(rhizotube, l, SDF_RotateTranslate::yaxis, Vector3d(l,0.,0));
+  SDF_RotateTranslate* rhizoX = new SDF_RotateTranslate(rhizotube, l, SDF_RotateTranslate::yaxis, Vector3d(l,0.,0.));
   vector<SignedDistanceFunction*> rhizotubes_;
   const int tubeN=6;
   double y_[tubeN] = { 35, 45, 55, 65, 75, 85 };
@@ -60,7 +60,7 @@ void shehan_RhizoTubes(string name = "wheat", bool exportVTP = false)
   /*
    * Initialize
    */
-  double r= 3.2;
+  double r = 3.2;
   SignedDistanceFunction* geometry = new SDF_Complement(fieldRhizoTubes(r));
   auto allRS = initializeRootSystems(name,geometry);
 
@@ -72,21 +72,13 @@ void shehan_RhizoTubes(string name = "wheat", bool exportVTP = false)
   //		217, 223, 231, 240}; // test...
   simulateRS(times, allRS);
 
-//  /*
-//   * Export root systems (around 4.5GB)
-//   */
-//  for (size_t i=0; i<1; i++) { // times.size()-1
-//      string vtpname = name + std::to_string(int(times[i+1]))+".vtp";
-//      AnalysisSDF analyser = getResult(allRS, times.at(i+1));
-//      analyser.write(vtpname);
-//  }
-
   /*
    * Analysis: crop to the segments visible from the rhizotubes
    */
   double dx = 0.3; //cm
   SignedDistanceFunction* visible = fieldRhizoTubes(3.2+dx);
 
+  vector<AnalysisSDF> croppedTubes;
   for (size_t i=1; i<times.size(); i++) {
       std::cout << "\nANALYSE TIME " << times.at(i) <<"\n\n";
       AnalysisSDF analyser = getResult(allRS,times.at(i));
@@ -96,6 +88,7 @@ void shehan_RhizoTubes(string name = "wheat", bool exportVTP = false)
           string vtpname = name + "_tube_cropped"+ std::to_string(i)+".vtp"; // export cropped segments for visualization
           analyser.write(vtpname);
       }
+      croppedTubes.push_back(analyser); // copies into the vector
   }
 
   /*
@@ -103,15 +96,29 @@ void shehan_RhizoTubes(string name = "wheat", bool exportVTP = false)
    */
   vector<vector<double>> finalmatrixC(times.size()-1);
   vector<vector<double>> finalmatrixL(times.size()-1);
-  double fl = 3; // cm
+
   vector<Vector3d> fpos = fotoPos();
-  vector<AnalysisSDF> fotos;
-  Matrix3d A;
+
+  vector<AnalysisSDF> fotos; // not real fotos, but slices of the croopedTube
+
+  double xx = 1.4; // cm slice thickness
+  double a1 = 8./180.*M_PI;
+  double a2 = 22./180.*M_PI;
+  double r_ = r+dx; // 3.5
+  double zz = sin(a1)*r_ + sin(a2)*r_;
+  cout << " foto box " << xx << ", 100, "<<zz<< "\n";
+  SDF_PlantBox fotoBox(xx,100.,zz);
+
+  vector<SignedDistanceFunction*> allcameras;
 
   for (size_t t=0; t<times.size()-1; t++) {
-      int c = 0;
 
-      AnalysisSDF f = getResult(allRS, times.at(t+1)); // copy time t+1 into analyser f
+      int c = 0;
+      cout << "Time: " << times.at(t) << "\n";
+      AnalysisSDF empty = AnalysisSDF();
+      fotos.push_back(empty); // fill in this time step
+      AnalysisSDF f = croppedTubes.at(t);
+
       for (auto& p :fpos) {
 
           int j = floor(double(c)/7.);
@@ -121,38 +128,35 @@ void shehan_RhizoTubes(string name = "wheat", bool exportVTP = false)
               finalmatrixL[t].push_back(0.);
           }
 
-          // foto 1
-          A = Matrix3d::rotX(-M_PI/2.);
-          AnalysisSDF foto1 = f.foto(p,A,fl);
-          //fotos.push_back(foto1);
+          // foto 1 + 2
+          SDF_RotateTranslate* foto = new SDF_RotateTranslate(&fotoBox,
+                                                              Vector3d(p.x,p.y,p.z+r_*sin(a2)));
+          AnalysisSDF foto12 = f;
+          foto12.crop(foto);
+          foto12.pack();
 
-          // foto 2
-          A = Matrix3d::rotX(M_PI/2.);
-          AnalysisSDF foto2 = f.foto(p,A,fl);
-          //fotos.push_back(foto2);
+          finalmatrixC[t][j] += double(foto12.getNumberOfRoots())/7.;
+          // number of segments is not feasible, since a root might grow around the tube
+          finalmatrixL[t][j] += double(foto12.getSummed(RootSystem::st_length))/7.;
+//          finalmatrixC[t][j] += 1./7.; // for debugging
+//          finalmatrixL[t][j] += 1./7.;
 
+          std::cout << "#" << c << " foto at location: "<< p.toString() << " tube " << j  << "\n";
+
+          allcameras.push_back(foto); // save geometry for later vizualisation
+          fotos.back().addSegments(foto12); // save segments for vizualisation
           c++;
-
-          finalmatrixC[t][j] += double(foto1.getNumberOfRoots())/14.;
-          finalmatrixC[t][j] += double(foto2.getNumberOfRoots())/14.;
-          finalmatrixL[t][j] += double(foto1.getSummed(RootSystem::st_length))/14.;
-          finalmatrixL[t][j] += double(foto2.getSummed(RootSystem::st_length))/14.;
-          //    		finalmatrixC[t][j] += 1./14.; // for debugging
-          //    		finalmatrixC[t][j] += 1./14.;
-          //    		finalmatrixL[t][j] += 1./14.;
-          //    		finalmatrixL[t][j] += 1./14.;
-
-          std::cout << "Foto at location: "<< p.toString() << " tube " << j  << "\n";
       }
   }
 
-//  /*
-//   * export fotos
-//   */
-//  for (size_t i=0; i<fotos.size(); i++) {
-//      string vtpname = name + "_tube_foto" +std::to_string(i+1)+".vtp";
-//      fotos.at(i).write(vtpname);
-//  }
+  /*
+   * export fotos
+   */
+  int c=0;
+  for (const auto& ft : fotos) {
+    string vtpname = name +  "_tube_fotos"+std::to_string(++c) +".vtp";
+    ft.write(vtpname);
+  }
 
   int n = finalmatrixC[0].size(); // 32
   int m = times.size()-1; // 8
@@ -189,7 +193,9 @@ void shehan_RhizoTubes(string name = "wheat", bool exportVTP = false)
   if (exportVTP) {
       string gname = name + "_tube.py";
       allRS[0]->write(gname);
+      string gname2 = name + "_tubeCamera.py";
+      SDF_Union cam(allcameras);
+      allRS[0]->setGeometry(&cam);
+      allRS[0]->write(gname2);
   }
 }
-
-
