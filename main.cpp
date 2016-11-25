@@ -25,7 +25,7 @@
 //#include "DumuxRootSystem.h" // suggested coupling
 //#include "examples/example_dumux.h"
 
-
+//testkommentar
 
 /**
  * Starts an examples (from the examples folder)
