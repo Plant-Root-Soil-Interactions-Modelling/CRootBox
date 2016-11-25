@@ -1,0 +1,33 @@
+# Parameter set for type 
+type	1
+name	Taproot
+lb	1	0
+la	10	0
+ln	4.68421052632	0
+nob	20	0
+r	1	0
+a	0.1	00
+color	1	0	0
+tropism	1	1.5	0.2
+dx	0.25
+successors	0
+successorP	0
+theta	0	0
+rlt	1e+09	0
+gf	1
+# Parameter set for type 
+type	2
+name	Lateral
+lb	0	0
+la	0	0
+ln	0	0
+nob	0	0
+r	1	0
+a	0.05	00
+color	0	1	0
+tropism	1	1	0.3
+dx	0.25
+successors	0
+successorP	0
+theta	1.22173	0
+rlt	1e+09

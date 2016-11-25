@@ -1,0 +1,18 @@
+# Parameter set for type (by Rootbox)
+type	1
+name	primaryroot
+lb	0.1	0
+la	18	1.8
+ln	0.6	0.06
+nob	120.4	0
+r	6	0.6
+a	0.04	00
+color	0.431373	0.392157	0.196078
+tropism	1	1.5	0.15708
+dx	0.5
+successors	0
+successorP	0
+theta	0	0
+rlt	1e+09	0
+gf	1
+
