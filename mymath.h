@@ -111,7 +111,7 @@ public:
     Matrix3d(double m11, double m12, double m13, double m21, double m22, double m23, double m31, double m32, double m33):
         r0(m11,m12,m13), r1(m21,m22,m23), r2(m31,m32,m33) { } ///< Constructor passing nine doubles as 3x3 matrix entries
     Matrix3d(const Vector3d& c1, const Vector3d& c2, const Vector3d& c3) :
-        r0(c1.x,c2.x,c3.x), r1(c1.y,c2.y,c3.y), r2(c1.z,c2.z,c3.z) { } ///< Conctructs the matrix from three column vectors
+        r0(c1.x,c2.x,c3.x), r1(c1.y,c2.y,c3.y), r2(c1.z,c2.z,c3.z) { } ///< Constructs the matrix from three column vectors
     Matrix3d(const Matrix3d& m): r0(m.r0), r1(m.r1), r2(m.r2) { } ///< Copy constructor
 
     static Matrix3d rotX(double a) {
@@ -164,7 +164,6 @@ public:
         return  r0.x*(r1.y*r2.z-r2.y*r1.z)-r0.y*(r1.x*r2.z-r1.z*r2.x)+r0.z*(r1.x*r2.y-r1.y*r2.x);
     }
 
-
     Matrix3d inverse() const {
         double d = det();
         assert(d>0); // regular matrix?
@@ -208,7 +207,7 @@ public:
         r2 = Vector3d(r2.times(m.r0), r2.times(m.r1), r2.times(m.r2) );
     } ///< Multiplies matrix m from right
 
-    Vector3d times(Vector3d v) const {
+    Vector3d times(const Vector3d& v) const {
         return Vector3d(r0.times(v), r1.times(v), r2.times(v));
     } ///<  Multiplies vector v from right
 

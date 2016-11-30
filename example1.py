@@ -10,7 +10,6 @@
 #  Additionally, exports the line segments as .txt file to import into Matlab for postprocessing
 #
 import py_rootbox as rb
-#from math import inf
 
 rootsystem = rb.RootSystem()
 name = "anagallis2010" 
@@ -48,15 +47,17 @@ analysis = rb.AnalysisSDF(rootsystem)
 analysis.write(name+".txt")
 
 #
-#      Total length and surface
+# Total length and surface
 #     
 l = analysis.getSummed(rb.ScalarType.length)  
 print("Total root system length is "+str(l)+" cm")    
 
 print("Finished with a total of "+str(rootsystem.getNumberOfNodes())+ " nodes")
 
+# end of example 1  
+
 #
-# Python 
+# Python testing ... 
 #
 L = analysis.getScalar(rb.ScalarType.length); # we can get scalar Data and do soemthing with it :-)
 lt= 0
@@ -74,6 +75,8 @@ ln_ = rb.std_vector_double_(); # how to append/fill values????
 #for i in range(0,3):
     #ln_[i]=0.1;
     
+from math import inf
+    
 type =1 # 1
 lb = 1 # cm
 la = 7  # cm
@@ -81,7 +84,7 @@ nob = 0 # 1
 r = 2 #  cm/day
 a = 0.1 # cm
 theta = 1.2 # rad
-#rlt = inf # day
+rlt = inf # day
 
 p2 = rb.RootParameter()
 p2.set(type,lb, la,ln_, nob, r, a, theta, rlt)

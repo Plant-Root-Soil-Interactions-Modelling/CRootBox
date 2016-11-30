@@ -13,7 +13,7 @@
  * mymath.h		currently only Vector3d is exposed (lets see if we will need anything else)
  *
  */
-// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -39,8 +39,12 @@ using namespace boost::python;
  */
 Vector3d (Vector3d::*times1)(const double) const = &Vector3d::times;
 double (Vector3d::*times2)(const Vector3d&) const = &Vector3d::times;
+
 double (AnalysisSDF::*getSummed1)(int st) const = &AnalysisSDF::getSummed;
 double (AnalysisSDF::*getSummed2)(int st, SignedDistanceFunction* geometry) const = &AnalysisSDF::getSummed;
+
+void (Matrix3d::*times3)(const Matrix3d&) = &Matrix3d::times;
+Vector3d (Matrix3d::*times4)(const Vector3d&) const = &Matrix3d::times;
 
 /**
  * Virtual functions (not sure if needed, or only if we derive classes from it in pyhton?), not working...
@@ -99,10 +103,30 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("__str__",&Vector3d::toString)
 			.def("__rep__",&Vector3d::toString)
 	;
+	class_<Matrix3d>("Matrix3d", init<>())
+			.def(init<double,double,double,double,double,double,double,double,double>())
+			.def(init<Vector3d&, Vector3d&, Vector3d&>())
+			.def(init<Matrix3d&>())
+			.def_readwrite("r0",&Matrix3d::r0)
+			.def_readwrite("r1",&Matrix3d::r1)
+			.def_readwrite("r2",&Matrix3d::r2)
+			.def("rotX",&Matrix3d::rotX)
+			.def("rotY",&Matrix3d::rotY)
+			.def("rotZ",&Matrix3d::rotZ)
+			.def("ons",&Matrix3d::ons)
+			.def("det",&Matrix3d::det)
+			.def("inverse",&Matrix3d::inverse)
+			.def("column",&Matrix3d::column)
+			.def("row",&Matrix3d::row)
+			.def("times",times3)
+			.def("times",times4)
+			.def("__str__",&Matrix3d::toString)
+			.def("__rep__",&Matrix3d::toString)
+	;
 	/* sdf.h */
 //	class_<SignedDistanceFunction_Wrap, boost::noncopyable>("SignedDistanceFunction")
 //	    .def("getDist", &SignedDistanceFunction_Wrap::getDist, &SignedDistanceFunction_Wrap::default_getDist)
-//	; // TODO how does polymorphism work...
+//	; // TODO how does polymorphism work... (everything works fine, dont ask why)
 	class_<SignedDistanceFunction>("SignedDistanceFunction")
 			.def("getDist",&SignedDistanceFunction::getDist)
 			.def("__str__",&SignedDistanceFunction::toString)
@@ -135,6 +159,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("realize",&RootTypeParameter::realize)
 			.def("__str__",&RootTypeParameter::toString)
 	;
+	// TODO vector<RootTypeParameter>
 	class_<RootParameter>("RootParameter", init<>())
 			.def(init<int , double, double, const std::vector<double>&, int, double, double, double, double>())
 			.def("set",&RootParameter::set)
@@ -150,6 +175,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("getK",&RootParameter::toString)
 			.def("__str__",&RootParameter::toString)
 	;
+	// TODO RootSystemParameter
 	/* RootSystem.h */
         class_<RootSystem>("RootSystem")
         .def("openFile", &RootSystem::openFile)

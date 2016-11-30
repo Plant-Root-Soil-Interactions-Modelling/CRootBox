@@ -42,12 +42,11 @@ void example2()
     Vector3d posA = Vector3d(0,r,-h/2); // origin before rotation
     Matrix3d A = Matrix3d::rotX(alpha/180.*3.14);
     posA = A.times(posA); // origin after rotation
-    //cout << posA.getString() <<"\n";
-    SDF_RotateTranslate rhizoAlpha(&rhizotron2,alpha,0,posA.times(-1));
+    SDF_RotateTranslate rotatedRhizotron(&rhizotron2,alpha,0,posA.times(-1));
 
     //rootsystem.setGeometry(&soilcore); // pick one of the geometries
     rootsystem.setGeometry(&rhizotron); // pick one of the geometries
-    //rootsystem.setGeometry(&rhizoAlpha); // pick one of the geometries
+    //rootsystem.setGeometry(&rotatedRhizotron); // pick one of the geometries
 
     /*
      * Initialize
