@@ -11,7 +11,7 @@ RootSystem::~RootSystem()
 }
 
 /**
- * Resets the root system: deletes all roots, deletes the growth functions, deletes the tropisms
+ * Resets the root system: deletes all roots, deletes the growth functions, deletes the tropisms, sets simulation time to 0
  */
 void RootSystem::reset() {
     for(auto b :baseRoots) {

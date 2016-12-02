@@ -40,11 +40,15 @@ using namespace boost::python;
 Vector3d (Vector3d::*times1)(const double) const = &Vector3d::times;
 double (Vector3d::*times2)(const Vector3d&) const = &Vector3d::times;
 
+void (Matrix3d::*times3)(const Matrix3d&) = &Matrix3d::times;
+Vector3d (Matrix3d::*times4)(const Vector3d&) const = &Matrix3d::times;
+
+std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceFunction::writePVPScript;
+
 double (AnalysisSDF::*getSummed1)(int st) const = &AnalysisSDF::getSummed;
 double (AnalysisSDF::*getSummed2)(int st, SignedDistanceFunction* geometry) const = &AnalysisSDF::getSummed;
 
-void (Matrix3d::*times3)(const Matrix3d&) = &Matrix3d::times;
-Vector3d (Matrix3d::*times4)(const Vector3d&) const = &Matrix3d::times;
+
 
 /**
  * Virtual functions (not sure if needed, or only if we derive classes from it in pyhton?), not working...
@@ -73,6 +77,9 @@ Vector3d (Matrix3d::*times4)(const Vector3d&) const = &Matrix3d::times;
 //	}
 //	double default_getDist(const Vector3d& v) { return this->SignedDistanceFunction::getDist(v); }
 //};
+//	class_<SignedDistanceFunction_Wrap, boost::noncopyable>("SignedDistanceFunction")
+//	    .def("getDist", &SignedDistanceFunction_Wrap::getDist, &SignedDistanceFunction_Wrap::default_getDist)
+//	; // TODO how does polymorphism work... (everything works fine, dont ask why)
 
 
 
@@ -81,12 +88,18 @@ Vector3d (Matrix3d::*times4)(const Vector3d&) const = &Matrix3d::times;
  */
 BOOST_PYTHON_MODULE(py_rootbox)
 {
-    /* general */
+    /*
+     * general
+     */
     class_<std::vector<double>>("std_vector_double_")
-        .def(vector_indexing_suite<std::vector<double>>() );
+        .def(vector_indexing_suite<std::vector<double>>() )
+	;
     class_<std::vector<int>>("std_vector_int_")
-        .def(vector_indexing_suite<std::vector<int>>() );
-	/* mymath.h */
+        .def(vector_indexing_suite<std::vector<int>>() )
+	;
+	/*
+	 * mymath.h
+	 */
 	class_<Vector3d>("Vector3d", init<>())
 			.def(init<double,double,double>())
 			.def(init<Vector3d&>())
@@ -123,13 +136,16 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("__str__",&Matrix3d::toString)
 			.def("__rep__",&Matrix3d::toString)
 	;
-	/* sdf.h */
-//	class_<SignedDistanceFunction_Wrap, boost::noncopyable>("SignedDistanceFunction")
-//	    .def("getDist", &SignedDistanceFunction_Wrap::getDist, &SignedDistanceFunction_Wrap::default_getDist)
-//	; // TODO how does polymorphism work... (everything works fine, dont ask why)
+	/*
+	 * sdf.h
+	 */
 	class_<SignedDistanceFunction>("SignedDistanceFunction")
 			.def("getDist",&SignedDistanceFunction::getDist)
+			.def("writePVPScript", writePVPScript)
 			.def("__str__",&SignedDistanceFunction::toString)
+	;
+    class_<std::vector<SignedDistanceFunction*>>("std_vector_SDF_")
+        .def(vector_indexing_suite<std::vector<SignedDistanceFunction*>>() )
 	;
 	class_<SDF_PlantBox, bases<SignedDistanceFunction>>("SDF_PlantBox",init<double,double,double>())
 			.def("getDist",&SDF_PlantBox::getDist)
@@ -150,16 +166,89 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	    .value("yaxis", SDF_RotateTranslate::SDF_Axes::yaxis)
 	    .value("zaxis", SDF_RotateTranslate::SDF_Axes::zaxis)
 	;
-	// TODO SDF_Intersection, SDF_Union, SDF_Difference, SDF_Complement, SDF_HalfPlane
-
-	/* ModelParameter */
+	class_<SDF_Intersection, bases<SignedDistanceFunction>>("SDF_Intersection",init<std::vector<SignedDistanceFunction*>>())
+			.def(init<SignedDistanceFunction*,SignedDistanceFunction*>())
+			.def("getDist",&SDF_Intersection::getDist)
+			.def("__str__",&SDF_Intersection::toString)
+	;
+	class_<SDF_Union, bases<SDF_Intersection>>("SDF_Union",init<std::vector<SignedDistanceFunction*>>())
+			.def(init<SignedDistanceFunction*,SignedDistanceFunction*>())
+			.def("getDist",&SDF_Union::getDist)
+			.def("__str__",&SDF_Union::toString)
+	;
+	class_<SDF_Difference, bases<SDF_Intersection>>("SDF_Difference",init<std::vector<SignedDistanceFunction*>>())
+			.def(init<SignedDistanceFunction*,SignedDistanceFunction*>())
+			.def("getDist",&SDF_Difference::getDist)
+			.def("__str__",&SDF_Difference::toString)
+	;
+	class_<SDF_Complement, bases<SignedDistanceFunction>>("SDF_Complement",init<SignedDistanceFunction*>())
+			.def("getDist",&SDF_Complement::getDist)
+			.def("__str__",&SDF_Complement::toString)
+	;
+	class_<SDF_HalfPlane, bases<SignedDistanceFunction>>("SDF_HalfPlane",init<Vector3d&,Vector3d&>())
+			.def(init<Vector3d&,Vector3d&,Vector3d&>())
+			.def("getDist",&SDF_HalfPlane::getDist)
+			.def_readwrite("o", &SDF_HalfPlane::o)
+			.def_readwrite("n", &SDF_HalfPlane::n)
+			.def_readwrite("p1", &SDF_HalfPlane::p1)
+			.def_readwrite("p2", &SDF_HalfPlane::p2)
+			.def("__str__",&SDF_HalfPlane::toString)
+	;
+	/*
+	 * soil.h
+	 */
+	class_<SoilProperty>("SoilProperty",init<>())
+			.def("getRelativeValue",&SoilProperty::getRelativeValue)
+			.def("getAbsoluteValue",&SoilProperty::getAbsoluteValue)
+	;
+	class_<SoilPropertySDF>("SoilPropertySDF",init<>())
+			.def(init<SignedDistanceFunction*, double, double, double>())
+			.def_readwrite("sdf", &SoilPropertySDF::sdf)
+			.def_readwrite("fmax", &SoilPropertySDF::fmax)
+			.def_readwrite("fmin", &SoilPropertySDF::fmin)
+			.def_readwrite("slope", &SoilPropertySDF::slope)
+	;
+	/*
+	 * ModelParameter
+	 */
 	class_<RootTypeParameter>("RootTypeParameter", init<>())
 			.def(init<RootTypeParameter&>())
-			//.def("set",&RootTypeParameter::set) // why not?
 			.def("realize",&RootTypeParameter::realize)
+			.def("getLateralType",&RootTypeParameter::getLateralType)
+			.def("getK",&RootTypeParameter::getK)
+			.def_readwrite("type", &RootTypeParameter::type)
+			.def_readwrite("lb", &RootTypeParameter::lb)
+			.def_readwrite("lbs", &RootTypeParameter::lbs)
+			.def_readwrite("la", &RootTypeParameter::la)
+			.def_readwrite("las", &RootTypeParameter::las)
+			.def_readwrite("ln", &RootTypeParameter::ln)
+			.def_readwrite("lns", &RootTypeParameter::lns)
+			.def_readwrite("nob", &RootTypeParameter::nob)
+			.def_readwrite("nobs", &RootTypeParameter::nobs)
+			.def_readwrite("r", &RootTypeParameter::r)
+			.def_readwrite("rs", &RootTypeParameter::rs)
+			.def_readwrite("a", &RootTypeParameter::a)
+			.def_readwrite("as", &RootTypeParameter::as)
+			.def_readwrite("colorR", &RootTypeParameter::colorR)
+			.def_readwrite("colorG", &RootTypeParameter::colorG)
+			.def_readwrite("colorB", &RootTypeParameter::colorB)
+			.def_readwrite("tropismT", &RootTypeParameter::tropismT)
+			.def_readwrite("tropismN", &RootTypeParameter::tropismN)
+			.def_readwrite("tropismS", &RootTypeParameter::tropismS)
+			.def_readwrite("dx", &RootTypeParameter::dx)
+			.def_readwrite("theta", &RootTypeParameter::theta)
+			.def_readwrite("thetas", &RootTypeParameter::thetas)
+			.def_readwrite("rlt", &RootTypeParameter::rlt)
+			.def_readwrite("rlts", &RootTypeParameter::rlts)
+			.def_readwrite("gf", &RootTypeParameter::gf)
+			.def_readwrite("name", &RootTypeParameter::name)
+			.def_readwrite("successor", &RootTypeParameter::successor)
+			.def_readwrite("successorP", &RootTypeParameter::successorP)
+			.def_readwrite("sef", &RootTypeParameter::sef)
+			.def_readwrite("sbpf", &RootTypeParameter::sbpf)
+			.def_readwrite("saf", &RootTypeParameter::saf)
 			.def("__str__",&RootTypeParameter::toString)
 	;
-	// TODO vector<RootTypeParameter>
 	class_<RootParameter>("RootParameter", init<>())
 			.def(init<int , double, double, const std::vector<double>&, int, double, double, double, double>())
 			.def("set",&RootParameter::set)
@@ -176,7 +265,9 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("__str__",&RootParameter::toString)
 	;
 	// TODO RootSystemParameter
-	/* RootSystem.h */
+	/*
+	 * RootSystem.h
+	 */
         class_<RootSystem>("RootSystem")
         .def("openFile", &RootSystem::openFile)
 		.def("setGeometry", &RootSystem::setGeometry)
@@ -201,14 +292,16 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	    .value("segments", RootSystem::OutputTypes::ot_segments)
 	    .value("polylines", RootSystem::OutputTypes::ot_polylines)
 	;
-    /* analysis.h */
+    /*
+     * analysis.h
+     */
     class_<AnalysisSDF>("AnalysisSDF",init<RootSystem&>()) //
     	.def(init<AnalysisSDF&>())
 		.def("pack", &AnalysisSDF::pack)
 		.def("getScalar", &AnalysisSDF::getScalar)
 		.def("getSummed", getSummed1)
 		.def("getSummed", getSummed2)
-                .def("getNumberOfRoots", &AnalysisSDF::getNumberOfRoots)
+         .def("getNumberOfRoots", &AnalysisSDF::getNumberOfRoots)
 		.def("write",&AnalysisSDF::write)
     ;
 

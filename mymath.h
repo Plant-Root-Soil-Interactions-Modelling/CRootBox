@@ -19,7 +19,8 @@
 /**
  * Vector2i stores two int values
  */
-class Vector2i {
+class Vector2i
+{
 
 public:
 
@@ -43,7 +44,8 @@ public:
 /**
  * Vector2d stores two double values
  */
-class Vector2d {
+class Vector2d
+{
 
 public:
 
@@ -67,7 +69,8 @@ public:
 /**
  * Vector3d stores three double values
  */
-class Vector3d {
+class Vector3d
+{
 
 public:
 
@@ -103,7 +106,8 @@ public:
  * 3x3 Matrix class, compatible with Vector3d for basic linear algebra
  * (i.e. exactly the operations needed for CRootBox)
  */
-class Matrix3d {
+class Matrix3d
+{
 
 public:
 

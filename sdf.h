@@ -15,7 +15,8 @@
  * SignedDistanceFunction is the base class of all geometries (e.g. PlantContainer).
  * Furthermore, the class is used when no geometry is set, and describes an unconstrained setting.
  */
-class SignedDistanceFunction {
+class SignedDistanceFunction
+{
 
 public:
     virtual ~SignedDistanceFunction() {};
@@ -42,6 +43,9 @@ public:
      */
     virtual int writePVPScript(std::ostream & cout, int c=1) const { return c; };
     ///< Writes a ParaView Phython script explicitly representing the implicit geometry
+
+    virtual std::string writePVPScript() const; ///< Writes the ParaView Phython script into a string
+
 };
 
 
@@ -49,7 +53,8 @@ public:
 /**
  * PlantBox describes a rectangular box
  */
-class SDF_PlantBox : public SignedDistanceFunction {
+class SDF_PlantBox : public SignedDistanceFunction
+{
 
 public:
 
@@ -77,7 +82,8 @@ private:
 /**
  * Cylindrical or square container
  */
-class SDF_PlantContainer : public SignedDistanceFunction {
+class SDF_PlantContainer : public SignedDistanceFunction
+{
 
 public:
 
@@ -102,7 +108,8 @@ private:
 /**
  * SDF_RotateTranslate first rotates, and then translates a base geometry
  */
-class SDF_RotateTranslate :public SignedDistanceFunction {
+class SDF_RotateTranslate :public SignedDistanceFunction
+{
 
 public:
 
@@ -130,7 +137,8 @@ private:
 /**
  * SDF_Intersection computes the geometric intersection between several signed distance functions
  */
-class SDF_Intersection : public SignedDistanceFunction {
+class SDF_Intersection : public SignedDistanceFunction
+{
 
 public:
     SDF_Intersection(std::vector<SignedDistanceFunction*> sdfs_) { sdfs=sdfs_; }
@@ -153,7 +161,8 @@ protected:
 /**
  * SDF_Union computes the geometric union between several signed distance functions
  */
-class SDF_Union : public SDF_Intersection {
+class SDF_Union : public SDF_Intersection
+{
 
 public:
     SDF_Union(std::vector<SignedDistanceFunction*> sdfs): SDF_Intersection(sdfs) { } ///< Constructs (sdfs_[0] U sdfs_[1] U sdfs_[2] U ... )
@@ -169,7 +178,8 @@ public:
 /**
  * SDF_Difference computes the difference between the first and several othter signed distance functions
  */
-class SDF_Difference : public SDF_Intersection {
+class SDF_Difference : public SDF_Intersection
+{
 
 public:
     SDF_Difference(std::vector<SignedDistanceFunction*> sdfs_) :SDF_Intersection(sdfs) { } ///< Constructs (...((sdfs_[0] \ sdfs_[1]) \ sdfs_[2])...)
@@ -185,7 +195,8 @@ public:
 /**
  * SDF_Complement computes the geometric complement (i.e. turns the geometry inside out)
  */
-class SDF_Complement : public SignedDistanceFunction {
+class SDF_Complement : public SignedDistanceFunction
+{
 
 public:
     SDF_Complement(SignedDistanceFunction* sdf_) { sdf=sdf_; } ///< Constructs the complement (sdf_)^c
@@ -205,7 +216,8 @@ private:
 /**
  * SDF_HalfPlane defines the signed distance function of a half plane
  */
-class SDF_HalfPlane : public SignedDistanceFunction {
+class SDF_HalfPlane : public SignedDistanceFunction
+{
 
 public:
 	SDF_HalfPlane(const Vector3d& o, const Vector3d& n_);

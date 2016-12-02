@@ -2,6 +2,15 @@
 
 
 
+std::string SignedDistanceFunction::writePVPScript() const
+{
+    	std::stringstream str;
+    	this->writePVPScript(str,1);
+    	return str.str();
+}
+
+
+
 /**
  * Returns the signed distance to the next boundary of the box
  *
@@ -285,6 +294,7 @@ double SDF_Difference::getDist(const Vector3d& v) const
 }
 
 
+
 /**
  * Constructor
  */
@@ -308,7 +318,6 @@ SDF_HalfPlane::SDF_HalfPlane(const Vector3d& o, const Vector3d& p1, const Vector
 	n.normalize();
 	std::cout << "SDF_HalfPlane normal:"<< n.toString() << "\n" ;
 };
-
 
 /**
  * Writes a ParaView Phython script explicitly representing the half plane,

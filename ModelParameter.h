@@ -56,7 +56,7 @@ public:
 	/*
 	 * Rootbox parameters per root type
 	 */
-	int type; 		///< Number of root type [1], TODO, is this used, or rather the index within the vector?
+	int type; 		///< Number of root type [1], this is the index within the vector +1
 	double lb; 	 	///< Basal zone [cm]
 	double lbs;  	///< Standard deviation basal zone [cm]
 	double la;		///< Apical zone [cm];
@@ -86,7 +86,7 @@ public:
 	std::vector<double> successorP; 	///< Probabiltities of lateral type to emerge (sum of values == 1) [1]
 
 	SoilProperty* sef = new SoilProperty(); ///< scale elongation function
-	SoilProperty* sbpf = new SoilProperty(); ///< scale branching propability function
+	SoilProperty* sbpf = new SoilProperty(); ///< scale branching probability function
 	SoilProperty* saf = new SoilProperty(); ///< scale angle function
 
 private:

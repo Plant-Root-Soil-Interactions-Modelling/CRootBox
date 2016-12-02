@@ -22,7 +22,8 @@ class TropismFunction;
  * This class manages the simulation, stores the base roots, and offers utility functions
  *
  */
-class RootSystem {
+class RootSystem
+{
 
 	friend Root;  // obviously :-)
 
@@ -46,6 +47,7 @@ public:
 	// Simulation
 	void setGeometry(SignedDistanceFunction* geom) { geometry = geom; }; ///< Optionally, sets a confining geometry (call before RootSystem::initialize())
 	void setSoil(SoilProperty* soil_) { soil = soil_; }; ///< Optionally sets a soil for hydro tropism (call before RootSystem::initialize())
+	void reset(); ///< Resets the root class, keeps the root type paramters
 	void initialize(); ///< Creates the base roots, call before simulation and after setting the plant and root parameters
 	void simulate(double dt); ///< Simulates root system growth for time span dt
 
@@ -75,6 +77,7 @@ public:
 	void writeDGF(std::ostream & os) const; ///< Writes the segments of the root system in DGF format used in Dumux
 
 	// TODO to encapsulate or not to encapsulate, thats the question
+	// TODO setRootType getRootType (fixed vector size of 100), set RootSystemParameter
 	RootSystemParameter rsparam; ///< Plant parameter
 	std::vector<RootTypeParameter> rtparam; ///< Parameter set for each root type
 
@@ -85,7 +88,6 @@ public:
 
 private:
 
-	void reset();
 	void writeRSMLMeta(std::ostream & os) const;
 	void writeRSMLPlant(std::ostream & os) const;
 

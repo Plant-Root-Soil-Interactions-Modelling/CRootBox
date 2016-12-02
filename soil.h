@@ -42,7 +42,7 @@ public:
 
 
 /**
- * A soil property that is defined by a signed distance function
+ * A static soil property that is defined by a signed distance function
  */
 class SoilPropertySDF : public SoilProperty
 {
@@ -63,7 +63,7 @@ public:
         fmax = max_;
         fmin = min_;
         slope = slope_;
-    } ///< Creaets the soil property from a signed distance function
+    } ///< Creates the soil property from a signed distance function
 
     virtual double getRelativeValue(const Vector3d& pos, const Root* root = nullptr) const override {
         return (this->getAbsoluteValue(pos,root)-fmin)/(fmax-fmin);
@@ -75,7 +75,6 @@ public:
         return std::max(std::min(c,fmax),fmin);
     } ///<@see SoilProperty::getAbsoluteValue
 
-private:
     SignedDistanceFunction* sdf;
     double fmax;
     double fmin;
