@@ -6,11 +6,6 @@ import matplotlib.pyplot as plt
 from math import sqrt
 
 
-output = np.zeros((N,N))
-pool = Pool() #defaults to number of available CPU's
-chunksize = 20 #this may take some guessing ... take a look at the docs to decide
-for ind, res in enumerate(pool.imap(Fun, product(xrange(N), xrange(N))), chunksize):
-    output.flat[ind] = res
 
 def simOnce(name,simtime,lbins,lrange,zbins,zrange):
     rootsystem = rb.RootSystem()
