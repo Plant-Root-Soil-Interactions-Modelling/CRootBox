@@ -13,7 +13,7 @@
  * mymath.h		currently only Vector3d is exposed (lets see if we will need anything else)
  *
  */
-// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+//#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -115,6 +115,9 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("cross",&Vector3d::cross)
 			.def("__str__",&Vector3d::toString)
 			.def("__rep__",&Vector3d::toString)
+	;
+    class_<std::vector<Vector3d>>("std_vector_Vector3d_")
+        .def(vector_indexing_suite<std::vector<Vector3d>>() )
 	;
 	class_<Matrix3d>("Matrix3d", init<>())
 			.def(init<double,double,double,double,double,double,double,double,double>())
@@ -264,17 +267,37 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("getK",&RootParameter::toString)
 			.def("__str__",&RootParameter::toString)
 	;
-	// TODO RootSystemParameter
+	class_<RootSystemParameter>("RootSystemParameter", init<>())
+			.def("set",&RootSystemParameter::set)
+			.def_readwrite("seedPos", &RootSystemParameter::seedPos)
+			.def_readwrite("firstB", &RootSystemParameter::firstB)
+			.def_readwrite("delayB", &RootSystemParameter::delayB)
+			.def_readwrite("maxB", &RootSystemParameter::maxB)
+			.def_readwrite("nC", &RootSystemParameter::nC)
+			.def_readwrite("firstSB", &RootSystemParameter::firstSB)
+			.def_readwrite("delaySB", &RootSystemParameter::delaySB)
+			.def_readwrite("delayRC", &RootSystemParameter::delayRC)
+			.def_readwrite("nz", &RootSystemParameter::nz)
+			.def("__str__",&RootSystemParameter::toString)
+	;
 	/*
 	 * RootSystem.h
 	 */
         class_<RootSystem>("RootSystem")
-        .def("openFile", &RootSystem::openFile)
+		.def("setRootTypeParameter", &RootSystem::setRootTypeParameter)
+		// .def("getRootTypeParameter", &RootSystem::getRootTypeParameter)
+		.def("setRootSystemParameter", &RootSystem::setRootSystemParameter)
+		// .def("getRootSystemParameter", &RootSystem::getRootSystemParameter)
+		.def("openFile", &RootSystem::openFile)
 		.def("setGeometry", &RootSystem::setGeometry)
 		.def("setSoil", &RootSystem::setSoil)
+		.def("reset", &RootSystem::reset)
 		.def("initialize", &RootSystem::initialize)
 		.def("simulate",&RootSystem::simulate)
 		.def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
+//		.def("getNodes", &RootSystem::getNodes) // TODO something clever to avoid Root, Root*, etc
+//		.def("getSegments", &RootSystem::getSegments)
+		.def("getRootTips", &RootSystem::getRootTips)
 		.def("write",&RootSystem::write)
 	;
 	enum_<RootSystem::ScalarTypes>("ScalarType")
@@ -301,7 +324,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getScalar", &AnalysisSDF::getScalar)
 		.def("getSummed", getSummed1)
 		.def("getSummed", getSummed2)
-         .def("getNumberOfRoots", &AnalysisSDF::getNumberOfRoots)
+        .def("getNumberOfRoots", &AnalysisSDF::getNumberOfRoots)
 		.def("write",&AnalysisSDF::write)
     ;
 

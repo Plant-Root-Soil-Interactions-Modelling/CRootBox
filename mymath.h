@@ -100,6 +100,8 @@ public:
 
 };
 
+inline bool operator==(const Vector3d& lhs, const Vector3d& rhs){ return ((lhs.x==rhs.x) && (lhs.y==rhs.y) && (lhs.z==rhs.z)); } // needed for boost python indexing suite
+inline bool operator!=(const Vector3d& lhs, const Vector3d& rhs){ return !(lhs == rhs); }
 
 
 /**

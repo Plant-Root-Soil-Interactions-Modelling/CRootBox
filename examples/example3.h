@@ -25,7 +25,7 @@ void example3()
           allRS.push_back(rs);
           rs->openFile(name);
           rs->getRootTypeParameter(4)->theta = 80./180.*M_PI; // fix insertion angle of the basal roots
-          rs->rsparam.seedPos = Vector3d(dist*i,dist*j,-3); // set position of seed [cm]
+          rs->getRootSystemParameter()->seedPos = Vector3d(dist*i,dist*j,-3); // set position of seed [cm]
       }
   }
 

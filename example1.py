@@ -23,7 +23,7 @@ rootsystem.openFile(name,"modelparameter/")
 #
 # Initialize
 #
-rootsystem.initialize()
+rootsystem.initialize(4,5) # TODO expose default values
 
 #
 # Simulate
@@ -55,6 +55,11 @@ print("Total root system length is "+str(l)+" cm")
 print("Finished with a total of "+str(rootsystem.getNumberOfNodes())+ " nodes")
 
 # end of example 1  
+
+
+
+
+
 
 #
 # Python testing ... 

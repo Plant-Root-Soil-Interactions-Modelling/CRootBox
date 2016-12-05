@@ -30,6 +30,9 @@ void RootSystem::reset()
     simtime=0;
 }
 
+/**
+ * Puts default values into the root type parameters vector
+ */
 void RootSystem::initRTP()
 {
   rtparam = std::vector<RootTypeParameter> (maxtypes);
@@ -146,10 +149,11 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
     Root* taproot = new Root(this, 1, iheading ,0, nullptr, 0, 0); // tap root has root type 1
     taproot->addNode(pp.seedPos,0);
     baseRoots.push_back(taproot);
+
     // Basal roots
     if (pp.maxB>0) {
         if (getRootTypeParameter(basaltype)->type<1) { // if the type is not defined, copy tap root
-            std::cout << "Basal root type #" << basaltype << "was not defined, using tap root parameters";
+            std::cout << "Basal root type #" << basaltype << " was not defined, using tap root parameters instead\n";
             RootTypeParameter brtp = RootTypeParameter(*getRootTypeParameter(1));
             brtp.type = basaltype;
             setRootTypeParameter(brtp);
@@ -167,10 +171,11 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
             delay += pp.delayB;
         }
     }
+
     // Shoot borne roots
     if ((pp.nC>0) && (pp.delaySB<maxT)) { // if the type is not defined, copy basal root
         if (getRootTypeParameter(shootbornetype)->type<1) {
-            std::cout << "Shootborne root type #" << shootbornetype << "was not defined, using tap root parameters";
+            std::cout << "Shootborne root type #" << shootbornetype << " was not defined, using tap root parameters instead\n";
             RootTypeParameter srtp = RootTypeParameter(*getRootTypeParameter(1));
             srtp.type = shootbornetype;
             setRootTypeParameter(srtp);
@@ -286,6 +291,19 @@ std::vector<Root*> RootSystem::getRoots() const
         br->getRoots(v);
     }
     return v;
+}
+
+/**
+ * Returns the positions of the root tips
+ */
+std::vector<Vector3d> RootSystem::getRootTips() const
+{
+	std::vector<Vector3d> tips;
+	auto roots = getRoots();
+	for (auto& r : roots) {
+		tips.push_back(r->getNode(r->getNumberOfNodes()-1));
+	}
+	return tips;
 }
 
 /**

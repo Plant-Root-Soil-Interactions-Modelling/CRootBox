@@ -38,12 +38,13 @@ public:
 	RootSystem() { initRTP(); };
 	virtual ~RootSystem();
 
-	// Model parameter input output
-        void setRootTypeParameter(RootTypeParameter p) { rtparam.at(p.type-1) = p; }
-        RootTypeParameter* getRootTypeParameter(int type) { return &rtparam.at(type-1); } ///< Returns the i-th root parameter set (i=1..n)
-        void setRootSystemParameter(const RootSystemParameter& rsp) { rsparam = rsp; };
+	// Parameter input output
+	void setRootTypeParameter(RootTypeParameter p) { rtparam.at(p.type-1) = p; } ///< set the root type parameter to the index type-1
+	RootTypeParameter* getRootTypeParameter(int type) { return &rtparam.at(type-1); } ///< Returns the i-th root parameter set (i=1..n)
+	void setRootSystemParameter(const RootSystemParameter& rsp) { rsparam = rsp; }; ///< sets the root system parameters
+	RootSystemParameter* getRootSystemParameter() { return &rsparam; } ///< gets the root system parameters
 
-        void openFile(std::string filename, std::string subdir="modelparameter/"); ///< Reads root paramter and plant parameter
+	void openFile(std::string filename, std::string subdir="modelparameter/"); ///< Reads root paramter and plant parameter
 	int readParameters(std::istream & cin); ///< Reads root parameters from an input stream
 	void writeParameters(std::ostream & os) const; ///< Writes root parameters
 
@@ -54,6 +55,7 @@ public:
 	void initialize(int basal=4, int shootborne=5); ///< Creates the base roots, call before simulation and after setting the plant and root parameters
 	void simulate(double dt); ///< Simulates root system growth for time span dt
 
+	//
 	virtual Root* createRoot(int lt, Vector3d  h, double delay, Root* parent, double pbl, int pni);
 	///< Creates a new lateral root, overwrite or change this method to use more spezialised root classes
 	virtual TropismFunction* createTropismFunction(int tt, int N, double sigma);
@@ -64,6 +66,7 @@ public:
 	// Analysis of simulation results
 	int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system
 	std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots
+	std::vector<Vector3d> getRootTips() const; ///< returns the positions of the root tips
 	std::vector<Vector3d> getNodes(int ot, std::vector<Root*> roots) const; ///< Copies all root system nodes into a vector
 	std::vector<Vector2i> getSegments(int ot, std::vector<Root*> roots) const; ///< Copies all segments indices into a vector
 	std::vector<Root*> getSegmentsOrigin(int ot, std::vector<Root*> roots) const; ///< Copies a pointer to the root containing the segment
@@ -82,13 +85,13 @@ public:
 	double rand() { return UD(gen); } ///< Uniformly distributed random number (0,1)
 	double randn() { return ND(gen); } ///< Normally distributed random number (0,1)
 
-        RootSystemParameter rsparam; ///< Plant parameter
-
 private:
-        void initRTP();
+	void initRTP();
 
-        const int maxtypes = 100;
-        std::vector<RootTypeParameter> rtparam; ///< Parameter set for each root type
+	const int maxtypes = 100;
+	std::vector<RootTypeParameter> rtparam; ///< Parameter set for each root type
+	RootSystemParameter rsparam; ///< Plant parameter
+
 
 	void writeRSMLMeta(std::ostream & os) const;
 	void writeRSMLPlant(std::ostream & os) const;

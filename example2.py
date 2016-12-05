@@ -46,7 +46,7 @@ rootsystem.setGeometry(rotatedRhizotron)  # soilcore, rhizotron, or rotatedRhizo
 #
 # Initialize
 #
-rootsystem.initialize()
+rootsystem.initialize(4,5) # TODO expose default values 
 
 #
 # Simulate
