@@ -36,6 +36,8 @@ public:
     double getLength(double age); ///< exact length of the root
     double getAge(double length); ///< exact age of the root
 
+    RootTypeParameter* getRootTypeParameter();  ///< Returns the root type parameter of the root
+
     std::vector<Root*> getRoots(); ///< return the root system as sequential vector
     void getRoots(std::vector<Root*>& v); ///< return the root system as sequential vector
 
@@ -60,7 +62,6 @@ public:
     bool active = 1; ///< true: active, false: stopped growing
     double length; ///< current length [cm], set within the constructor
     double age; ///< current age [days], set within the constructor
-
 
     /* parent */
     Root* parent; ///< pointer to the parent root (equals nullptr if it is a base root)

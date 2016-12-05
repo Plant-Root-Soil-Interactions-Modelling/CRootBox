@@ -18,7 +18,7 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
 {
   //cout << "Root: constructor \n";
   rootsystem=rs; // remember
-  param = rs->getRootParameter(type)->realize(); // throw the dice
+  param = rs->getRootTypeParameter(type)->realize(); // throw the dice
   // initial rotation
   double beta = 2*M_PI*rs->rand();
   Matrix3d ons = Matrix3d::ons(pheading);
@@ -38,7 +38,7 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
   parent_base_length=pbl;
   parent_ni=pni;
   length = 0;
-  dx = rs->getRootParameter(type)->dx;
+  dx = getRootTypeParameter()->dx;
   // initial node
   if (parent!=nullptr) { // the first node of the base roots must be created in initialize
       // dont use addNode for the first node of the root,
@@ -85,7 +85,7 @@ double Root::getCreationTime(double length)
       throw std::invalid_argument( "bugbugbug" );
   }
   if (parent!=nullptr) {
-      double pl = parent_base_length+parent->param.la; // parent length, when this root was crated
+      double pl = parent_base_length+parent->param.la; // parent length, when this root was created
       double page=parent->getCreationTime(pl);
       assert(page>=0);
       return rootage+page;
@@ -103,6 +103,11 @@ double Root::getAge(double length)
 {
   assert(length>=0);
   return rootsystem->gf.at(param.type-1)->getAge(length,param.r,param.getK(),this);
+}
+
+RootTypeParameter* Root::getRootTypeParameter()
+{
+  return rootsystem->getRootTypeParameter(param.type);
 }
 
 /**
@@ -206,7 +211,7 @@ void Root::createLateral()
 {
   const RootParameter &p = param; // rename
 
-  int lt = rootsystem->getRootParameter(p.type)->getLateralType(nodes.back());
+  int lt = rootsystem->getRootTypeParameter(p.type)->getLateralType(nodes.back());
   if (lt>0) {
 
       Vector3d h; // old heading
@@ -240,7 +245,7 @@ void Root::createLateral()
 void Root::createSegments(double l)
 {
   assert(l>0);
-  double scale = rootsystem->getRootParameter(param.type)->sef->getRelativeValue(nodes.back(),this); // hope this optimized out if not set
+  double scale = rootsystem->getRootTypeParameter(param.type)->sef->getRelativeValue(nodes.back(),this); // hope this optimized out if not set
   l = l*scale;
 
   double sl=0; // summed length of created segment

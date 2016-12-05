@@ -13,7 +13,8 @@ RootSystem::~RootSystem()
 /**
  * Resets the root system: deletes all roots, deletes the growth functions, deletes the tropisms, sets simulation time to 0
  */
-void RootSystem::reset() {
+void RootSystem::reset()
+{
     for(auto b :baseRoots) {
         delete b;
     }
@@ -28,6 +29,15 @@ void RootSystem::reset() {
     tf.clear();
     simtime=0;
 }
+
+void RootSystem::initRTP()
+{
+  rtparam = std::vector<RootTypeParameter> (maxtypes);
+  for (auto& rtp:rtparam) {
+      rtp = RootTypeParameter();
+  }
+}
+
 
 /**
  * Reads the root parameter from a file. Opens plant parameters with the same filename if available,
@@ -44,20 +54,16 @@ void RootSystem::openFile(std::string name, std::string subdir)
     rp_name.append(name);
     rp_name.append(".rparam");
     fis.open(rp_name.c_str());
+    int c = 0;
     if (fis.good()) { // did it work?
-        readParameters(fis);
+        c = readParameters(fis);
         fis.close();
     } else {
         std::string s = "RootSystem::openFile() could not open root parameter file ";
         throw std::invalid_argument(s.append(rp_name));
     }
-    int num_read = rtparam.size();
-    // debug
-    std::cout << "Read " << rtparam.size() << " root type parameter sets\n";
-    //
-    for (int i=rtparam.size(); i<5; i++) { // add empty up to 5
-        rtparam.push_back(RootTypeParameter());
-    }
+    std::cout << "Read " << c << " root type parameters \n"; // debug
+
     // open plant parameter
     std::string pp_name = subdir;
     pp_name.append(name);
@@ -66,24 +72,10 @@ void RootSystem::openFile(std::string name, std::string subdir)
     if (fis.good()) { // did it work?
         rsparam.read(fis);
         fis.close();
-        double maxT=365;
-        int maxSB = ceil((maxT-rsparam.firstSB)/rsparam.delayRC); // maximal number of root crowns
-        // check if basal roots are defined
-        if (((rsparam.maxB>0) || (maxSB>0)) && (num_read<rt_basal)) {
-            std::cout<<"No basal root type (#"<< rt_basal <<") defined, using tap root parameters as default\n";
-            rtparam.at(rt_basal-1) = RootTypeParameter(rtparam.at(rt_tap-1));
-        }
-        // check if shootborne roots are defined
-        if ((maxSB>0) && (num_read<(rt_shootborne-1)) ) {
-            std::cout<<"No shoot borne root type defined, using tap root type as default\n";
-            rtparam.at(rt_shootborne) = rtparam.at(rt_tap-1);
-        }
     } else { // create a tap root system
-        std::cout << "Using default tap root system \n";
+        std::cout << "No root system parameters found, using default tap root system \n";
         rsparam = RootSystemParameter();
     }
-
-    // plantparam.write(cout);
 }
 
 /**
@@ -91,14 +83,17 @@ void RootSystem::openFile(std::string name, std::string subdir)
  *
  * @param cin  in stream
  */
-void RootSystem::readParameters(std::istream& cin)
+int RootSystem::readParameters(std::istream& cin)
 {
-    rtparam.clear();
-    while (cin.good()) {
-        RootTypeParameter p;
-        p.read(cin);
-        rtparam.push_back(p);
-    }
+  initRTP();
+  int c = 0;
+  while (cin.good()) {
+      RootTypeParameter p;
+      p.read(cin);
+      setRootTypeParameter(p); // sets the param to the index (p.type-1)
+      c++;
+  }
+  return c;
 }
 
 /**
@@ -108,8 +103,13 @@ void RootSystem::readParameters(std::istream& cin)
  */
 void RootSystem::writeParameters(std::ostream& os) const
 {
-    for (auto const& rp:rtparam) { // stream out
-        rp.write(os);
+    int t = 0;
+    for (auto const& rp:rtparam) {
+        t++;
+        if (rp.type>0) {
+            assert(rp.type==t); // check if index is really type-1
+            rp.write(os); // only write if defined
+        }
     }
 }
 
@@ -119,7 +119,7 @@ void RootSystem::writeParameters(std::ostream& os) const
  *
  * Call this method before simulation and after setting geometry, plant and root parameters
  */
-void RootSystem::initialize()
+void RootSystem::initialize(int basaltype, int shootbornetype)
 {
     //cout << "Root system initialize\n";
     reset(); // just in case
@@ -143,19 +143,24 @@ void RootSystem::initialize()
     RootSystemParameter const &pp = rsparam; // rename
     Vector3d iheading(0,0,-1);
     // Taproot
-    Root* taproot = new Root(this, rt_tap, iheading ,0, nullptr, 0, 0);
+    Root* taproot = new Root(this, 1, iheading ,0, nullptr, 0, 0); // tap root has root type 1
     taproot->addNode(pp.seedPos,0);
     baseRoots.push_back(taproot);
     // Basal roots
     if (pp.maxB>0) {
+        if (getRootTypeParameter(basaltype)->type<1) { // if the type is not defined, copy tap root
+            std::cout << "Basal root type #" << basaltype << "was not defined, using tap root parameters";
+            RootTypeParameter brtp = RootTypeParameter(*getRootTypeParameter(1));
+            brtp.type = basaltype;
+            setRootTypeParameter(brtp);
+        }
         int maxB = pp.maxB;
         if (pp.delayB>0) {
             maxB = std::min(maxB,int(ceil((maxT-pp.firstB)/pp.delayB))); // maximal for simtime maxT
         }
-
         double delay = pp.firstB;
         for (int i=0; i<maxB; i++) {
-            Root* basalroot = new Root(this, rt_basal, iheading ,delay, nullptr, 0, 0);
+            Root* basalroot = new Root(this, basaltype, iheading ,delay, nullptr, 0, 0);
             Vector3d node = pp.seedPos.minus(Vector3d(0.,0.,dzB));
             basalroot->addNode(node,delay);
             baseRoots.push_back(basalroot);
@@ -163,14 +168,20 @@ void RootSystem::initialize()
         }
     }
     // Shoot borne roots
-    if ((pp.nC>0) && (pp.delaySB<maxT)) {
+    if ((pp.nC>0) && (pp.delaySB<maxT)) { // if the type is not defined, copy basal root
+        if (getRootTypeParameter(shootbornetype)->type<1) {
+            std::cout << "Shootborne root type #" << shootbornetype << "was not defined, using tap root parameters";
+            RootTypeParameter srtp = RootTypeParameter(*getRootTypeParameter(1));
+            srtp.type = shootbornetype;
+            setRootTypeParameter(srtp);
+        }
         Vector3d sbpos = pp.seedPos;
         sbpos.z=sbpos.z/2.; // half way up the mesocotyl
         int maxSB = ceil((maxT-pp.firstSB)/pp.delayRC); // maximal number of root crowns
         double delay = pp.firstSB;
         for (int i=0; i<maxSB; i++) {
             for (int j=0; j<pp.nC; j++) {
-                Root* shootborne = new Root(this, rt_shootborne, iheading ,delay, nullptr, 0, 0);
+                Root* shootborne = new Root(this, shootbornetype, iheading ,delay, nullptr, 0, 0);
                 // TODO fix the initial heading
                 shootborne->addNode(sbpos,delay);
                 baseRoots.push_back(shootborne);
@@ -504,16 +515,16 @@ void RootSystem::write(std::string name, int type) const
     fos.open(name.c_str());
     std::string ext = name.substr(name.size()-3,name.size()); // pick the right writer
     if (ext.compare("sml")==0) {
-        std::cout << "writing RSML...\n";
+        std::cout << "writing RSML... "<< name.c_str() <<"\n";
         writeRSML(fos);
     } else if (ext.compare("vtp")==0) {
-        std::cout << "writing VTP...\n";
+        std::cout << "writing VTP... "<< name.c_str() <<"\n";
         writeVTP(fos,type);
     } else if (ext.compare(".py")==0)  {
-        std::cout << "writing Geometry ...\n";
+        std::cout << "writing Geometry ... "<< name.c_str() <<"\n";
         writeGeometry(fos);
     } else if (ext.compare("dgf")==0) {
-        std::cout << "writing DGF ...\n";
+        std::cout << "writing DGF ... "<< name.c_str() <<"\n";
         writeDGF(fos);
     } else {
         throw std::invalid_argument("RootSystem::write(): Unkwown file type");

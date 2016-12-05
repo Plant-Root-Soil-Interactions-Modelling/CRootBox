@@ -572,9 +572,9 @@ void AnalysisSDF::writeRBSegments(std::ostream & os) const
 		Vector3d n2 = nodes.at(s.y);
 		Root* r = segO.at(i);
 		double radius = r->param.a;
-		double red = r->rootsystem->rtparam.at(r->param.type-1).colorR;
-		double green = r->rootsystem->rtparam.at(r->param.type-1).colorG;
-		double blue = r->rootsystem->rtparam.at(r->param.type-1).colorB;
+		double red = r->getRootTypeParameter()->colorR;
+		double green = r->getRootTypeParameter()->colorG;
+		double blue = r->getRootTypeParameter()->colorB;
 		double time = ctimes.at(i);
 		double type = r->param.type;
 		os << std::fixed << std::setprecision(4)<< n1.x << " " << n1.y << " " << n1.z << " " << n2.x << " " << n2.y << " " << n2.z << " " <<

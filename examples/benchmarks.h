@@ -22,8 +22,8 @@ void benchmark(string name, vector<double> times, vector<double> dt_, double dx,
 {
   RootSystem rs1;
   rs1.openFile(name);
-  rs1.getRootParameter(1)->dx=dx; // apply axial resolution
-  rs1.getRootParameter(2)->dx=dx; // apply axial resolution
+  rs1.getRootTypeParameter(1)->dx=dx; // apply axial resolution
+  rs1.getRootTypeParameter(2)->dx=dx; // apply axial resolution
   rs1.initialize();
   int i =0;
   for (auto dt : dt_) {

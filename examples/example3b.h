@@ -50,11 +50,11 @@ vector<RootSystem*> example3b()
           RootSystem* rs = new RootSystem();
           allRS.push_back(rs);
           rs->openFile(name);
-          rs->getRootParameter(RootSystem::rt_basal)->theta = 80./180.*M_PI; // fix insertion angle of the basal roots
+          rs->getRootTypeParameter(4)->theta = 80./180.*M_PI; // fix insertion angle of the basal roots
           rs->rsparam.seedPos = Vector3d(dist*i+dist/2.,dist*j+dist/2,-3); // set position of seed [cm]
           rs->setGeometry(&geometry2);
           rs->setSeed(double(UD(gen))); // randomly select a seed
-          rs->initialize();
+          rs->initialize(4,5);
       }
   }
 

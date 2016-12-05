@@ -23,8 +23,8 @@ void example1_wb()
     rootsystem.writeParameters(std::cout);
 
     // THETA by hand
-    rootsystem.getRootParameter(2)->theta = M_PI/4.;
-    rootsystem.getRootParameter(2)->thetas = 0; // no std
+    rootsystem.getRootTypeParameter(2)->theta = M_PI/4.;
+    rootsystem.getRootTypeParameter(2)->thetas = 0; // no std
 
     /*
      * Set geometry

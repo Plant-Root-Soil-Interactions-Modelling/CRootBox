@@ -34,24 +34,25 @@ public:
 	enum OutputTypes { ot_segments=0, ot_polylines=1 }; ///< used for postprocessing
 	enum ScalarTypes { st_type, st_radius, st_order, st_red, st_green, st_blue, st_time, st_length, st_surface }; ///< @see RootSystem::getScalar
 	static const std::vector<std::string> scalarTypeNames; ///< the corresponding names
-	enum RootTypes { rt_tap = 1, rt_basal = 4, rt_shootborne = 5 }; ///< @see RootSystem::initialize
 
-	RootSystem() { };
+	RootSystem() { initRTP(); };
 	virtual ~RootSystem();
 
 	// Model parameter input output
-	void openFile(std::string filename, std::string subdir="modelparameter/"); ///< Reads root paramter and plant parameter
-	void readParameters(std::istream & cin); ///< Reads root parameters from an input stream
+        void setRootTypeParameter(RootTypeParameter p) { rtparam.at(p.type-1) = p; }
+        RootTypeParameter* getRootTypeParameter(int type) { return &rtparam.at(type-1); } ///< Returns the i-th root parameter set (i=1..n)
+        void setRootSystemParameter(const RootSystemParameter& rsp) { rsparam = rsp; };
+
+        void openFile(std::string filename, std::string subdir="modelparameter/"); ///< Reads root paramter and plant parameter
+	int readParameters(std::istream & cin); ///< Reads root parameters from an input stream
 	void writeParameters(std::ostream & os) const; ///< Writes root parameters
 
 	// Simulation
 	void setGeometry(SignedDistanceFunction* geom) { geometry = geom; }; ///< Optionally, sets a confining geometry (call before RootSystem::initialize())
 	void setSoil(SoilProperty* soil_) { soil = soil_; }; ///< Optionally sets a soil for hydro tropism (call before RootSystem::initialize())
-	void reset(); ///< Resets the root class, keeps the root type paramters
-	void initialize(); ///< Creates the base roots, call before simulation and after setting the plant and root parameters
+	void reset(); ///< Resets the root class, keeps the root type parameters
+	void initialize(int basal=4, int shootborne=5); ///< Creates the base roots, call before simulation and after setting the plant and root parameters
 	void simulate(double dt); ///< Simulates root system growth for time span dt
-
-	RootTypeParameter* getRootParameter(int i) { return &rtparam.at(i-1); } ///< Returns the i-th root parameter set (i=1..n)
 
 	virtual Root* createRoot(int lt, Vector3d  h, double delay, Root* parent, double pbl, int pni);
 	///< Creates a new lateral root, overwrite or change this method to use more spezialised root classes
@@ -76,17 +77,18 @@ public:
 	void writeGeometry(std::ostream & os) const; ///< Writes the current confining geometry (e.g. a plant container) as paraview python script
 	void writeDGF(std::ostream & os) const; ///< Writes the segments of the root system in DGF format used in Dumux
 
-	// TODO to encapsulate or not to encapsulate, thats the question
-	// TODO setRootType getRootType (fixed vector size of 100), set RootSystemParameter
-	RootSystemParameter rsparam; ///< Plant parameter
-	std::vector<RootTypeParameter> rtparam; ///< Parameter set for each root type
-
 	// random stuff
 	void setSeed(double seed); ///< help fate (sets the seed of all random generators)
 	double rand() { return UD(gen); } ///< Uniformly distributed random number (0,1)
 	double randn() { return ND(gen); } ///< Normally distributed random number (0,1)
 
+        RootSystemParameter rsparam; ///< Plant parameter
+
 private:
+        void initRTP();
+
+        const int maxtypes = 100;
+        std::vector<RootTypeParameter> rtparam; ///< Parameter set for each root type
 
 	void writeRSMLMeta(std::ostream & os) const;
 	void writeRSMLPlant(std::ostream & os) const;

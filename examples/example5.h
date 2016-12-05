@@ -19,9 +19,9 @@ void example5()
     rootsystem.openFile(name);
     // "manually" set tropism to hydrotropism
     for (int i=1; i<7; i++) {
-        rootsystem.getRootParameter(i)->tropismT = RootSystem::tt_hydro;
-        rootsystem.getRootParameter(i)->tropismN = 1; //N
-        rootsystem.getRootParameter(i)->tropismS = 0.4; //sigma
+        rootsystem.getRootTypeParameter(i)->tropismT = RootSystem::tt_hydro;
+        rootsystem.getRootTypeParameter(i)->tropismN = 1; //N
+        rootsystem.getRootTypeParameter(i)->tropismS = 0.4; //sigma
     }
 
     /**

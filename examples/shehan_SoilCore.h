@@ -32,7 +32,7 @@ vector<RootSystem*> initializeRootSystems(string name, SignedDistanceFunction* g
 			allRS.push_back(rs);
 			rs->openFile(name);
 			rs->setGeometry(geom);
-			rs->getRootParameter(RootSystem::rt_basal)->theta = 80./180.*M_PI; // fix insertion angle of the basal roots
+			rs->getRootTypeParameter(4)->theta = 80./180.*M_PI; // fix insertion angle of the basal roots
 			rs->rsparam.seedPos = Vector3d(dist1*i,dist2*j,-3); // set position of seed [cm]
 			double s = UD(gen);
 			rs->setSeed(s); // randomly select a seed
