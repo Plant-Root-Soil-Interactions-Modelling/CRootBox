@@ -13,7 +13,7 @@
  * mymath.h		currently only Vector3d is exposed (lets see if we will need anything else)
  *
  */
-//#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
