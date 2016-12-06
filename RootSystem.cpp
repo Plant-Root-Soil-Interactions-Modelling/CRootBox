@@ -127,6 +127,64 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
     //cout << "Root system initialize\n";
     reset(); // just in case
 
+    // Create root system
+    const double maxT = 365.; // maximal simulation time
+    const double dzB = 0.1; // distance of basal roots up the mesocotyl [cm] (hardcoded in the orginal version, hardcoded here)
+    RootSystemParameter const &rs = rsparam; // rename
+    Vector3d iheading(0,0,-1);
+
+    // Taproot
+    Root* taproot = new Root(this, 1, iheading ,0, nullptr, 0, 0); // tap root has root type 1
+    taproot->addNode(rs.seedPos,0);
+    baseRoots.push_back(taproot);
+
+    // Basal roots
+    if (rs.maxB>0) {
+        if (getRootTypeParameter(basaltype)->type<1) { // if the type is not defined, copy tap root
+            std::cout << "Basal root type #" << basaltype << " was not defined, using tap root parameters instead\n";
+            RootTypeParameter brtp = RootTypeParameter(*getRootTypeParameter(1));
+            brtp.type = basaltype;
+            setRootTypeParameter(brtp);
+        }
+        int maxB = rs.maxB;
+        if (rs.delayB>0) {
+            maxB = std::min(maxB,int(ceil((maxT-rs.firstB)/rs.delayB))); // maximal for simtime maxT
+        }
+        double delay = rs.firstB;
+        for (int i=0; i<maxB; i++) {
+            Root* basalroot = new Root(this, basaltype, iheading ,delay, nullptr, 0, 0);
+            Vector3d node = rs.seedPos.minus(Vector3d(0.,0.,dzB));
+            basalroot->addNode(node,delay);
+            baseRoots.push_back(basalroot);
+            delay += rs.delayB;
+        }
+    }
+
+    // Shoot borne roots
+    if ((rs.nC>0) && (rs.delaySB<maxT)) { // if the type is not defined, copy basal root
+        if (getRootTypeParameter(shootbornetype)->type<1) {
+            std::cout << "Shootborne root type #" << shootbornetype << " was not defined, using tap root parameters instead\n";
+            RootTypeParameter srtp = RootTypeParameter(*getRootTypeParameter(1));
+            srtp.type = shootbornetype;
+            setRootTypeParameter(srtp);
+        }
+        Vector3d sbpos = rs.seedPos;
+        sbpos.z=sbpos.z/2.; // half way up the mesocotyl
+        int maxSB = ceil((maxT-rs.firstSB)/rs.delayRC); // maximal number of root crowns
+        double delay = rs.firstSB;
+        for (int i=0; i<maxSB; i++) {
+            for (int j=0; j<rs.nC; j++) {
+                Root* shootborne = new Root(this, shootbornetype, iheading ,delay, nullptr, 0, 0);
+                // TODO fix the initial radial heading
+                shootborne->addNode(sbpos,delay);
+                baseRoots.push_back(shootborne);
+                delay += rs.delaySB;
+            }
+            sbpos.z+=rs.nz;  // move up, for next root crown
+            delay = rs.firstSB + i*rs.delayRC; // reset age
+        }
+    }
+
     // Create tropisms and growth functions per root type
     for (size_t i=0; i<rtparam.size(); i++) {
         int type = rtparam.at(i).tropismT;
@@ -140,62 +198,6 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
         gf.push_back(gf_);
     }
 
-    // Create root system
-    const double maxT = 365.; // maximal simulation time
-    const double dzB = 0.1; // distance of basal roots up the mesocotyl [cm] (hardcoded in the orginal version, hardcoded here)
-    RootSystemParameter const &pp = rsparam; // rename
-    Vector3d iheading(0,0,-1);
-    // Taproot
-    Root* taproot = new Root(this, 1, iheading ,0, nullptr, 0, 0); // tap root has root type 1
-    taproot->addNode(pp.seedPos,0);
-    baseRoots.push_back(taproot);
-
-    // Basal roots
-    if (pp.maxB>0) {
-        if (getRootTypeParameter(basaltype)->type<1) { // if the type is not defined, copy tap root
-            std::cout << "Basal root type #" << basaltype << " was not defined, using tap root parameters instead\n";
-            RootTypeParameter brtp = RootTypeParameter(*getRootTypeParameter(1));
-            brtp.type = basaltype;
-            setRootTypeParameter(brtp);
-        }
-        int maxB = pp.maxB;
-        if (pp.delayB>0) {
-            maxB = std::min(maxB,int(ceil((maxT-pp.firstB)/pp.delayB))); // maximal for simtime maxT
-        }
-        double delay = pp.firstB;
-        for (int i=0; i<maxB; i++) {
-            Root* basalroot = new Root(this, basaltype, iheading ,delay, nullptr, 0, 0);
-            Vector3d node = pp.seedPos.minus(Vector3d(0.,0.,dzB));
-            basalroot->addNode(node,delay);
-            baseRoots.push_back(basalroot);
-            delay += pp.delayB;
-        }
-    }
-
-    // Shoot borne roots
-    if ((pp.nC>0) && (pp.delaySB<maxT)) { // if the type is not defined, copy basal root
-        if (getRootTypeParameter(shootbornetype)->type<1) {
-            std::cout << "Shootborne root type #" << shootbornetype << " was not defined, using tap root parameters instead\n";
-            RootTypeParameter srtp = RootTypeParameter(*getRootTypeParameter(1));
-            srtp.type = shootbornetype;
-            setRootTypeParameter(srtp);
-        }
-        Vector3d sbpos = pp.seedPos;
-        sbpos.z=sbpos.z/2.; // half way up the mesocotyl
-        int maxSB = ceil((maxT-pp.firstSB)/pp.delayRC); // maximal number of root crowns
-        double delay = pp.firstSB;
-        for (int i=0; i<maxSB; i++) {
-            for (int j=0; j<pp.nC; j++) {
-                Root* shootborne = new Root(this, shootbornetype, iheading ,delay, nullptr, 0, 0);
-                // TODO fix the initial heading
-                shootborne->addNode(sbpos,delay);
-                baseRoots.push_back(shootborne);
-                delay += pp.delaySB;
-            }
-            sbpos.z+=pp.nz;  // move up, for next root crown
-            delay = pp.firstSB + i*pp.delayRC; // reset age
-        }
-    }
 }
 
 /**
@@ -249,9 +251,9 @@ Root* RootSystem::createRoot(int lt, Vector3d  h, double delay, Root* parent, do
 
 /**
  * Creates a specific tropsim,
- * the function must bhe extended or overwritten to add more tropisms
+ * the function must be extended or overwritten to add more tropisms
  */
-TropismFunction* RootSystem::createTropismFunction(int tt, int N, double sigma) {
+TropismFunction* RootSystem::createTropismFunction(int tt, double N, double sigma) {
     switch (tt) {
     case tt_plagio: return new Plagiotropism(N,sigma);
     case tt_gravi: return new Gravitropism(N,sigma);

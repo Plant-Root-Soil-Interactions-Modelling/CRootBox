@@ -58,7 +58,7 @@ public:
 	//
 	virtual Root* createRoot(int lt, Vector3d  h, double delay, Root* parent, double pbl, int pni);
 	///< Creates a new lateral root, overwrite or change this method to use more spezialised root classes
-	virtual TropismFunction* createTropismFunction(int tt, int N, double sigma);
+	virtual TropismFunction* createTropismFunction(int tt, double N, double sigma);
 	///< Creates the tropisms, overwrite or change this method to add more tropisms
 	virtual GrowthFunction* createGrowthFunction(int gft);
 	///< Creates the growth function per root type, overwrite or change this method to add more tropisms

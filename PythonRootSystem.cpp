@@ -13,7 +13,7 @@
  * mymath.h		currently only Vector3d is exposed (lets see if we will need anything else)
  *
  */
-#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -285,9 +285,9 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	 */
         class_<RootSystem>("RootSystem")
 		.def("setRootTypeParameter", &RootSystem::setRootTypeParameter)
-		// .def("getRootTypeParameter", &RootSystem::getRootTypeParameter)
+		.def("getRootTypeParameter", &RootSystem::getRootTypeParameter, return_value_policy<reference_existing_object>())
 		.def("setRootSystemParameter", &RootSystem::setRootSystemParameter)
-		// .def("getRootSystemParameter", &RootSystem::getRootSystemParameter)
+		.def("getRootSystemParameter", &RootSystem::getRootSystemParameter, return_value_policy<reference_existing_object>()) // tutorial "naive (dangerous) approach"
 		.def("openFile", &RootSystem::openFile)
 		.def("setGeometry", &RootSystem::setGeometry)
 		.def("setSoil", &RootSystem::setSoil)

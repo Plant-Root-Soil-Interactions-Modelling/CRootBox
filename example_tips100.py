@@ -1,7 +1,8 @@
 import py_rootbox as rb
 
-import numpy as np
 import matplotlib.pyplot as plt
+import numpy as np
+from scipy import stats
 
 from math import sqrt
 
@@ -31,13 +32,13 @@ def simOnce(name,simtime,lbins,lrange,zbins,zrange):
     
 
 # Params
-runs = 100
+runs = 10
 name = 'zeamays_test'
-simtime = 120
+simtime = 60
 
 # Histogram params
-lbins = 50
-lrange = (0,50)
+lbins = 10
+lrange = (0,10)
 zbins = 120
 zrange = (-120,0)
 
@@ -51,20 +52,20 @@ for i in range(1,runs):
     print(np.shape(allZ)) # size is shape
         
 meanZ = np.mean(allZ,0)
-stdZ = np.std(allZ,0)
+semZ = stats.sem(allZ,0)
 meanL = np.mean(allL,0)
-stdL = np.mean(allL,0)
+semL = stats.sem(allL,0)
 
 print(np.shape(meanL))
-print(np.shape(stdL))
+print(np.shape(semL))
 
 plt.figure(1)
-plt.errorbar(np.linspace(lrange[0],lrange[1],lbins), meanL, stdL, linestyle='None', marker='^')
+plt.errorbar(np.linspace(lrange[0],lrange[1],lbins), meanL, semL, linestyle='None', marker='^')
 plt.title("Root tip radial distance")
 plt.show(False)
 
 plt.figure(2)
-plt.errorbar(np.linspace(zrange[0],zrange[1],zbins), meanZ, stdZ, linestyle='None', marker='^')
+plt.errorbar(np.linspace(zrange[0],zrange[1],zbins), meanZ, semZ, linestyle='None', marker='^')
 plt.title("Root tip depth")
 plt.show()
 
