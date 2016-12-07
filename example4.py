@@ -54,7 +54,7 @@ rhizotubes_ = rb.std_vector_SDF_()
 y_ = ( -30, -18, -6, 6, 18, 30 )
 z_ = ( -10, -20, -40, -60, -80, -120 )
 
-tube = [] # tubes must be stored (ohterwise destroyed by GC), some policy should be set in SDF_RotateTranslate
+tube = [] # tubes must be stored! ohterwise, they are destroyed by GC (not sure why), probably, some policy should be set in std_vector_SDF_
 for i in range(0,len(y_)):
     v = rb.Vector3d(0,y_[i],z_[i]);
     tube.append(rb.SDF_RotateTranslate(rhizoX, v))

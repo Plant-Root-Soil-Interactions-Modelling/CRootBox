@@ -1,8 +1,8 @@
 /**
  * Example 5
  *
- * Hydrotropism
- *
+ * Hydrotropism ,
+ * proof of concept, with a static soil water content
  *
  */
 using namespace std;
@@ -17,6 +17,7 @@ void example5()
      * Plant and root parameter from a file
      */
     rootsystem.openFile(name);
+
     // "manually" set tropism to hydrotropism
     for (int i=1; i<7; i++) {
         rootsystem.getRootTypeParameter(i)->tropismT = RootSystem::tt_hydro;

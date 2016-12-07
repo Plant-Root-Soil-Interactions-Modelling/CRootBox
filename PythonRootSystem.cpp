@@ -204,7 +204,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("getRelativeValue",&SoilProperty::getRelativeValue)
 			.def("getAbsoluteValue",&SoilProperty::getAbsoluteValue)
 	;
-	class_<SoilPropertySDF>("SoilPropertySDF",init<>())
+	class_<SoilPropertySDF, bases<SoilProperty>>("SoilPropertySDF",init<>())
 			.def(init<SignedDistanceFunction*, double, double, double>())
 			.def_readwrite("sdf", &SoilPropertySDF::sdf)
 			.def_readwrite("fmax", &SoilPropertySDF::fmax)
@@ -283,7 +283,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	/*
 	 * RootSystem.h
 	 */
-        class_<RootSystem>("RootSystem")
+    class_<RootSystem>("RootSystem")
 		.def("setRootTypeParameter", &RootSystem::setRootTypeParameter)
 		.def("getRootTypeParameter", &RootSystem::getRootTypeParameter, return_value_policy<reference_existing_object>())
 		.def("setRootSystemParameter", &RootSystem::setRootSystemParameter)
@@ -301,6 +301,20 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("write",&RootSystem::write)
 		.def("setSeed",&RootSystem::setSeed)
 	;
+    enum_<RootSystem::TropismTypes>("TropismType")
+    	.value("plagio", RootSystem::TropismTypes::tt_plagio)
+		.value("gravi", RootSystem::TropismTypes::tt_gravi)
+    	.value("exo", RootSystem::TropismTypes::tt_exo)
+    	.value("hydro", RootSystem::TropismTypes::tt_hydro)
+    ;
+    enum_<RootSystem::GrowthFunctionTypes>("GrowthFunctionType")
+    	.value("negexp", RootSystem::GrowthFunctionTypes::gft_negexp)
+		.value("linear", RootSystem::GrowthFunctionTypes::gft_linear)
+    ;
+    enum_<RootSystem::OutputTypes>("OutputType")
+    	.value("segments", RootSystem::OutputTypes::ot_segments)
+    	.value("polylines", RootSystem::OutputTypes::ot_polylines)
+    	;
 	enum_<RootSystem::ScalarTypes>("ScalarType")
 	    .value("type", RootSystem::ScalarTypes::st_type)
 	    .value("radius", RootSystem::ScalarTypes::st_radius)
@@ -311,10 +325,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	    .value("time", RootSystem::ScalarTypes::st_time)
 	    .value("length", RootSystem::ScalarTypes::st_length)
 	    .value("surface", RootSystem::ScalarTypes::st_surface)
-	;
-	enum_<RootSystem::OutputTypes>("OutputType")
-	    .value("segments", RootSystem::OutputTypes::ot_segments)
-	    .value("polylines", RootSystem::OutputTypes::ot_polylines)
 	;
     /*
      * analysis.h
