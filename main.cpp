@@ -11,8 +11,6 @@
 #include "examples/example1_wb.h"
 #include "examples/example2.h"
 #include "examples/example3.h"
-#include "examples/example3b.h"
-#include "examples/example3c.h"
 #include "examples/example4.h"
 #include "examples/example5.h"
 
@@ -25,8 +23,6 @@
 //#include "DumuxRootSystem.h" // suggested coupling
 //#include "examples/example_dumux.h"
 
-//testkommentar
-
 /**
  * Starts an examples (from the examples folder)
  */
@@ -38,13 +34,11 @@ int main(int argc, char* argv[])
         name= argv[1];
     }
 
-    example1(); // open parameter file, and output VTP
+    //example1(); // open parameter file, and output VTP
     //example1_wb(); // root growth inside a big box to simulate soil surface, open parameter file, and output VTP
-    // example2(); // like example 1, but with put geometry
-    // example3(); // more than 1 plant
-    //example3b(); // for Shehan
-    //example3c(); // for Shehan
-    //example4(); // rhizotubes (an example for a more complex geomety)
+    //example2(); // like example 1, but with put geometry
+    //example3(); // more than 1 plant
+    example4(); // rhizotubes (an example for a more complex geomety)
     //example5(); // hydrotropism
 
     // benchmarks();

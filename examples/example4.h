@@ -22,27 +22,24 @@ void example4()
      */
     rootsystem.openFile(name);
 
-//    /*
-//     * 1. A split pot experiment
-//     */
-//    SDF_PlantBox topBox(22,20,5);
-//    SDF_PlantBox sideBox(10,20,35);
-//
-//    SDF_RotateTranslate left(&sideBox, Vector3d(-6,0,-5));
-//    SDF_RotateTranslate right(&sideBox, Vector3d(6,0,-5));
-//
-//    vector<SignedDistanceFunction*> box_;
-//    box_.push_back(&topBox);
-//    box_.push_back(&left);
-//    box_.push_back(&right);
-//    SDF_Union splitBox(box_);
-//
-//    rootsystem.setGeometry(&splitBox);
+    /*
+     * 1. A split pot experiment
+     */
+    SDF_PlantBox topBox(22,20,5);
+    SDF_PlantBox sideBox(10,20,35);
+
+    SDF_RotateTranslate left(&sideBox, Vector3d(-6,0,-5));
+    SDF_RotateTranslate right(&sideBox, Vector3d(6,0,-5));
+
+    vector<SignedDistanceFunction*> box_;
+    box_.push_back(&topBox);
+    box_.push_back(&left);
+    box_.push_back(&right);
+    SDF_Union splitBox(box_);
 
     /*
-     * 2. Rhizotubes as obstacles (from Example_Rhizotubes.m)
+     * 2. Rhizotubes as obstacles
      */
-
     // Box
     double boxX = 96.;
     double boxY = 126.;
@@ -62,12 +59,12 @@ void example4()
     for (int i=0; i<tubeN; i++) {
         rhizotubes_.push_back(new SDF_RotateTranslate(&rhizoX, 0, SDF_RotateTranslate::xaxis, Vector3d(0,y_[i],z_[i])));
     }
-    SDF_Union rhizotubes(rhizotubes_);
 
     // Final geometry
-    SDF_Difference geometry(&box, &rhizotubes);
+    SDF_Union rhizotubes(rhizotubes_);
+    SDF_Difference rhizoTubes(&box, &rhizotubes);
 
-    rootsystem.setGeometry(&geometry);
+    rootsystem.setGeometry(&rhizoTubes); // &splitBox, or &rhizoTubes
 
     /**
      * Initialize

@@ -58,9 +58,6 @@ print("Finished with a total of "+str(rootsystem.getNumberOfNodes())+ " nodes")
 
 
 
-
-
-
 #
 # Python testing ... 
 #
@@ -94,10 +91,3 @@ rlt = inf # day
 p2 = rb.RootParameter()
 p2.set(type,lb, la,ln_, nob, r, a, theta, rlt)
 print(p2)
-
-
-
-
-
-
-

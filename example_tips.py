@@ -52,10 +52,10 @@ rp2 = rootsystem.getRootTypeParameter(2)
 rp3 = rootsystem.getRootTypeParameter(3)
 rp4 = rootsystem.getRootTypeParameter(4)
 print('\nTropisms')
-print('#1 Type '+str(rp1.tropismT)+', N '+str(rp1.tropismN)+', sigma '+str(rp1.tropismS))
-print('#2 Type '+str(rp2.tropismT)+', N '+str(rp2.tropismN)+', sigma '+str(rp2.tropismS))
-print('#3 Type '+str(rp3.tropismT)+', N '+str(rp3.tropismN)+', sigma '+str(rp3.tropismS))
-print('#4 Type '+str(rp4.tropismT)+', N '+str(rp4.tropismN)+', sigma '+str(rp4.tropismS))
+print('#1 Type '+str(rp1.tropismT)+', N '+str(rp1.tropismN)+', sigma '+str(rp1.tropismS)+', dx '+str(rp1.dx))
+print('#2 Type '+str(rp2.tropismT)+', N '+str(rp2.tropismN)+', sigma '+str(rp2.tropismS)+', dx '+str(rp2.dx))
+print('#3 Type '+str(rp3.tropismT)+', N '+str(rp3.tropismN)+', sigma '+str(rp3.tropismS)+', dx '+str(rp3.dx))
+print('#4 Type '+str(rp4.tropismT)+', N '+str(rp4.tropismN)+', sigma '+str(rp4.tropismS)+', dx '+str(rp4.dx))
 
 #
 # Analyse tip distribution

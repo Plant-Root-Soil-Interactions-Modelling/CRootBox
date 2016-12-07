@@ -13,7 +13,7 @@
  * mymath.h		currently only Vector3d is exposed (lets see if we will need anything else)
  *
  */
-// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+//#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -299,6 +299,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 //		.def("getSegments", &RootSystem::getSegments)
 		.def("getRootTips", &RootSystem::getRootTips)
 		.def("write",&RootSystem::write)
+		.def("setSeed",&RootSystem::setSeed)
 	;
 	enum_<RootSystem::ScalarTypes>("ScalarType")
 	    .value("type", RootSystem::ScalarTypes::st_type)

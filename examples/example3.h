@@ -24,7 +24,6 @@ void example3()
           RootSystem* rs = new RootSystem();
           allRS.push_back(rs);
           rs->openFile(name);
-          rs->getRootTypeParameter(4)->theta = 80./180.*M_PI; // fix insertion angle of the basal roots
           rs->getRootSystemParameter()->seedPos = Vector3d(dist*i,dist*j,-3); // set position of seed [cm]
       }
   }
@@ -41,7 +40,9 @@ void example3()
       cout << "Finished with a total of " << rs->getNumberOfNodes()<< " nodes\n";
   }
 
-  /* Export results as single vtp files */
+  /*
+   * Export results as single vtp files
+   */
   int c=0;
   for (auto rs : allRS) {
       c++; // root system number
