@@ -35,11 +35,17 @@ rootsystem.simulate(simtime);
 # delete(segs)
 
 tips = rootsystem.getRootTips()
-notips = sum(1 for _ in tips) # is there a more clever way?
+notips = len(tips) 
+
+ana = rb.AnalysisSDF(rootsystem)
+totalLength = ana.getSummed(rb.ScalarType.length)
+l = ana.getScalar(rb.ScalarType.length)
+nos = len(l)
 
 print('\nNumber of root tips is '+str(notips))
 print('Number of nodes is ' + str(rootsystem.getNumberOfNodes()))
-# print('Number of segments is ' + str(nosegs))
+print('Number of segmentes is '+str(nos))
+print('Length of root system is '+ str(totalLength)+ " cm")
 
 rp1 = rootsystem.getRootTypeParameter(1)
 rp2 = rootsystem.getRootTypeParameter(2)
