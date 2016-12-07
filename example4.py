@@ -54,15 +54,17 @@ rhizotubes_ = rb.std_vector_SDF_()
 y_ = ( -30, -18, -6, 6, 18, 30 )
 z_ = ( -10, -20, -40, -60, -80, -120 )
 
+tube = [] # tubes must be stored (ohterwise destroyed by GC), some policy should be set in SDF_RotateTranslate
 for i in range(0,len(y_)):
-    tube = rb.SDF_RotateTranslate(rhizoX, rb.Vector3d(0,y_[i],z_[i]))
-    rhizotubes_.append(tube)
+    v = rb.Vector3d(0,y_[i],z_[i]);
+    tube.append(rb.SDF_RotateTranslate(rhizoX, v))
+    rhizotubes_.append(tube[i])
     
 # Final geometry    
 rhizotubes = rb.SDF_Union(rhizotubes_)
 rhizoTube = rb.SDF_Difference(box, rhizotubes)
 
-rootsystem.setGeometry(splitBox); # splitBox, or rhizoTube
+rootsystem.setGeometry(rhizoTube); # splitBox, or rhizoTube
 
 #
 # Initialize
