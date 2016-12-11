@@ -19,7 +19,7 @@ allRS = [ ]
 for i in range(0,N):
     for j in range(0,N):
          rs = rb.RootSystem()
-         rs.openFile(name,"modelparameter/") 
+         rs.openFile(name) 
          rs.getRootSystemParameter().seedPos = rb.Vector3d(dist*i,dist*j,-3) # set position of seed [cm]
          allRS.append(rs)
 
@@ -29,7 +29,7 @@ for i in range(0,N):
 simtime = 120
 for rs in allRS:
     rs.setSeed(random.random() )
-    rs.initialize(4,5)
+    rs.initialize()
     rs.simulate(simtime)
     print(rs.getNumberOfNodes())
 

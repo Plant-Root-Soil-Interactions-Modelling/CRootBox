@@ -17,7 +17,7 @@ name = "maize"
 #
 # Plant and root parameter from a file
 #
-rootsystem.openFile(name,"modelparameter/");
+rootsystem.openFile(name);
 
 #
 # 1. A split pot experiment
@@ -69,7 +69,7 @@ rootsystem.setGeometry(rhizoTube); # splitBox, or rhizoTube
 #
 # Initialize
 #
-rootsystem.initialize(4,5); # it is important to call initialize() after setGeometry()
+rootsystem.initialize(); # it is important to call initialize() after setGeometry()
 
 #
 # Simulate

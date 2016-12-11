@@ -17,13 +17,13 @@ name = "anagallis2010"
 #
 # Open plant and root parameter from a file
 #
-rootsystem.openFile(name,"modelparameter/")
+rootsystem.openFile(name)
 # rootsystem.writeParameters() # not exposed to python yet
 
 #
 # Initialize
 #
-rootsystem.initialize(4,5) # TODO expose default values
+rootsystem.initialize() 
 
 #
 # Simulate

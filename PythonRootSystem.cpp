@@ -13,7 +13,7 @@
  * mymath.h		currently only Vector3d is exposed (lets see if we will need anything else)
  *
  */
-//#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -47,6 +47,12 @@ std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceF
 
 double (AnalysisSDF::*getSummed1)(int st) const = &AnalysisSDF::getSummed;
 double (AnalysisSDF::*getSummed2)(int st, SignedDistanceFunction* geometry) const = &AnalysisSDF::getSummed;
+
+/**
+ * Default arguments
+ */
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(initialize_overloads,initialize,0,2); // no idea how to do it by hand,  magic everywhere...
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openFile_overloads,openFile,1,2);
 
 
 
@@ -100,6 +106,16 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	/*
 	 * mymath.h
 	 */
+  	class_<Vector2i>("Vector2i", init<>())
+			.def(init<int,int>())
+			.def(init<Vector2i&>())
+			.def_readwrite("x",&Vector2i::x)
+			.def_readwrite("y",&Vector2i::y)
+			.def("__str__",&Vector2i::toString)
+	;
+    class_<std::vector<Vector2i>>("std_vector_Vector2i_")
+        .def(vector_indexing_suite<std::vector<Vector2i>>() )
+	;
 	class_<Vector3d>("Vector3d", init<>())
 			.def(init<double,double,double>())
 			.def(init<Vector3d&>())
@@ -203,6 +219,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	class_<SoilProperty>("SoilProperty",init<>())
 			.def("getRelativeValue",&SoilProperty::getRelativeValue)
 			.def("getAbsoluteValue",&SoilProperty::getAbsoluteValue)
+			.def("__str__",&SoilProperty::toString)
 	;
 	class_<SoilPropertySDF, bases<SoilProperty>>("SoilPropertySDF",init<>())
 			.def(init<SignedDistanceFunction*, double, double, double>())
@@ -210,6 +227,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def_readwrite("fmax", &SoilPropertySDF::fmax)
 			.def_readwrite("fmin", &SoilPropertySDF::fmin)
 			.def_readwrite("slope", &SoilPropertySDF::slope)
+			.def("__str__",&SoilPropertySDF::toString)
 	;
 	/*
 	 * ModelParameter
@@ -280,6 +298,15 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def_readwrite("nz", &RootSystemParameter::nz)
 			.def("__str__",&RootSystemParameter::toString)
 	;
+	/**
+	 * Root.h (only pointers, no members)
+	 */
+    class_<Root>("Root", init<RootSystem*, int, Vector3d, double, Root*, double, int>())
+		.def("__str__",&Root::toString)
+    ;
+    class_<std::vector<Root*>>("std_vector_Root_")
+        .def(vector_indexing_suite<std::vector<Root*>>() )
+	;
 	/*
 	 * RootSystem.h
 	 */
@@ -288,16 +315,20 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getRootTypeParameter", &RootSystem::getRootTypeParameter, return_value_policy<reference_existing_object>())
 		.def("setRootSystemParameter", &RootSystem::setRootSystemParameter)
 		.def("getRootSystemParameter", &RootSystem::getRootSystemParameter, return_value_policy<reference_existing_object>()) // tutorial "naive (dangerous) approach"
-		.def("openFile", &RootSystem::openFile)
+		.def("openFile", &RootSystem::openFile, openFile_overloads())
 		.def("setGeometry", &RootSystem::setGeometry)
 		.def("setSoil", &RootSystem::setSoil)
 		.def("reset", &RootSystem::reset)
-		.def("initialize", &RootSystem::initialize)
+		.def("initialize", &RootSystem::initialize, initialize_overloads())
 		.def("simulate",&RootSystem::simulate)
 		.def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
-//		.def("getNodes", &RootSystem::getNodes) // TODO something clever to avoid Root, Root*, etc
-//		.def("getSegments", &RootSystem::getSegments)
+		.def("getRoots", &RootSystem::getRoots)
 		.def("getRootTips", &RootSystem::getRootTips)
+		.def("getNodes", &RootSystem::getNodes)
+		.def("getSegments", &RootSystem::getSegments) // TODO expose vector<Vector2i>
+		.def("getSegmentsOrigin", &RootSystem::getSegmentsOrigin)
+		.def("getNETimes", &RootSystem::getNETimes)
+		.def("getScalar", &RootSystem::getScalar)
 		.def("write",&RootSystem::write)
 		.def("setSeed",&RootSystem::setSeed)
 	;
@@ -342,15 +373,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
 }
 
 /*
- *  currently not exposed..
+ *  currently not exposed.. (because not needed)
  *
-  	class_<Vector2i>("Vector2i", init<>())
-			.def(init<int,int>())
-			.def(init<Vector2i&>())
-			.def_readwrite("x",&Vector2i::x)
-			.def_readwrite("y",&Vector2i::y)
-			.def("__str__",&Vector2i::toString)
-			;
 	class_<Vector2d>("Vector2d", init<>())
 			.def(init<double,double>())
 			.def(init<Vector2d&>())
@@ -358,37 +382,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def_readwrite("y",&Vector2d::y)
 			.def("__str__",&Vector2d::toString)
 	;
- */
-
-/**
- * solution to wrap vectors from Stackoverflow
- *
-// C++ code
-typedef std::vector<std::string> MyList;
-class MyClass {
-  MyList myFuncGet();
-  void myFuncSet(const Mylist& list);
-  //       stuff
-};
-
-// Wrapper code
-
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-
-using namespace boost::python;
-
-
-BOOST_PYTHON_MODULE(mymodule)
-{
-    class_<MyList>("MyList")
-        .def(vector_indexing_suite<MyList>() );
-
-    class_<myClass>("MyClass")
-        .def("myFuncGet", &MyClass::myFuncGet)
-        .def("myFuncSet", &MyClass::myFuncSet)
-        ;
-}
-*
  */
 
 #endif /* PYTHON_WRAPPER */

@@ -12,7 +12,7 @@ name = "maize"
 #
 # Plant and root parameter from a file
 # 
-rootsystem.openFile(name,"modelparameter/");
+rootsystem.openFile(name);
 
 # "manually" set tropism to hydrotropism for the first ten root types
 for i in range(0,10):    
@@ -23,7 +23,9 @@ for i in range(0,10):
 # check if it worked
 # for i in range(0,10):
 #     print(rootsystem.getRootTypeParameter(i+1))
-    
+ 
+print (rootsystem.getRootSystemParameter().seedPos)
+   
 #
 # Static soil property
 #    

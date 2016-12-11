@@ -298,11 +298,15 @@ std::vector<Root*> RootSystem::getRoots() const
 
 /**
  * Returns the positions of the root tips
+ *
+ * @param roots		a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
  */
-std::vector<Vector3d> RootSystem::getRootTips() const
+std::vector<Vector3d> RootSystem::getRootTips(std::vector<Root*> roots) const
 {
+	if (roots.empty()) {
+		roots = this->getRoots();
+	}
 	std::vector<Vector3d> tips;
-	auto roots = getRoots();
 	for (auto& r : roots) {
 		tips.push_back(r->getNode(r->getNumberOfNodes()-1));
 	}
@@ -315,10 +319,13 @@ std::vector<Vector3d> RootSystem::getRootTips() const
  *
  * @param ot        ot_segments: each segment is a line, nodes are unique
  *                  ot_polyline: each root is a line, nodes are not unique
- * @param roots     the sequential vector of roots (@see RootSystem::getRoots)
+ * @param roots     a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
  */
 std::vector<Vector3d> RootSystem::getNodes(int ot, std::vector<Root*> roots) const
 {
+	if (roots.empty()) {
+		roots = this->getRoots();
+	}
     switch (ot) {
     case ot_segments: {
         int non = getNumberOfNodes();
@@ -354,10 +361,13 @@ std::vector<Vector3d> RootSystem::getNodes(int ot, std::vector<Root*> roots) con
  *
  * @param ot        ot_segments: each segment connects two unique nodes
  *                  ot_polyline: not implemented
- * @param roots     the sequential vector of roots (@see RootSystem::getRoots)
+ * @param roots     a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
  */
 std::vector<Vector2i> RootSystem::getSegments(int ot, std::vector<Root*> roots) const
 {
+	if (roots.empty()) {
+		roots = this->getRoots();
+	}
     switch (ot) {
     case ot_segments: {
         int non=0;
@@ -383,10 +393,13 @@ std::vector<Vector2i> RootSystem::getSegments(int ot, std::vector<Root*> roots) 
  * Returns pointers of the roots corresponding to each segment
  * @param ot        ot_segments: each segment connects two unique nodes
  *                  ot_polyline: not implemented
- * @param roots     the sequential vector of roots (@see RootSystem::getRoots)
+ * @param roots     a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
  */
 std::vector<Root*> RootSystem::getSegmentsOrigin(int ot, std::vector<Root*> roots) const
 {
+	if (roots.empty()) {
+		roots = this->getRoots();
+	}
     switch (ot) {
     case ot_segments: {
         int non=0;
@@ -415,10 +428,13 @@ std::vector<Root*> RootSystem::getSegmentsOrigin(int ot, std::vector<Root*> root
  *
  * @param ot        out_segments: each segment is a line, nodes are unique
  *                  out_polyline: each root is a line (and cell), nodes are not unique
- * @param roots      the sequential vector of roots (@see RootSystem::getRoots)
+ * @param roots     a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
  */
 std::vector<double> RootSystem::getNETimes(int ot, std::vector<Root*> roots) const
 {
+	if (roots.empty()) {
+		roots = this->getRoots();
+	}
     switch (ot) {
     case ot_segments: {
         int non=0;
@@ -450,7 +466,7 @@ std::vector<double> RootSystem::getNETimes(int ot, std::vector<Root*> roots) con
         }
         return netv;
     }
-    default: throw std::invalid_argument( "RootSystem::copyNodes() vtp type not implemented" );
+    default: throw std::invalid_argument( "RootSystem::getNETimes() output type not implemented" );
     }
 }
 
@@ -461,10 +477,13 @@ std::vector<double> RootSystem::getNETimes(int ot, std::vector<Root*> roots) con
  * @param ot        out_segments: scalar for each segment
  *                  out_polyline: scalar for each root
  * @param stype     a scalar type: type, radius, order, red, green, blue,... (@see RootSystem::ScalarTypes)
- * @param roots     the sequential vector of roots (@see RootSystem::getRoots)
+ * @param roots     a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
  */
 std::vector<double> RootSystem::getScalar(int ot, int stype, std::vector<Root*> roots) const
 {
+	if (roots.empty()) {
+		roots = this->getRoots();
+	}
     std::vector<double> scalars(roots.size());
     for (size_t i=0; i<roots.size(); i++) {
         double value=0;
