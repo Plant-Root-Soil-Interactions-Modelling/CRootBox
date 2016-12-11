@@ -1,19 +1,19 @@
 #ifndef PY_ROOTBOX_H_
 #define PY_ROOTBOX_H_
 
+// copy paste for daniel
+// 1. export LD_LIBRARY_PATH=~/boost_1_62_0/stage/lib
+// 2. g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.5 -L/home/daniel/boost_1_62_0/stage/lib -lboost_python Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o
 
 /**
  *  A Python module for CRootbox based on boost.python
  *
- *  build shared library
- *  1. export LD_LIBRARY_PATH=~/boost_1_62_0/stage/lib
- *  2. g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.5 -L/home/daniel/boost_1_62_0/stage/lib -lboost_python Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o
+ *  build a shared library from this file
+ *  put comment to line 16 to ignore this file
  *
- * sdf.h 		writePVPScript is not exposed, use RootSystem::write to write the geometry script
- * mymath.h		currently only Vector3d is exposed (lets see if we will need anything else)
  *
  */
-#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -49,12 +49,17 @@ double (AnalysisSDF::*getSummed1)(int st) const = &AnalysisSDF::getSummed;
 double (AnalysisSDF::*getSummed2)(int st, SignedDistanceFunction* geometry) const = &AnalysisSDF::getSummed;
 
 /**
- * Default arguments
+ * Default arguments: no idea how to do it by hand,  magic everywhere...
  */
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(initialize_overloads,initialize,0,2); // no idea how to do it by hand,  magic everywhere...
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(initialize_overloads,initialize,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openFile_overloads,openFile,1,2);
-
-
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getRootTips_overloads,getRootTips,0,1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNodes_overloads,getNodes,0,2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegments_overloads,getSegments,0,2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentsOrigin_overloads,getSegmentsOrigin,0,2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNETimes_overloads,getNETimes,0,2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getScalar_overloads,getScalar,0,3);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(write_overloads,write,1,2);
 
 /**
  * Virtual functions (not sure if needed, or only if we derive classes from it in pyhton?), not working...
@@ -323,15 +328,16 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("simulate",&RootSystem::simulate)
 		.def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
 		.def("getRoots", &RootSystem::getRoots)
-		.def("getRootTips", &RootSystem::getRootTips)
-		.def("getNodes", &RootSystem::getNodes)
-		.def("getSegments", &RootSystem::getSegments) // TODO expose vector<Vector2i>
-		.def("getSegmentsOrigin", &RootSystem::getSegmentsOrigin)
-		.def("getNETimes", &RootSystem::getNETimes)
-		.def("getScalar", &RootSystem::getScalar)
+		.def("getRootTips", &RootSystem::getRootTips, getRootTips_overloads())
+		.def("getNodes", &RootSystem::getNodes, getNodes_overloads())
+		.def("getSegments", &RootSystem::getSegments, getSegments_overloads())
+		.def("getSegmentsOrigin", &RootSystem::getSegmentsOrigin, getSegmentsOrigin_overloads())
+		.def("getNETimes", &RootSystem::getNETimes, getNETimes_overloads())
+		.def("getScalar", &RootSystem::getScalar, getScalar_overloads())
 		.def("write",&RootSystem::write)
 		.def("setSeed",&RootSystem::setSeed)
 	;
+
     enum_<RootSystem::TropismTypes>("TropismType")
     	.value("plagio", RootSystem::TropismTypes::tt_plagio)
 		.value("gravi", RootSystem::TropismTypes::tt_gravi)

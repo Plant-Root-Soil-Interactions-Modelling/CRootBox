@@ -67,11 +67,11 @@ public:
 	int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system
 	std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots
 	std::vector<Vector3d> getRootTips(std::vector<Root*> roots=std::vector<Root*>()) const; ///< returns the positions of the root tips
-	std::vector<Vector3d> getNodes(int ot, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all root system nodes into a vector
-	std::vector<Vector2i> getSegments(int ot, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all segments indices into a vector
-	std::vector<Root*> getSegmentsOrigin(int ot, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a pointer to the root containing the segment
-	std::vector<double> getNETimes(int ot, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all node emergence times into a vector
-	std::vector<double> getScalar(int ot, int stype, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a scalar root parameter that is constant per root to a vector
+	std::vector<Vector3d> getNodes(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all root system nodes into a vector
+	std::vector<Vector2i> getSegments(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all segments indices into a vector
+	std::vector<Root*> getSegmentsOrigin(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a pointer to the root containing the segment
+	std::vector<double> getNETimes(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all node emergence times into a vector
+	std::vector<double> getScalar(int ot=RootSystem::ot_segments, int stype=RootSystem::st_length, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a scalar root parameter that is constant per root to a vector
 
 	// Output Simulation results
 	void write(std::string name, int type = ot_polylines) const; /// writes simulation results (type is determined from file extension in name)
