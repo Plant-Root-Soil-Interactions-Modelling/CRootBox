@@ -481,9 +481,9 @@ std::vector<double> RootSystem::getNETimes(int ot, std::vector<Root*> roots) con
  */
 std::vector<double> RootSystem::getScalar(int ot, int stype, std::vector<Root*> roots) const
 {
-	if (roots.empty()) {
-		roots = this->getRoots();
-	}
+    if (roots.empty()) {
+        roots = this->getRoots();
+    }
     std::vector<double> scalars(roots.size());
     for (size_t i=0; i<roots.size(); i++) {
         double value=0;
@@ -539,7 +539,7 @@ std::vector<double> RootSystem::getScalar(int ot, int stype, std::vector<Root*> 
         }
         return values;
     } else {
-        throw std::invalid_argument( "RootSystem::copyRootParam() type not implemented" );
+        throw std::invalid_argument( "RootSystem::getScalar() type not implemented" );
     }
 }
 
