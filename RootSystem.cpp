@@ -315,13 +315,17 @@ std::vector<Vector3d> RootSystem::getRootTips(std::vector<Root*> roots) const
 
 /**
  * Returns the positions of the root bases
+ *
+ * @param roots         a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
  */
-std::vector<Vector3d> RootSystem::getRootBases() const
+std::vector<Vector3d> RootSystem::getRootBases(std::vector<Root*> roots) const
 {
+        if (roots.empty()) {
+                roots = this->getRoots();
+        }
 	std::vector<Vector3d> bases;
-	auto roots = getRoots();
 	for (auto& r : roots) {
-		bases.push_back(r->getNode(0));
+	        bases.push_back(r->getNode(0));
 	}
 	return bases;
 }
@@ -330,7 +334,7 @@ std::vector<Vector3d> RootSystem::getRootBases() const
  * Copies the nodes of the root systems into a sequential vector,
  * there are two different node numberings
  *
- * @param ot        ot_segments: each segment is a line, nodes are unique
+ * @param ot        ot_segments: each segment is a line, nodes are unique (default)
  *                  ot_polyline: each root is a line, nodes are not unique
  * @param roots     a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
  */
@@ -365,7 +369,7 @@ std::vector<Vector3d> RootSystem::getNodes(int ot, std::vector<Root*> roots) con
         }
         return nv;
     }
-    default: throw std::invalid_argument( "RootSystem::copyNodes() output type not implemented" );
+    default: throw std::invalid_argument( "RootSystem::getNodes() output type not implemented" );
     }
 }
 
@@ -437,7 +441,7 @@ std::vector<Root*> RootSystem::getSegmentsOrigin(int ot, std::vector<Root*> root
  * Copies the node emergence times of the root systems into a sequential vector,
  * there are two different node numberings
  *
- * Gives either cell data (in case of segements) or point data (in case of polyline)
+ * Gives either cell data (in case of segments) or point data (in case of polyline)
  *
  * @param ot        out_segments: each segment is a line, nodes are unique
  *                  out_polyline: each root is a line (and cell), nodes are not unique
