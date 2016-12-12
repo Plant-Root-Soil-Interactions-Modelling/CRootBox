@@ -53,6 +53,9 @@ void AnalysisSDF::addSegments(const AnalysisSDF& a)
  */
 std::vector<double> AnalysisSDF::getScalar(int st) const
 {
+	// TODO since segments have know their origin root: segO, pure root segment mapping could be done by using RootSystem::getScalar
+	// to avoid redundant code,
+	// scalars that are segment wise must be treated extra
 	std::vector<double> data(segO.size());
 	double v = 0; // value
 	for (size_t i=0; i<segO.size(); i++) {

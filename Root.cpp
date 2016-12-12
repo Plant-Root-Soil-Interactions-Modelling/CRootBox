@@ -19,8 +19,7 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
   //cout << "Root: constructor \n";
   rootsystem=rs; // remember
   param = rs->getRootTypeParameter(type)->realize(); // throw the dice
-  // initial rotation
-  double beta = 2*M_PI*rs->rand();
+  double beta = 2*M_PI*rs->rand(); // initial rotation
   Matrix3d ons = Matrix3d::ons(pheading);
   ons.times(Matrix3d::rotX(beta));
   double theta = param.theta;
@@ -371,3 +370,17 @@ void Root::writeRSML(std::ostream & cout, std::string indent) const
   cout << indent << "\t</functions>\n"; // close functions
   cout << indent << "</root>\n"; // close root
 }
+
+/**
+ * Quick info about the object for debugging
+ */
+std::string Root::toString() const
+{
+	std::stringstream str;
+	str << "Root #"<< id <<": type "<<param.type << ", length: "<< length << ", age: " <<age<<" with "<< laterals.size() <<"laterals\n";
+	return str.str();
+
+
+}
+
+

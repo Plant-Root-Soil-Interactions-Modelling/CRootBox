@@ -17,13 +17,13 @@ name = "anagallis2010"
 #
 # Open plant and root parameter from a file
 #
-rootsystem.openFile(name,"modelparameter/")
+rootsystem.openFile(name)
 # rootsystem.writeParameters() # not exposed to python yet
 
 #
 # Initialize
 #
-rootsystem.initialize(4,5) # TODO expose default values
+rootsystem.initialize() 
 
 #
 # Simulate
@@ -55,9 +55,6 @@ print("Total root system length is "+str(l)+" cm")
 print("Finished with a total of "+str(rootsystem.getNumberOfNodes())+ " nodes")
 
 # end of example 1  
-
-
-
 
 
 
@@ -94,10 +91,3 @@ rlt = inf # day
 p2 = rb.RootParameter()
 p2.set(type,lb, la,ln_, nob, r, a, theta, rlt)
 print(p2)
-
-
-
-
-
-
-

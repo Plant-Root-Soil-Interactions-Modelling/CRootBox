@@ -19,7 +19,7 @@ name = "lupine2014"
 #
 # Open plant and root parameter from a file
 #
-rootsystem.openFile(name,"modelparameter/")
+rootsystem.openFile(name)
 
 #
 # set geometry
@@ -46,7 +46,7 @@ rootsystem.setGeometry(rotatedRhizotron)  # soilcore, rhizotron, or rotatedRhizo
 #
 # Initialize
 #
-rootsystem.initialize(4,5) # TODO expose default values 
+rootsystem.initialize()
 
 #
 # Simulate

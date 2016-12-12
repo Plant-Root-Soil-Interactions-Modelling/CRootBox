@@ -37,6 +37,8 @@ public:
      */
     virtual double getAbsoluteValue(const Vector3d& pos, const Root* root = nullptr) const { return 1.; } ///< Returns a scalar poperty of the soil
 
+    virtual std::string toString() const { return "SoilProperty base class"; } ///< Quick info about the object for debugging
+
 };
 
 
@@ -74,6 +76,8 @@ public:
         c += (fmax-fmin)/2.; // thats the value at the boundary
         return std::max(std::min(c,fmax),fmin);
     } ///<@see SoilProperty::getAbsoluteValue
+
+    virtual std::string toString() const { return "SoilPropertySDF"; } ///< Quick info about the object for debugging
 
     SignedDistanceFunction* sdf;
     double fmax;

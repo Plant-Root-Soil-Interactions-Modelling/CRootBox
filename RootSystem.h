@@ -58,7 +58,7 @@ public:
 	//
 	virtual Root* createRoot(int lt, Vector3d  h, double delay, Root* parent, double pbl, int pni);
 	///< Creates a new lateral root, overwrite or change this method to use more spezialised root classes
-	virtual TropismFunction* createTropismFunction(int tt, int N, double sigma);
+	virtual TropismFunction* createTropismFunction(int tt, double N, double sigma);
 	///< Creates the tropisms, overwrite or change this method to add more tropisms
 	virtual GrowthFunction* createGrowthFunction(int gft);
 	///< Creates the growth function per root type, overwrite or change this method to add more tropisms
@@ -66,6 +66,7 @@ public:
 	// Analysis of simulation results
 	int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system
 	std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots
+<<<<<<< HEAD
 	std::vector<Vector3d> getRootTips() const; ///< returns the positions of the root tips
 	std::vector<Vector3d> getRootBases() const; ///< returns the positions of the root bases
 	std::vector<Vector3d> getNodes(int ot, std::vector<Root*> roots) const; ///< Copies all root system nodes into a vector
@@ -73,6 +74,14 @@ public:
 	std::vector<Root*> getSegmentsOrigin(int ot, std::vector<Root*> roots) const; ///< Copies a pointer to the root containing the segment
 	std::vector<double> getNETimes(int ot, std::vector<Root*> roots) const; ///< Copies all node emergence times into a vector
 	std::vector<double> getScalar(int ot, int stype, std::vector<Root*> roots) const; ///< Copies a scalar root parameter that is constant per root to a vector
+=======
+	std::vector<Vector3d> getRootTips(std::vector<Root*> roots=std::vector<Root*>()) const; ///< returns the positions of the root tips
+	std::vector<Vector3d> getNodes(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all root system nodes into a vector
+	std::vector<Vector2i> getSegments(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all segments indices into a vector
+	std::vector<Root*> getSegmentsOrigin(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a pointer to the root containing the segment
+	std::vector<double> getNETimes(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all node emergence times into a vector
+	std::vector<double> getScalar(int ot=RootSystem::ot_segments, int stype=RootSystem::st_length, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a scalar root parameter that is constant per root to a vector
+>>>>>>> c933e6abc6c9da8a70a013854c70c287c9b225bd
 
 	// Output Simulation results
 	void write(std::string name, int type = ot_polylines) const; /// writes simulation results (type is determined from file extension in name)
@@ -80,6 +89,8 @@ public:
 	void writeVTP(std::ostream & os, int type = ot_polylines) const; ///< Writes current simulation results as VTP (VTK polydata file)
 	void writeGeometry(std::ostream & os) const; ///< Writes the current confining geometry (e.g. a plant container) as paraview python script
 	void writeDGF(std::ostream & os) const; ///< Writes the segments of the root system in DGF format used in Dumux
+
+	// void std::toString() const; TODO
 
 	// random stuff
 	void setSeed(double seed); ///< help fate (sets the seed of all random generators)

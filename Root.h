@@ -50,6 +50,7 @@ public:
 
     /* IO */
     void writeRSML(std::ostream & cout, std::string indent) const; ///< writes a RSML root tag
+    std::string toString() const;
 
     RootSystem* rootsystem; ///< pointer to the root system this root is part of
 
