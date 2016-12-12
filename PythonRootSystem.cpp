@@ -13,7 +13,8 @@
  *
  *
  */
-// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+
+//#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -327,6 +328,10 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("initialize", &RootSystem::initialize, initialize_overloads())
 		.def("simulate",&RootSystem::simulate)
 		.def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
+//		.def("getNodes", &RootSystem::getNodes) // TODO something clever to avoid Root, Root*, etc
+//		.def("getSegments", &RootSystem::getSegments)
+		.def("getRootTips", &RootSystem::getRootTips)
+		.def("getRootBases", &RootSystem::getRootBases)
 		.def("getRoots", &RootSystem::getRoots)
 		.def("getRootTips", &RootSystem::getRootTips, getRootTips_overloads())
 		.def("getNodes", &RootSystem::getNodes, getNodes_overloads())

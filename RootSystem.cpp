@@ -314,6 +314,19 @@ std::vector<Vector3d> RootSystem::getRootTips(std::vector<Root*> roots) const
 }
 
 /**
+ * Returns the positions of the root bases
+ */
+std::vector<Vector3d> RootSystem::getRootBases() const
+{
+	std::vector<Vector3d> bases;
+	auto roots = getRoots();
+	for (auto& r : roots) {
+		bases.push_back(r->getNode(0));
+	}
+	return bases;
+}
+
+/**
  * Copies the nodes of the root systems into a sequential vector,
  * there are two different node numberings
  *
