@@ -8,7 +8,19 @@ import py_rootbox as rb
 import numpy as np
 
 
+#
+#    auxiliary functions that should be moved to py_rootbox
+#
+def v2v(v): # rb.Vector3 to numpy array 
+    return np.array([v.x, v.y, v.z])
 
+def vd2l(vd): # rb.std_vector_double_ to numpy array
+    N  = len(vd)
+    l = np.zeros(N) 
+    for i in range(0,N):
+        l[i] = vd[i]
+    return l
+        
 #
 # Initialize soil domain
 #    
@@ -91,14 +103,23 @@ while (time < simTime):
     #    
     rs_nodes = rs.getNodes()
     rs_segI = rs.getSegments()
-    # rs_segType = rs.getScalar()
-    # rs_segZ
-    # rs_segL
-    # rs_segR
-
+    rs_segType = vd2l(rs.getScalar(rb.OutputType.segments, rb.ScalarType.type))
+    rs_segL = vd2l(rs.getScalar(rb.OutputType.segments, rb.ScalarType.length))
+    rs_segR = vd2l(rs.getScalar(rb.OutputType.segments, rb.ScalarType.radius))
+    
     N = len(rs_segI)
     print("Number of segments is "+str(N))
-    rs_segPot = np.ones(N) * - 10000 # pressure head
+    rs_segPot = np.ones(N) * -10000 # pressure head
+    
+    rs_segV = np.zeros((N,3)) # needed for doussan
+    rs_segZ = np.zeros(N) # segment mid point z coordinate
+    for i in range(0,N):
+        s = rs_segI[i]
+        n1 = v2v(rs_nodes[s.x])
+        n2 = v2v(rs_nodes[s.y])
+        rs_segV[i,:] = n2-n1
+        mid = 0.5*(n1+n2)
+        rs_segZ[i] = mid[2]  
     
     rs_flux = np.zeros(N)
     for i in range(0,N):
