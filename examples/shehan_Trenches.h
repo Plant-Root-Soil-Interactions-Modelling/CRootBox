@@ -114,8 +114,8 @@ void shehan_Trenches(string name = "wheat", bool exportVTP = false)
 
 			// split into grid
 			std::cout <<"grid \n";
-			vector<vector<AnalysisSDF>> anamatrix1 = cut.distribution2(0,-160, tr->o.x-dist1,tr->o.x,n,m);
-			vector<vector<AnalysisSDF>> anamatrix2 = cut.distribution2(0,-160, tr->o.x,tr->o.x+dist1,n,m);
+			vector<vector<AnalysisSDF>> anamatrix1 = cut.distribution2(0,160, tr->o.x-dist1,tr->o.x,n,m);
+			vector<vector<AnalysisSDF>> anamatrix2 = cut.distribution2(0,160, tr->o.x,tr->o.x+dist1,n,m);
 
 			// save root count into matrix
 			std::cout<<"count \n";

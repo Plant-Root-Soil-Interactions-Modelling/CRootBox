@@ -30,10 +30,6 @@ rootsystem.simulate(simtime);
 #
 # Analyse root system
 # 
-# segs = rootsystem.getSegments()
-# nosegs = sum(1 for _ in segs)
-# delete(segs)
-
 tips = rootsystem.getRootTips()
 notips = len(tips) 
 

@@ -54,8 +54,7 @@ void AnalysisSDF::addSegments(const AnalysisSDF& a)
 std::vector<double> AnalysisSDF::getScalar(int st) const
 {
 	// TODO since segments have know their origin root: segO, pure root segment mapping could be done by using RootSystem::getScalar
-	// to avoid redundant code,
-	// scalars that are segment wise must be treated extra
+	// to avoid redundant code, scalars that are segment wise must be treated extra
 	std::vector<double> data(segO.size());
 	double v = 0; // value
 	for (size_t i=0; i<segO.size(); i++) {
@@ -471,7 +470,7 @@ std::vector<std::vector<double>> AnalysisSDF::distribution2(int st, double top, 
 std::vector<std::vector<AnalysisSDF>> AnalysisSDF::distribution2(double top, double bot, double left, double right, int n, int m) const
 {
 	std::vector<std::vector<AnalysisSDF>> d(n);
-	double dz = (top-bot)/double(n);
+	double dz = (bot-top)/double(n);
 	double dx = (right-left)/double(m);
 	SDF_PlantBox* layer = new SDF_PlantBox(dx,1.e9,dz);
 	// std::cout << "dx " << dx  <<", dz "<< dz << "\n";

@@ -72,7 +72,7 @@ public:
 	std::vector<Vector2i> getSegments(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all segments indices into a vector
 	std::vector<Root*> getSegmentsOrigin(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a pointer to the root containing the segment
 	std::vector<double> getNETimes(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all node emergence times into a vector
-	std::vector<double> getScalar(int ot=RootSystem::ot_segments, int stype=RootSystem::st_length, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a scalar root parameter that is constant per root to a vector
+	std::vector<double> getScalar(int ot=RootSystem::ot_polylines, int stype=RootSystem::st_length, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a scalar root parameter that is constant per root to a vector
 
 	// Output Simulation results
 	void write(std::string name, int type = ot_polylines) const; /// writes simulation results (type is determined from file extension in name)

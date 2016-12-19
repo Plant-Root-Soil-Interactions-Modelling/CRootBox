@@ -7,7 +7,7 @@ from PSP_soil import *
 
 waterDensity = 1000.        
 area = 1                    
-maxNrIterations = 100
+maxNrIterations = 500
 tolerance = 1e-6
 n = 200
  

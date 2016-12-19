@@ -34,8 +34,8 @@ public:
         return strs.str();
     } ///< creates a string representing the two doubles
 
-    int x; ///< double number 1
-    int y; ///< double number 2
+    int x; ///< number 1
+    int y; ///< number 2
 
 };
 
@@ -62,8 +62,8 @@ public:
         return strs.str();
     } ///< creates a string representing the two doubles
 
-    double x; ///< double number 1
-    double y; ///< double number 2
+    double x; ///< number 1
+    double y; ///< number 2
 
 };
 

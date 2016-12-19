@@ -69,5 +69,3 @@ rootsystem.write(name+".vtp",rb.OutputType.polylines) # use ot_polylines for nic
 rootsystem.write(name+".py", 0) 
 
 print("Finished with a total of "+str(rootsystem.getNumberOfNodes())+ " nodes")
-
-# end of example 2

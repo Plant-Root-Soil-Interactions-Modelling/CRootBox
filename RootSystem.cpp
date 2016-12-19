@@ -521,12 +521,12 @@ std::vector<double> RootSystem::getScalar(int ot, int stype, std::vector<Root*> 
             break;
         }
         case RootSystem::st_time:
-            value = roots[i]->getNodeETime(0);
+            value = roots[i]->getNodeETime(0); // TODO
             break;
-        case RootSystem::st_length:
+        case RootSystem::st_length: // TODO
             value = roots[i]->length;
             break;
-        case RootSystem::st_surface:
+        case RootSystem::st_surface: // TODO
             value =  roots[i]->length*2.*M_PI*roots[i]->param.a;
             break;
         default:
