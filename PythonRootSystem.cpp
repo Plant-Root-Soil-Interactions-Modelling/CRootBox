@@ -363,9 +363,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	    .value("type", RootSystem::ScalarTypes::st_type)
 	    .value("radius", RootSystem::ScalarTypes::st_radius)
 	    .value("order", RootSystem::ScalarTypes::st_order)
-	    .value("red", RootSystem::ScalarTypes::st_red)
-	    .value("green", RootSystem::ScalarTypes::st_green)
-	    .value("blue", RootSystem::ScalarTypes::st_blue)
 	    .value("time", RootSystem::ScalarTypes::st_time)
 	    .value("length", RootSystem::ScalarTypes::st_length)
 	    .value("surface", RootSystem::ScalarTypes::st_surface)
@@ -375,13 +372,13 @@ BOOST_PYTHON_MODULE(py_rootbox)
      */
     class_<AnalysisSDF>("AnalysisSDF",init<RootSystem&>()) //
     	.def(init<AnalysisSDF&>())
-		.def("pack", &AnalysisSDF::pack)
-		.def("getScalar", &AnalysisSDF::getScalar)
-		.def("getSummed", getSummed1)
-		.def("getSummed", getSummed2)
+	.def("pack", &AnalysisSDF::pack)
+	.def("getScalar", &AnalysisSDF::getScalar)
+	.def("getSummed", getSummed1)
+	.def("getSummed", getSummed2)
         .def("getNumberOfRoots", &AnalysisSDF::getNumberOfRoots)
         .def("write",&AnalysisSDF::write)
-		.def("distribution", distribution1)
+	.def("distribution", distribution1)
     ;
 }
 

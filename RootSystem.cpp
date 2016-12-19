@@ -520,15 +520,6 @@ std::vector<double> RootSystem::getScalar(int ot, int stype, std::vector<Root*> 
             }
             break;
         }
-        case st_red:
-            value = rtparam.at(roots[i]->param.type-1).colorR;
-            break;
-        case st_green:
-            value = rtparam.at(roots[i]->param.type-1).colorG;
-            break;
-        case st_blue:
-            value = rtparam.at(roots[i]->param.type-1).colorB;
-            break;
         case RootSystem::st_time:
             value = roots[i]->getNodeETime(0);
             break;
