@@ -13,7 +13,8 @@
  *
  *
  */
-// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+
+#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -47,6 +48,8 @@ std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceF
 
 double (AnalysisSDF::*getSummed1)(int st) const = &AnalysisSDF::getSummed;
 double (AnalysisSDF::*getSummed2)(int st, SignedDistanceFunction* geometry) const = &AnalysisSDF::getSummed;
+
+std::vector<double> (AnalysisSDF::*distribution1)(int st, double top, double bot, int n, bool exact) const = &AnalysisSDF::distribution;
 
 /**
  * Default arguments: no idea how to do it by hand,  magic everywhere...
@@ -369,14 +372,14 @@ BOOST_PYTHON_MODULE(py_rootbox)
      */
     class_<AnalysisSDF>("AnalysisSDF",init<RootSystem&>()) //
     	.def(init<AnalysisSDF&>())
-		.def("pack", &AnalysisSDF::pack)
-		.def("getScalar", &AnalysisSDF::getScalar)
-		.def("getSummed", getSummed1)
-		.def("getSummed", getSummed2)
+	.def("pack", &AnalysisSDF::pack)
+	.def("getScalar", &AnalysisSDF::getScalar)
+	.def("getSummed", getSummed1)
+	.def("getSummed", getSummed2)
         .def("getNumberOfRoots", &AnalysisSDF::getNumberOfRoots)
-		.def("write",&AnalysisSDF::write)
+        .def("write",&AnalysisSDF::write)
+	.def("distribution", distribution1)
     ;
-
 }
 
 /*
