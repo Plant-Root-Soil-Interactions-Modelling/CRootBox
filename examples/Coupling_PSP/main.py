@@ -16,7 +16,7 @@ from rb_tools import *
 #
 # Initialize soil domain
 #    
-isSuccess, soil = inf.readSoil("soilUniform.txt")
+isSuccess, soil = inf.readSoil("clay.txt")
 if not isSuccess: 
     print("warning: wrong soil file.")
     quit()        
@@ -27,8 +27,8 @@ Se = 0.5  # Initial degree of saturation ]0-1]
 
 inf.initializeWater(funcType, soil, Se, inf.CELL_CENT_FIN_VOL)
         
-ubPotential = inf.airEntryPotential(funcType, soil[0]) # [J kg^-1] upper boundary condition
-#ubPotential = inf.waterPotential(funcType, soil[0],inf.thetaFromSe(funcType, soil[0],0.1))    
+# ubPotential = inf.airEntryPotential(funcType, soil[0]) # [J kg^-1] upper boundary condition INFILTRATION
+ubPotential = inf.waterPotential(funcType, soil[0],inf.thetaFromSe(funcType, soil[0],0.1))    
 isFreeDrainage = True
 
 sumInfiltration = 0
@@ -46,7 +46,7 @@ rs_Kr = ( 1e-10, 1e-10, 1e-10, 1e-10, 1e-10 ) # root hydraulic conductivity per 
 #
 # Simulation
 #                   
-simTime = 31 * 24 * 3600   
+simTime = 30*24 * 3600   
 maxTimeStep = 24*3600                  
 dt = 3600              
 time = 0               
@@ -69,9 +69,13 @@ ax1 = fig.add_subplot(2, 2, 1)
 ax2 = fig.add_subplot(2, 2, 2, projection='3d')  
 
 ax3 = fig.add_subplot(2, 2, 3)
-
-ax3.set_xlabel("Time [s])");
+ax3.set_xlabel("Time [s]");
 ax3.set_ylabel("Root uptake [1]") 
+
+ax4 = fig.add_subplot(2, 2, 4)
+ax4.set_ylim(-1, 0)
+ax4.set_xlabel("Water content");
+ax4.set_ylabel("Depth [m]") 
 
 
 
@@ -137,14 +141,18 @@ while (time < simTime):
         j = z2i(rs_segZ[i], inf.n)
         ind = int(rs_segType[i])
         rs_flux[i] =  (2*rs_segR[i]*math.pi*rs_segL[i])*rs_Kr[ind-1]*(inf.psi[j+1]-rs_segPot[i]) 
-        rs_flux2[j+1] += (rs_flux[i]*dt)             
-                           
+        #print((inf.psi[j+1]-rs_segPot[i]))
+        rs_flux2[j+1] += max((rs_flux[i]*dt),0)             
+    #print(rs_flux2)                  
     #
     # Apply Sink
     #    
     for i in range(0,inf.n):
-        inf.theta[i+1] -= ( rs_flux2[i+1]/inf.area/inf.dz[i+1] )       
+        inf.theta[i+1] -= ( rs_flux2[i+1]/inf.area/inf.dz[i+1] )    
+        inf.theta[i+1] = min(inf.theta[i+1],1)
+        inf.theta[i+1] = max(inf.theta[i+1],0)          
       
+    print(inf.theta)
     for i in range(0,inf.n+2):
         inf.psi[i] = inf.waterPotential(funcType, soil[inf.hor[i]], inf.theta[i])
      
@@ -160,18 +168,20 @@ while (time < simTime):
         
         # Subplot 1
         out_img[:,out_c] = inf.theta[:]
-        imin = np.min(np.min(out_img))
-        imax = np.max(np.max(out_img))     
-        print(imin)
-        print(imax)
+#         imin = np.min(np.min(out_img))
+#         imax = np.max(np.max(out_img))     
         out_c += 1
-        ax1.imshow((out_img-imin)/(imax-imin), interpolation="nearest", cmap="hot")        
+        #ax1.imshow((out_img-imin)/(imax-imin), interpolation="nearest", cmap="hot")        
+        ax1.imshow(out_img, interpolation="nearest", cmap="hot")        
 
         # Subplot2
         plotRSscatter(ax2, rs.getRootTips())        
         
         # Subplot 3                    
         ax3.plot([time,out_next], [cflux,cflux], 'k-')
+    
+        # Subplot 4
+        ax4.plot(inf.theta,-inf.z,'k-')   
     
         plt.pause(0.0001)
             
