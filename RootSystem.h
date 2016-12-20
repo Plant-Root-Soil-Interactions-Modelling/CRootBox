@@ -29,7 +29,7 @@ class RootSystem
 
 public:
 
-	enum TropismTypes { tt_plagio=0, tt_gravi=1, tt_exo=2, tt_hydro=3 };  ///< root tropism
+	enum TropismTypes { tt_plagio=0, tt_gravi=1, tt_exo=2, tt_hydro=3, tt_chemo=4 };  ///< root tropism
 	enum GrowthFunctionTypes { gft_negexp=1, gft_linear=2 }; // root growth function
 	enum OutputTypes { ot_segments=0, ot_polylines=1 }; ///< used for postprocessing
 	enum ScalarTypes { st_type, st_radius, st_order,  st_time, st_length, st_surface }; ///< @see RootSystem::getScalar

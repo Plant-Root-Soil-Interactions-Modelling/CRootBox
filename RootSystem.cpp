@@ -265,6 +265,12 @@ TropismFunction* RootSystem::createTropismFunction(int tt, double N, double sigm
         TropismFunction* cht = new CombinedTropism(N,sigma,ht,10.,gt,1.); // does only use the objective functions from gravitropism and hydrotropism
         return cht;
     }
+    case tt_chemo: {
+        TropismFunction* gt =  new Gravitropism(N,sigma);
+        TropismFunction* ct= new Chemotropism(N,sigma,soil);
+        TropismFunction* cht = new CombinedTropism(N,sigma,ct,100.,gt,1.); // does only use the objective functions from gravitropism and chemotropism
+        return cht;
+    }
     default: throw std::invalid_argument( "RootSystem::createTropismFunction() tropism type not implemented" );
     }
 }

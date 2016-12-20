@@ -124,7 +124,7 @@ public:
 
 
 /**
- * Plagiotropism: the tendency to stay in a horicontal layer
+ * Plagiotropism: the tendency to stay in a horizontal layer
  */
 class Plagiotropism : public TropismFunction
 {
@@ -177,6 +177,22 @@ private:
     SoilProperty* soil;
 };
 
+/**
+ * Chemotropism : the tendency to grow towards a higher concentration of nutrient
+ */
+class Chemotropism : public TropismFunction
+{
+
+public:
+
+    Chemotropism(double n, double sigma, SoilProperty* soil) : TropismFunction(n,sigma), soil(soil) { } ///< @see TropismFunction
+
+    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root) override;
+    ///< getHeading() minimizes this function, @see TropismFunction
+
+private:
+    SoilProperty* soil;
+};
 
 
 /**

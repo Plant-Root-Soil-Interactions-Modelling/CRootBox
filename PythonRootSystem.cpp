@@ -350,6 +350,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.value("gravi", RootSystem::TropismTypes::tt_gravi)
     	.value("exo", RootSystem::TropismTypes::tt_exo)
     	.value("hydro", RootSystem::TropismTypes::tt_hydro)
+    	.value("chemo", RootSystem::TropismTypes::tt_chemo)
     ;
     enum_<RootSystem::GrowthFunctionTypes>("GrowthFunctionType")
     	.value("negexp", RootSystem::GrowthFunctionTypes::gft_negexp)

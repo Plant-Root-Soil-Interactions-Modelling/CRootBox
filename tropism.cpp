@@ -156,6 +156,18 @@ double Hydrotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double 
     return -v; ///< (-1) because we want to maximize the soil property
 }
 
+/**
+ * getHeading() minimizes this function, @see TropismFunction::tropismObjective
+ */
+double Chemotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root)
+{
+    assert(soil!=nullptr);
+    Vector3d newpos = this->getPosition(pos,old,a,b,dx);
+    double v = soil->getRelativeValue(newpos,root);
+    // std::cout << "\n" << newpos.getString() << ", = "<< v;
+    return -v; ///< (-1) because we want to maximize the soil property
+}
+
 
 
 /**
