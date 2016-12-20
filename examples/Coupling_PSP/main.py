@@ -1,33 +1,17 @@
-#PSP_infiltrationRedistribution1D
-from __future__ import print_function, division
+import math
 
-import matplotlib.pyplot as plt
-import PSP_infiltration1D as inf
-
-import py_rootbox as rb    
 import numpy as np
 from numpy import linalg as LA
 
-import math 
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
+import PSP_infiltration1D as inf
 
-#
-# Auxiliary functions that should be moved to py_rootbox
-#
-def v2v(v): # rb.Vector3 to numpy array 
-    return np.array([v.x, v.y, v.z])
+import py_rootbox as rb    
+from rb_tools import *
 
-def vd2a(vd): # rb.std_vector_double_ to numpy array
-    N  = len(vd)
-    l = np.zeros(N) 
-    for i in range(0,N):
-        l[i] = vd[i]
-    return l
-
-def z2i(z):
-    i = int(round((abs(z)/100)*inf.n))  
-    return min(max(i,0),inf.n-1) 
-
+    
         
 #
 # Initialize soil domain
@@ -65,29 +49,46 @@ rs_Kr = ( 1e-10, 1e-10, 1e-10, 1e-10, 1e-10 ) # root hydraulic conductivity per 
 simTime = 31 * 24 * 3600   
 maxTimeStep = 24*3600                  
 dt = 3600              
-time = 0                            
+time = 0               
+
+out_delay = 6*3600
+out_next = out_delay             
+out_img = np.zeros((inf.n+2,round(simTime/out_delay)))
+out_c = 0
+
+cflux = 0
   
 #   
 # Output
 #
 plt.ion()
-f, myPlot = plt.subplots(2, figsize=(10, 8), dpi=80)
-myPlot[1].set_xlim(0, simTime)
-myPlot[1].set_ylim(0, 0.1)
-myPlot[1].set_xlabel("Time [s]",fontsize=16,labelpad=8)
-myPlot[1].set_ylabel("todo",fontsize=16,labelpad=8)
-plt.tick_params(axis='both', which='major', labelsize=12,pad=6)
+fig = plt.figure() 
+
+ax1 = fig.add_subplot(2, 2, 1)
+
+ax2 = fig.add_subplot(2, 2, 2, projection='3d')  
+
+ax3 = fig.add_subplot(2, 2, 3)
+
+ax3.set_xlabel("Time [s])");
+ax3.set_ylabel("Root uptake [1]") 
+
+
 
 #
 # Simulation loop
 #
 while (time < simTime):
-    dt = min(dt, simTime - time) 
+    
+    dt = min(dt, out_next - time) 
 
     #
     # Python Richards Code
     #    
+    
     success, nrIterations, flux = inf.cellCentFiniteVolWater(funcType, soil, dt, ubPotential, isFreeDrainage,inf.LOGARITHMIC)
+    #success, nrIterations, flux = (True,1,0)
+    
     while (not success):
         print ("dt =", dt, "No convergence")
         dt = max(dt / 2, 1)
@@ -129,41 +130,50 @@ while (time < simTime):
         rs_segV[i,:] = n2-n1 # todo normalize
         mid = 0.5*(n1+n2)
         rs_segZ[i] = mid[2]  
-    
+     
     rs_flux = np.zeros(N)
     rs_flux2 = np.zeros(inf.n+2)
     for i in range(0,N):
-        j = z2i(rs_segZ[i])
+        j = z2i(rs_segZ[i], inf.n)
         ind = int(rs_segType[i])
         rs_flux[i] =  (2*rs_segR[i]*math.pi*rs_segL[i])*rs_Kr[ind-1]*(inf.psi[j+1]-rs_segPot[i]) 
         rs_flux2[j+1] += (rs_flux[i]*dt)             
-                         
+                           
     #
     # Apply Sink
     #    
     for i in range(0,inf.n):
         inf.theta[i+1] -= ( rs_flux2[i+1]/inf.area/inf.dz[i+1] )       
-     
+      
     for i in range(0,inf.n+2):
         inf.psi[i] = inf.waterPotential(funcType, soil[inf.hor[i]], inf.theta[i])
      
+    cflux += float(np.sum(rs_flux2))   
      
     #
     # Output
     #
     print("time =", int(time), "\tdt =", dt, "\tIter. =", int(nrIterations),  "\tInf:", format(sumInfiltration, '.3f'))
-    myPlot[0].clear()
-    myPlot[0].set_xlim(0, 0.5)
-    myPlot[0].set_xlabel("Water content [m$^3$ m$^{-3}$]",fontsize=16,labelpad=8)
-    myPlot[0].set_ylabel("Depth [m]",fontsize=16,labelpad=8)
-    myPlot[0].plot(inf.theta, -inf.z, 'k-')
-    myPlot[0].plot(inf.theta, -inf.z, 'ko')
-
-    myPlot[1].clear();
-    myPlot[1].plot(rs_flux2, -inf.z, 'k-')
-    myPlot[1].plot(rs_flux2, -inf.z, 'ko')    
     
-    plt.pause(0.0001)
+    if time>=out_next:
+        out_next += out_delay
+        
+        # Subplot 1
+        out_img[:,out_c] = inf.theta[:]
+        imin = np.min(np.min(out_img))
+        imax = np.max(np.max(out_img))     
+        print(imin)
+        print(imax)
+        out_c += 1
+        ax1.imshow((out_img-imin)/(imax-imin), interpolation="nearest", cmap="hot")        
+
+        # Subplot2
+        plotRSscatter(ax2, rs.getRootTips())        
+        
+        # Subplot 3                    
+        ax3.plot([time,out_next], [cflux,cflux], 'k-')
+    
+        plt.pause(0.0001)
             
     if (float(nrIterations/inf.maxNrIterations) < 0.1): 
         dt = min(dt*2, maxTimeStep) # go fasetr        

@@ -14,7 +14,7 @@
  *
  */
 
-#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -376,8 +376,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	.def("getScalar", &AnalysisSDF::getScalar)
 	.def("getSummed", getSummed1)
 	.def("getSummed", getSummed2)
-        .def("getNumberOfRoots", &AnalysisSDF::getNumberOfRoots)
-        .def("write",&AnalysisSDF::write)
+    .def("getNumberOfRoots", &AnalysisSDF::getNumberOfRoots)
+    .def("write",&AnalysisSDF::write)
 	.def("distribution", distribution1)
     ;
 }

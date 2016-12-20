@@ -9,7 +9,7 @@ waterDensity = 1000.
 area = 1                    
 maxNrIterations = 500
 tolerance = 1e-6
-n = 200
+n = 100
  
 hor = np.zeros(n+2, int)                      
 z = np.zeros(n+2, float) 
