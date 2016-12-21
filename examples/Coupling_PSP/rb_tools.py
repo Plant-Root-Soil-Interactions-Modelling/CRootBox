@@ -30,12 +30,12 @@ def z2i(z,n): # maps z to equidistant mesh
 
 def plotRSinit(ax):
     ax.clear()
-    ax.set_xlim(-0.5, 0.5)
-    ax.set_ylim(-0.5, 0.5)
-    ax.set_zlim(-1, 0)
+    ax.set_xlim(-0.2, 0.2)
+    ax.set_ylim(-0.2, 0.2)
+    ax.set_zlim(-0.35, 0)
     ax.set_xlabel("x [m]")
     ax.set_ylabel("y [m]")
-    ax.set_zlabel("z [m]")     
+    ax.set_zlabel("z [m]")         
 
 def plotRS(ax,seg,nodes): # plots the root system as line plot (too slow)
     plotRSinit(ax)
@@ -50,3 +50,7 @@ def plotRSscatter(ax,nodes): # plots the root system nodes (rather slow)
     scale = 0.01
     n = vv2a(nodes)
     ax.scatter(n[:,0]*scale,n[:,1]*scale,n[:,2]*scale)
+    ax.set_title("Root tips")
+    
+    
+    

@@ -13,7 +13,6 @@
  *
  *
  */
-
 // #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
@@ -62,7 +61,8 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegments_overloads,getSegments,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentsOrigin_overloads,getSegmentsOrigin,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNETimes_overloads,getNETimes,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getScalar_overloads,getScalar,0,3);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(write_overloads,write,1,2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(write_overloads,write,1,2); // for RootSystem
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(write2_overloads,write,1,2); // for AnalysisSDF
 
 /**
  * Virtual functions (not sure if needed, or only if we derive classes from it in pyhton?), not working...
@@ -330,8 +330,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("initialize", &RootSystem::initialize, initialize_overloads())
 		.def("simulate",&RootSystem::simulate)
 		.def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
-//		.def("getNodes", &RootSystem::getNodes) // TODO something clever to avoid Root, Root*, etc
-//		.def("getSegments", &RootSystem::getSegments)
 		.def("getRootTips", &RootSystem::getRootTips)
 		.def("getRootBases", &RootSystem::getRootBases)
 		.def("getRoots", &RootSystem::getRoots)
@@ -341,10 +339,9 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getSegmentsOrigin", &RootSystem::getSegmentsOrigin, getSegmentsOrigin_overloads())
 		.def("getNETimes", &RootSystem::getNETimes, getNETimes_overloads())
 		.def("getScalar", &RootSystem::getScalar, getScalar_overloads())
-		.def("write",&RootSystem::write)
+		.def("write", &RootSystem::write,  write_overloads())
 		.def("setSeed",&RootSystem::setSeed)
 	;
-
     enum_<RootSystem::TropismTypes>("TropismType")
     	.value("plagio", RootSystem::TropismTypes::tt_plagio)
 		.value("gravi", RootSystem::TropismTypes::tt_gravi)
@@ -377,8 +374,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	.def("getSummed", getSummed1)
 	.def("getSummed", getSummed2)
     .def("getNumberOfRoots", &AnalysisSDF::getNumberOfRoots)
-    .def("write",&AnalysisSDF::write)
 	.def("distribution", distribution1)
+	.def("write", &AnalysisSDF::write, write2_overloads())
     ;
 }
 

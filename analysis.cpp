@@ -494,15 +494,16 @@ std::vector<std::vector<AnalysisSDF>> AnalysisSDF::distribution2(double top, dou
  * (that must be lower case)
  *
  * @param name      file name e.g. output.vtp
+ *  * @param data_ 	optional user data per segment
  */
-void AnalysisSDF::write(std::string name) const
+void AnalysisSDF::write(std::string name, std::vector<double> data_) const
 {
 	std::ofstream fos;
 	fos.open(name.c_str());
 	std::string ext = name.substr(name.size()-3,name.size()); // pick the right writer
 	if (ext.compare("vtp")==0) {
 		std::cout << "writing VTP: " << name << "\n";
-		this->writeVTP(fos,{ RootSystem::st_radius, RootSystem::st_type, RootSystem::st_time });
+		this->writeVTP(fos,{ RootSystem::st_radius, RootSystem::st_type, RootSystem::st_time },data_);
 	} else if (ext.compare("txt")==0)  {
 		std::cout << "writing text file for Matlab import: "<< name << "\n";
 		writeRBSegments(fos);
@@ -517,8 +518,9 @@ void AnalysisSDF::write(std::string name) const
  *
  * @param os        typically a file out stream
  * @param types     multiple parameter types (@see RootSystem::ScalarType) that are saved in the VTP file
+ * @param data_ 	optional user data per segment
  */
-void AnalysisSDF::writeVTP(std::ostream & os, std::vector<int> types) const
+void AnalysisSDF::writeVTP(std::ostream & os, std::vector<int> types, std::vector<double> data_) const
 {
 	assert(segments.size() == segO.size());
 	assert(segments.size() == ctimes.size());
@@ -532,6 +534,14 @@ void AnalysisSDF::writeVTP(std::ostream & os, std::vector<int> types) const
 		std::vector<double> data = getScalar(i);
 		os << "<DataArray type=\"Float32\" Name=\"" << RootSystem::scalarTypeNames.at(i) << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
 		for (auto const& t : data) {
+			os << t << " ";
+		}
+		os << "\n</DataArray>\n";
+	}
+	// write additional data
+	if (!data_.empty()) {
+		os << "<DataArray type=\"Float32\" Name=\"" << "user data" << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
+		for (auto const& t : data_) {
 			os << t << " ";
 		}
 		os << "\n</DataArray>\n";

@@ -64,20 +64,23 @@ cflux = 0
 plt.ion()
 fig = plt.figure() 
 
+
 ax1 = fig.add_subplot(2, 2, 1)
+ax1.set_xlabel("Time");     
+ax1.set_ylabel("Depth");
+ax1.set_title("Water content")
+# ax1.yticks(np.linspace(0,-1,11)) # how?
 
 ax2 = fig.add_subplot(2, 2, 2, projection='3d')  
 
 ax3 = fig.add_subplot(2, 2, 3)
-ax3.set_xlabel("Time [s]");
-ax3.set_ylabel("Root uptake [1]") 
+ax3.set_xlabel("Time [days]");
+ax3.set_ylabel("Root water uptake [1]") 
 
 ax4 = fig.add_subplot(2, 2, 4)
 ax4.set_ylim(-1, 0)
 ax4.set_xlabel("Water content");
 ax4.set_ylabel("Depth [m]") 
-
-
 
 #
 # Simulation loop
@@ -152,7 +155,7 @@ while (time < simTime):
         inf.theta[i+1] = min(inf.theta[i+1],1)
         inf.theta[i+1] = max(inf.theta[i+1],0)          
       
-    print(inf.theta)
+    #print(inf.theta)
     for i in range(0,inf.n+2):
         inf.psi[i] = inf.waterPotential(funcType, soil[inf.hor[i]], inf.theta[i])
      
@@ -168,20 +171,21 @@ while (time < simTime):
         
         # Subplot 1
         out_img[:,out_c] = inf.theta[:]
-#         imin = np.min(np.min(out_img))
-#         imax = np.max(np.max(out_img))     
+        imin = np.min(np.min(out_img))
+        imax = np.max(np.max(out_img))     
         out_c += 1
         #ax1.imshow((out_img-imin)/(imax-imin), interpolation="nearest", cmap="hot")        
-        ax1.imshow(out_img, interpolation="nearest", cmap="hot")        
-
+        ax1.imshow(out_img, interpolation="nearest", cmap="hot")     
+        # fig.colorbar(ax1,[-1,0,1]) # np.linspace(imin,imax,10) 
+        
         # Subplot2
         plotRSscatter(ax2, rs.getRootTips())        
         
         # Subplot 3                    
-        ax3.plot([time,out_next], [cflux,cflux], 'k-')
+        ax3.plot([time/3600/24,out_next/3600/24], [cflux,cflux], 'k-')
     
         # Subplot 4
-        ax4.plot(inf.theta,-inf.z,'k-')   
+        ax4.plot(inf.theta,-inf.z)   
     
         plt.pause(0.0001)
             

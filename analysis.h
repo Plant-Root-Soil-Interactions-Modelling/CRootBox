@@ -44,8 +44,8 @@ public:
     AnalysisSDF cut(const SDF_HalfPlane& plane) const; ///< cuts with a plane and returns the intersection
 
     // some exports
-    void write(std::string name) const; ///< writes simulation results (type is determined from file extension in name)
-    void writeVTP(std::ostream & os, std::vector<int> types = {RootSystem::st_radius}) const; ///< writes a VTP file
+    void write(std::string name, std::vector<double> data = std::vector<double>()) const; ///< writes simulation results (type is determined from file extension in name)
+    void writeVTP(std::ostream & os, std::vector<int> types = {RootSystem::st_radius}, std::vector<double> data = std::vector<double>()) const; ///< writes a VTP file
     void writeRBSegments(std::ostream & os) const; ///< Writes the segments of the root system, mimics the Matlab script getSegments()
 
     // auxiliary
