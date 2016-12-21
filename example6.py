@@ -30,13 +30,13 @@ print (rootsystem.getRootSystemParameter().seedPos)
 # Static soil property
 #
 sideBox = rb.SDF_PlantBox(30,30,50)
-#left = rb.SDF_RotateTranslate(sideBox, rb.Vector3d(-4.99,0,0))
-#right = rb.SDF_RotateTranslate(sideBox, rb.Vector3d(4.99,0,0))
-#leftright = rb.SDF_Union(left,right)
 rootsystem.setGeometry(sideBox)  # for vizualisation
 
+#nutrientBox = rb.SDF_PlantBox(30,30,5)
+#nutrientBox2 = rb.SDF_RotateTranslate(nutrientBox, rb.Vector3d(0,0,-20))
 nutrientBox = rb.SDF_PlantBox(10,10,10)
-nutrientBox2 = rb.SDF_RotateTranslate(nutrientBox, rb.Vector3d(-4.99,0,-10))
+nutrientBox2 = rb.SDF_RotateTranslate(nutrientBox, rb.Vector3d(-5,0,-10))
+
 
 maxS = 0.7 # maximal saturation
 minS = 0.1 # minimal saturation

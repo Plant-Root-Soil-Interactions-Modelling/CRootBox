@@ -16,7 +16,7 @@ from rb_tools import *
 #
 # Initialize soil domain
 #    
-isSuccess, soil = inf.readSoil("clay.txt")
+isSuccess, soil = inf.readSoil("soil.txt")
 if not isSuccess: 
     print("warning: wrong soil file.")
     quit()        
