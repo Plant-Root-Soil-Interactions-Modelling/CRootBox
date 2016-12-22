@@ -9,8 +9,10 @@ import math
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+from tempfile import TemporaryFile
 
-name = "maize"
+nameOutputFile="example8"
+nameRootParameterFile = "maize"
 
 #
 # Plant and root parameter from a file
@@ -23,10 +25,10 @@ allRSnormal = [ ]
 N=100
 for i in range(0,N-1):
 	rootsystem1 = rb.RootSystem();
-	rootsystem1.openFile(name);
+	rootsystem1.openFile(nameRootParameterFile);
 	allRS.append(rootsystem1);
 	rootsystem2 = rb.RootSystem();
-	rootsystem2.openFile(name);
+	rootsystem2.openFile(nameRootParameterFile);
 	allRSnormal.append(rootsystem2)
 
 # Created soil property
@@ -84,23 +86,23 @@ for rs in allRSnormal:
 c = 0
 for rs in allRS:
       c += 1 # root system number
-      vtpname = "results/"+name+str(c)+".vtp";
+      vtpname = "results/"+nameRootParameterFile+str(c)+".vtp";
       rs.write(vtpname, rb.OutputType.polylines);
 c = 0
 for rs in allRSnormal:
       c += 1 # root system number
-      vtpname = "results/"+name+"_normal"+str(c)+".vtp";
+      vtpname = "results/"+nameRootParameterFile+"_normal"+str(c)+".vtp";
       rs.write(vtpname, rb.OutputType.polylines);
 
 #
 # Export container geometry as Paraview Python script (run file in Paraview by Tools->Python Shell, Run Script)
 #
-rs.write(name + "_example8.py",0);
+rs.write(nameRootParameterFile + "_example8.py",0);
 
 #
 # Compute vertical RLD distribution in layers
 #
-nl = 50; # number of layers
+nl = 100; # number of layers
 vRLD=np.zeros((N,nl)); # N rows, nl columns
 depth=100;
 c=0
@@ -128,6 +130,10 @@ plt.plot(mean,z,'k-',linewidth=2)
 plt.fill_betweenx(z,mean+std,mean-std,color='#b9cfe7',edgecolor='')
 plt.plot(mean_normal,z,'ko',color="red")
 plt.fill_betweenx(z,mean_normal+std_normal,mean_normal-std_normal,color='red',edgecolor='')
+# save picture
+plt.savefig(nameOutputFile+".png") # save picture
 plt.show()
-
+# save data: z, mean, std in npz format (for multi array)
+#https://docs.scipy.org/doc/numpy/reference/generated/numpy.savez.html
+np.savez(nameOutputFile, z=z, mean=mean, std=std, mean_normal=mean_normal, std_normal=std_normal)
 #print("Finished with a total of " + str(rootsystem.getNumberOfNodes()) + " nodes\n")
