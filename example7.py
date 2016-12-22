@@ -21,7 +21,7 @@ allRS = [ ]
 #
 # Creates N root systems
 #
-N=100
+N=10
 for i in range(0,N-1):
 	rootsystem = rb.RootSystem();
 	rootsystem.openFile(name);
@@ -112,8 +112,8 @@ z=np.linspace(0,depth*(-1),nl)   # depth*-1 is the (negativ) z coordinate
 mean=np.mean(vRLD,axis=0)
 std=np.std(vRLD,axis=0)
 plt.figure(figsize=(3.8,3))
-plt.plot(z,mean,'k-',linewidth=2)
-plt.fill_between(z,mean+std,mean-std,color='#b9cfe7',edgecolor='')
+plt.plot(mean,z,'k-',linewidth=2)
+plt.fill_betweenx(z,mean+std,mean-std,color='#b9cfe7',edgecolor='')
 plt.show()
 
 #print("Finished with a total of " + str(rootsystem.getNumberOfNodes()) + " nodes\n")
