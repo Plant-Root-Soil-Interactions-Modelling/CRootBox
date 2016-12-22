@@ -1,8 +1,7 @@
 #
-# Example 7
+# Example 8
 #
-# 100 root system
-# Chemotropism ,
+# 100 root systems with Chemotropism and 100 root systems without Chemotropism,
 # proof of concept, with a static nutrient concentration
 #
 import py_rootbox as rb
@@ -125,10 +124,10 @@ std=np.std(vRLD,axis=0)
 mean_normal=np.mean(vRLD_normal,axis=0)
 std_normal=np.std(vRLD_normal,axis=0)
 plt.figure(figsize=(3.8,3))
-plt.plot(z,mean,'k-',linewidth=2)
-plt.fill_between(z,mean+std,mean-std,color='#b9cfe7',edgecolor='')
-plt.plot(z,mean_normal,'ko',color="red")
-plt.fill_between(z,mean_normal+std_normal,mean_normal-std_normal,color='red',edgecolor='')
+plt.plot(mean,z,'k-',linewidth=2)
+plt.fill_betweenx(z,mean+std,mean-std,color='#b9cfe7',edgecolor='')
+plt.plot(mean_normal,z,'ko',color="red")
+plt.fill_betweenx(z,mean_normal+std_normal,mean_normal-std_normal,color='red',edgecolor='')
 plt.show()
 
 #print("Finished with a total of " + str(rootsystem.getNumberOfNodes()) + " nodes\n")
