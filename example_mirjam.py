@@ -28,7 +28,7 @@ allRS = [ ]
 N=100
 for i in range(0,N-1):
      rs = rb.RootSystem()
-     rs.openFile(name) 
+     rs.openFile(name)
      allRS.append(rs)
 
 #
@@ -52,26 +52,29 @@ for rs in allRS:
       rs.write(vtpname, rb.OutputType.polylines);
 
 #
-# Compute vertical RLD distribution in layers 
-#   
+# Compute vertical RLD distribution in layers
+#
 nl = 100; # number of layers
 vRLD=np.zeros((N,nl)); # N rows, nl columns
-depth=100;
+depth=100.;
 c=0
 for rs in allRS:
-      c += 1 # root system number
       analysis = rb.AnalysisSDF(rs)
       RLD = analysis.distribution(rb.ScalarType.length,0,depth,nl,1)
       vRLD[c,:]=RLD
+      vRLD[c,:] /= (depth/nl)
+      c += 1 # root system number
 
-z=np.linspace(0,depth*(-1),nl)   # depth*-1 is the (negativ) z coordinate 
+z=np.linspace(0,depth*(-1),nl)   # depth*-1 is the (negativ) z coordinate
 mean=np.mean(vRLD,axis=0)
 std=np.std(vRLD,axis=0)
-plt.figure(figsize=(3.8,3))
+#plt.figure(figsize=(3.8,3))
 plt.plot(mean,z,'k-', color="blue",linewidth=2)
 plt.fill_betweenx(z,mean+std,mean-std,color="blue",edgecolor='',alpha=0.5)
 x1,x2,y1,y2 = plt.axis()
 plt.axis((0,x2,y1,y2)) # set min of x axis to 0, because of some negative values of (mean-std)
+plt.xlabel('RLD (cm/cm)')
+plt.ylabel('Depth (cm)')
 plt.savefig(nameOutputFile+".png")
 plt.show()
 # save data: z, mean, std in npz format (for multi array)

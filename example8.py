@@ -107,18 +107,20 @@ vRLD=np.zeros((N,nl)); # N rows, nl columns
 depth=100;
 c=0
 for rs in allRS:
-      c += 1 # root system number
       analysis = rb.AnalysisSDF(rs)
       RLD = analysis.distribution(rb.ScalarType.length,0,depth,nl,1)
       vRLD[c,:]=RLD
+      vRLD[c,:] /= (depth/nl)
+      c += 1
 
 vRLD_normal=np.zeros((N,nl)); # N rows, nl columns
 c=0
 for rs in allRSnormal:
-      c += 1 # root system number
       analysis = rb.AnalysisSDF(rs)
       RLD = analysis.distribution(rb.ScalarType.length,0,depth,nl,1)
       vRLD_normal[c,:]=RLD
+      vRLD[c,:] /= (depth/nl)
+      c += 1
 
 z=np.linspace(0,depth*(-1),nl)   # depth*-1 is the (negativ) z coordinate
 mean=np.mean(vRLD,axis=0)
@@ -126,11 +128,16 @@ std=np.std(vRLD,axis=0)
 mean_normal=np.mean(vRLD_normal,axis=0)
 std_normal=np.std(vRLD_normal,axis=0)
 plt.figure(figsize=(3.8,3))
-plt.plot(mean,z,'k-',linewidth=2)
-plt.fill_betweenx(z,mean+std,mean-std,color='#b9cfe7',edgecolor='')
-plt.plot(mean_normal,z,'ko',color="red")
-plt.fill_betweenx(z,mean_normal+std_normal,mean_normal-std_normal,color='red',edgecolor='')
+plt.plot(mean,z,'k-',color="blue", linewidth=2)
+plt.fill_betweenx(z,mean+std,mean-std,color="blue",edgecolor='',alpha=0.5)
+plt.plot(mean_normal,z,'k-',color="red", linewidth=2)
+plt.fill_betweenx(z,mean_normal+std_normal,mean_normal-std_normal,color='red',edgecolor='',alpha=0.5)
+x1,x2,y1,y2 = plt.axis()
+plt.axis((0,x2,y1,y2)) # set min of x axis to 0, because of some negative values of (mean-std)
+plt.xlabel('RLD (cm/cm)')
+plt.ylabel('Depth (cm)')
 # save picture
+# change color http://stackoverflow.com/questions/22408237/named-colors-in-matplotlib
 plt.savefig(nameOutputFile+".png") # save picture
 plt.show()
 # save data: z, mean, std in npz format (for multi array)
