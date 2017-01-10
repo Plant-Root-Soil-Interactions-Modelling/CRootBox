@@ -56,6 +56,7 @@ std::vector<double> (AnalysisSDF::*distribution1)(int st, double top, double bot
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(initialize_overloads,initialize,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openFile_overloads,openFile,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getRootTips_overloads,getRootTips,0,1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getRootBases_overloads,getRootBases,0,1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNodes_overloads,getNodes,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegments_overloads,getSegments,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentsOrigin_overloads,getSegmentsOrigin,0,2);
@@ -334,6 +335,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getRootBases", &RootSystem::getRootBases)
 		.def("getRoots", &RootSystem::getRoots)
 		.def("getRootTips", &RootSystem::getRootTips, getRootTips_overloads())
+		.def("getRootBases", &RootSystem::getRootBases, getRootBases_overloads())
 		.def("getNodes", &RootSystem::getNodes, getNodes_overloads())
 		.def("getSegments", &RootSystem::getSegments, getSegments_overloads())
 		.def("getSegmentsOrigin", &RootSystem::getSegmentsOrigin, getSegmentsOrigin_overloads())
