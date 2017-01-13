@@ -209,7 +209,7 @@ void RootSystemParameter::read(std::istream & cin) {
 	double plantingdepth;
 	std::string s; // dummy
 	cin  >>  s >> plantingdepth;
-	cin >> s >> firstB >> s >> delayB >> s >> maxB >> s >> nC >> s >> firstSB >> s >> delaySB >> s >> delayRC >> s >> nz >> s >> simetime;
+	cin >> s >> firstB >> s >> delayB >> s >> maxB >> s >> nC >> s >> firstSB >> s >> delaySB >> s >> delayRC >> s >> nz >> s >> simtime;
 	seedPos = Vector3d(0,0,-plantingdepth);
 }
 
@@ -218,7 +218,7 @@ void RootSystemParameter::write(std::ostream & cout) const {
 	double pd = -seedPos.z;
 	cout <<  "plantingdepth\t" << pd << "\n" <<  "firstB\t" << firstB << "\n" <<  "delayB\t" << delayB << "\n"
 			<<  "maxB\t" << maxB << "\n" <<  "nC\t" << nC << "\n" <<  "firstSB\t" << firstSB << "\n"
-			<<  "delaySB\t" << delaySB << "\n" <<  "delayRC\t" << delayRC << "\n" <<  "nz\t" << nz << s << simtime "\n";
+			<<  "delaySB\t" << delaySB << "\n" <<  "delayRC\t" << delayRC << "\n" <<  "nz\t" << nz << "\n" << "simulationTime\t" << simtime << "\n";
 }
 
 /**

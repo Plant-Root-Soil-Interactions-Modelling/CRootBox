@@ -172,7 +172,7 @@ public:
 	double nz; 		    ///< Distance between the root crowns along the shoot [cm]
 
 	//Simulation parameters
-	double simetime;    // simulation time
+	double simtime;    // simulation time
 };
 
 
