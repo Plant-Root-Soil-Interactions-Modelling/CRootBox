@@ -150,7 +150,7 @@ public:
 	RootSystemParameter(); ///< Default constructor
 	virtual ~RootSystemParameter();
 
-	virtual void set(double pd, double fB, double dB, int mB, int nC, double fSB, double dSB, double dRC, double nz); ///< Sets all the parameters
+	virtual void set(double pd, double fB, double dB, int mB, int nC, double fSB, double dSB, double dRC, double nz, double simtime); ///< Sets all the parameters
 
 	virtual void read(std::istream & cin); ///< Read plant parameters
 	virtual void write(std::ostream & cout) const; ///< Write plant parameters
@@ -171,6 +171,8 @@ public:
 	double delayRC; 	///< Delay between the root crowns [day]
 	double nz; 		    ///< Distance between the root crowns along the shoot [cm]
 
+	//Simulation parameters
+	double simetime;    // simulation time
 };
 
 

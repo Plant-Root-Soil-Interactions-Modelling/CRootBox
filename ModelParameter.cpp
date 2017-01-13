@@ -197,7 +197,7 @@ void RootParameter::write(std::ostream & cout) const {
  */
 RootSystemParameter::RootSystemParameter() {
 	set(3.,1.e9,0.,0, //pd, fB, dB, mB,
-			0,1.e9,1.e9,0.,0.);  // nC, fSB, dSB, dRC, nz
+			0,1.e9,1.e9,0.,0.,30.);  // nC, fSB, dSB, dRC, nz
 }
 
 
@@ -209,7 +209,7 @@ void RootSystemParameter::read(std::istream & cin) {
 	double plantingdepth;
 	std::string s; // dummy
 	cin  >>  s >> plantingdepth;
-	cin >> s >> firstB >> s >> delayB >> s >> maxB >> s >> nC >> s >> firstSB >> s >> delaySB >> s >> delayRC >> s >> nz;
+	cin >> s >> firstB >> s >> delayB >> s >> maxB >> s >> nC >> s >> firstSB >> s >> delaySB >> s >> delayRC >> s >> nz >> s >> simetime;
 	seedPos = Vector3d(0,0,-plantingdepth);
 }
 
@@ -218,7 +218,7 @@ void RootSystemParameter::write(std::ostream & cout) const {
 	double pd = -seedPos.z;
 	cout <<  "plantingdepth\t" << pd << "\n" <<  "firstB\t" << firstB << "\n" <<  "delayB\t" << delayB << "\n"
 			<<  "maxB\t" << maxB << "\n" <<  "nC\t" << nC << "\n" <<  "firstSB\t" << firstSB << "\n"
-			<<  "delaySB\t" << delaySB << "\n" <<  "delayRC\t" << delayRC << "\n" <<  "nz\t" << nz << "\n";
+			<<  "delaySB\t" << delaySB << "\n" <<  "delayRC\t" << delayRC << "\n" <<  "nz\t" << nz << s << simtime "\n";
 }
 
 /**
@@ -234,7 +234,7 @@ void RootSystemParameter::write(std::ostream & cout) const {
  * @param dRC         Delay between the root crowns [day]
  * @param nz          Distance between the root crowns along the shoot [cm]
  */
-void RootSystemParameter::set(double pd, double fB, double dB, int mB, int nC, double fSB, double dSB, double dRC, double nz) {
+void RootSystemParameter::set(double pd, double fB, double dB, int mB, int nC, double fSB, double dSB, double dRC, double nz, double simtime) {
 	seedPos=Vector3d(0,0,-pd);
 	firstB=fB;
 	delayB=dB;
@@ -244,4 +244,5 @@ void RootSystemParameter::set(double pd, double fB, double dB, int mB, int nC, d
 	delaySB=dSB;
 	delayRC=dRC;
 	this->nz=nz;
+	this->simtime=simtime;
 }
