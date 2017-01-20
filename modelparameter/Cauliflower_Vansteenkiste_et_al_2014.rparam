@@ -4,7 +4,7 @@ name	mainroots
 lb	6.8	0
 la	10	0
 ln	0.4	0
-nob	470	0
+lmax	204.4	0
 r	1.7	0
 a	0.05	00
 color	1	0	0
@@ -21,7 +21,7 @@ name	longlateralsfrommainroots
 lb	3.5	0
 la	5	0
 ln	0.6	0
-nob	7.5	0
+lmax	12.4	0
 r	0.7	0
 a	0.015	00
 color	1	1	0
