@@ -1,4 +1,5 @@
 import numpy as np
+import py_rootbox as rb   
 
 
 
@@ -9,12 +10,18 @@ import numpy as np
 def v2v(v): # rb.Vector3 to numpy array 
     return np.array([v.x, v.y, v.z])
 
-def vd2a(vd): # rb.std_vector_double_ to numpy array
-    N  = len(vd)
-    l = np.zeros(N) 
-    for i in range(0,N):
+def vd2a(vd): # rb.std_vector_double_ to numpy array    
+    l = np.zeros(len(vd)) 
+    for i in range(0,len(vd)):
         l[i] = vd[i]
     return l
+
+def a2vd(a): #  numpy array to rb.std_vector_double
+    l = rb.std_vector_double_()
+    for d in a:
+        l.append(d)
+    return l
+    
 
 def vv2a(vd): # rb.std_vector_Vector3_ to numpy array
     N  = len(vd)
@@ -22,6 +29,16 @@ def vv2a(vd): # rb.std_vector_Vector3_ to numpy array
     for i in range(0,N):
         l[i,:] = [vd[i].x,vd[i].y,vd[i].z]
     return l
+
+def nodes2seg(nodes,seg,data): # node data to segment data 
+    data_ = np.zeros(len(data))
+    for i in range(0,len(data)):
+        s = seg[i];
+        data_[i] = 0.5*(data[s.x-1]+data[s.y-1])
+    return data_
+    
+    
+
 
 
 def z2i(z,n): # maps z to equidistant mesh

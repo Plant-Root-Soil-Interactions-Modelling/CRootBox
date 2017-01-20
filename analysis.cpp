@@ -522,6 +522,7 @@ void AnalysisSDF::write(std::string name, std::vector<double> data_) const
  */
 void AnalysisSDF::writeVTP(std::ostream & os, std::vector<int> types, std::vector<double> data_) const
 {
+	std::cout << "size" << data_.size() << " matters \n";
 	assert(segments.size() == segO.size());
 	assert(segments.size() == ctimes.size());
 	os << "<?xml version=\"1.0\"?>";
@@ -540,7 +541,7 @@ void AnalysisSDF::writeVTP(std::ostream & os, std::vector<int> types, std::vecto
 	}
 	// write additional data
 	if (!data_.empty()) {
-		os << "<DataArray type=\"Float32\" Name=\"" << "user data" << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
+		os << "<DataArray type=\"Float32\" Name=\"" << "userdata" << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
 		for (auto const& t : data_) {
 			os << t << " ";
 		}

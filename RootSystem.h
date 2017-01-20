@@ -32,7 +32,7 @@ public:
 	enum TropismTypes { tt_plagio=0, tt_gravi=1, tt_exo=2, tt_hydro=3 };  ///< root tropism
 	enum GrowthFunctionTypes { gft_negexp=1, gft_linear=2 }; // root growth function
 	enum OutputTypes { ot_segments=0, ot_polylines=1 }; ///< used for postprocessing
-	enum ScalarTypes { st_type, st_radius, st_order,  st_time, st_length, st_surface }; ///< @see RootSystem::getScalar
+	enum ScalarTypes { st_type=0, st_radius=1, st_order=2,  st_time=3, st_length=4, st_surface=5 }; ///< @see RootSystem::getScalar
 	static const std::vector<std::string> scalarTypeNames; ///< the corresponding names
 
 	RootSystem() { initRTP(); };
@@ -66,8 +66,9 @@ public:
 	// Analysis of simulation results
 	int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system
 	std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots
-	std::vector<Vector3d> getRootTips(std::vector<Root*> roots=std::vector<Root*>()) const; ///< returns the positions of the root tips
-    std::vector<Vector3d> getRootBases(std::vector<Root*> roots=std::vector<Root*>()) const; ///< returns the positions of the root bases
+	std::vector<Root*> getBaseRoots() { return baseRoots; } ///< Base roots are tap root, basal roots, and shoot borne roots
+	std::vector<Vector3d> getRootTips(std::vector<Root*> roots=std::vector<Root*>()) const; ///< Positions of the root tips
+    std::vector<Vector3d> getRootBases(std::vector<Root*> roots=std::vector<Root*>()) const; ///< Positions of the root bases
     std::vector<Vector3d> getNodes(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all root system nodes into a vector
 	std::vector<Vector2i> getSegments(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all segments indices into a vector
 	std::vector<Root*> getSegmentsOrigin(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a pointer to the root containing the segment
