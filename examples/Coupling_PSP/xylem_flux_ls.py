@@ -40,19 +40,19 @@ def xylem_flux_ls(seg, nodes, sLen, sType, sRad, kr, kz):
         v = n2-n1
         v = v / norm(v)
         # v[2] = 0 # TODO
-        
+    
         p_s = -60 # TODO psoil(mid) 
         
         a = sRad[c]
         l = sLen[c]
         t = int(sType[c])
         
-        bi =  -2.*a*math.pi*l*kr[t]*p_s - kz[t]*rho*g*abs(v[2])# Eqn 9
-        cii = -a*math.pi*l*kr[t] - kz[t]/l # Eqn 10
-        cij = -a*math.pi*l*kr[t] + kz[t]/l # Eqn 11
+        cii = a*math.pi*l*kr[t] + kz[t]/l # Eqn 10
+        cij = a*math.pi*l*kr[t] - kz[t]/l # Eqn 11
+        bi = 2.*a*math.pi *l*kr[t]*p_s # firstterm of Eqn 12 & 13            
         
         # edge ij
-        b[i] +=  bi           
+        b[i] +=  (bi + kz[t]*rho*g*v[2])  # Eqn 12        
         
         I[k] = i
         J[k] = i     
@@ -67,7 +67,7 @@ def xylem_flux_ls(seg, nodes, sLen, sType, sRad, kr, kz):
         # edge ji
         i,j = j, i
         
-        b[i] += bi          
+        b[i] += (bi - kz[t]*rho*g*v[2]) # Eqn 13
 
         I[k] = i
         J[k] = i  
@@ -84,7 +84,6 @@ def xylem_flux_ls(seg, nodes, sLen, sType, sRad, kr, kz):
     Q = sparse.csr_matrix(Q) # Sparse row matrix seems the most reasonable to solve Qx = b iteratively
     
     return (Q, b)
-
 
 #
 #
