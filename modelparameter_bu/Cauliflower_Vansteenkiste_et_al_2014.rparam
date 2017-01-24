@@ -1,4 +1,4 @@
-# Parameter set for type
+# Parameter set for type (by Rootbox)
 type	1
 name	mainroots
 lb	6.8	0
@@ -15,7 +15,7 @@ successorP	2	0.1	0.9
 theta	0.436332	0
 rlt	1e+09	0
 gf	1
-# Parameter set for type
+# Parameter set for type (by Rootbox)
 type	2
 name	longlateralsfrommainroots
 lb	3.5	0
@@ -32,13 +32,13 @@ successorP	1	1
 theta	0.785398	0
 rlt	1e+09	0
 gf	1
-# Parameter set for type
+# Parameter set for type (by Rootbox)
 type	3
 name	shortlateralsfrommainrootsandfromlonglaterals
 lb	0	0
 la	10	0
 ln	0	0
-lmax	10	0
+nob	0	0
 r	0.3	0
 a	0.008	00
 color	1	1	1

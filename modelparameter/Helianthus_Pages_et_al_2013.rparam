@@ -1,29 +1,29 @@
 # Parameter set for type
 type	1
-name	mainroots
-lb	6.8	0
+name	Taproot
+lb	11.86	0
 la	10	0
 ln	0.4	0
-lmax	204.4	0
-r	1.7	0
-a	0.05	00
+lmax	101.46	0
+r	2.965	0
+a	0.023	00
 color	1	0	0
 tropism	1	2	0.1
 dx	0.25
 successors	2	2	3
-successorP	2	0.1	0.9
-theta	0.436332	0
+successorP	2	0.3	0.7
+theta	0	0
 rlt	1e+09	0
 gf	1
 # Parameter set for type
 type	2
-name	longlateralsfrommainroots
-lb	3.5	0
-la	5	0
-ln	0.6	0
-lmax	12.4	0
-r	0.7	0
-a	0.015	00
+name	1storderlateral
+lb	0	0
+la	10	0
+ln	0.4	0
+lmax	49.6	0
+r	2.965	0
+a	0.023	00
 color	1	1	0
 tropism	2	1	0.5
 dx	0.25
@@ -34,7 +34,7 @@ rlt	1e+09	0
 gf	1
 # Parameter set for type
 type	3
-name	shortlateralsfrommainrootsandfromlonglaterals
+name	2ndorderlateral
 lb	0	0
 la	10	0
 ln	0	0
