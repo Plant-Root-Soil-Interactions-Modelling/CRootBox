@@ -1,28 +1,22 @@
 import numpy as np
 import py_rootbox as rb   
 
-
-
 #
-# Auxiliary functions that should be moved to py_rootbox
+# Auxiliary functions that could be moved to py_rootbox
 #
 
-def v2v(v): # rb.Vector3 to numpy array 
-    return np.array([v.x, v.y, v.z])
-
-def vd2a(vd): # rb.std_vector_double_ to numpy array    
+def v2a(vd): # rb.std_vector_double_ to numpy array    
     l = np.zeros(len(vd)) 
     for i in range(0,len(vd)):
         l[i] = vd[i]
     return l
 
-def a2vd(a): #  numpy array to rb.std_vector_double
+def a2v(a): #  numpy array to rb.std_vector_double
     l = rb.std_vector_double_()
     for d in a:
         l.append(d)
     return l
     
-
 def vv2a(vd): # rb.std_vector_Vector3_ to numpy array
     N  = len(vd)
     l = np.zeros((N,3)) 
@@ -30,17 +24,25 @@ def vv2a(vd): # rb.std_vector_Vector3_ to numpy array
         l[i,:] = [vd[i].x,vd[i].y,vd[i].z]
     return l
 
+def seg2a(seg): # rb.std_vector_Vector2i_ to numpy array
+    Ns = len(seg)
+    seg_ = np.zeros((Ns,2),dtype = np.uint32)
+    for i in range(0,Ns):
+        seg_[i,:] = np.array([seg[i].x, seg[i].y])
+    return seg_
+
 def nodes2seg(nodes,seg,data): # node data to segment data 
-    data_ = np.zeros(len(data))
-    for i in range(0,len(data)):
-        s = seg[i];
-        data_[i] = 0.5*(data[s.x-1]+data[s.y-1])
+    Ns = seg.shape[0]
+    data_ = np.zeros(Ns)
+    for i in range(0,Ns):
+        n1 = seg[i,0]
+        n2 = seg[i,1]
+        data_[i] = 0.5*(data[n1]+data[n2])
     return data_
     
     
-
-
-
+    
+    
 def z2i(z,n): # maps z to equidistant mesh
     i = int(round((abs(z)/100)*n))  
     return min(max(i,0),n-1) 

@@ -2,57 +2,58 @@ import math
 import numpy as np
 from scipy import sparse
 
-# import py_rootbox as rb   
-from rb_tools import *
 from numpy.linalg.linalg import norm
 
-
-# Units
 #
-# M = kg
-# L = cm
-# T = s
+# Creates the linear system describing the pressure inside a xylem network
+#
+# in:
+# seg     numpy array (Ns,2) of segment indices [1]
+# nodes   numpy array (N,3) of the node coordinates [L]
+# radius  segment radii [L]
+# kr      radial conductivity for each segment [L2 T M−1]
+# kz      axial conductivity for each segment [L5 T]
+# rho     density of soil water [M L-3]
+# g       gravitational acceleration [L T−2]
+# soil_p  lambda funciton returning the soil matric potential at a given location, p=soil_p(x,y,z) [M L−1 T−2]
+#
+# out: 
+# Q,b     The equations are represented by the linear system Qx=b
 # 
-def xylem_flux_ls(seg, nodes, sLen, sType, sRad, kr, kz):
-    
-    rho = 1e-3 # kg / cm  
-    g = 9.8 *100 # cm / s^2 
+def xylem_flux_ls(seg, nodes, radius, kr, kz, rho, g, soil_p):
         
-    N = len(nodes)
-    Ns = len(seg)
+    Ns = seg.shape[0]
+    N = nodes.shape[0]
     
     I = np.zeros(4*Ns)
     J = np.zeros(4*Ns)    
     V = np.zeros(4*Ns)
-    b = np.zeros(N-1)
+    b = np.zeros(N)
     
-    k = 0
+    k = 0     
 
-    for c in range(1,Ns): # ignore first segment (bc)
+    for c in range(0,Ns):
         
-        i = seg[c].x-1
-        j = seg[c].y-1
-    
-        n1 = v2v(nodes[i])
-        n2 = v2v(nodes[j])
+        i = seg[c,0]
+        j = seg[c,1]
+        
+        n1 = nodes[i,:]
+        n2 = nodes[j,:]
         mid = 0.5*(n1+n2)
         
+        p_s = soil_p(mid[0],mid[1],mid[2]) # evaluate soil matric potential
+
         v = n2-n1
-        v = v / norm(v)
-        # v[2] = 0 # TODO
-    
-        p_s = -60 # TODO psoil(mid) 
+        l = norm(v)        
+        v = v / l # normed direction        
+        a = radius[c]
         
-        a = sRad[c]
-        l = sLen[c]
-        t = int(sType[c])
-        
-        cii = a*math.pi*l*kr[t] + kz[t]/l # Eqn 10
-        cij = a*math.pi*l*kr[t] - kz[t]/l # Eqn 11
-        bi = 2.*a*math.pi *l*kr[t]*p_s # firstterm of Eqn 12 & 13            
+        cii = a*math.pi*l*kr[c] + kz[c]/l # Eqn 10
+        cij = a*math.pi*l*kr[c] - kz[c]/l # Eqn 11
+        bi = 2.*a*math.pi*l*kr[c]*p_s # firstterm of Eqn 12 & 13            
         
         # edge ij
-        b[i] +=  (bi + kz[t]*rho*g*v[2])  # Eqn 12        
+        b[i] +=  (bi + kz[c]*rho*g*v[2])  # Eqn 12        
         
         I[k] = i
         J[k] = i     
@@ -67,7 +68,7 @@ def xylem_flux_ls(seg, nodes, sLen, sType, sRad, kr, kz):
         # edge ji
         i,j = j, i
         
-        b[i] += (bi - kz[t]*rho*g*v[2]) # Eqn 13
+        b[i] += (bi - kz[c]*rho*g*v[2]) # Eqn 13
 
         I[k] = i
         J[k] = i  
@@ -86,16 +87,23 @@ def xylem_flux_ls(seg, nodes, sLen, sType, sRad, kr, kz):
     return (Q, b)
 
 #
+# Modifies the linear system to describe Diriclet BC at the node indices n0
+#
+# in: 
 #
 #
-def xylem_flux_bc_dirichlet(Q, b, seg, d):
+# out:
+# Q, b    the updated linear system
+#
+def xylem_flux_bc_dirichlet(Q, b, n0, d):
     c = 0
-    for s in seg:
-        i = s[0]      
+    for c in range(0, len(n0)):
+        i = n0[c]      
+        # print("Dirichlet BC at node "+str(i)) 
         e0 = np.zeros((1,Q.shape[1])) # build zero vector
-        Q[i-1,:] = sparse.csr_matrix(e0) # replace row i with ei
-        Q[i-1,i-1] = 1
-        b[i-1] = d[c]    
+        Q[i,:] = sparse.csr_matrix(e0) # replace row i with ei
+        Q[i,i] = 1
+        b[i] = d[c]    
         c += 1
 
     return Q, b 

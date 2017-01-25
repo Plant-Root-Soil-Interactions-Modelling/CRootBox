@@ -13,16 +13,12 @@ from rb_tools import *
 from xylem_flux_ls import *
 
 #
-# initialize
+# initialize (root system)
 #
 rsname = "anagallis2010" 
 rs = rb.RootSystem()
 rs.openFile(rsname,"")
 rs.initialize() # hydrotropism is not set right now, link to soil is missing
-
-rs_Kr = np.array([ 1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10 ]) # root hydraulic radial conductivity per root type 
-# # # rs_Kr = list(map(lambda x: x * 0, rs_Kr)) # scalar multiplication of a list (crazy) 
-rs_Kz = np.array([ 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8 ]) # root hydraulic axial conductivity per root type  
 
 #
 # simulate
@@ -30,52 +26,60 @@ rs_Kz = np.array([ 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8 ]) # root hydraulic 
 rs.simulate(15)
 
 #
-# analysse
+# results 
 #
-rs_nodes = rs.getNodes()
-rs_seg = rs.getSegments()
+seg = seg2a(rs.getSegments())
+nodes = vv2a(rs.getNodes())
 rs_ana = rb.AnalysisSDF(rs) # segment analyser
-rs_segL = vd2a(rs_ana.getScalar(rb.ScalarType.length))
-rs_segType = vd2a(rs_ana.getScalar(rb.ScalarType.type))
-rs_segR = vd2a(rs_ana.getScalar(rb.ScalarType.radius))
+type = v2a(rs_ana.getScalar(rb.ScalarType.type))
+radius = v2a(rs_ana.getScalar(rb.ScalarType.radius))
 
-Q, b = xylem_flux_ls(rs_seg, rs_nodes, rs_segL, rs_segType, rs_segR, rs_Kr, rs_Kz)  
+#
+# initialize (xylem_flux)
+#
+rs_Kr = np.array([ 1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10 ]) # root hydraulic radial conductivity per root type [cm^2 s / kg], plausible values?
+rs_Kz = np.array([ 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8 ]) # root hydraulic axial conductivity per root type [cm^5 s], plausible values?  
+kr = np.array(list(map(lambda t: rs_Kr[int(t)-1], type))) # convert from 'per type' to 'per segment'
+kz = np.array(list(map(lambda t: rs_Kz[int(t)-1], type)))
+
+rho = 1e-3 # kg / cm      
+g = 9.8 *100 # cm / s^2 
+
+soil_p = lambda x,y,z : -60 # kg/(cm s^2)
+
+#
+# create linear system
+#
+Q, b = xylem_flux_ls(seg, nodes, radius, kr, kz, rho, g, soil_p)  
 # print("row 0 ")
 # print(Q[0,0], Q[0,1])
 # print(Q[1,0], Q[1,1])
 # print(b[0])
 # print(b[1])
 
-s1 = [1,2] 
-seg = [s1]
-
-rho = 1e-3 # kg / cm      
-g = 9.8 *100 # cm / s^2 
+#
+# apply Dirichlet BC
+#
 d = [-1000.*rho*g] 
+n0= np.array([0]) 
+Q, b = xylem_flux_bc_dirichlet(Q, b, n0, d)
 
-Q, b = xylem_flux_bc_dirichlet(Q, b, seg, d)
-
-x0 = d*np.ones(Q.shape[0]) # empirically proofen to be the best
-
+#
+# solve LS
+#
 t = time.time()
 print("solve")
+# x0 = d*np.ones(Q.shape[0]) # empirically proofen to be the best
 # x, info = LA.cg(Q,b,x0=x0, tol=1e-12)  # tested with CG, CGS, GMRES, BICG. CG by far the best
 x = LA.spsolve(Q, b) # direct
 print("fin")
-print("CG: " + str(t-time.time()) +" sec" ) 
-
-# plt.spy(Q, markersize=3) plt.show()
-# print(Q)
-# print(b)
-print(x)
-segX = nodes2seg(rs_nodes,rs_seg,x);
-print(segX)
-segX = a2vd(segX)
-print(len(segX))
+# print("CG: " + str(time.time()-t) +" sec" ) 
+print("spsolve: " + str(time.time()-t) +" sec" )
 
 #
 # output
 # 
-rs_ana.write(rsname+".vtp",segX)
+segX = nodes2seg(nodes,seg,x) 
+rs_ana.write(rsname+".vtp",a2v(segX))
 
 
