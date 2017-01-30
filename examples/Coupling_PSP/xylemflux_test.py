@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 import py_rootbox as rb    
 from rb_tools import *
 
-from xylem_flux_ls import *
+from xylem_flux import *
 
 #
 # initialize (root system)

@@ -20,7 +20,7 @@ from numpy.linalg.linalg import norm
 # out: 
 # Q,b     The equations are represented by the linear system Qx=b
 # 
-def xylem_flux_ls(seg, nodes, radius, kr, kz, rho, g, soil_p):
+def linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p):
         
     Ns = seg.shape[0]
     N = nodes.shape[0]
@@ -95,7 +95,7 @@ def xylem_flux_ls(seg, nodes, radius, kr, kz, rho, g, soil_p):
 # out:
 # Q, b    the updated linear system
 #
-def xylem_flux_bc_dirichlet(Q, b, n0, d):
+def bc_dirichlet(Q, b, n0, d):
     c = 0
     for c in range(0, len(n0)):
         i = n0[c]      
