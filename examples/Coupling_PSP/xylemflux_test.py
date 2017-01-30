@@ -15,12 +15,12 @@ import matplotlib.pyplot as plt
 import py_rootbox as rb    
 from rb_tools import *
 
-from xylem_flux import *
+import xylem_flux 
 
 #
 # initialize (root system)
 #
-path = examplePath()
+path = parameterPath()
 rsname = "anagallis_Leitner_et_al(2010)" 
 rs = rb.RootSystem()
 rs.openFile(rsname,path)
@@ -36,7 +36,7 @@ rs.simulate(15)
 #
 seg = seg2a(rs.getSegments())
 nodes = vv2a(rs.getNodes())
-rs_ana = rb.SegmentAnalyser(rs) # segment analyser
+rs_ana = rb.SegmentAnalyser(rs) 
 type = v2a(rs_ana.getScalar(rb.ScalarType.type))
 radius = v2a(rs_ana.getScalar(rb.ScalarType.radius))
 
@@ -56,7 +56,7 @@ soil_p = lambda x,y,z : -60 # kg/(cm s^2)
 #
 # create linear system
 #
-Q, b = xylem_flux_ls(seg, nodes, radius, kr, kz, rho, g, soil_p)  
+Q, b = xylem_flux.linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p)  
 # print("row 0 ")
 # print(Q[0,0], Q[0,1])
 # print(Q[1,0], Q[1,1])
@@ -67,8 +67,15 @@ Q, b = xylem_flux_ls(seg, nodes, radius, kr, kz, rho, g, soil_p)
 # apply Dirichlet BC
 #
 d = [-1000.*rho*g] 
-n0= np.array([0]) 
-Q, b = xylem_flux_bc_dirichlet(Q, b, n0, d)
+n0= np.array([0]) # node indices
+# Q, b = xylem_flux.bc_dirichlet(Q, b, n0, d)
+
+#
+# apply Neumann BC
+#
+seg0 = np.array([0]) # segment indices
+aflux = np.array([-2.e-6])
+Q, b = xylem_flux.bc_neumann(Q, b, seg0, aflux, seg, nodes)
 
 #
 # solve LS
@@ -85,8 +92,15 @@ print("spsolve: " + str(time.time()-t) +" sec" )
 #
 # output
 # 
-segX = nodes2seg(nodes,seg,x) 
-rs_ana.addUserData(a2v(segX),"pressure")
+segP = nodes2seg(nodes,seg,x) 
+axial_flux = xylem_flux.axial_flux(x, seg, nodes, kz, rho, g)
+radial_flux = xylem_flux.radial_flux(x, seg, nodes, radius, kr, soil_p)
+net_flux = axial_flux+radial_flux
+
+rs_ana.addUserData(a2v(segP),"pressure")
+rs_ana.addUserData(a2v(axial_flux),"axial_flux")
+rs_ana.addUserData(a2v(radial_flux),"radial_flux")
+rs_ana.addUserData(a2v(net_flux),"net_flux")
 rs_ana.write(rsname+".vtp")
 
 

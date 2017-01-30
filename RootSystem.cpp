@@ -1,6 +1,6 @@
 #include "RootSystem.h"
 
-const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","red","green","blue","time","length","surface"};
+const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface"};
 
 /**
  * Destructor

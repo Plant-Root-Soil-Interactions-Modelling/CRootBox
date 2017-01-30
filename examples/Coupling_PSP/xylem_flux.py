@@ -48,12 +48,12 @@ def linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p):
         v = v / l # normed direction        
         a = radius[c]
         
-        cii = a*math.pi*l*kr[c] + kz[c]/l # Eqn 10
-        cij = a*math.pi*l*kr[c] - kz[c]/l # Eqn 11
-        bi = 2.*a*math.pi*l*kr[c]*p_s # firstterm of Eqn 12 & 13            
+        cii = a*math.pi*l*kr[c] + kz[c]/l # Eqn (10)
+        cij = a*math.pi*l*kr[c] - kz[c]/l # Eqn (11)
+        bi = 2.*a*math.pi*l*kr[c]*p_s # firstterm of Eqn (12) & (13)            
         
         # edge ij
-        b[i] +=  (bi + kz[c]*rho*g*v[2])  # Eqn 12        
+        b[i] +=  (bi + kz[c]*rho*g*v[2])  # Eqn (12)        
         
         I[k] = i
         J[k] = i     
@@ -68,7 +68,7 @@ def linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p):
         # edge ji
         i,j = j, i
         
-        b[i] += (bi - kz[c]*rho*g*v[2]) # Eqn 13
+        b[i] += (bi - kz[c]*rho*g*v[2]) # Eqn (13)
 
         I[k] = i
         J[k] = i  
@@ -89,8 +89,7 @@ def linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p):
 #
 # Modifies the linear system to describe Diriclet BC at the node indices n0
 #
-# in: 
-#
+# in: TODO
 #
 # out:
 # Q, b    the updated linear system
@@ -99,7 +98,7 @@ def bc_dirichlet(Q, b, n0, d):
     c = 0
     for c in range(0, len(n0)):
         i = n0[c]      
-        # print("Dirichlet BC at node "+str(i)) 
+        print("Dirichlet BC at node "+str(i)) 
         e0 = np.zeros((1,Q.shape[1])) # build zero vector
         Q[i,:] = sparse.csr_matrix(e0) # replace row i with ei
         Q[i,i] = 1
@@ -107,6 +106,79 @@ def bc_dirichlet(Q, b, n0, d):
         c += 1
 
     return Q, b 
+
+#
+# Modifies the linear system to describe a Neumann BC at the segments seg0
+#
+# in: TODO
+#
+# out:
+# Q, b    the updated linear system
+#
+def bc_neumann(Q, b, seg0, aflux, seg, nodes):
+    c = 0
+    for c in range(0, len(seg0)):                
+        i = seg[seg0[c],0]  
+        print("Neumann BC at node "+str(i))
+        b[i] += aflux[c]        
+        c += 1
+
+    return Q, b 
+
+#
+# Calculates the axial flux for each segment
+#
+# in: TODO
+#
+# out:
+# the axial flux
+def axial_flux(p, seg, nodes, kz, rho, g):
+    af = np.zeros(seg.shape[0])
+    c = 0
+    for s in seg:
+        i = s[0]
+        j = s[1]        
+        v = nodes[j,:]-nodes[i,:] # segment direction
+        l = norm(v) # length        
+        v = v / l # normed direction           
+        af[c] = -kz[c]*((p[j]-p[i])/l+rho*g*v[2])  # Eqn (6)
+        c += 1
+        
+    return af
+
+#
+# Calculates the radial flux for each segment
+#
+# in: TODO
+#
+# out:
+# the radial flux
+def radial_flux(p, seg, nodes, radius, kr, soil_p):
+    rf = np.zeros(seg.shape[0])
+    c = 0
+    for s in seg:
+        i = s[0]
+        j = s[1] 
+        n1 = nodes[i,:]
+        n2 = nodes[j,:]       
+        l = norm(n2-n1) # length
+        a = radius[c]
+        mid = (n1+n2)/2 # segment mid point 
+        ps = soil_p(mid[0],mid[1],mid[2])
+        rf[c] = -2*a*math.pi*l*kr[c]*(ps-(p[j]+p[i])/2) # Eqn (7)
+        c += 1
+                
+    return rf
+
+#
+# Calculates the radial net for each segment
+#
+# in: TODO
+#
+# out:
+# the net flux
+def net_flux(p,seg, nodes, radius, kr, kz, rho, g, soil_p):
+    return axial_flux(p, seg, nodes, radius, kr, kz, rho, g, soil_p) + radial_flux(p,seg, nodes, radius, kr, kz, rho, g, soil_p)
 
 
 
