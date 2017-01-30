@@ -12,7 +12,7 @@
 import py_rootbox as rb
 
 rootsystem = rb.RootSystem()
-name = "maize" 
+name = "Maize_Pheno1_Leitner_et_al_2014" 
 
 #
 # Plant and root parameter from a file
@@ -83,11 +83,11 @@ for _ in range(0,N):
 #     
 # Export results (as vtp)
 #    
-rootsystem.write(name + ".vtp", rb.OutputType.polylines);
+rootsystem.write("results/"+name + ".vtp", rb.OutputType.polylines);
 
 #
 # Export container geometry as Paraview Python script (run file in Paraview by Tools->Python Shell, Run Script)
 # 
-rootsystem.write(name + ".py",0);
+rootsystem.write("results/"+name + ".py",0);
 
 print("Finished with a total of " + str(rootsystem.getNumberOfNodes()) + " nodes\n")

@@ -1,9 +1,15 @@
 import numpy as np
 import py_rootbox as rb   
 
+import os
+
 #
 # Auxiliary functions that could be moved to py_rootbox
 #
+def examplePath(): # works only if everything is located in folder CRootBox
+    cwd = os.getcwd()
+    i = cwd.index("CRootBox")
+    return cwd[0:i] + "CRootBox"+os.sep+"modelparameter"+os.sep    
 
 def v2a(vd): # rb.std_vector_double_ to numpy array    
     l = np.zeros(len(vd)) 

@@ -1,5 +1,10 @@
 import math
 import time
+import os # add the search path for py_rootbox.so (probably there is a nicer way to do it?)
+import sys
+cwd = os.getcwd()
+i = cwd.index("CRootBox")
+sys.path.append(cwd[0:i+8]) 
 
 import numpy as np
 from scipy import sparse
@@ -15,9 +20,10 @@ from xylem_flux_ls import *
 #
 # initialize (root system)
 #
-rsname = "anagallis2010" 
+path = examplePath()
+rsname = "anagallis_Leitner_et_al(2010)" 
 rs = rb.RootSystem()
-rs.openFile(rsname,"")
+rs.openFile(rsname,path)
 rs.initialize() # hydrotropism is not set right now, link to soil is missing
 
 #
@@ -30,7 +36,7 @@ rs.simulate(15)
 #
 seg = seg2a(rs.getSegments())
 nodes = vv2a(rs.getNodes())
-rs_ana = rb.AnalysisSDF(rs) # segment analyser
+rs_ana = rb.SegmentAnalyser(rs) # segment analyser
 type = v2a(rs_ana.getScalar(rb.ScalarType.type))
 radius = v2a(rs_ana.getScalar(rb.ScalarType.radius))
 
@@ -80,6 +86,9 @@ print("spsolve: " + str(time.time()-t) +" sec" )
 # output
 # 
 segX = nodes2seg(nodes,seg,x) 
-rs_ana.write(rsname+".vtp",a2v(segX))
+rs_ana.addUserData(a2v(segX),"pressure")
+rs_ana.write(rsname+".vtp")
+
+
 
 

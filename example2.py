@@ -14,7 +14,7 @@
 import py_rootbox as rb
 
 rootsystem = rb.RootSystem()
-name = "lupine2014" 
+name = "BrassicaNapus_a_Leitner_et_al_2010" 
 
 #
 # Open plant and root parameter from a file
@@ -61,11 +61,11 @@ for i in range(0,int(N)):
 #
 # Export final result (as vtp)
 #
-rootsystem.write(name+".vtp",rb.OutputType.polylines) # use ot_polylines for nicer visualization, ot_segments for animations
+rootsystem.write("results/"+name+".vtp",rb.OutputType.polylines) # use ot_polylines for nicer visualization, ot_segments for animations
 
 #
 # Export container geometry as Paraview Python script (run file in Paraview by Tools->Python Shell, Run Script)
 #    
-rootsystem.write(name+".py", 0) 
+rootsystem.write("results/"+name+".py", 0) 
 
 print("Finished with a total of "+str(rootsystem.getNumberOfNodes())+ " nodes")

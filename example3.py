@@ -7,7 +7,7 @@ import py_rootbox as rb
 import math
 import random
 
-name = "maize"
+name = "Maize_Pheno1_Leitner_et_al_2014"
 
 N = 3
 dist = 40 # cm
@@ -39,6 +39,6 @@ for rs in allRS:
 c = 0
 for rs in allRS:
       c += 1 # root system number
-      vtpname = "results/"+name+str(c)+".vtp";
+      vtpname = "results/"+name+"_"+str(c)+".vtp";
       rs.write(vtpname, rb.OutputType.polylines);
         

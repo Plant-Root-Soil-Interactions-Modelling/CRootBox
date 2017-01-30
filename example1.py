@@ -12,7 +12,7 @@
 import py_rootbox as rb
 
 rootsystem = rb.RootSystem()
-name = "anagallis2010" 
+name = "anagallis_Leitner_et_al(2010)" 
 
 #
 # Open plant and root parameter from a file
@@ -38,13 +38,13 @@ for i in range(0,int(N)):
 #
 # Export final result (as vtp)
 #
-rootsystem.write(name+".vtp",rb.OutputType.segments) # use ot_polylines for nicer visualization, ot_segments for animations
+rootsystem.write("results/"+name+".vtp",rb.OutputType.segments) # use ot_polylines for nicer visualization, ot_segments for animations
 
 #
 # Export segments for Matlab analysis
 #    
-analysis = rb.AnalysisSDF(rootsystem)
-analysis.write(name+".txt")
+analysis = rb.SegmentAnalyser(rootsystem)
+analysis.write("results/"+name+".txt")
 
 #
 # Total length and surface
