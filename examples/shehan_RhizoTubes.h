@@ -78,10 +78,10 @@ void shehan_RhizoTubes(string name = "wheat", bool exportVTP = false)
   double dx = 0.3; //cm
   SignedDistanceFunction* visible = fieldRhizoTubes(3.2+dx);
 
-  vector<AnalysisSDF> croppedTubes;
+  vector<SegmentAnalyser> croppedTubes;
   for (size_t i=1; i<times.size(); i++) {
       std::cout << "\nANALYSE TIME " << times.at(i) <<"\n\n";
-      AnalysisSDF analyser = getResult(allRS,times.at(i));
+      SegmentAnalyser analyser = getResult(allRS,times.at(i));
       analyser.crop(visible); // throw segments away
       analyser.pack(); // throw nodes away
       if (exportVTP) {
@@ -99,7 +99,7 @@ void shehan_RhizoTubes(string name = "wheat", bool exportVTP = false)
 
   vector<Vector3d> fpos = fotoPos();
 
-  vector<AnalysisSDF> fotos; // not real fotos, but slices of the croopedTube
+  vector<SegmentAnalyser> fotos; // not real fotos, but slices of the croopedTube
 
   double xx = 1.4; // cm slice thickness
   double a1 = 8./180.*M_PI;
@@ -115,9 +115,9 @@ void shehan_RhizoTubes(string name = "wheat", bool exportVTP = false)
 
       int c = 0;
       cout << "Time: " << times.at(t) << "\n";
-      AnalysisSDF empty = AnalysisSDF();
+      SegmentAnalyser empty = SegmentAnalyser();
       fotos.push_back(empty); // fill in this time step
-      AnalysisSDF f = croppedTubes.at(t);
+      SegmentAnalyser f = croppedTubes.at(t);
 
       for (auto& p :fpos) {
 
@@ -131,7 +131,7 @@ void shehan_RhizoTubes(string name = "wheat", bool exportVTP = false)
           // foto 1 + 2
           SDF_RotateTranslate* foto = new SDF_RotateTranslate(&fotoBox,
                                                               Vector3d(p.x,p.y,p.z+r_*sin(a2)));
-          AnalysisSDF foto12 = f;
+          SegmentAnalyser foto12 = f;
           foto12.crop(foto);
           foto12.pack();
 

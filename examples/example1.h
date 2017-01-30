@@ -51,7 +51,7 @@ void example1()
     /*
      * Export segments for Matlab analysis
      */
-    AnalysisSDF analysis(rootsystem);
+    SegmentAnalyser analysis(rootsystem);
     analysis.write(name+".txt");
 
     /*

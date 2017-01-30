@@ -1,9 +1,9 @@
 import math
+import time
 
 import numpy as np
 from scipy import sparse
 import scipy.sparse.linalg as LA
-import time
 
 import matplotlib.pyplot as plt
 

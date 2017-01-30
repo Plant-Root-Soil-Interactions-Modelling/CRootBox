@@ -10,19 +10,19 @@
  *
  * for a start this class should contain what Shehan needs for his experimental set-up
  */
-class AnalysisSDF
+class SegmentAnalyser
 {
 
 public:
 
-    AnalysisSDF() { }; ///< Creates an empty object (use AnalysisSDF::addSegments)
-    AnalysisSDF(const RootSystem& rs); ///< Creates an analyser object containing the segments from the root system
-    AnalysisSDF(const AnalysisSDF& a) : nodes(a.nodes), segments(a.segments), ctimes(a.ctimes), segO(a.segO) { }; ///< Copy constructor
-    virtual ~AnalysisSDF() { };
+    SegmentAnalyser() { }; ///< Creates an empty object (use AnalysisSDF::addSegments)
+    SegmentAnalyser(const RootSystem& rs); ///< Creates an analyser object containing the segments from the root system
+    SegmentAnalyser(const SegmentAnalyser& a) : nodes(a.nodes), segments(a.segments), ctimes(a.ctimes), segO(a.segO) { }; ///< Copy constructor
+    virtual ~SegmentAnalyser() { };
 
     // merge segments
     void addSegments(const RootSystem& rs); ///< adds the segments
-    void addSegments(const AnalysisSDF& a); ///< adds the segments
+    void addSegments(const SegmentAnalyser& a); ///< adds the segments
 
     void crop(SignedDistanceFunction* geometry); ///< crops the data to a geometry
     void filter(int st, double min, double max); ///< filters the segments to the data @see AnalysisSDF::getScalar
@@ -34,18 +34,21 @@ public:
     double getSummed(int st) const; ///< Sums up the parameter
     double getSummed(int st, SignedDistanceFunction* geometry) const; ///< Sums up the parameter within the geometry
     std::vector<double> distribution(int st, double top, double bot, int n, bool exact=false) const; ///< vertical distribution of a parameter
-    std::vector<AnalysisSDF> distribution(double top, double bot, int n) const; ///< vertical distribution of a parameter
+    std::vector<SegmentAnalyser> distribution(double top, double bot, int n) const; ///< vertical distribution of a parameter
     std::vector<std::vector<double>> distribution2(int st, double top, double bot, double left, double right, int n, int m, bool exact=false) const; // 2d distribution (x,z) of a parameter
-    std::vector<std::vector<AnalysisSDF>> distribution2(double top, double bot, double left, double right, int n, int m) const; // 2d distribution (x,z) of a parameter
-
+    std::vector<std::vector<SegmentAnalyser>> distribution2(double top, double bot, double left, double right, int n, int m) const; // 2d distribution (x,z) of a parameter
+    // todo distribution3
     int getNumberOfRoots() const; ///< number of different roots
+    SegmentAnalyser foto(const Vector3d& pos, const Matrix3d& ons, double height) const; ///< takes a picture  // TODO unfinished
+    SegmentAnalyser cut(const SDF_HalfPlane& plane) const; ///< cuts with a plane and returns the intersection
 
-    AnalysisSDF foto(const Vector3d& pos, const Matrix3d& ons, double height) const; ///< takes a picture
-    AnalysisSDF cut(const SDF_HalfPlane& plane) const; ///< cuts with a plane and returns the intersection
+    void addUserData(std::vector<double> data, std::string name) { assert(data.size()==segments.size()); userData.push_back(data); userDataNames.push_back(name);}
+    //< adds user data that are written inot the VTP file, @see SegmentAnalyser::writeVTP
+    void clearUserData() { userData.clear(); userDataNames.clear(); } //< resets the user data
 
     // some exports
-    void write(std::string name, std::vector<double> data = std::vector<double>()) const; ///< writes simulation results (type is determined from file extension in name)
-    void writeVTP(std::ostream & os, std::vector<int> types = {RootSystem::st_radius}, std::vector<double> data = std::vector<double>()) const; ///< writes a VTP file
+    void write(std::string name) const; ///< writes simulation results (type is determined from file extension in name)
+    void writeVTP(std::ostream & os, std::vector<int> types = {RootSystem::st_radius}) const; ///< writes a VTP file
     void writeRBSegments(std::ostream & os) const; ///< Writes the segments of the root system, mimics the Matlab script getSegments()
 
     // auxiliary
@@ -55,6 +58,12 @@ public:
     std::vector<Vector2i> segments; ///< connectivity of the nodes
     std::vector<double> ctimes; ///< creation times of the segments
     std::vector<Root*> segO; ///< to look up things
+
+protected:
+
+    std::vector<std::vector<double>> userData;
+    std::vector<std::string> userDataNames;
+
 
 };
 

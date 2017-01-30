@@ -108,14 +108,14 @@ void shehan_Trenches(string name = "wheat", bool exportVTP = false)
 
 			// cut along the trench
 			std::cout << "cut \n";
-			AnalysisSDF analyser = getResult(allRS,times.at(t+1));
-			AnalysisSDF cut = analyser.cut(*tr);
+			SegmentAnalyser analyser = getResult(allRS,times.at(t+1));
+			SegmentAnalyser cut = analyser.cut(*tr);
 			cut.crop(&box); // cut with bounding box
 
 			// split into grid
 			std::cout <<"grid \n";
-			vector<vector<AnalysisSDF>> anamatrix1 = cut.distribution2(0,160, tr->o.x-dist1,tr->o.x,n,m);
-			vector<vector<AnalysisSDF>> anamatrix2 = cut.distribution2(0,160, tr->o.x,tr->o.x+dist1,n,m);
+			vector<vector<SegmentAnalyser>> anamatrix1 = cut.distribution2(0,160, tr->o.x-dist1,tr->o.x,n,m);
+			vector<vector<SegmentAnalyser>> anamatrix2 = cut.distribution2(0,160, tr->o.x,tr->o.x+dist1,n,m);
 
 			// save root count into matrix
 			std::cout<<"count \n";

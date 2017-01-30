@@ -28,11 +28,11 @@ void benchmark(string name, vector<double> times, vector<double> dt_, double dx,
   int i =0;
   for (auto dt : dt_) {
       rs1.simulate(dt);
-      AnalysisSDF analysis0(rs1);
+      SegmentAnalyser analysis0(rs1);
       lt[i] = analysis0.getSummed(RootSystem::st_length);
       analysis0.filter(RootSystem::st_type,1);
       l0[i] = analysis0.getSummed(RootSystem::st_length);
-      AnalysisSDF analysis1(rs1);
+      SegmentAnalyser analysis1(rs1);
       analysis1.filter(RootSystem::st_type,2);
       l1[i] = analysis1.getSummed(RootSystem::st_length);
       i++;

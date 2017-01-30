@@ -13,7 +13,7 @@
  *
  *
  */
-#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -45,10 +45,10 @@ Vector3d (Matrix3d::*times4)(const Vector3d&) const = &Matrix3d::times;
 
 std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceFunction::writePVPScript;
 
-double (AnalysisSDF::*getSummed1)(int st) const = &AnalysisSDF::getSummed;
-double (AnalysisSDF::*getSummed2)(int st, SignedDistanceFunction* geometry) const = &AnalysisSDF::getSummed;
+double (SegmentAnalyser::*getSummed1)(int st) const = &SegmentAnalyser::getSummed;
+double (SegmentAnalyser::*getSummed2)(int st, SignedDistanceFunction* geometry) const = &SegmentAnalyser::getSummed;
 
-std::vector<double> (AnalysisSDF::*distribution1)(int st, double top, double bot, int n, bool exact) const = &AnalysisSDF::distribution;
+std::vector<double> (SegmentAnalyser::*distribution1)(int st, double top, double bot, int n, bool exact) const = &SegmentAnalyser::distribution;
 
 /**
  * Default arguments: no idea how to do it by hand,  magic everywhere...
@@ -63,10 +63,9 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentsOrigin_overloads,getSegmentsOr
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNETimes_overloads,getNETimes,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getScalar_overloads,getScalar,0,3);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(write_overloads,write,1,2); // for RootSystem
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(write2_overloads,write,1,2); // for AnalysisSDF
 
 /**
- * Virtual functions (not sure if needed, or only if we derive classes from it in pyhton?), not working...
+ * Virtual functions (not sure if needed, or only if we derive classes from it in python?), not working...
  *
  * it seems a bit tricky to make polymorphism work, we have to wrap the classes
  *
@@ -308,7 +307,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("__str__",&RootSystemParameter::toString)
 	;
 	/**
-	 * Root.h (only pointers, no members)
+	 * Root.h (only pointers, no members) TODO think carefully what to expose
 	 */
     class_<Root>("Root", init<RootSystem*, int, Vector3d, double, Root*, double, int>())
 		.def("__str__",&Root::toString)
@@ -369,15 +368,17 @@ BOOST_PYTHON_MODULE(py_rootbox)
     /*
      * analysis.h
      */
-    class_<AnalysisSDF>("AnalysisSDF",init<RootSystem&>()) //
-    	.def(init<AnalysisSDF&>())
-	.def("pack", &AnalysisSDF::pack)
-	.def("getScalar", &AnalysisSDF::getScalar)
+    class_<SegmentAnalyser>("SegmentAnalyser",init<RootSystem&>()) //
+    	.def(init<SegmentAnalyser&>())
+	.def("pack", &SegmentAnalyser::pack)
+	.def("getScalar", &SegmentAnalyser::getScalar)
 	.def("getSummed", getSummed1)
 	.def("getSummed", getSummed2)
-    .def("getNumberOfRoots", &AnalysisSDF::getNumberOfRoots)
+    .def("getNumberOfRoots", &SegmentAnalyser::getNumberOfRoots)
 	.def("distribution", distribution1)
-	.def("write", &AnalysisSDF::write, write2_overloads())
+	.def("addUserData", &SegmentAnalyser::addUserData)
+	.def("clearUserData", &SegmentAnalyser::clearUserData)
+	.def("write", &SegmentAnalyser::write)
     ;
 }
 

@@ -19,7 +19,7 @@ class TropismFunction;
 /**
  * RootSystem
  *
- * This class manages the simulation, stores the base roots, and offers utility functions
+ * This class manages all model parameter, the simulation, stores the base roots, and offers utility functions
  *
  */
 class RootSystem
@@ -55,7 +55,13 @@ public:
 	void initialize(int basal=4, int shootborne=5); ///< Creates the base roots, call before simulation and after setting the plant and root parameters
 	void simulate(double dt); ///< Simulates root system growth for time span dt
 
-	//
+	// TODO
+	// dynamic information what happened last time step
+	// getNodeUpdates
+	// getNewNodes
+	// getNewSegments
+
+	// call back functions
 	virtual Root* createRoot(int lt, Vector3d  h, double delay, Root* parent, double pbl, int pni);
 	///< Creates a new lateral root, overwrite or change this method to use more spezialised root classes
 	virtual TropismFunction* createTropismFunction(int tt, double N, double sigma);
@@ -67,8 +73,8 @@ public:
 	int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system
 	std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots
 	std::vector<Root*> getBaseRoots() { return baseRoots; } ///< Base roots are tap root, basal roots, and shoot borne roots
-	std::vector<Vector3d> getRootTips(std::vector<Root*> roots=std::vector<Root*>()) const; ///< Positions of the root tips
-    std::vector<Vector3d> getRootBases(std::vector<Root*> roots=std::vector<Root*>()) const; ///< Positions of the root bases
+	std::vector<Vector3d> getRootTips(std::vector<Root*> roots=std::vector<Root*>()) const; ///< Positions of the root tips TODO node or segment indices make more sense
+    std::vector<Vector3d> getRootBases(std::vector<Root*> roots=std::vector<Root*>()) const; ///< Positions of the root bases TODO node or segment  indices make more sense
     std::vector<Vector3d> getNodes(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all root system nodes into a vector
 	std::vector<Vector2i> getSegments(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all segments indices into a vector
 	std::vector<Root*> getSegmentsOrigin(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a pointer to the root containing the segment

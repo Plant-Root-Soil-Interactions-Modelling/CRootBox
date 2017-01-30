@@ -7,7 +7,7 @@
  *
  * @param rs      the root system that is analysed
  */
-AnalysisSDF::AnalysisSDF(const RootSystem& rs)
+SegmentAnalyser::SegmentAnalyser(const RootSystem& rs)
 {
 	auto roots = rs.getRoots();
 	nodes = rs.getNodes(RootSystem::ot_segments,roots);
@@ -21,15 +21,15 @@ AnalysisSDF::AnalysisSDF(const RootSystem& rs)
 /**
  * Adds all segmentes from root system @param rs to the analysis.
  */
-void AnalysisSDF::addSegments(const RootSystem& rs)
+void SegmentAnalyser::addSegments(const RootSystem& rs)
 {
-	addSegments(AnalysisSDF(rs));
+	addSegments(SegmentAnalyser(rs));
 }
 
 /**
  * Adds all segmentes from the analyser @param a to this analysis.
  */
-void AnalysisSDF::addSegments(const AnalysisSDF& a)
+void SegmentAnalyser::addSegments(const SegmentAnalyser& a)
 {
 	int offset = nodes.size();
 	nodes.insert(nodes.end(),a.nodes.begin(),a.nodes.end()); // copy nodes
@@ -51,7 +51,7 @@ void AnalysisSDF::addSegments(const AnalysisSDF& a)
  * @param st    parameter type @see RootSystem::ScalarType
  * \return      vector containing parameter value per segment
  */
-std::vector<double> AnalysisSDF::getScalar(int st) const
+std::vector<double> SegmentAnalyser::getScalar(int st) const
 {
 	// TODO since segments have know their origin root: segO, pure root segment mapping could be done by using RootSystem::getScalar
 	// to avoid redundant code, scalars that are segment wise must be treated extra
@@ -106,7 +106,7 @@ std::vector<double> AnalysisSDF::getScalar(int st) const
  *
  * @param geometry      signed distance function of the geometry
  */
-void AnalysisSDF::crop(SignedDistanceFunction* geometry)
+void SegmentAnalyser::crop(SignedDistanceFunction* geometry)
 {
 	//std::cout << "cropping " << segments.size() << " segments...";
 	std::vector<Vector2i> seg;
@@ -164,7 +164,7 @@ void AnalysisSDF::crop(SignedDistanceFunction* geometry)
  * @param min   minimal value
  * @param max   maximal value
  */
-void AnalysisSDF::filter(int st, double min, double max)
+void SegmentAnalyser::filter(int st, double min, double max)
 {
   std::vector<double> data = getScalar(st);
   std::vector<Vector2i> seg;
@@ -189,7 +189,7 @@ void AnalysisSDF::filter(int st, double min, double max)
  * @param st        parameter type @see RootSystem::ScalarType
  * @param value     parameter value of the segments that are kept
  */
-void AnalysisSDF::filter(int st, double value)
+void SegmentAnalyser::filter(int st, double value)
 {
 	std::vector<double> data = getScalar(st);
 	std::vector<Vector2i> seg;
@@ -211,7 +211,7 @@ void AnalysisSDF::filter(int st, double value)
  * Sorts nodes and deletes unused nodes.
  * This can save a lot of memory, since AnalysisSDF::crop and AnalysisSDF::filter only delete segments, not unused nodes
  */
-void AnalysisSDF::pack() {
+void SegmentAnalyser::pack() {
 	std::vector<double> ni(nodes.size());
 	std::fill(ni.begin(),ni.end(), 0.);
 	std::vector<Vector3d> newnodes;
@@ -239,7 +239,7 @@ void AnalysisSDF::pack() {
  * @param geometry signed distance function of the geometry
  * \return         the intersection point
  */
-Vector3d AnalysisSDF::cut(Vector3d in, Vector3d out, SignedDistanceFunction* geometry)
+Vector3d SegmentAnalyser::cut(Vector3d in, Vector3d out, SignedDistanceFunction* geometry)
 {
 	assert(geometry->getDist(in)<=0);
 	assert(geometry->getDist(out)>=0);
@@ -258,7 +258,7 @@ Vector3d AnalysisSDF::cut(Vector3d in, Vector3d out, SignedDistanceFunction* geo
 /**
  * \return The summed parameter of type @param st (@see RootSystem::ScalarType)
  */
-double AnalysisSDF::getSummed(int st) const {
+double SegmentAnalyser::getSummed(int st) const {
 	std::vector<double> data = getScalar(st);
 	double v = 0;
 	for (auto const& d : data) {
@@ -271,7 +271,7 @@ double AnalysisSDF::getSummed(int st) const {
  * \return The summed parameter of type @param st (@see RootSystem::ScalarType), that is within geometry @param g ,
  * based on the segment mid point (i.e. not exact)
  */
-double AnalysisSDF::getSummed(int st, SignedDistanceFunction* g) const {
+double SegmentAnalyser::getSummed(int st, SignedDistanceFunction* g) const {
 	std::vector<double> data = getScalar(st);
 	double v = 0;
 	for (size_t i=0; i<segments.size(); i++) {
@@ -290,7 +290,7 @@ double AnalysisSDF::getSummed(int st, SignedDistanceFunction* g) const {
 /**
  * \return The number of roots
  */
-int AnalysisSDF::getNumberOfRoots() const
+int SegmentAnalyser::getNumberOfRoots() const
 {
 	std::set<Root*> rootset;  // praise the stl
 	for (Root* r : segO) {
@@ -308,9 +308,9 @@ int AnalysisSDF::getNumberOfRoots() const
  *
  * \return The image segments in the x-y plane (z=0)
  */
-AnalysisSDF AnalysisSDF::foto(const Vector3d& pos, const Matrix3d& ons, double fl) const
+SegmentAnalyser SegmentAnalyser::foto(const Vector3d& pos, const Matrix3d& ons, double fl) const
 {
-	AnalysisSDF f(*this); // copy
+	SegmentAnalyser f(*this); // copy
 	for (auto& n : f.nodes) { // translate
 		n = n.minus(pos);
 	}
@@ -339,9 +339,9 @@ AnalysisSDF AnalysisSDF::foto(const Vector3d& pos, const Matrix3d& ons, double f
 /**
  * Cuts the segments with a plane
  */
-AnalysisSDF AnalysisSDF::cut(const SDF_HalfPlane& plane) const
+SegmentAnalyser SegmentAnalyser::cut(const SDF_HalfPlane& plane) const
 {
-	AnalysisSDF f;
+	SegmentAnalyser f;
 	f.nodes = nodes; // copy all nodes
 	for (size_t i=0; i<segments.size(); i++) {
 		Vector2i s = segments.at(i);
@@ -368,7 +368,7 @@ AnalysisSDF AnalysisSDF::cut(const SDF_HalfPlane& plane) const
  * @param exact     calculates the intersection with the layer boundaries (true), only based on segment midpoints (false)
  * \return Vector of size @param n containing the summed parameter in this layer
  */
-std::vector<double> AnalysisSDF::distribution(int st, double top, double bot, int n, bool exact) const
+std::vector<double> SegmentAnalyser::distribution(int st, double top, double bot, int n, bool exact) const
 {
 	std::vector<double> d(n);
 	double dz = (bot-top)/double(n);
@@ -377,7 +377,7 @@ std::vector<double> AnalysisSDF::distribution(int st, double top, double bot, in
 		Vector3d t(0,0,-dz/2.-i*dz);
 		SDF_RotateTranslate g(layer,t);
 		if (exact) {
-			AnalysisSDF a(*this); // copy everything
+			SegmentAnalyser a(*this); // copy everything
 			a.crop(&g); // crop exactly
 			d.at(i) = a.getSummed(st);
 		} else {
@@ -398,15 +398,15 @@ std::vector<double> AnalysisSDF::distribution(int st, double top, double bot, in
  * @param exact     calculates the intersection with the layer boundaries (true), only based on segment midpoints (false)
  * \return Vector of size @param n containing an Analysis object of the layer (cropped exactly)
  */
-std::vector<AnalysisSDF> AnalysisSDF::distribution(double top, double bot, int n) const
+std::vector<SegmentAnalyser> SegmentAnalyser::distribution(double top, double bot, int n) const
 {
-	std::vector<AnalysisSDF> d(n);
+	std::vector<SegmentAnalyser> d(n);
 	double dz = (bot-top)/double(n);
 	SDF_PlantBox* layer = new SDF_PlantBox(1e100,1e100,dz);
 	for (int i=0; i<n; i++) {
 		Vector3d t(0,0,-dz/2.-i*dz);
 		SDF_RotateTranslate g(layer,t);
-		AnalysisSDF a = AnalysisSDF(*this); // copy everything
+		SegmentAnalyser a = SegmentAnalyser(*this); // copy everything
 		a.crop(&g); // crop exactly
 		d.at(i) = a;
 	}
@@ -427,7 +427,7 @@ std::vector<AnalysisSDF> AnalysisSDF::distribution(double top, double bot, int n
  * @param exact     calculates the intersection with the layer boundaries (true), only based on segment midpoints (false)
  * \return Vector of size @param n containing the summed parameter in this layer
  */
-std::vector<std::vector<double>> AnalysisSDF::distribution2(int st, double top, double bot, double left, double right, int n, int m, bool exact) const
+std::vector<std::vector<double>> SegmentAnalyser::distribution2(int st, double top, double bot, double left, double right, int n, int m, bool exact) const
 {
 	std::vector<std::vector<double>> d(n);
 	double dz = (bot-top)/double(n);
@@ -443,7 +443,7 @@ std::vector<std::vector<double>> AnalysisSDF::distribution2(int st, double top, 
 			SDF_RotateTranslate g(layer,t);
 
 			if (exact) {
-				AnalysisSDF a(*this); // copy everything
+				SegmentAnalyser a(*this); // copy everything
 				a.crop(&g); // crop exactly
 				row.at(j) = a.getSummed(st);
 			} else {
@@ -467,9 +467,9 @@ std::vector<std::vector<double>> AnalysisSDF::distribution2(int st, double top, 
  * @param n         number of layers (each with a height of (bot-top)/n )
  * \return Vector of size @param n containing the summed parameter in this layser
  */
-std::vector<std::vector<AnalysisSDF>> AnalysisSDF::distribution2(double top, double bot, double left, double right, int n, int m) const
+std::vector<std::vector<SegmentAnalyser>> SegmentAnalyser::distribution2(double top, double bot, double left, double right, int n, int m) const
 {
-	std::vector<std::vector<AnalysisSDF>> d(n);
+	std::vector<std::vector<SegmentAnalyser>> d(n);
 	double dz = (bot-top)/double(n);
 	double dx = (right-left)/double(m);
 	SDF_PlantBox* layer = new SDF_PlantBox(dx,1.e9,dz);
@@ -479,7 +479,7 @@ std::vector<std::vector<AnalysisSDF>> AnalysisSDF::distribution2(double top, dou
 			Vector3d t(left+dx/2.+j*dx,0.,top-i*dz);
 			//std::cout << i<< "," << j << ", " <<t.getString() << "; ";
 			SDF_RotateTranslate g(layer,t);
-			AnalysisSDF a(*this); // copy everything
+			SegmentAnalyser a(*this); // copy everything
 			a.crop(&g); // crop exactly
 			d.at(i).push_back(a);
 
@@ -494,16 +494,15 @@ std::vector<std::vector<AnalysisSDF>> AnalysisSDF::distribution2(double top, dou
  * (that must be lower case)
  *
  * @param name      file name e.g. output.vtp
- *  * @param data_ 	optional user data per segment
  */
-void AnalysisSDF::write(std::string name, std::vector<double> data_) const
+void SegmentAnalyser::write(std::string name) const
 {
 	std::ofstream fos;
 	fos.open(name.c_str());
 	std::string ext = name.substr(name.size()-3,name.size()); // pick the right writer
 	if (ext.compare("vtp")==0) {
 		std::cout << "writing VTP: " << name << "\n";
-		this->writeVTP(fos,{ RootSystem::st_radius, RootSystem::st_type, RootSystem::st_time },data_);
+		this->writeVTP(fos,{ RootSystem::st_radius, RootSystem::st_type, RootSystem::st_time });
 	} else if (ext.compare("txt")==0)  {
 		std::cout << "writing text file for Matlab import: "<< name << "\n";
 		writeRBSegments(fos);
@@ -518,11 +517,9 @@ void AnalysisSDF::write(std::string name, std::vector<double> data_) const
  *
  * @param os        typically a file out stream
  * @param types     multiple parameter types (@see RootSystem::ScalarType) that are saved in the VTP file
- * @param data_ 	optional user data per segment
  */
-void AnalysisSDF::writeVTP(std::ostream & os, std::vector<int> types, std::vector<double> data_) const
+void SegmentAnalyser::writeVTP(std::ostream & os, std::vector<int> types) const
 {
-	std::cout << "size" << data_.size() << " matters \n";
 	assert(segments.size() == segO.size());
 	assert(segments.size() == ctimes.size());
 	os << "<?xml version=\"1.0\"?>";
@@ -539,10 +536,12 @@ void AnalysisSDF::writeVTP(std::ostream & os, std::vector<int> types, std::vecto
 		}
 		os << "\n</DataArray>\n";
 	}
-	// write additional data
-	if (!data_.empty()) {
-		os << "<DataArray type=\"Float32\" Name=\"" << "userdata" << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-		for (auto const& t : data_) {
+	// write user data
+	for (size_t i=0; i<userData.size(); i++) {
+		const auto& data = userData.at(i);
+		std::string name = userDataNames.at(i);
+		os << "<DataArray type=\"Float32\" Name=\"" << name << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
+		for (auto const& t : data) {
 			os << t << " ";
 		}
 		os << "\n</DataArray>\n";
@@ -576,7 +575,7 @@ void AnalysisSDF::writeVTP(std::ostream & os, std::vector<int> types, std::vecto
  *
  * @param os      typically a file out stream
  */
-void AnalysisSDF::writeRBSegments(std::ostream & os) const
+void SegmentAnalyser::writeRBSegments(std::ostream & os) const
 {
 	os << "x1 y1 z1 x2 y2 z2 radius R G B time type \n";
 	for (size_t i=0; i<segments.size(); i++) {
