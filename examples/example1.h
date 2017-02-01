@@ -14,7 +14,7 @@ void example1()
 {
     RootSystem rootsystem;
 
-    string name = "zeamays_test";
+    string name = "Maize_Pheno1_Leitner_et_al_2014";
 
     /*
      * Open plant and root parameter from a file
@@ -44,9 +44,9 @@ void example1()
     rootsystem.write(name+".vtp",RootSystem::ot_segments); // use ot_polylines for nicer visualization, ot_segments for animations
 
     /*
-     * Export segments in DGF format TODO finish and test this method
+     * Export segments in RSML format
      */
-    // rootsystem.write(name+".dgf");
+    rootsystem.write(name+".rsml");
 
     /*
      * Export segments for Matlab analysis

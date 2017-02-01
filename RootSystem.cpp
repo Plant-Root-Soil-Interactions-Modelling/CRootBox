@@ -590,9 +590,7 @@ void RootSystem::writeRSML(std::ostream & os) const
 {
     os << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n"; // i am not using utf-8, but not sure if ISO-8859-1 is correct
     os << "<rsml>\n";
-    std::cout << "writing metadata \n";
     writeRSMLMeta(os);
-    std::cout << "writing plant \n";
     os<< "<scene>\n";
     writeRSMLPlant(os);
     os << "</scene>\n";

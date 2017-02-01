@@ -17,7 +17,7 @@ public:
 
     SegmentAnalyser() { }; ///< Creates an empty object (use AnalysisSDF::addSegments)
     SegmentAnalyser(const RootSystem& rs); ///< Creates an analyser object containing the segments from the root system
-    SegmentAnalyser(const SegmentAnalyser& a) : nodes(a.nodes), segments(a.segments), ctimes(a.ctimes), segO(a.segO) { }; ///< Copy constructor
+    SegmentAnalyser(const SegmentAnalyser& a) : nodes(a.nodes), segments(a.segments), ctimes(a.ctimes), segO(a.segO) { }; ///< Copy constructor, does not copy user data
     virtual ~SegmentAnalyser() { };
 
     // merge segments

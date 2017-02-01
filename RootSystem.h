@@ -95,6 +95,8 @@ public:
 	double rand() { return UD(gen); } ///< Uniformly distributed random number (0,1)
 	double randn() { return ND(gen); } ///< Normally distributed random number (0,1)
 
+	int rsmlReduction = 5; ///< only each n-th node is written to the rsml file (to coarsely adjust axial resolution for output)
+
 private:
 	void initRTP();
 
