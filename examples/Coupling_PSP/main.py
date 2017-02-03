@@ -171,7 +171,7 @@ while (time < simTime):
         n2 = nodes[seg[i,1],:]
         z = float(0.5*(n1[2]+n2[2]))
         ind = round(-z/soil[-1].lowerDepth*inf.n)
-        sink[ind]+=sink[ind]        
+        sink[ind]+=radial_flux[i]        
     
     for i in range(0,inf.n):
         inf.theta[i+1] -= sink[i] # TODO  
