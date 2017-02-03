@@ -16,11 +16,9 @@
  */
 Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* parent, double pbl, int pni)
 {
-  std::cout << "Root constructor \n";
+  //std::cout << "Root constructor \n";
   rootsystem=rs; // remember
-  std::cout << "realize() \n";
   param = rs->getRootTypeParameter(type)->realize(); // throw the dice
-  std::cout << "initial heading.. \n";
   double beta = 2*M_PI*rs->rand(); // initial rotation
   Matrix3d ons = Matrix3d::ons(pheading);
   ons.times(Matrix3d::rotX(beta));
@@ -34,16 +32,13 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
   //
   age = -delay; // the root starts growing when age>0
   alive = 1; // alive per default
-  std::cout << "getRootIndex() \n";
   id = rs->getRootIndex(); // root id
   this->parent = parent;
   parent_base_length=pbl;
   parent_ni=pni;
   length = 0;
-  std::cout << "getRootTypeParameter() \n";
   dx = getRootTypeParameter()->dx;
   // initial node
-  std::cout << "Initial node\n";
   if (parent!=nullptr) { // the first node of the base roots must be created in initialize
       // dont use addNode for the first node of the root,
       // since this node exists already and does not need a new identifier
@@ -51,7 +46,7 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
       nodeIds.push_back(parent->getNodeId(pni));
       netimes.push_back(parent->getNodeETime(pni)+delay);
   }
-  std::cout << "finished root constructor \n";}
+}
 
 /**
  * Destructor, spread the word
@@ -216,36 +211,27 @@ void Root::createLateral()
   const RootParameter &p = param; // rename
 
   int lt = rootsystem->getRootTypeParameter(p.type)->getLateralType(nodes.back());
-  std::cout << "lateral type " << lt << "\n";
+  //std::cout << "lateral type " << lt << "\n";
 
   if (lt>0) {
-      std::cout << "Number of nodes: " << nodes.size() << "\n";
 
       Vector3d h; // old heading
       if (nodes.size()>1) {
           h = nodes.back().minus(nodes.at(nodes.size()-2)); // getHeading(b-a)
-          std::cout << "Heading " << h.toString() << "\n";
+          // std::cout << "Heading " << h.toString() << "\n";
       } else {
           h= iheading;
       }
 
       double ageLN = this->getAge(length); // age of root when lateral node is created
-      std::cout << "Age " << ageLN << "\n";
       double ageLG = this->getAge(length+p.la); // age of the root, when the lateral starts growing (i.e when the apical zone is developed)
-      std::cout << "Age " << ageLG << "\n";
       double delay = ageLG-ageLN; // time the lateral has to wait
-      std::cout << "Delay " << delay << "\n";
 
-      std::cout << "createRoot() length="<< length <<"\n";
       Root* lateral = rootsystem->createRoot(lt,  h, delay,  this, length, nodes.size()-1);
-      std::cout << "Root.createLateral() type "<< lt <<","<< nodes.size() <<"nodes \n";
-
       laterals.push_back(lateral);
       lateral->simulate(age-ageLN); // pass time overhead (age we want to achieve minus current age)
       //cout << "time overhead " << age-ageLN << "\n";
   }
-
-  std::cout << "finished createLateral()\n";
 }
 
 /**

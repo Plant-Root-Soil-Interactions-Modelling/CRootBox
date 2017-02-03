@@ -128,12 +128,21 @@ void RootTypeParameter::read(std::istream & cin) {
 	double ks;
 	cin >> s >> type >> s >> name >> s >> lb >> lbs >> s >> la >> las >> s >> ln >> lns >> s >> k >> ks;
 	cin >> s >> r >> rs >> s >> a >> as >> s >> colorR >> colorG >> colorB >> s >> tropismT >> tropismN >> tropismS >> s >> dx;
-	if(ln > 0) {
+	if (ln > 0) {
 		nob=  (k-la-lb)/ln+1;   //conversion, because the input file delivers the lmax value and not the nob value
 		nob = std::max(nob,0.);
-		nobs = sqrt(pow((ks/k),2.0) + pow((lns/ln),2.0 ))*k/ln +
-		    sqrt(pow((las/la),2.0) + pow((lns/ln),2.0) )*la/ln +
-		    sqrt(pow((lbs/lb),2.0) + pow((lns/ln),2.0) )*lb/ln;  // Fehlerfortpflanzung --richtig?
+		nobs = (ks/k - lns/ln)*k/ln; // error propagation
+		if (la>0) {
+			nobs -= (las/la - lns/ln)*la/ln;
+		}
+		if (lb>0) {
+			nobs -= (lbs/lb - lns/ln)*lb/ln;
+		}
+		nobs = std::max(nobs,0.);
+		if (std::isnan(nobs)) {
+			std::cout << "RootTypeParameter::read() nobs is nan \n";
+			nobs =0;
+		}
 	} else {
 		nob=0;
 		nobs = 0;
