@@ -110,7 +110,7 @@ void shehan_SoilCore(string name = "wheat", bool exportVTP = false)
 	/*
 	 * Simulate
 	 */
-	vector<double> times = {0, 30, 60, 90, 120, 150, 180, 210, 240};
+	vector<double> times = {0, 30, 60, 90};
 	simulateRS(times, allRS);
 
 	/*
@@ -159,13 +159,16 @@ void shehan_SoilCore(string name = "wheat", bool exportVTP = false)
 	}
 	fos.close();
 
-//	/*
-//	 * Export rootsystems (around 4.5GB)
-//	 */
-//	for (size_t i=0; i<1; i++) { //
-//		string vtpname = name + std::to_string(int(times[i+1]))+".vtp";
-//		analyser.at(i)->write(vtpname);
-//	}
+	/*
+	 * Export rootsystems (around 4.5GB)
+	 */
+	SegmentAnalyser analyser;
+	for (const auto& rs : allRS) {
+	    analyser.addSegments(*rs);
+	}
+	string vtpname = name +".vtp";
+	analyser.write(vtpname);
+
 
 	/**
 	 * Export core geometry

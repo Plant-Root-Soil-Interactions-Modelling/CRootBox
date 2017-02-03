@@ -16,46 +16,51 @@
  */
 Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* parent, double pbl, int pni)
 {
-	//cout << "Root: constructor \n";
-	rootsystem=rs; // remember
-	param = rs->getRootTypeParameter(type)->realize(); // throw the dice
-	double beta = 2*M_PI*rs->rand(); // initial rotation
-	Matrix3d ons = Matrix3d::ons(pheading);
-	ons.times(Matrix3d::rotX(beta));
-	double theta = param.theta;
-	//  if (parent!=nullptr) { // scale if not a baseRoot
-	//      double scale = rs->getRootParameter(type)->saf->getRelativeValue(parent->getNode(pni),this);
-	//      theta*=scale;
-	//  }
-	ons.times(Matrix3d::rotZ(theta));
-	this->iheading = ons.column(0);  // new initial heading
-	//
-	age = -delay; // the root starts growing when age>0
-	alive = 1; // alive per default
-	id = rs->getRootIndex(); // root id
-	this->parent = parent;
-	parent_base_length=pbl;
-	parent_ni=pni;
-	length = 0;
-	dx = getRootTypeParameter()->dx;
-	// initial node
-	if (parent!=nullptr) { // the first node of the base roots must be created in initialize
-		// dont use addNode for the first node of the root,
-		// since this node exists already and does not need a new identifier
-		nodes.push_back(parent->getNode(pni));
-		nodeIds.push_back(parent->getNodeId(pni));
-		netimes.push_back(parent->getNodeETime(pni)+delay);
-	}
-}
+  std::cout << "Root constructor \n";
+  rootsystem=rs; // remember
+  std::cout << "realize() \n";
+  param = rs->getRootTypeParameter(type)->realize(); // throw the dice
+  std::cout << "initial heading.. \n";
+  double beta = 2*M_PI*rs->rand(); // initial rotation
+  Matrix3d ons = Matrix3d::ons(pheading);
+  ons.times(Matrix3d::rotX(beta));
+  double theta = param.theta;
+  //  if (parent!=nullptr) { // scale if not a baseRoot
+  //      double scale = rs->getRootParameter(type)->saf->getRelativeValue(parent->getNode(pni),this);
+  //      theta*=scale;
+  //  }
+  ons.times(Matrix3d::rotZ(theta));
+  this->iheading = ons.column(0);  // new initial heading
+  //
+  age = -delay; // the root starts growing when age>0
+  alive = 1; // alive per default
+  std::cout << "getRootIndex() \n";
+  id = rs->getRootIndex(); // root id
+  this->parent = parent;
+  parent_base_length=pbl;
+  parent_ni=pni;
+  length = 0;
+  std::cout << "getRootTypeParameter() \n";
+  dx = getRootTypeParameter()->dx;
+  // initial node
+  std::cout << "Initial node\n";
+  if (parent!=nullptr) { // the first node of the base roots must be created in initialize
+      // dont use addNode for the first node of the root,
+      // since this node exists already and does not need a new identifier
+      nodes.push_back(parent->getNode(pni));
+      nodeIds.push_back(parent->getNodeId(pni));
+      netimes.push_back(parent->getNodeETime(pni)+delay);
+  }
+  std::cout << "finished root constructor \n";}
 
 /**
  * Destructor, spread the word
  */
 Root::~Root()
 {
-	for(auto l : laterals) {
-		delete l;
-	}
+  for(auto l : laterals) {
+      delete l;
+  }
 }
 
 /**
@@ -65,8 +70,8 @@ Root::~Root()
  */
 double Root::getLength(double age)
 {
-	assert(age>=0);
-	return rootsystem->gf.at(param.type-1)->getLength(age,param.r,param.getK(),this);
+  assert(age>=0);
+  return rootsystem->gf.at(param.type-1)->getLength(age,param.r,param.getK(),this);
 }
 
 /**
@@ -76,21 +81,21 @@ double Root::getLength(double age)
  */
 double Root::getCreationTime(double length)
 {
-	assert(length>=0);
-	double rootage = getAge(length);
-	if (rootage<0) {
-		std::cout << "negative root age "<<rootage<<" at length "<< length;
-		std::cout.flush();
-		throw std::invalid_argument( "bugbugbug" );
-	}
-	if (parent!=nullptr) {
-		double pl = parent_base_length+parent->param.la; // parent length, when this root was created
-		double page=parent->getCreationTime(pl);
-		assert(page>=0);
-		return rootage+page;
-	} else {
-		return rootage;
-	}
+  assert(length>=0);
+  double rootage = getAge(length);
+  if (rootage<0) {
+      std::cout << "negative root age "<<rootage<<" at length "<< length;
+      std::cout.flush();
+      throw std::invalid_argument( "bugbugbug" );
+  }
+  if (parent!=nullptr) {
+      double pl = parent_base_length+parent->param.la; // parent length, when this root was created
+      double page=parent->getCreationTime(pl);
+      assert(page>=0);
+      return rootage+page;
+  } else {
+      return rootage;
+  }
 }
 
 /**
@@ -100,13 +105,13 @@ double Root::getCreationTime(double length)
  */
 double Root::getAge(double length)
 {
-	assert(length>=0);
-	return rootsystem->gf.at(param.type-1)->getAge(length,param.r,param.getK(),this);
+  assert(length>=0);
+  return rootsystem->gf.at(param.type-1)->getAge(length,param.r,param.getK(),this);
 }
 
 RootTypeParameter* Root::getRootTypeParameter()
 {
-	return rootsystem->getRootTypeParameter(param.type);
+  return rootsystem->getRootTypeParameter(param.type);
 }
 
 /**
@@ -116,89 +121,88 @@ RootTypeParameter* Root::getRootTypeParameter()
  */
 void Root::simulate(double dt)
 {
-	// cout << "Root.simulate(dt) " <<rp.name<< "\n";
+  const RootParameter &p = param; // rename
+  // std::cout << "Root.simulate(dt) \n" << p.toString();
 
-	const RootParameter &p = param; // rename
+  // increase age
+  if (age+dt>p.rlt) { // root life time
+      dt=p.rlt-age; // dt might be 0
+      alive = false; // this root is dead TODO
+  }
+  age+=dt;
 
-	// increase age
-	if (age+dt>p.rlt) { // root life time
-		dt=p.rlt-age; // dt might be 0
-		alive = false; // this root is dead TODO
-	}
-	age+=dt;
+  if (alive) { // dead roots wont grow
 
-	if (alive) { // dead roots wont grow
+      if (age>0) {
 
-		if (age>0) {
+          // children first (always care for the children, even if inactive)
+          for (auto l:laterals) {
+              l->simulate(dt);
+          }
 
-			// children first (always care for the children, even if inactive)
-			for (auto l:laterals) {
-				l->simulate(dt);
-			}
+          if (active) {
+              // length increment
+              double targetlength = getLength(age);
+              //cout << "targetlength: "<< targetlength << " at age " << age <<", r="<<p.r<< ", k="<<p.getK()<<"\n";
+              double dl = std::max(targetlength-length, double(0)); // length increment
 
-			if (active) {
-				// length increment
-				double targetlength = getLength(age);
-				//cout << "targetlength: "<< targetlength << " at age " << age <<", r="<<p.r<< ", k="<<p.getK()<<"\n";
-				double dl = std::max(targetlength-length, double(0)); // length increment
-
-				// create geometry
-				if (p.nob>0) { // root has laterals
-					// basal zone
-					if ((dl>0)&&(length<p.lb)) { // length is the current length of the root
-						if (length+dl<=p.lb) {
-							createSegments(dl);
-							length+=dl;
-							dl=0;
-						} else {
-							double ddx = p.lb-length;
-							createSegments(ddx);
-							dl-=ddx; // ddx already has been created
-							length=p.lb;
-						}
-					}
-					// branching zone
-					if ((dl>0)&&(length>=p.lb)) {
-						double s = p.lb; // summed length
-						for (size_t i=0; ((i<p.ln.size()) && (dl>0)); i++) {
-							s+=p.ln.at(i);
-							if (length<s) {
-								if (i==laterals.size()) { // new lateral
-									createLateral();
-								}
-								if (length+dl<=s) { // finish within inter-lateral distance i
-									createSegments(dl);
-									length+=dl;
-									dl=0;
-								} else { // grow over inter-lateral distance i
-									double ddx = s-length;
-									createSegments(ddx);
-									dl-=ddx;
-									length=s;
-								}
-							}
-						}
-						if (dl>0) {
-							if (p.ln.size()==laterals.size()) { // new lateral (the last one)
-								createLateral();
-							}
-						}
-					}
-					// apical zone
-					if (dl>0) {
-						createSegments(dl);
-						length+=dl;
-					}
-				} else { // no laterals
-					if (dl>0) {
-						createSegments(dl);
-						length+=dl;
-					}
-				} // if laterals
-			} // if active
-			active = getLength(std::max(age,0.))<(p.getK()-dx/10); // become inactive, if final length is nearly reached
-		}
-	} // if alive
+              // create geometry
+              if (p.nob>0) { // root has laterals
+                  // basal zone
+                  if ((dl>0)&&(length<p.lb)) { // length is the current length of the root
+                      if (length+dl<=p.lb) {
+                          createSegments(dl);
+                          length+=dl;
+                          dl=0;
+                      } else {
+                          double ddx = p.lb-length;
+                          createSegments(ddx);
+                          dl-=ddx; // ddx already has been created
+                          length=p.lb;
+                      }
+                  }
+                  // branching zone
+                  if ((dl>0)&&(length>=p.lb)) {
+                      double s = p.lb; // summed length
+                      for (size_t i=0; ((i<p.ln.size()) && (dl>0)); i++) {
+                          s+=p.ln.at(i);
+                          if (length<s) {
+                              if (i==laterals.size()) { // new lateral
+                                  createLateral();
+                              }
+                              if (length+dl<=s) { // finish within inter-lateral distance i
+                                  createSegments(dl);
+                                  length+=dl;
+                                  dl=0;
+                              } else { // grow over inter-lateral distance i
+                                  double ddx = s-length;
+                                  createSegments(ddx);
+                                  dl-=ddx;
+                                  length=s;
+                              }
+                          }
+                      }
+                      if (dl>0) {
+                          if (p.ln.size()==laterals.size()) { // new lateral (the last one)
+                              createLateral();
+                          }
+                      }
+                  }
+                  // apical zone
+                  if (dl>0) {
+                      createSegments(dl);
+                      length+=dl;
+                  }
+              } else { // no laterals
+                  if (dl>0) {
+                      createSegments(dl);
+                      length+=dl;
+                  }
+              } // if laterals
+          } // if active
+          active = getLength(std::max(age,0.))<(p.getK()-dx/10); // become inactive, if final length is nearly reached
+      }
+  } // if alive
 }
 
 /**
@@ -208,29 +212,40 @@ void Root::simulate(double dt)
  */
 void Root::createLateral()
 {
-	const RootParameter &p = param; // rename
+  // std::cout << "createLateral()\n";
+  const RootParameter &p = param; // rename
 
-	int lt = rootsystem->getRootTypeParameter(p.type)->getLateralType(nodes.back());
-	if (lt>0) {
+  int lt = rootsystem->getRootTypeParameter(p.type)->getLateralType(nodes.back());
+  std::cout << "lateral type " << lt << "\n";
 
-		Vector3d h; // old heading
-		if (nodes.size()>1) {
-			h = nodes.back().minus(nodes.at(nodes.size()-2)); // getHeading(b-a)
-		} else {
-			h= iheading;
-		}
+  if (lt>0) {
+      std::cout << "Number of nodes: " << nodes.size() << "\n";
 
-		double ageLN = this->getAge(length); // age of root when lateral node is created
-		double ageLG = this->getAge(length+p.la); // age of the root, when the lateral starts growing (i.e when the apical zone is developed)
-		double delay = ageLG-ageLN; // time the lateral has to wait
+      Vector3d h; // old heading
+      if (nodes.size()>1) {
+          h = nodes.back().minus(nodes.at(nodes.size()-2)); // getHeading(b-a)
+          std::cout << "Heading " << h.toString() << "\n";
+      } else {
+          h= iheading;
+      }
 
-		Root* lateral = rootsystem->createRoot(lt,  h, delay,  this, length, nodes.size()-1);
-		//cout << "Root.createLateral() type "<< lt << "\n";
+      double ageLN = this->getAge(length); // age of root when lateral node is created
+      std::cout << "Age " << ageLN << "\n";
+      double ageLG = this->getAge(length+p.la); // age of the root, when the lateral starts growing (i.e when the apical zone is developed)
+      std::cout << "Age " << ageLG << "\n";
+      double delay = ageLG-ageLN; // time the lateral has to wait
+      std::cout << "Delay " << delay << "\n";
 
-		laterals.push_back(lateral);
-		lateral->simulate(age-ageLN); // pass time overhead (age we want to achieve minus current age)
-		//cout << "time overhead " << age-ageLN << "\n";
-	}
+      std::cout << "createRoot() length="<< length <<"\n";
+      Root* lateral = rootsystem->createRoot(lt,  h, delay,  this, length, nodes.size()-1);
+      std::cout << "Root.createLateral() type "<< lt <<","<< nodes.size() <<"nodes \n";
+
+      laterals.push_back(lateral);
+      lateral->simulate(age-ageLN); // pass time overhead (age we want to achieve minus current age)
+      //cout << "time overhead " << age-ageLN << "\n";
+  }
+
+  std::cout << "finished createLateral()\n";
 }
 
 /**
@@ -243,54 +258,55 @@ void Root::createLateral()
  */
 void Root::createSegments(double l)
 {
-	assert(l>0);
-	double scale = rootsystem->getRootTypeParameter(param.type)->sef->getRelativeValue(nodes.back(),this); // hope this optimized out if not set
-	l = l*scale;
+  // std::cout << "createSegments("<< l << ")\n";
+  assert(l>0);
+  double scale = rootsystem->getRootTypeParameter(param.type)->sef->getRelativeValue(nodes.back(),this); // hope this optimized out if not set
+  l = l*scale;
 
-	double sl=0; // summed length of created segment
-	int n = floor(l/dx);
+  double sl=0; // summed length of created segment
+  int n = floor(l/dx);
 
-	for (int i=0; i<n+1; i++) {
+  for (int i=0; i<n+1; i++) {
 
-		Vector3d h; // current heading
-		if (nodes.size()>1) {
-			h = nodes.back().minus(nodes.at(nodes.size()-2));
-			h.normalize();
-		} else {
-			h = iheading;
-		}
+      Vector3d h; // current heading
+      if (nodes.size()>1) {
+          h = nodes.back().minus(nodes.at(nodes.size()-2));
+          h.normalize();
+      } else {
+          h = iheading;
+      }
 
-		double sdx; // segment length (<=dx)
-		if (i<n) {  // normal case
-			sdx = dx;
-		} else { // last segment
-			sdx = l-n*dx;
-			if (sdx<ddx) { // ensure minimal length
-				// std::cout << "Root::createSegments() dropped very small segment\n";
-				sdx=0;
-				break;
-			}
-		}
-		sl+=sdx;
+      double sdx; // segment length (<=dx)
+      if (i<n) {  // normal case
+          sdx = dx;
+      } else { // last segment
+          sdx = l-n*dx;
+          if (sdx<ddx) { // ensure minimal length
+              // std::cout << "Root::createSegments() dropped very small segment\n";
+              sdx=0;
+              break;
+          }
+      }
+      sl+=sdx;
 
-		//std::cout << "heading: " << h.toString() << "  ";
-		Matrix3d ons = Matrix3d::ons(h);
-		//cout << "\n" << ons.getString() << "\n";
-		Vector2d ab = rootsystem->tf.at(param.type-1)->getHeading(nodes.back(),ons,sdx,this);
-		ons.times(Matrix3d::rotX(ab.y));
-		ons.times(Matrix3d::rotZ(ab.x));
-		//std::cout << "norm heading " << ons.column(0).toString() << "\n"; // == 1
-		Vector3d newdx = Vector3d(ons.column(0).times(sdx));
-		//std::cout << "   node " << newdx.toString() <<"\n";
+      //std::cout << "heading: " << h.toString() << "  ";
+      Matrix3d ons = Matrix3d::ons(h);
+      //cout << "\n" << ons.getString() << "\n";
+      Vector2d ab = rootsystem->tf.at(param.type-1)->getHeading(nodes.back(),ons,sdx,this);
+      ons.times(Matrix3d::rotX(ab.y));
+      ons.times(Matrix3d::rotZ(ab.x));
+      //std::cout << "norm heading " << ons.column(0).toString() << "\n"; // == 1
+      Vector3d newdx = Vector3d(ons.column(0).times(sdx));
+      //std::cout << "   node " << newdx.toString() <<"\n";
 
-		Vector3d newnode = Vector3d(nodes.back().plus(newdx));
-		double et = this->getCreationTime(length+sl);
-		if (std::isnan(et)) {
-			std::cout << "Creation time is nan \n";
-			std::cout.flush();
-		}
-		addNode(newnode,et);
-	} // for
+      Vector3d newnode = Vector3d(nodes.back().plus(newdx));
+      double et = this->getCreationTime(length+sl);
+      if (std::isnan(et)) {
+          std::cout << "Creation time is nan \n";
+          std::cout.flush();
+      }
+      addNode(newnode,et);
+  } // for
 }
 
 /**
@@ -301,9 +317,9 @@ void Root::createSegments(double l)
  */
 std::vector<Root*> Root::getRoots()
 {
-	std::vector<Root*> v = std::vector<Root*>();
-	getRoots(v);
-	return v;
+  std::vector<Root*> v = std::vector<Root*>();
+  getRoots(v);
+  return v;
 }
 
 /**
@@ -314,12 +330,12 @@ std::vector<Root*> Root::getRoots()
  */
 void Root::getRoots(std::vector<Root*>& v)
 {
-	if (this->nodes.size()>1) {
-		v.push_back(this);
-	}
-	for (auto const& l:this->laterals) {
-		l->getRoots(v);
-	}
+  if (this->nodes.size()>1) {
+      v.push_back(this);
+  }
+  for (auto const& l:this->laterals) {
+      l->getRoots(v);
+  }
 }
 
 /**
@@ -332,10 +348,10 @@ void Root::getRoots(std::vector<Root*>& v)
  */
 void Root::addNode(Vector3d n, double t)
 {
-	assert(t>=0.);
-	nodes.push_back(n); // node
-	nodeIds.push_back(rootsystem->getNodeIndex()); // new unique id
-	netimes.push_back(t); // exact creation time
+  assert(t>=0.);
+  nodes.push_back(n); // node
+  nodeIds.push_back(rootsystem->getNodeIndex()); // new unique id
+  netimes.push_back(t); // exact creation time
 }
 
 /**
@@ -346,39 +362,39 @@ void Root::addNode(Vector3d n, double t)
  */
 void Root::writeRSML(std::ostream & cout, std::string indent) const
 {
-	if (this->nodes.size()>1) {
-		cout << indent << "<root id=\"" <<  id << "\">\n";  // open root
-		/* geometry tag */
-		cout << indent << "\t<geometry>\n"; // open geometry
-		cout << indent << "\t\t<polyline>\n"; // open polyline
-		// polyline nodes
-		cout << indent << "\t\t\t" << "<point ";
-		Vector3d v = nodes.at(0);
-		cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
-		int n = this->rootsystem->rsmlReduction;
-		for (size_t i = 1; i<nodes.size()-1; i+=n) {
-			cout << indent << "\t\t\t" << "<point ";
-			Vector3d v = nodes.at(i);
-			cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
-		}
-		cout << indent << "\t\t\t" << "<point ";
-		v = nodes.at(nodes.size()-1);
-		cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
-		cout << indent << "\t\t</polyline>\n"; // close polyline
-		cout << indent << "\t</geometry>\n"; // close geometry
-		/* properties */
-		cout << indent <<"\t<properties>\n"; // open properties
-		// TODO
-		cout << indent << "\t</properties>\n"; // close properties
-		/* laterals roots */
-		for (size_t i = 0; i<laterals.size(); i++) {
-			laterals[i]->writeRSML(cout,indent+"\t");
-		}
-		cout << indent << "\t<functions>\n"; // open functions
-		// TODO
-		cout << indent << "\t</functions>\n"; // close functions
-		cout << indent << "</root>\n"; // close root
-	}
+  if (this->nodes.size()>1) {
+      cout << indent << "<root id=\"" <<  id << "\">\n";  // open root
+      /* geometry tag */
+      cout << indent << "\t<geometry>\n"; // open geometry
+      cout << indent << "\t\t<polyline>\n"; // open polyline
+      // polyline nodes
+      cout << indent << "\t\t\t" << "<point ";
+      Vector3d v = nodes.at(0);
+      cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
+      int n = this->rootsystem->rsmlReduction;
+      for (size_t i = 1; i<nodes.size()-1; i+=n) {
+          cout << indent << "\t\t\t" << "<point ";
+          Vector3d v = nodes.at(i);
+          cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
+      }
+      cout << indent << "\t\t\t" << "<point ";
+      v = nodes.at(nodes.size()-1);
+      cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
+      cout << indent << "\t\t</polyline>\n"; // close polyline
+      cout << indent << "\t</geometry>\n"; // close geometry
+      /* properties */
+      cout << indent <<"\t<properties>\n"; // open properties
+      // TODO
+      cout << indent << "\t</properties>\n"; // close properties
+      /* laterals roots */
+      for (size_t i = 0; i<laterals.size(); i++) {
+          laterals[i]->writeRSML(cout,indent+"\t");
+      }
+      cout << indent << "\t<functions>\n"; // open functions
+      // TODO
+      cout << indent << "\t</functions>\n"; // close functions
+      cout << indent << "</root>\n"; // close root
+  }
 }
 
 /**
@@ -386,9 +402,9 @@ void Root::writeRSML(std::ostream & cout, std::string indent) const
  */
 std::string Root::toString() const
 {
-	std::stringstream str;
-	str << "Root #"<< id <<": type "<<param.type << ", length: "<< length << ", age: " <<age<<" with "<< laterals.size() <<"laterals\n";
-	return str.str();
+  std::stringstream str;
+  str << "Root #"<< id <<": type "<<param.type << ", length: "<< length << ", age: " <<age<<" with "<< laterals.size() <<"laterals\n";
+  return str.str();
 
 
 }

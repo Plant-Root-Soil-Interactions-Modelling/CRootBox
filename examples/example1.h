@@ -37,6 +37,7 @@ void example1()
     for (int i=0; i<N; i++) {
         rootsystem.simulate(dt);
     }
+    cout << "fin\n";
 
     /*
      * Export final result (as vtp)

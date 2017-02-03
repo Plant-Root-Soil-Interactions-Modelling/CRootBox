@@ -74,8 +74,8 @@ public:
 	std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots
 	std::vector<Root*> getBaseRoots() { return baseRoots; } ///< Base roots are tap root, basal roots, and shoot borne roots
 	std::vector<Vector3d> getRootTips(std::vector<Root*> roots=std::vector<Root*>()) const; ///< Positions of the root tips TODO node or segment indices make more sense
-    std::vector<Vector3d> getRootBases(std::vector<Root*> roots=std::vector<Root*>()) const; ///< Positions of the root bases TODO node or segment  indices make more sense
-    std::vector<Vector3d> getNodes(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all root system nodes into a vector
+        std::vector<Vector3d> getRootBases(std::vector<Root*> roots=std::vector<Root*>()) const; ///< Positions of the root bases TODO node or segment  indices make more sense
+        std::vector<Vector3d> getNodes(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all root system nodes into a vector
 	std::vector<Vector2i> getSegments(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all segments indices into a vector
 	std::vector<Root*> getSegmentsOrigin(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a pointer to the root containing the segment
 	std::vector<double> getNETimes(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all node emergence times into a vector
@@ -103,7 +103,6 @@ private:
 	const int maxtypes = 100;
 	std::vector<RootTypeParameter> rtparam; ///< Parameter set for each root type
 	RootSystemParameter rsparam; ///< Plant parameter
-
 
 	void writeRSMLMeta(std::ostream & os) const;
 	void writeRSMLPlant(std::ostream & os) const;

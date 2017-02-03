@@ -3,7 +3,8 @@
 
 // copy paste for daniel
 // 1. export LD_LIBRARY_PATH=~/boost_1_62_0/stage/lib
-// 2. g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.5 -L/home/daniel/boost_1_62_0/stage/lib -lboost_python Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o
+// 2.  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.5 -L/home/daniel/boost_1_62_0/stage/lib -lboost_python Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o
+// 2b  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.4 -lboost_python-py34 Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o
 
 /**
  *  A Python module for CRootbox based on boost.python
@@ -397,3 +398,4 @@ BOOST_PYTHON_MODULE(py_rootbox)
 #endif /* PYTHON_WRAPPER */
 
 #endif /* PY_ROOTBOX_H_ */
+

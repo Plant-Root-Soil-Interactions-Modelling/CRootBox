@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
     //example2(); // like example 1, but with put geometry
     //example3(); // more than 1 plant
     // example4(); // rhizotubes (an example for a more complex geomety)
-    //example5(); // hydrotropism
+    // example5(); // hydrotropism
 
     // benchmarks();
 

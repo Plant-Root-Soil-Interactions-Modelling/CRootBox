@@ -127,35 +127,35 @@ void RootTypeParameter::read(std::istream & cin) {
 	double k;
 	double ks;
 	cin >> s >> type >> s >> name >> s >> lb >> lbs >> s >> la >> las >> s >> ln >> lns >> s >> k >> ks;
-	cin >> s >> r >> rs >> s >> a >> as >> s >> colorR >> colorG >> colorB >> s >> tropismT >> tropismN >> tropismS >> s >> dx >> s;
+	cin >> s >> r >> rs >> s >> a >> as >> s >> colorR >> colorG >> colorB >> s >> tropismT >> tropismN >> tropismS >> s >> dx;
 	if(ln > 0) {
 		nob=  (k-la-lb)/ln+1;   //conversion, because the input file delivers the lmax value and not the nob value
 		nob = std::max(nob,0.);
 		nobs = sqrt(pow((ks/k),2.0) + pow((lns/ln),2.0 ))*k/ln +
 		    sqrt(pow((las/la),2.0) + pow((lns/ln),2.0) )*la/ln +
 		    sqrt(pow((lbs/lb),2.0) + pow((lns/ln),2.0) )*lb/ln;  // Fehlerfortpflanzung --richtig?
-	}else{
+	} else {
 		nob=0;
 		nobs = 0;
 	}
-	int size;
-	cin >> size;
+	int n;
+	cin  >> s >> n;
 	successor.clear();
 	int is;
-	for (int i=0; i<size; i++) {
+	for (int i=0; i<n; i++) {
 		cin >> is;
 		successor.push_back(is);
 	}
-	cin >> s >> size;
+	cin >> s >> n;
 	successorP.clear();
 	double ds;
-	for (int i=0; i<size; i++) {
+	for (int i=0; i<n; i++) {
 		cin >> ds;
 		successorP.push_back(ds);
 	}
 	cin >> s >> theta >> thetas >> s >> rlt >> rlts >> s >> gf >> s;
-	successorP.push_back(1); // to be on the safe side, in case P does not sum up to 1
-	successor.push_back(-1); // -1 means no lateral
+	//successorP.push_back(1); // to be on the safe side, in case P does not sum up to 1
+	//successor.push_back(-1); // -1 means no lateral
 }
 
 /*

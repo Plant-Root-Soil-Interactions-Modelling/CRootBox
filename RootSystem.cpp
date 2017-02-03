@@ -208,9 +208,8 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
  */
 void RootSystem::simulate(double dt)
 {
-    //dt = rsparam.simtime;
-    std::cout << "RootSystem.simulate(dt) from "<< simtime << " to " << simtime+dt << " days \n";
-    simtime+=dt;
+    // std::cout << "RootSystem.simulate(dt) from "<< simtime << " to " << simtime+dt << " days \n";
+    simtime += dt;
     for (auto const& r: baseRoots) {
         r->simulate(dt);
     }
@@ -248,7 +247,8 @@ void RootSystem::setSeed(double seed) {
  *
  */
 Root* RootSystem::createRoot(int lt, Vector3d  h, double delay, Root* parent, double pbl, int pni) {
-    return new Root(this,lt,h,delay,parent,pbl,pni);
+// call Root* lateral = rootsystem->createRoot(lt,  h, delay,  this, length, nodes.size()-1);
+  return new Root(this,lt,h,delay,parent,pbl,pni);
 }
 
 /**

@@ -39,6 +39,7 @@ nodes = vv2a(rs.getNodes())
 rs_ana = rb.SegmentAnalyser(rs) 
 type = v2a(rs_ana.getScalar(rb.ScalarType.type))
 radius = v2a(rs_ana.getScalar(rb.ScalarType.radius))
+time_ = v2a(rs_ana.getScalar(rb.ScalarType.time))
 
 #
 # initialize (xylem_flux)
@@ -47,6 +48,12 @@ rs_Kr = np.array([ 1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10 ]) # root hyd
 rs_Kz = np.array([ 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8 ]) # root hydraulic axial conductivity per root type [cm^5 s], plausible values?  
 kr = np.array(list(map(lambda t: rs_Kr[int(t)-1], type))) # convert from 'per type' to 'per segment'
 kz = np.array(list(map(lambda t: rs_Kz[int(t)-1], type)))
+
+kr = kr * (10*time_ + 1)
+kz = kz / (10*time_ + 1)
+
+kr = kr / 100
+kz = kz * 100
 
 rho = 1e-3 # kg / cm      
 g = 9.8 *100 # cm / s^2 
@@ -74,7 +81,7 @@ n0= np.array([0]) # node indices
 # apply Neumann BC
 #
 seg0 = np.array([0]) # segment indices
-aflux = np.array([-2.e-6])
+aflux = np.array([-2.e-5])
 Q, b = xylem_flux.bc_neumann(Q, b, seg0, aflux, seg, nodes)
 
 #

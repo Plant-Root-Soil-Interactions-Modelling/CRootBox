@@ -44,7 +44,7 @@ public:
     /* Nodes of the root */
     void addNode(Vector3d n,double t); //< adds a node to the root
     Vector3d getNode(int i) const { return nodes.at(i); } ///< i-th node of the root
-    double getNodeETime(int i) const { return netimes.at(i); } ///< cretation time of i-th node
+    double getNodeETime(int i) const { return netimes.at(i); } ///< creation time of i-th node
     int getNodeId(int i) const {return nodeIds.at(i); } ///< unique identifier of i-th node
     size_t getNumberOfNodes() const {return nodes.size(); }  ///< return the number of the nodes of the root
 
