@@ -1,7 +1,14 @@
 import math
+import time as timer
+import os # add the search path for py_rootbox.so (probably there is a nicer way to do it?)
+import sys
+cwd = os.getcwd()
+i = cwd.index("CRootBox")
+sys.path.append(cwd[0:i+8])
 
 import numpy as np
-from numpy import linalg as LA
+import scipy.sparse.linalg as LA
+from scipy import sparse
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -10,8 +17,11 @@ import PSP_infiltration1D as inf
 
 import py_rootbox as rb    
 from rb_tools import *
-
+import xylem_flux 
     
+def soil_p(x,y,z,psi,depth):
+    i = round(-z/depth*inf.n)
+    return psi[i]
         
 #
 # Initialize soil domain
@@ -37,18 +47,20 @@ totalIterationNr = 0
 #
 # Initialize root domain
 #
-rsname = "anagallis2010" 
+rsname = "anagallis_Leitner_et_al(2010)" 
 rs = rb.RootSystem()
-rs.openFile(rsname,"")
+rs.openFile(rsname,parameterPath())
 rs.initialize() # hydrotropism is not set right now, link to soil is missing
+
 rs_Kr = ( 1e-10, 1e-10, 1e-10, 1e-10, 1e-10 ) # root hydraulic conductivity per root type 
+
 
 #
 # Simulation
 #                   
-simTime = 30*24 * 3600   
+simTime = 30*24*3600   
 maxTimeStep = 24*3600                  
-dt = 3600              
+dt = 36              
 time = 0               
 
 out_delay = 6*3600
@@ -93,7 +105,7 @@ while (time < simTime):
     # Python Richards Code
     #    
     
-    success, nrIterations, flux = inf.cellCentFiniteVolWater(funcType, soil, dt, ubPotential, isFreeDrainage,inf.LOGARITHMIC)
+    success, nrIterations, flux = inf.cellCentFiniteVolWater(funcType, soil, dt, ubPotential, isFreeDrainage, inf.LOGARITHMIC)
     #success, nrIterations, flux = (True,1,0)
     
     while (not success):
@@ -117,41 +129,52 @@ while (time < simTime):
     #
     # Root System fluxes
     #    
-    rs_nodes = rs.getNodes()
-    rs_segI = rs.getSegments()
-    rs_ana = rb.AnalysisSDF(rs) # segment analyser
-    rs_segType = vd2a(rs_ana.getScalar(rb.ScalarType.type))
-    rs_segL = vd2a(rs_ana.getScalar(rb.ScalarType.length))
-    rs_segR = vd2a(rs_ana.getScalar(rb.ScalarType.radius))
+    t = timer.time()
+    seg = seg2a(rs.getSegments())
+    nodes = vv2a(rs.getNodes()) /100 # convert to meter
+    rs_ana = rb.SegmentAnalyser(rs) 
+    type = v2a(rs_ana.getScalar(rb.ScalarType.type))
+    radius = v2a(rs_ana.getScalar(rb.ScalarType.radius))/100 # convert to meter 
+    time_ = v2a(rs_ana.getScalar(rb.ScalarType.time))*3600*24 # convert to seconds 
     
-    N = len(rs_segI)
-    print("Number of segments is "+str(N))
-    rs_segPot = np.ones(N) * (-1000) # pressure head
+    rs_Kr = np.array([ 1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10 ]) # root hydraulic radial conductivity per root type TODO Andrea
+    rs_Kz = np.array([ 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8 ]) # root hydraulic axial conductivity per root type  
+    kr = np.array(list(map(lambda t: rs_Kr[int(t)-1], type))) # convert from 'per type' to 'per segment'
+    kz = np.array(list(map(lambda t: rs_Kz[int(t)-1], type)))
+    kr = kr * (10*time_ + 1)
+    kz = kz / (10*time_ + 1)
     
-    rs_segV = np.zeros((N,3)) # direction of segment, needed for doussan
-    rs_segZ = np.zeros(N) # segment mid point z coordinate
-    for i in range(0,N):
-        s = rs_segI[i]
-        n1 = v2v(rs_nodes[s.x])
-        n2 = v2v(rs_nodes[s.y])
-        rs_segV[i,:] = n2-n1 # todo normalize
-        mid = 0.5*(n1+n2)
-        rs_segZ[i] = mid[2]  
+    rho = 1e3 # kg / m^3      
+    g = 9.8  # m / s^2    
      
-    rs_flux = np.zeros(N)
-    rs_flux2 = np.zeros(inf.n+2)
-    for i in range(0,N):
-        j = z2i(rs_segZ[i], inf.n)
-        ind = int(rs_segType[i])
-        rs_flux[i] =  (2*rs_segR[i]*math.pi*rs_segL[i])*rs_Kr[ind-1]*(inf.psi[j+1]-rs_segPot[i]) 
-        #print((inf.psi[j+1]-rs_segPot[i]))
-        rs_flux2[j+1] += max((rs_flux[i]*dt),0)             
-    #print(rs_flux2)                  
+    soil_p2 = lambda x,y,z : soil_p(x,y,z, inf.psi,soil[-1].lowerDepth) # J/kg
+    
+    Q, b = xylem_flux.linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p2)  
+    Tpot = np.array([-6.e-8]) # m^3 s^-1 TODO Andrea
+    Q, b = xylem_flux.bc_neumann(Q, b, np.array([0]), Tpot, seg, nodes)
+    x = LA.spsolve(Q, b) # direct
+    if x[0]<-15000:
+        print("using dirichlet")
+        Q, b = xylem_flux.bc_dirichlet(Q, b, np.array([0]), np.array([-15000])) # TODO Andrea
+        x = LA.spsolve(Q, b) # direct
+        
+    radial_flux = xylem_flux.radial_flux(x, seg, nodes, radius, kr, soil_p2)
+    
+    print("xylem flux time: " + str(timer.time()-t) +" sec" )
+
     #
     # Apply Sink
     #    
+    sink = np.zeros(inf.n)
+    for i in range(0,len(seg)):
+        n1 = nodes[seg[i,0],:]
+        n2 = nodes[seg[i,1],:]
+        z = float(0.5*(n1[2]+n2[2]))
+        ind = round(-z/soil[-1].lowerDepth*inf.n)
+        sink[ind]+=sink[ind]        
+    
     for i in range(0,inf.n):
-        inf.theta[i+1] -= ( rs_flux2[i+1]/inf.area/inf.dz[i+1] )    
+        inf.theta[i+1] -= sink[i] # TODO  
         inf.theta[i+1] = min(inf.theta[i+1],1)
         inf.theta[i+1] = max(inf.theta[i+1],0)          
       
@@ -159,7 +182,7 @@ while (time < simTime):
     for i in range(0,inf.n+2):
         inf.psi[i] = inf.waterPotential(funcType, soil[inf.hor[i]], inf.theta[i])
      
-    cflux += float(np.sum(rs_flux2))   
+    cflux += float(np.sum(sink))   
      
     #
     # Output
