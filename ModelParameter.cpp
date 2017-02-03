@@ -124,11 +124,13 @@ void RootTypeParameter::read(std::istream & cin) {
 	char ch[256]; // dummy
 	cin.getline(ch,256);
 	std::string s; // dummy
-	cin >> s >> type >> s >> name >> s >> lb >> lbs >> s >> la >> las >> s >> ln >> lns >> s >> nob >> nobs;
+	double k;
+	double ks;
+	cin >> s >> type >> s >> name >> s >> lb >> lbs >> s >> la >> las >> s >> ln >> lns >> s >> k >> ks;
 	cin >> s >> r >> rs >> s >> a >> as >> s >> colorR >> colorG >> colorB >> s >> tropismT >> tropismN >> tropismS >> s >> dx >> s;
 	if(ln > 0) {
-		nob=(nob-la-lb)/ln+1;   //conversion, because the input file delivers the lmax value and not the nob value
-		nobs = sqrt(pow((nobs/nob),2.0) + pow((lns/ln),2.0 ))*nob/ln + sqrt(pow((las/la),2.0) + pow((lns/ln),2.0) )*la/ln + sqrt(pow((lbs/lb),2.0) + pow((lns/ln),2.0) )*lb/ln;  // Fehlerfortpflanzung --richtig?
+		nob=(k-la-lb)/ln+1;   //conversion, because the input file delivers the lmax value and not the nob value
+		nobs = 0;//sqrt(pow((ks/k),2.0) + pow((lns/ln),2.0 ))*k/ln + sqrt(pow((las/la),2.0) + pow((lns/ln),2.0) )*la/ln + sqrt(pow((lbs/lb),2.0) + pow((lns/ln),2.0) )*lb/ln;  // Fehlerfortpflanzung --richtig?
 	}else{
 		nob=0;
 		nobs = 0;
