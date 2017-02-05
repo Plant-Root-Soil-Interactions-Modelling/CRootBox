@@ -137,12 +137,12 @@ while (time < simTime):
     radius = v2a(rs_ana.getScalar(rb.ScalarType.radius))/100 # convert to meter 
     time_ = v2a(rs_ana.getScalar(rb.ScalarType.time))*3600*24 # convert to seconds 
     
-    rs_Kr = np.array([ 1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10 ]) # root hydraulic radial conductivity per root type TODO Andrea
-    rs_Kz = np.array([ 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8 ]) # root hydraulic axial conductivity per root type  
+    rs_Kr = np.array([ 1.16e-6, 1.74e-5, 1.74e-5, 1.74e-5, 11.74e-5, 1.74e-5, 1.74e-5 ]) # s/m; root hydraulic radial conductivity per root type 
+    rs_Kz = np.array([ 2.3e-8, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11 ]) # m²*s; root hydraulic axial conductivity per root type  
     kr = np.array(list(map(lambda t: rs_Kr[int(t)-1], type))) # convert from 'per type' to 'per segment'
     kz = np.array(list(map(lambda t: rs_Kz[int(t)-1], type)))
-    kr = kr * (10*time_ + 1)
-    kz = kz / (10*time_ + 1)
+    #kr = kr * (10*time_ + 1)
+    #kz = kz / (10*time_ + 1)
     
     rho = 1e3 # kg / m^3      
     g = 9.8  # m / s^2    
@@ -150,12 +150,12 @@ while (time < simTime):
     soil_p2 = lambda x,y,z : soil_p(x,y,z, inf.psi,soil[-1].lowerDepth) # J/kg
     
     Q, b = xylem_flux.linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p2)  
-    Tpot = np.array([-6.e-8]) # m^3 s^-1 TODO Andrea
+    Tpot = np.array([-5.79e-4]) # m^3 s^-1 
     Q, b = xylem_flux.bc_neumann(Q, b, np.array([0]), Tpot, seg, nodes)
     x = LA.spsolve(Q, b) # direct
-    if x[0]<-15000:
+    if x[0]<-1500:
         print("using dirichlet")
-        Q, b = xylem_flux.bc_dirichlet(Q, b, np.array([0]), np.array([-15000])) # TODO Andrea
+        Q, b = xylem_flux.bc_dirichlet(Q, b, np.array([0]), np.array([-1500])) # J/kg
         x = LA.spsolve(Q, b) # direct
         
     radial_flux = xylem_flux.radial_flux(x, seg, nodes, radius, kr, soil_p2)
@@ -171,7 +171,7 @@ while (time < simTime):
         n2 = nodes[seg[i,1],:]
         z = float(0.5*(n1[2]+n2[2]))
         ind = round(-z/soil[-1].lowerDepth*inf.n)
-        sink[ind]+=radial_flux[i]        
+        sink[ind]+=sink[ind]        
     
     for i in range(0,inf.n):
         inf.theta[i+1] -= sink[i] # TODO  
