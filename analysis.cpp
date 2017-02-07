@@ -93,11 +93,11 @@ std::vector<double> SegmentAnalyser::getScalar(int st) const
 		}
 		break;
 		case RootSystem::st_length: { // compute segment length
-			v = getSegLength(i);
+			v = getSegmentLength(i);
 		}
 		break;
 		case RootSystem::st_surface: { // compute segment surface
-			v = getSegLength(i)*2*M_PI*r->param.a;
+			v = getSegmentLength(i)*2*M_PI*r->param.a;
 		}
 		break;
 		case RootSystem::st_one: { // e.g. for counting segments
@@ -105,7 +105,7 @@ std::vector<double> SegmentAnalyser::getScalar(int st) const
 		}
 		break;
 		case RootSystem::st_length_times_ud1: { // e.g. raidal flux per length times length
-			v = getSegLength(i)*userData.at(0).at(i);
+			v = getSegmentLength(i)*userData.at(0).at(i);
 		}
 		break;
 		default:
@@ -122,7 +122,7 @@ std::vector<double> SegmentAnalyser::getScalar(int st) const
  * @param i 	index of the segment
  * \return 		the length of segment i
  */
-double SegmentAnalyser::getSegLength(int i) const
+double SegmentAnalyser::getSegmentLength(int i) const
 {
 	Vector2i s = segments.at(i);
 	Vector3d x = nodes.at(s.x);

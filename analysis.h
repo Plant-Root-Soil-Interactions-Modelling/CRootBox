@@ -32,7 +32,7 @@ public:
 
     // some things we might want to know
     std::vector<double> getScalar(int st) const; ///< Returns a specific parameter per segment @see RootSystem::ScalarType
-    double getSegLength(int i) const; ///< returns the length of a segment
+    double getSegmentLength(int i) const; ///< returns the length of a segment
     double getSummed(int st) const; ///< Sums up the parameter
     double getSummed(int st, SignedDistanceFunction* geometry) const; ///< Sums up the parameter within the geometry
     std::vector<double> distribution(int st, double top, double bot, int n, bool exact=false) const; ///< vertical distribution of a parameter
