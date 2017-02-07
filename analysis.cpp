@@ -48,14 +48,32 @@ void SegmentAnalyser::addSegments(const SegmentAnalyser& a)
 /**
  * Returns a specific parameter per root segment
  *
- * @param st    parameter type @see RootSystem::ScalarType
+ * @param st    parameter type @see RootSystem::ScalarType per segment
  * \return      vector containing parameter value per segment
  */
 std::vector<double> SegmentAnalyser::getScalar(int st) const
 {
 	// TODO since segments have know their origin root: segO, pure root segment mapping could be done by using RootSystem::getScalar
-	// to avoid redundant code, scalars that are segment wise must be treated extra
+
 	std::vector<double> data(segO.size());
+
+	if (st==RootSystem::st_time) {
+		data = ctimes;
+		return data;
+	}
+	if (st==RootSystem::st_userdata1) {
+		data = userData.at(0);
+		return data;
+	}
+	if (st==RootSystem::st_userdata2) {
+		data = userData.at(1);
+		return data;
+	}
+	if (st==RootSystem::st_userdata3) {
+		data = userData.at(2);
+		return data;
+	}
+
 	double v = 0; // value
 	for (size_t i=0; i<segO.size(); i++) {
 		const auto& r = segO.at(i);
@@ -68,26 +86,26 @@ std::vector<double> SegmentAnalyser::getScalar(int st) const
 			break;
 		case RootSystem::st_order: {
 			Root* r_ = r;
-			while (r_->parent!=nullptr) {
+			while (r_->parent!=nullptr) { // find root order
 				v++;
 				r_=r_->parent;
 			}
 		}
 		break;
-		case RootSystem::st_time: // at the end of the method
-			break;
-		case RootSystem::st_length: {
-			Vector2i s = segments.at(i);
-			Vector3d x = nodes.at(s.x);
-			Vector3d y = nodes.at(s.y);
-			v = x.minus(y).length();
+		case RootSystem::st_length: { // compute segment length
+			v = getSegLength(i);
 		}
 		break;
-		case RootSystem::st_surface: {
-			Vector2i s = segments.at(i);
-			Vector3d x = nodes.at(s.x);
-			Vector3d y = nodes.at(s.y);
-			v = x.minus(y).length()*2*M_PI*r->param.a;
+		case RootSystem::st_surface: { // compute segment surface
+			v = getSegLength(i)*2*M_PI*r->param.a;
+		}
+		break;
+		case RootSystem::st_one: { // e.g. for counting segments
+			v=1;
+		}
+		break;
+		case RootSystem::st_length_times_ud1: { // e.g. raidal flux per length times length
+			v = getSegLength(i)*userData.at(0).at(i);
 		}
 		break;
 		default:
@@ -95,11 +113,23 @@ std::vector<double> SegmentAnalyser::getScalar(int st) const
 		}
 		data.at(i) = v;
 	}
-	if (st==RootSystem::st_time) {
-		data = ctimes;
-	}
 	return data;
 }
+
+/**
+ * Returns the length of a segment
+ *
+ * @param i 	index of the segment
+ * \return 		the length of segment i
+ */
+double SegmentAnalyser::getSegLength(int i) const
+{
+	Vector2i s = segments.at(i);
+	Vector3d x = nodes.at(s.x);
+	Vector3d y = nodes.at(s.y);
+	return x.minus(y).length();
+}
+
 
 /**
  * Crops the segments with some geometry
@@ -153,7 +183,6 @@ void SegmentAnalyser::crop(SignedDistanceFunction* geometry)
 	segO  = sO;
 	ctimes = ntimes;
 	std::cout << " cropped to " << segments.size() << " segments " << "\n";
-
 }
 
 /**
@@ -269,7 +298,7 @@ double SegmentAnalyser::getSummed(int st) const {
 
 /**
  * \return The summed parameter of type @param st (@see RootSystem::ScalarType), that is within geometry @param g ,
- * based on the segment mid point (i.e. not exact)
+ * based on the segment mid point (i.e. not exact). To sum exatly, first crop to the geometry, then run SegmentAnalyser::getSummed(st).
  */
 double SegmentAnalyser::getSummed(int st, SignedDistanceFunction* g) const {
 	std::vector<double> data = getScalar(st);
@@ -300,7 +329,7 @@ int SegmentAnalyser::getNumberOfRoots() const
 }
 
 /**
- * Projects the segments to an image plane
+ * Projects the segments to an image plane (todo verify this code)
  *
  * @param pos       position of camera
  * @parma ons       orthonormal system, row 1 is orthogonal to the image plane given by [row 2,row 3]
@@ -337,7 +366,9 @@ SegmentAnalyser SegmentAnalyser::foto(const Vector3d& pos, const Matrix3d& ons, 
 }
 
 /**
- * Cuts the segments with a plane
+ * Keeps the segments that intersect with a plane
+ *
+ * @param plane 	half plane
  */
 SegmentAnalyser SegmentAnalyser::cut(const SDF_HalfPlane& plane) const
 {
@@ -516,7 +547,8 @@ void SegmentAnalyser::write(std::string name) const
  * Writes a VTP file with @param types data per segment.
  *
  * @param os        typically a file out stream
- * @param types     multiple parameter types (@see RootSystem::ScalarType) that are saved in the VTP file
+ * @param types     multiple parameter types (@see RootSystem::ScalarType) that are saved in the VTP file,
+ * 					additionally, all userdata is saved per default
  */
 void SegmentAnalyser::writeVTP(std::ostream & os, std::vector<int> types) const
 {
