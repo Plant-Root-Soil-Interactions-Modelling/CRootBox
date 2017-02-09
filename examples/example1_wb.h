@@ -14,12 +14,12 @@ void example1_wb()
 {
     RootSystem rootsystem;
 
-    string name = "Cauliflower_Vansteenkiste_et_al_2014";
+    string name = "param";
 
     /*
      * Plant and root parameter from a file
      */
-    rootsystem.openFile(name);
+    rootsystem.openFile(name, "www/");
     rootsystem.writeParameters(std::cout);
 
     // THETA by hand
@@ -40,29 +40,29 @@ void example1_wb()
     /*
      * Simulate
      */
-    double simtime = 10; // 20, 40, 60 days
-    double dt = 1; // try other values here
-    int N = round(simtime/dt);
+    // double simtime = 10; // 20, 40, 60 days
+    // double dt = 1; // try other values here
+    // int N = round(simtime/dt);
 
-    for (int i=0; i<N; i++) {
-        rootsystem.simulate(dt);
-    }
+    // for (int i=0; i<N; i++) {
+        rootsystem.simulate(0);
+    // }
 
     /*
      * Export final result (as vtp)
      */
-    rootsystem.write(name+".vtp",RootSystem::ot_segments); // use ot_polylines for nicer visualization, ot_segments for animations
+    rootsystem.write("www/rootsystem.vtp",RootSystem::ot_segments); // use ot_polylines for nicer visualization, ot_segments for animations
 
     /*
-     * Export segments in DGF format TODO finish and test this method
+     * Export segments in RSML format
      */
-    // rootsystem.write(name+".dgf");
+    rootsystem.write("www/rootsystem.rsml");
 
     /*
      * Export segments for Matlab analysis
      */
     SegmentAnalyser analysis(rootsystem);
-    analysis.write(name+".txt");
+    analysis.write("www/rootsystem.txt");
 
     /*
       Total length and surface

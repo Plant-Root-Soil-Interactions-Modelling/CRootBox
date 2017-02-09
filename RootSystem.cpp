@@ -209,7 +209,9 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 void RootSystem::simulate(double dt)
 {
     // std::cout << "RootSystem.simulate(dt) from "<< simtime << " to " << simtime+dt << " days \n";
-    simtime += dt;
+    dt = rsparam.simtime;
+    std::cout << "RootSystem.simulate(dt) from "<< simtime << " to " << simtime+dt << " days \n";
+    simtime+=dt;
     for (auto const& r: baseRoots) {
         r->simulate(dt);
     }
