@@ -615,9 +615,9 @@ void SegmentAnalyser::writeDGF(std::ostream & os) const
 		double radius = r->param.a;
 		double time = ctimes.at(i);
 		double type = r->param.type;
-        os << n1.x/100 << " " << n1.y/100 << " " << n1.z/100 << " \n";
+        os << n1.x/100 << " " << n1.y << " " << n1.z << " \n";
         if(i==segments.size()-1)
-		    os << n2.x/100 << " " << n2.y/100 << " " << n2.z/100 << " \n";
+		    os << n2.x << " " << n2.y << " " << n2.z << " \n";
 	}
 
 
@@ -636,7 +636,7 @@ void SegmentAnalyser::writeDGF(std::ostream & os) const
 		double surface = 2*radius*M_PI*length;
 		double time = ctimes.at(i);
 		double type = r->param.type;
-         os << s.x << " " << s.y << " " << type << " "<< surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << time*3600*24 << " \n";
+         os << s.x << " " << s.y << " " << type << " "<< "0.00" << " " << length <<" " << radius << " " << "0.00" << " " << time << " \n";
         }
 
     os << "# \n";

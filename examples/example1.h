@@ -56,6 +56,12 @@ void example1()
     analysis.write(name+".txt");
 
     /*
+     * Export dgf file
+     */
+    SegmentAnalyser analysis_dgf(rootsystem);
+    analysis_dgf.write(name+".dgf");
+
+    /*
       Total length and surface
      */
     double l = analysis.getSummed(RootSystem::st_length);
