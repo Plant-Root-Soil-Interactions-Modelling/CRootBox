@@ -9,6 +9,7 @@
 
 #include "examples/example1.h"
 #include "examples/example1_wb.h"
+#include "examples/example1_wb_dgf.h"
 #include "examples/example2.h"
 #include "examples/example3.h"
 #include "examples/example4.h"
@@ -35,7 +36,7 @@ int main(int argc, char* argv[])
     }
 
     //example1(); // open parameter file, and output VTP
-    example1_wb(); // root growth inside a big box to simulate soil surface, open parameter file, and output VTP
+    example1_wb_dgf(); // root growth inside a big box to simulate soil surface, open parameter file, and output VTP
     //example2(); // like example 1, but with put geometry
     //example3(); // more than 1 plant
     // example4(); // rhizotubes (an example for a more complex geomety)

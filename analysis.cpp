@@ -643,10 +643,6 @@ void SegmentAnalyser::writeDGF(std::ostream & os) const
 		Vector2i s = segments.at(i);
 		Vector3d n1 = nodes.at(s.x);
 		Vector3d n2 = nodes.at(s.y);
-		Root* r = segO.at(i);
-		double radius = r->param.a;
-		double time = ctimes.at(i);
-		double type = r->param.type;
         os << n1.x/100 << " " << n1.y/100 << " " << n1.z/100 << " \n";
         if(i==segments.size()-1)
 		    os << n2.x/100 << " " << n2.y/100 << " " << n2.z/100 << " \n";
@@ -656,19 +652,20 @@ void SegmentAnalyser::writeDGF(std::ostream & os) const
     os << "# \n";
     os << "SIMPLEX \n";
     os << "parameters 10 \n";
-    // node1ID, node2ID, type, branchID, surfaceIdx = 0, radiusIdx = 1, orderIdx = 2, branchIdx = 3, massIdx = 4, axialPermIdx = 5, radialPermIdx = 6, creationTimeIdx = 7
+    // node1ID, node2ID, type, branchID, surfaceIdx, length, radiusIdx, massIdx, axialPermIdx, radialPermIdx, creationTimeId
 
 	for (size_t i=0; i<segments.size(); i++) {
 		Vector2i s = segments.at(i);
 		Vector3d n1 = nodes.at(s.x);
 		Vector3d n2 = nodes.at(s.y);
 		Root* r = segO.at(i);
+                int branchnumber = r->id;
 		double radius = r->param.a;
 		double length = sqrt((n1.x-n2.x)*(n1.x-n2.x)+(n1.y-n2.y)*(n1.y-n2.y)+(n1.z-n2.z)*(n1.z-n2.z));
 		double surface = 2*radius*M_PI*length;
 		double time = ctimes.at(i);
 		double type = r->param.type;
-         os << s.x << " " << s.y << " " << type << " "<< surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << time*3600*24 << " \n";
+         os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
         }
 
     os << "# \n";
