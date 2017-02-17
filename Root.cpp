@@ -59,7 +59,7 @@ Root::~Root()
 }
 
 /**
- * Exact length of the root at a certain age
+ * Analytical length of the root at a given age
  *
  * @param age          age of the root [day]
  */
@@ -70,7 +70,7 @@ double Root::getLength(double age)
 }
 
 /**
- * Creation time of a node at a certain length
+ * Analytical creation (=emergence) time of a node at a length along the root
  *
  * @param length   length of the root [cm]
  */
@@ -94,7 +94,7 @@ double Root::getCreationTime(double length)
 }
 
 /**
- * Exact age of the root at a ceratain length
+ * Analytical age of the root at a given length
  *
  * @param length   length of the root [cm]
  */

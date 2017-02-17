@@ -14,12 +14,12 @@ void example1()
 {
     RootSystem rootsystem;
 
-    string name = "Maize_Pheno1_Leitner_et_al_2014";
+    string name = "param";
 
     /*
      * Open plant and root parameter from a file
      */
-    rootsystem.openFile(name);
+    rootsystem.openFile(name, "www/");
     rootsystem.writeParameters(std::cout);
 
     /*
@@ -42,18 +42,18 @@ void example1()
     /*
      * Export final result (as vtp)
      */
-    rootsystem.write(name+".vtp",RootSystem::ot_segments); // use ot_polylines for nicer visualization, ot_segments for animations
+    rootsystem.write("www/rootsystem.vtp",RootSystem::ot_segments); // use ot_polylines for nicer visualization, ot_segments for animations
 
     /*
      * Export segments in RSML format
      */
-    rootsystem.write(name+".rsml");
+    rootsystem.write("www/rootsystem.rsml");
 
     /*
      * Export segments for Matlab analysis
      */
     SegmentAnalyser analysis(rootsystem);
-    analysis.write(name+".txt");
+    analysis.write("www/rootsystem.txt");
 
     /*
      * Export dgf file

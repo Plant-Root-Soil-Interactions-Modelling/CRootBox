@@ -32,7 +32,7 @@ public:
 
     void simulate(double dt); ///< root growth for a time span of \param dt
 
-    double getCreationTime(double lenght); ///< creation time of a node at a lenght
+    double getCreationTime(double lenght); ///< creation time of a node at a length
     double getLength(double age); ///< exact length of the root
     double getAge(double length); ///< exact age of the root
 
@@ -52,7 +52,7 @@ public:
     void writeRSML(std::ostream & cout, std::string indent) const; ///< writes a RSML root tag
     std::string toString() const;
 
-    RootSystem* rootsystem; ///< pointer to the root system this root is part of
+    RootSystem* rootsystem; ///< the root system this root is part of
 
     /* parameters that are given per root */
     RootParameter param; ///< the parameters of this root

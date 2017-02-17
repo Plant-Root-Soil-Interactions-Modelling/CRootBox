@@ -1,6 +1,6 @@
 #include "RootSystem.h"
 
-const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface"};
+const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","1","user data 1", "user data 2", "user data 3" };
 
 /**
  * Destructor
@@ -209,7 +209,9 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 void RootSystem::simulate(double dt)
 {
     // std::cout << "RootSystem.simulate(dt) from "<< simtime << " to " << simtime+dt << " days \n";
-    simtime += dt;
+    dt = rsparam.simtime;
+    std::cout << "RootSystem.simulate(dt) from "<< simtime << " to " << simtime+dt << " days \n";
+    simtime+=dt;
     for (auto const& r: baseRoots) {
         r->simulate(dt);
     }

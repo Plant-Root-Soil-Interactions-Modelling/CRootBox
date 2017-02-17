@@ -1,0 +1,8 @@
+.project
+.cproject
+.pydevproject
+.settings/
+Debug/
+py_rootbox.so
+examples/Coupling_PSP/__pycache__/
+
