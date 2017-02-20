@@ -4,7 +4,6 @@
 #include "RootSystem.h"
 #include <set>
 
-
 /**
  * Meshfree analysis of the root system based on signed distance functions.
  *
@@ -52,10 +51,10 @@ public:
     void clearUserData() { userData.clear(); userDataNames.clear(); } //< resets the user data
 
     // some exports
-    void write(std::string name) const; ///< writes simulation results (type is determined from file extension in name)
+    void write(std::string name); ///< writes simulation results (type is determined from file extension in name)
     void writeVTP(std::ostream & os, std::vector<int> types = {RootSystem::st_radius}) const; ///< writes a VTP file
     void writeRBSegments(std::ostream & os) const; ///< Writes the segments of the root system, mimics the Matlab script getSegments()
-   void writeDGF(std::ostream & os) const; ///< Writes the segments of the root system in DGF format used by DuMux
+    void writeDGF(std::ostream & os) const; ///< Writes the segments of the root system in DGF format used by DuMux
 
     // auxiliary
     static Vector3d cut(Vector3d in, Vector3d out, SignedDistanceFunction* geometry); ///< intersects a line with  the geometry
@@ -69,7 +68,6 @@ protected:
 
     std::vector<std::vector<double>> userData;
     std::vector<std::string> userDataNames;
-
 
 };
 
