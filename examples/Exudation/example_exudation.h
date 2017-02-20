@@ -58,7 +58,7 @@ void example_exudation()
 {
     RootSystem rootsystem;
 
-    string name = "anagallis_straight";
+    string name = "Zea_mays_1_Leitner_2010";
 
     /*
      * Plant and root parameter from a file
@@ -84,13 +84,15 @@ void example_exudation()
     /*
      * Simulate
      */
-    double simtime = 10; // 20, 40, 60 days
-    double dt = 1; // try other values here
+    double simtime = 10.; // 20, 40, 60 days
+    double dt = 1.; // try other values here
     int N = round(simtime/dt);
 
     for (int i=0; i<N; i++) {
         rootsystem.simulate(dt);
     }
+
+    cout << "Number of roots " << rootsystem.getRoots().size() << "\n";
 
     /*
      * Export final result (as vtp)
@@ -116,9 +118,9 @@ void example_exudation()
     assert(roots.size()==ages.size());
 
 
-    int X = 100;
-    int Y = 100;
-    int Z = 100;
+    int X = 10;
+    int Y = 10;
+    int Z = 10;
     double width = 50;
     double depth = 100;
 
@@ -166,7 +168,17 @@ void example_exudation()
 
     }
 
-    cout << "fin \n"
+    /*
+     * write as txt file
+     */
+    std::ofstream fos;
+    fos.open(name+".txt");
+    for (size_t i=0; i<allc.size(); i++) {
+    	fos << allc[i] << "\n";
+    }
+    fos.close();
+
+    cout << "fin \n";
 
 
 }

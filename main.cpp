@@ -21,6 +21,8 @@
 #include "examples/shehan_RhizoTubes.h"
 #include "examples/shehan_Trenches.h"
 
+#include "examples/Exudation/example_exudation.h"
+
 //#include "DumuxRootSystem.h" // suggested coupling
 //#include "examples/example_dumux.h"
 
@@ -36,7 +38,7 @@ int main(int argc, char* argv[])
     }
 
     //example1(); // open parameter file, and output VTP
-    example1_wb_dgf(); // root growth inside a big box to simulate soil surface, open parameter file, and output VTP
+    //example1_wb_dgf(); // root growth inside a big box to simulate soil surface, open parameter file, and output VTP
     //example2(); // like example 1, but with put geometry
     //example3(); // more than 1 plant
     // example4(); // rhizotubes (an example for a more complex geomety)
@@ -59,7 +61,10 @@ int main(int argc, char* argv[])
 
     // example_dumux(); // tests the suggested dumux coupling
 
+    example_exudation();
+
     return(0);
+
 }
 
 

@@ -208,13 +208,19 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
  */
 void RootSystem::simulate(double dt)
 {
-    // std::cout << "RootSystem.simulate(dt) from "<< simtime << " to " << simtime+dt << " days \n";
-    dt = rsparam.simtime;
     std::cout << "RootSystem.simulate(dt) from "<< simtime << " to " << simtime+dt << " days \n";
     simtime+=dt;
     for (auto const& r: baseRoots) {
         r->simulate(dt);
     }
+}
+
+/**
+ * Simulates root system growth for the time span defined in the parameter set
+ */
+void RootSystem::simulate()
+{
+	this-simulate(rsparam.simtime);
 }
 
 /**
