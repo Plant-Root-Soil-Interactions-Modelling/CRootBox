@@ -87,7 +87,6 @@ public:
 	void writeRSML(std::ostream & os) const; ///< Writes current simulation results as RSML
 	void writeVTP(std::ostream & os, int type = ot_polylines) const; ///< Writes current simulation results as VTP (VTK polydata file)
 	void writeGeometry(std::ostream & os) const; ///< Writes the current confining geometry (e.g. a plant container) as paraview python script
-	void writeDGF(std::ostream & os) const; ///< Writes the segments of the root system in DGF format used in Dumux
 
 	// void std::toString() const; TODO
 

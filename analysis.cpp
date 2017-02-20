@@ -195,20 +195,20 @@ void SegmentAnalyser::crop(SignedDistanceFunction* geometry)
  */
 void SegmentAnalyser::filter(int st, double min, double max)
 {
-  std::vector<double> data = getScalar(st);
-  std::vector<Vector2i> seg;
-  std::vector<Root*> sO;
-  std::vector<double> ntimes;
-  for (size_t i=0; i<segments.size(); i++) {
-      if ((data.at(i)>=min) && (data.at(i)<=max)) {
-          seg.push_back(segments.at(i));
-          sO.push_back(segO.at(i));
-          ntimes.push_back(ctimes.at(i));
-      }
-  }
-  segments = seg;
-  segO  = sO;
-  ctimes = ntimes;
+	std::vector<double> data = getScalar(st);
+	std::vector<Vector2i> seg;
+	std::vector<Root*> sO;
+	std::vector<double> ntimes;
+	for (size_t i=0; i<segments.size(); i++) {
+		if ((data.at(i)>=min) && (data.at(i)<=max)) {
+			seg.push_back(segments.at(i));
+			sO.push_back(segO.at(i));
+			ntimes.push_back(ctimes.at(i));
+		}
+	}
+	segments = seg;
+	segO  = sO;
+	ctimes = ntimes;
 }
 
 /**
@@ -347,7 +347,7 @@ SegmentAnalyser SegmentAnalyser::foto(const Vector3d& pos, const Matrix3d& ons, 
 	for (auto& n : f.nodes) {
 		n = m.times(n);
 	}
-//	// crop to objects in front of the camera
+	//	// crop to objects in front of the camera
 	Vector3d o(0.,0.,0.);
 	Vector3d plane(0.,0., -1);
 	SDF_HalfPlane sdf = SDF_HalfPlane(o,plane);
@@ -526,8 +526,9 @@ std::vector<std::vector<SegmentAnalyser>> SegmentAnalyser::distribution2(double 
  *
  * @param name      file name e.g. output.vtp
  */
-void SegmentAnalyser::write(std::string name) const
+void SegmentAnalyser::write(std::string name)
 {
+	this->pack(); // a good idea before writing any file
 	std::ofstream fos;
 	fos.open(name.c_str());
 	std::string ext = name.substr(name.size()-3,name.size()); // pick the right writer
@@ -633,44 +634,37 @@ void SegmentAnalyser::writeRBSegments(std::ostream & os) const
  * Writes the (line)segments of the root system in dgf format used by DuMux
  *
  * @param os      typically a file out stream
-*/
+ */
 
 void SegmentAnalyser::writeDGF(std::ostream & os) const
 {
-    os << "DGF \n";
-    os << "Vertex \n";
-	for (size_t i=0; i<segments.size(); i++) {
-		Vector2i s = segments.at(i);
-		Vector3d n1 = nodes.at(s.x);
-		Vector3d n2 = nodes.at(s.y);
-        os << n1.x/100 << " " << n1.y/100 << " " << n1.z/100 << " \n";
-        if(i==segments.size()-1)
-		    os << n2.x/100 << " " << n2.y/100 << " " << n2.z/100 << " \n";
+	os << "DGF \n";
+	os << "Vertex \n";
+	for (auto& n : nodes) {
+		os << n.x/100 << " " << n.y/100 << " " << n.z/100 << " \n";
 	}
 
-
-    os << "# \n";
-    os << "SIMPLEX \n";
-    os << "parameters 10 \n";
-    // node1ID, node2ID, type, branchID, surfaceIdx, length, radiusIdx, massIdx, axialPermIdx, radialPermIdx, creationTimeId
-
+	os << "# \n";
+	os << "SIMPLEX \n";
+	os << "parameters 10 \n";
+	// node1ID, node2ID, type, branchID, surfaceIdx, length, radiusIdx, massIdx, axialPermIdx, radialPermIdx, creationTimeId
 	for (size_t i=0; i<segments.size(); i++) {
 		Vector2i s = segments.at(i);
 		Vector3d n1 = nodes.at(s.x);
 		Vector3d n2 = nodes.at(s.y);
 		Root* r = segO.at(i);
-                int branchnumber = r->id;
+		int branchnumber = r->id;
 		double radius = r->param.a;
 		double length = sqrt((n1.x-n2.x)*(n1.x-n2.x)+(n1.y-n2.y)*(n1.y-n2.y)+(n1.z-n2.z)*(n1.z-n2.z));
 		double surface = 2*radius*M_PI*length;
 		double time = ctimes.at(i);
 		double type = r->param.type;
-         os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
-        }
+		os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
+	}
 
-    os << "# \n";
-    os << "BOUNDARYDOMAIN \n";
-    os << "default 1 \n";
-    os << "# \n";
+	os << "# \n";
+	os << "BOUNDARYDOMAIN \n";
+	os << "default 1 \n";
+	os << "# \n";
 }
 

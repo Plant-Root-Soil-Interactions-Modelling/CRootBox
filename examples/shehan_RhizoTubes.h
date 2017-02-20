@@ -153,7 +153,7 @@ void shehan_RhizoTubes(string name = "wheat", bool exportVTP = false)
    * export fotos
    */
   int c=0;
-  for (const auto& ft : fotos) {
+  for (auto& ft : fotos) {
     string vtpname = name +  "_tube_fotos"+std::to_string(++c) +".vtp";
     ft.write(vtpname);
   }

@@ -574,9 +574,6 @@ void RootSystem::write(std::string name, int type) const
     } else if (ext.compare(".py")==0)  {
         std::cout << "writing Geometry ... "<< name.c_str() <<"\n";
         writeGeometry(fos);
-    } else if (ext.compare("dgf")==0) {
-        std::cout << "writing DGF ... "<< name.c_str() <<"\n";
-        writeDGF(fos);
     } else {
         throw std::invalid_argument("RootSystem::write(): Unkwown file type");
     }
@@ -745,56 +742,5 @@ void RootSystem::writeGeometry(std::ostream & os) const
     os << "paraview.simple._DisableFirstRenderCameraReset()\n";
     os << "renderView1 = GetActiveViewOrCreate('RenderView')\n\n";
     geometry->writePVPScript(os);
-}
-
-/**
- * TODO finish and test
- */
-void RootSystem::writeDGF(std::ostream & os) const
-{
-    os << "DGF \n";
-    os << "Vertex \n";
-    //os << "x1 y1 z1 x2 y2 z2 radius R G B time type \n";
-
-    auto roots = getRoots();
-    std::vector<int> x1;
-    std::vector<int> x2;
-    std::vector<int> branchnumber;
-    int k=0;
-    for (auto const& r:roots) {
-        k=k+1;
-        for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
-            x1.push_back(r->getNodeId(i)); // from x1
-            x2.push_back(r->getNodeId(i+1)); // to x2
-            branchnumber.push_back(k);
-        }
-    }
-    auto radius_ = getScalar(ot_segments,st_radius,roots);
-    auto time_ = getNETimes(ot_segments,roots);
-    auto type_ = getScalar(ot_segments,st_type,roots);
-    auto nodes = getNodes(ot_segments,roots);
-
-    for (size_t i =0; i<x1.size(); i++) {
-        Vector3d n1 = nodes.at(x1[i]);
-        os << n1.x << " " << n1.y << " " << n1.z << " \n";
-    }
-    Vector3d n2 = nodes.at(x2[x2.size()-1]);
-    os << n2.x << " " << n2.y << " " << n2.z << " \n";
-
-    os << "# \n";
-    os << "SIMPLEX \n";
-    os << "parameters 4 \n";
-
-    //    for (size_t i =0; i<x1.size(); i++) {
-    //        Vector3d n1 = nodes.at(x1[i]);
-    //        Vector3d n2 = nodes.at(x2[i]);
-    //        os << x1[i] << " " << x2[i] << " " << type_.at(i) <<              " "<< branchnumber[i] <<" " << radius_.at(i) << " " << "0.00" << " " << "0.00"<< " \n";
-    //    }
-
-    os << "# \n";
-    os << "BOUNDARYDOMAIN \n";
-    os << "default 1 \n";
-    os << "# \n";
-
 }
 
