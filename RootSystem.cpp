@@ -220,7 +220,7 @@ void RootSystem::simulate(double dt)
  */
 void RootSystem::simulate()
 {
-	this-simulate(rsparam.simtime);
+	this->simulate(rsparam.simtime);
 }
 
 /**
