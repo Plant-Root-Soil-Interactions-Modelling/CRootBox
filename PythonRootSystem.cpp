@@ -25,6 +25,7 @@
 #include "sdf.h"
 #include "RootSystem.h"
 #include "analysis.h"
+#include "examples/Exudation/example_exudation.h"
 
 using namespace boost::python;
 
@@ -46,10 +47,15 @@ Vector3d (Matrix3d::*times4)(const Vector3d&) const = &Matrix3d::times;
 
 std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceFunction::writePVPScript;
 
+void (RootSystem::*simulate1)(double dt) = &RootSystem::simulate;
+void (RootSystem::*simulate2)() = &RootSystem::simulate;
+
 double (SegmentAnalyser::*getSummed1)(int st) const = &SegmentAnalyser::getSummed;
 double (SegmentAnalyser::*getSummed2)(int st, SignedDistanceFunction* geometry) const = &SegmentAnalyser::getSummed;
 
 std::vector<double> (SegmentAnalyser::*distribution1)(int st, double top, double bot, int n, bool exact) const = &SegmentAnalyser::distribution;
+
+
 
 /**
  * Default arguments: no idea how to do it by hand,  magic everywhere...
@@ -64,6 +70,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentsOrigin_overloads,getSegmentsOr
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNETimes_overloads,getNETimes,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getScalar_overloads,getScalar,0,3);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(write_overloads,write,1,2); // for RootSystem
+
 
 /**
  * Virtual functions (not sure if needed, or only if we derive classes from it in python?), not working...
@@ -329,7 +336,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("setSoil", &RootSystem::setSoil)
 		.def("reset", &RootSystem::reset)
 		.def("initialize", &RootSystem::initialize, initialize_overloads())
-		.def("simulate",&RootSystem::simulate)
+		.def("simulate",simulate1)
+		.def("simulate",simulate2)
 		.def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
 		.def("getRootTips", &RootSystem::getRootTips)
 		.def("getRootBases", &RootSystem::getRootBases)
@@ -381,6 +389,22 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	.def("clearUserData", &SegmentAnalyser::clearUserData)
 	.def("write", &SegmentAnalyser::write)
     ;
+    /*
+     * example_exudation.h (rather specific for Cheng)
+     */
+//    class_<ExudationParameters>("ExudationParameters")
+//		.def_readwrite("M", &ExudationParameters::M)
+//		.def_readwrite("Dt", &ExudationParameters::Dt)
+//		.def_readwrite("Dl", &ExudationParameters::Dl)
+//		.def_readwrite("theta", &ExudationParameters::theta)
+//		.def_readwrite("R", &ExudationParameters::R)
+//		.def_readwrite("lambda_", &ExudationParameters::lambda_)
+//		.def_readwrite("age_r", &ExudationParameters::age_r)
+//		.def_readwrite("tip", &ExudationParameters::tip)
+//		.def_readwrite("v", &ExudationParameters::v)
+//		.def_readwrite("pos", &ExudationParameters::pos)
+//		;
+    // def("getExudateConcentration", getExudateConcentration);
 }
 
 /*
