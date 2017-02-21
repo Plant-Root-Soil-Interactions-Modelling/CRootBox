@@ -3,18 +3,16 @@
 
 // copy paste for daniel
 // 1. export LD_LIBRARY_PATH=~/boost_1_62_0/stage/lib
-// 2.  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.5 -L/home/daniel/boost_1_62_0/stage/lib -lboost_python Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o
-// 2b  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.4 -lboost_python-py34 Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o
+// 2.  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.5 -L/home/daniel/boost_1_62_0/stage/lib -lboost_python Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o Debug/examples/Exudation/gauss_legendre.o
+// 2b  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.4 -lboost_python-py34
 
 /**
  *  A Python module for CRootbox based on boost.python
  *
  *  build a shared library from this file
  *  put comment to line 16 to ignore this file
- *
- *
  */
-// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -55,8 +53,6 @@ double (SegmentAnalyser::*getSummed2)(int st, SignedDistanceFunction* geometry) 
 
 std::vector<double> (SegmentAnalyser::*distribution1)(int st, double top, double bot, int n, bool exact) const = &SegmentAnalyser::distribution;
 
-
-
 /**
  * Default arguments: no idea how to do it by hand,  magic everywhere...
  */
@@ -70,7 +66,6 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentsOrigin_overloads,getSegmentsOr
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNETimes_overloads,getNETimes,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getScalar_overloads,getScalar,0,3);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(write_overloads,write,1,2); // for RootSystem
-
 
 /**
  * Virtual functions (not sure if needed, or only if we derive classes from it in python?), not working...
@@ -392,19 +387,19 @@ BOOST_PYTHON_MODULE(py_rootbox)
     /*
      * example_exudation.h (rather specific for Cheng)
      */
-//    class_<ExudationParameters>("ExudationParameters")
-//		.def_readwrite("M", &ExudationParameters::M)
-//		.def_readwrite("Dt", &ExudationParameters::Dt)
-//		.def_readwrite("Dl", &ExudationParameters::Dl)
-//		.def_readwrite("theta", &ExudationParameters::theta)
-//		.def_readwrite("R", &ExudationParameters::R)
-//		.def_readwrite("lambda_", &ExudationParameters::lambda_)
-//		.def_readwrite("age_r", &ExudationParameters::age_r)
-//		.def_readwrite("tip", &ExudationParameters::tip)
-//		.def_readwrite("v", &ExudationParameters::v)
-//		.def_readwrite("pos", &ExudationParameters::pos)
-//		;
-    // def("getExudateConcentration", getExudateConcentration);
+    class_<ExudationParameters>("ExudationParameters")
+		.def_readwrite("M", &ExudationParameters::M)
+		.def_readwrite("Dt", &ExudationParameters::Dt)
+		.def_readwrite("Dl", &ExudationParameters::Dl)
+		.def_readwrite("theta", &ExudationParameters::theta)
+		.def_readwrite("R", &ExudationParameters::R)
+		.def_readwrite("lambda_", &ExudationParameters::lambda_)
+		.def_readwrite("age_r", &ExudationParameters::age_r)
+		.def_readwrite("tip", &ExudationParameters::tip)
+		.def_readwrite("v", &ExudationParameters::v)
+		.def_readwrite("pos", &ExudationParameters::pos)
+		;
+     def("getExudateConcentration", getExudateConcentration);
 }
 
 /*

@@ -8,7 +8,7 @@ Using CRootBox in Python
 
 3. outcomment line 16 again
 
-4. g++ -std=c++11 -o3 -fpic -shared -o py_rootbox.so -Wl,-soname, "py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.4 -lboost_python34 ModelParameter.o Root.o RootSystem.o analysis.o sdf.o tropism.o
+4. g++ -std=c++11 -o3 -fpic -shared -o py_rootbox.so -Wl,-soname, "py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.4 -lboost_python34 ModelParameter.o Root.o RootSystem.o analysis.o sdf.o tropism.o Debug/examples/Exudation/gauss_legendre.o
 
 
 - /usr/include/python3.4    is the path to the file pyconfig.h

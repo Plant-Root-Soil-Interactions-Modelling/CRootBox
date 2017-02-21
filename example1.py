@@ -12,7 +12,7 @@
 import py_rootbox as rb
 
 rootsystem = rb.RootSystem()
-name = "anagallis_Leitner_et_al(2010)" 
+name = "Anagallis_femina_Leitner_2010" 
 
 #
 # Open plant and root parameter from a file

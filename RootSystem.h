@@ -56,7 +56,7 @@ public:
 	void initialize(int basal=4, int shootborne=5); ///< Creates the base roots, call before simulation and after setting the plant and root parameters
 	void simulate(double dt); ///< Simulates root system growth for time span dt
 	void simulate(); ///< Simulates root system growth for the time defined in the parameters
-
+	double getSimTime() const { return simtime; }
 
 	// TODO
 	// dynamic information what happened last time step
