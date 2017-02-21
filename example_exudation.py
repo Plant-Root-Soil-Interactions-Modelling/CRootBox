@@ -1,14 +1,13 @@
 #
-# The Python version of example1.h:
-#
+# Example Exudation
 #
 # 1) Opens plant and root parameters from a file
 # 2) Simulates root growth
 # 3) Outputs a VTP (for vizualisation in ParaView)
-#    In Paraview: use tubePLot.py script for fancy visualisation (Macro/Add new macro...), apply after opening file
 #
-#  Additionally, exports the line segments as .txt file to import into Matlab for postprocessing
+#  Computes analytical solution of moving point/line sources based on Carslaw and Jaeger
 #
+
 import py_rootbox as rb
 import numpy as np
 import matplotlib.pyplot as plt
