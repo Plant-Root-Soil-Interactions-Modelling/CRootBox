@@ -14,12 +14,12 @@ void example1()
 {
     RootSystem rootsystem;
 
-    string name = "param";
+    string name = "Anagallis_femina_Leitner_2010";
 
     /*
      * Open plant and root parameter from a file
      */
-    rootsystem.openFile(name, "www/");
+    rootsystem.openFile(name);
     rootsystem.writeParameters(std::cout);
 
     /*

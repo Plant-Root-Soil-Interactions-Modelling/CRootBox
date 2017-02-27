@@ -147,6 +147,25 @@ def axial_flux(p, seg, nodes, kz, rho, g):
     return af
 
 #
+# Calculates the axial flux for the top segment
+#
+# in: TODO
+#
+# out:
+# the axial flux
+def axial_flux0(p, seg, nodes, kz, rho, g):
+    s = seg[0]
+    i = s[0]
+    j = s[1]        
+    v = nodes[j,:]-nodes[i,:] # segment direction
+    l = norm(v) # length        
+    v = v / l # normed direction           
+    af = -kz[0]*((p[j]-p[i])/l+rho*g*v[2])  # Eqn (6)
+    return af
+
+
+
+#
 # Calculates the radial flux for each segment
 #
 # in: TODO

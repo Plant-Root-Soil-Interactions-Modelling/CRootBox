@@ -56,13 +56,14 @@ public:
 
     /* parameters that are given per root */
     RootParameter param; ///< the parameters of this root
-    int id; ///< unique root id
     Vector3d iheading; ///< the initial heading of the root, when it was created
+    int id; ///< unique root id, (not used so far)
 
     bool alive = 1; ///< true: alive, false: dead, (not implemented yet)
     bool active = 1; ///< true: active, false: stopped growing
-    double length; ///< current length [cm], set within the constructor
-    double age; ///< current age [days], set within the constructor
+    double length; ///< length [cm]
+    double age; ///< current age [days] (redundant with length)
+    int newnodes = 0; ///< number of new nodes created in the last simulation step
 
     /* parent */
     Root* parent; ///< pointer to the parent root (equals nullptr if it is a base root)
@@ -84,7 +85,6 @@ protected:
 
     /* discretisation parameters */
     double dx; ///< axial resolution [cm]
-    const double ddx = 1e-6; ///< smallest allowed distance between nodes [cm]
 
 };
 
