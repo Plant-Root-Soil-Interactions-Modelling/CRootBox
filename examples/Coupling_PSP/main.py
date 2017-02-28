@@ -92,7 +92,6 @@ ax2 = fig.add_subplot(2, 2, 2, projection='3d')
 ax3 = fig.add_subplot(2, 2, 3)
 ax4 = fig.add_subplot(2, 2, 4)
 
-
 #
 # Simulation loop
 #
@@ -210,30 +209,29 @@ while (time < simTime):
     s2 = str(format((t3-t2)/t0, '.3f'))
     s3 = str(format((t4-t3)/t0, '.3f'))
     s4 = str(format((t -t4)/t0, '.3f'))
-    print("time = "+ s0 +" ("+s1+", "+s2+", "+s3+", "+s4+") ", "\tdt =", dt, "\tIterations =", int(nrIterations),  "\tInfiltration:", format(sumInfiltration, '.3f'))
+    print("simtime =", time/3600./24. , "days, spent = "+ s0 +"s ("+s1+", "+s2+", "+s3+", "+s4+") ", rs.getNumberOfNodes(), "nodes, ", " dt =", dt, " iterations =", int(nrIterations),  " summed infiltration:", format(sumInfiltration, '.3f'))
     
     if time>=out_next:
         out_next += out_delay
         
-#         # Subplot 1 - WATER CONTENT
-#         out_img[:,out_c] = inf.theta[:]
-#         imin = np.min(np.min(out_img))
-#         imax = np.max(np.max(out_img))     
-#         out_c += 1
-#         #ax1.imshow((out_img-imin)/(imax-imin), interpolation="nearest", cmap="hot")        
-#         ax1.set_xlabel("Time");     
-#         ax1.set_ylabel("Depth");
-#         ax1.set_title("Water content")
-#         # ax1.yticks(np.linspace(0,-1,11)) # how?        
-#         ax1.imshow(out_img, interpolation="nearest", cmap="hot")     
-#         # fig.colorbar(ax1,[-1,0,1]) # np.linspace(imin,imax,10) 
-        # Subplot 4 - THETA
-        
-        ax1.set_ylim(-1, 0)
-        ax1.set_xlabel("Water potential");
-        ax1.set_ylabel("Depth [m]")         
-        ax1.plot(inf.psi,-inf.z)   
+        # Subplot 1 - WATER CONTENT
+        out_img[:,out_c] = inf.theta[:]
+        imin = np.min(np.min(out_img))
+        imax = np.max(np.max(out_img))     
+        out_c += 1
+        #ax1.imshow((out_img-imin)/(imax-imin), interpolation="nearest", cmap="hot")        
+        ax1.set_xlabel("Time");     
+        ax1.set_ylabel("Depth");
+        ax1.set_title("Water content")
+        # ax1.yticks(np.linspace(0,-1,11)) # how?        
+        ax1.imshow(out_img, interpolation="nearest", cmap="hot")     
+        # fig.colorbar(ax1,[-1,0,1]) # np.linspace(imin,imax,10) 
 
+#        Subplot 4 - THETA        
+#         ax1.set_ylim(-1, 0)
+#         ax1.set_xlabel("Water potential");
+#         ax1.set_ylabel("Depth [m]")         
+#         ax1.plot(inf.psi,-inf.z)   
         
         # Subplot2 - ROOT SYSTEM
         plotRSscatter(ax2, rs.getRootTips())        

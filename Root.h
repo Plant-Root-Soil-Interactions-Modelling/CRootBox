@@ -36,7 +36,8 @@ public:
     double getLength(double age); ///< exact length of the root
     double getAge(double length); ///< exact age of the root
 
-    RootTypeParameter* getRootTypeParameter();  ///< Returns the root type parameter of the root
+    RootTypeParameter* getRootTypeParameter() const;  ///< Returns the root type parameter of the root
+    double dx() const { return getRootTypeParameter()->dx; }; // returns the axial resolution
 
     std::vector<Root*> getRoots(); ///< return the root system as sequential vector
     void getRoots(std::vector<Root*>& v); ///< return the root system as sequential vector
@@ -82,9 +83,6 @@ protected:
     std::vector<Vector3d> nodes; ///< nodes of the root
     std::vector<int> nodeIds; ///< unique node identifier
     std::vector<double> netimes; ///< node emergence times [days]
-
-    /* discretisation parameters */
-    double dx; ///< axial resolution [cm]
 
 };
 

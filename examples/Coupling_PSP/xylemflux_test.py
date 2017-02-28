@@ -21,7 +21,7 @@ import xylem_flux
 # initialize (root system)
 #
 path = parameterPath()
-rsname = "anagallis_Leitner_et_al(2010)" 
+rsname = "Anagallis_femina_Leitner_2010" 
 rs = rb.RootSystem()
 rs.openFile(rsname,path)
 rs.initialize() # hydrotropism is not set right now, link to soil is missing
@@ -44,31 +44,26 @@ time_ = v2a(rs_ana.getScalar(rb.ScalarType.time))
 #
 # initialize (xylem_flux)
 #
-rs_Kr = np.array([ 1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10, 1e-10 ]) # root hydraulic radial conductivity per root type [cm^2 s / kg], plausible values?
-rs_Kz = np.array([ 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8, 1e-8 ]) # root hydraulic axial conductivity per root type [cm^5 s], plausible values?  
+rs_Kr = np.array([ 1.16e-6, 1.74e-5, 1.74e-5, 1.74e-5, 11.74e-5, 1.74e-5, 1.74e-5 ]) # s/m; root hydraulic radial conductivity per root type 
+rs_Kz = np.array([ 2.3e-8, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11 ]) # m²*s; root hydraulic axial conductivity per root type  
 kr = np.array(list(map(lambda t: rs_Kr[int(t)-1], type))) # convert from 'per type' to 'per segment'
 kz = np.array(list(map(lambda t: rs_Kz[int(t)-1], type)))
 
-kr = kr * (10*time_ + 1)
-kz = kz / (10*time_ + 1)
+# kr = kr * (10*time_ + 1)
+# kz = kz / (10*time_ + 1)
+# kr = kr / 100
+# kz = kz * 100
 
-kr = kr / 100
-kz = kz * 100
+rho = 1e3 # kg / m^3      
+g = 9.8  # m / s^2   
 
-rho = 1e-3 # kg / cm      
-g = 9.8 *100 # cm / s^2 
-
-soil_p = lambda x,y,z : -60 # kg/(cm s^2)
+soil_p = lambda x,y,z : -500 # 
 
 #
 # create linear system
 #
 Q, b = xylem_flux.linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p)  
-# print("row 0 ")
-# print(Q[0,0], Q[0,1])
-# print(Q[1,0], Q[1,1])
-# print(b[0])
-# print(b[1])
+
 
 #
 # apply Dirichlet BC
@@ -78,11 +73,14 @@ n0= np.array([0]) # node indices
 # Q, b = xylem_flux.bc_dirichlet(Q, b, n0, d)
 
 #
-# apply Neumann BC
+# apply BC
 #
 seg0 = np.array([0]) # segment indices
-aflux = np.array([-2.e-5])
-Q, b = xylem_flux.bc_neumann(Q, b, seg0, aflux, seg, nodes)
+potT = np.array([-5.79e-4]) # potential Transpiration
+topP = np.array([-1500]) # top potential (J/kg)
+
+# Q, b = xylem_flux.bc_neumann(Q, b, seg0, potT, seg, nodes) # Neumann
+Q, b = xylem_flux.bc_dirichlet(Q, b, seg0, topP) # Dirichlet
 
 #
 # solve LS

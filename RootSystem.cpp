@@ -28,6 +28,8 @@ void RootSystem::reset()
     gf.clear();
     tf.clear();
     simtime=0;
+    rid = -1;
+    nid = -1;
 }
 
 /**
@@ -206,9 +208,11 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
  *
  * @param dt    time step [days]
  */
-void RootSystem::simulate(double dt)
+void RootSystem::simulate(double dt, bool silence)
 {
-    std::cout << "RootSystem.simulate(dt) from "<< simtime << " to " << simtime+dt << " days \n";
+    if (!silence) {
+    	std::cout << "RootSystem.simulate(dt) from "<< simtime << " to " << simtime+dt << " days \n";
+    }
     simtime+=dt;
     for (auto const& r: baseRoots) {
         r->simulate(dt);

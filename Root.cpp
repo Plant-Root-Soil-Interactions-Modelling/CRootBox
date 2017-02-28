@@ -37,7 +37,6 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
 	parent_base_length=pbl;
 	parent_ni=pni;
 	length = 0;
-	dx = getRootTypeParameter()->dx;
 	// initial node
 	if (parent!=nullptr) { // the first node of the base roots must be created in initialize
 		// dont use addNode for the first node of the root,
@@ -104,7 +103,7 @@ double Root::getAge(double length)
 	return rootsystem->gf.at(param.type-1)->getAge(length,param.r,param.getK(),this);
 }
 
-RootTypeParameter* Root::getRootTypeParameter()
+RootTypeParameter* Root::getRootTypeParameter() const
 {
 	return rootsystem->getRootTypeParameter(param.type);
 }
@@ -197,7 +196,7 @@ void Root::simulate(double dt)
 					}
 				} // if laterals
 			} // if active
-			active = getLength(std::max(age,0.))<(p.getK()-dx/10); // become inactive, if final length is nearly reached
+			active = getLength(std::max(age,0.))<(p.getK()-dx()/10); // become inactive, if final length is nearly reached
 		}
 	} // if alive
 }
@@ -259,7 +258,7 @@ void Root::createSegments(double l)
 		auto n2 = nodes.at(nn-2);
 		auto n1 = nodes.at(nn-1);
 		double olddx = n1.minus(n2).length();
-		if (olddx<dx*0.9) { // shift node instead of newnode
+		if (olddx<dx()*0.99) { // shift node instead of newnode
 			Vector3d h; // current heading
 			if (nn>2) {
 				h = n2.minus(nodes.at(nn-3));
@@ -269,7 +268,7 @@ void Root::createSegments(double l)
 			}
 
 			// repeat down stuff
-			double sdx = dx-olddx;
+			double sdx = dx()-olddx;
 			if (l<sdx) {
 				sdx = l;
 			}
@@ -283,16 +282,17 @@ void Root::createSegments(double l)
 			Vector3d newnode = Vector3d(nodes.back().plus(newdx));
 			sl = sdx;
 			double et = this->getCreationTime(length+sl);
-			addNode(newnode,et);
+			nodes[nodes.size()-1] = newnode;
+			netimes[netimes.size()-1] = et;
 
 			l -= sdx;
-			if (l==0) {
+			if (l<=0) { // ==0 should be enough
 				return;
 			}
 		}
 	}
 
-	int n = floor(l/dx);
+	int n = floor(l/dx());
 
 	for (int i=0; i<n+1; i++) {
 
@@ -306,9 +306,9 @@ void Root::createSegments(double l)
 
 		double sdx; // segment length (<=dx)
 		if (i<n) {  // normal case
-			sdx = dx;
+			sdx = dx();
 		} else { // last segment
-			sdx = l-n*dx;
+			sdx = l-n*dx();
 		}
 		sl+=sdx;
 

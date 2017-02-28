@@ -45,7 +45,7 @@ Vector3d (Matrix3d::*times4)(const Vector3d&) const = &Matrix3d::times;
 
 std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceFunction::writePVPScript;
 
-void (RootSystem::*simulate1)(double dt) = &RootSystem::simulate;
+void (RootSystem::*simulate1)(double dt, bool silence) = &RootSystem::simulate;
 void (RootSystem::*simulate2)() = &RootSystem::simulate;
 
 double (SegmentAnalyser::*getSummed1)(int st) const = &SegmentAnalyser::getSummed;
@@ -58,6 +58,7 @@ std::vector<double> (SegmentAnalyser::*distribution1)(int st, double top, double
  */
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(initialize_overloads,initialize,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openFile_overloads,openFile,1,2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate1_overloads,simulate,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getRootTips_overloads,getRootTips,0,1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getRootBases_overloads,getRootBases,0,1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNodes_overloads,getNodes,0,2);
@@ -331,7 +332,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("setSoil", &RootSystem::setSoil)
 		.def("reset", &RootSystem::reset)
 		.def("initialize", &RootSystem::initialize, initialize_overloads())
-		.def("simulate",simulate1)
+		.def("simulate",simulate1, simulate1_overloads())
 		.def("simulate",simulate2)
 		.def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
 		.def("getRootTips", &RootSystem::getRootTips)
