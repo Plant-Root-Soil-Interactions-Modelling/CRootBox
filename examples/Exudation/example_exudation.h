@@ -103,6 +103,7 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
 								((-double(z))/Z)*depth);
 
             			int ind = x*Y*Z+y*Z+z;
+            			// int ind = z*Y*X+y*X+x; // one is c, one is fortran ordering
 
             			allc[ind] += gauss_legendre(5,integrand,&params,0,params.age_r);
             			// gauss_legendre_2D_cube()

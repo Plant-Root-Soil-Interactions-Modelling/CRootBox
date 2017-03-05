@@ -9,8 +9,9 @@
 #
 
 import py_rootbox as rb
+
 import numpy as np
-# from evtk.hl import gridToVTK # how to install? TVTK ?
+
 
 
 def v2a(vd): # rb.std_vector_double_ to numpy array    
@@ -53,16 +54,23 @@ rootsystem.write("results/"+name+".vtp",rb.OutputType.segments) # use ot_polylin
 
 params = rb.ExudationParameters()  
 
-X = 10
-Y = 10
-Z = 100
-width = 30
-depth = 30
+nx = 10
+ny = 20
+nz = 100
+width = 30 # cm
+depth = 50 # cm
 
-C = rb.getExudateConcentration(rootsystem, params, 10, 10, 100, 30, 50);
+C = rb.getExudateConcentration(rootsystem, params, nx, ny, nz, width, depth);
 C = v2a(C); # make a numpy array 
-C = np.reshape(C, (10,10,100) ) # hope that works
+C = np.reshape(C, (nx, ny, nz) ) # hope that works, it does not :-(, or does it?
 
+X=np.linspace(-width/2,width/2,nx)
+Y=np.linspace(-width/2,width/2,ny)
+Z=np.linspace(0,-depth,nz)
 
+X_,Y_,Z_=np.meshgrid(X,Y,Z,indexing="ij") # stupid matlab default
 
+print(X_.shape)
+print(Y_.shape)
+print(Z_.shape)
 
