@@ -56,7 +56,7 @@ totalIterationNr = 0
 # Initialize root domain
 #
 # rsname = "Anagallis_femina_Leitner_2010" 
-rsname = "Lupinus_albus_Leitner_2014"
+rsname = "Anagallis_femina_Leitner_2010"
 rs = rb.RootSystem()
 rs.openFile(rsname,parameterPath())
 rs.initialize() # hydrotropism is not set right now, link to soil is missing
@@ -134,7 +134,7 @@ while (time < simTime):
     t3 = timer.time()
     print("3 . Xylem fluxes")
     seg = seg2a(rs.getSegments())
-    nodes = vv2a(rs.getNodes()) /100. # convert to meter
+    nodes = vv2a(rs.getNodes())/100. # convert to meter
     rs_ana = rb.SegmentAnalyser(rs) 
     type = v2a(rs_ana.getScalar(rb.ScalarType.type))
     radius = v2a(rs_ana.getScalar(rb.ScalarType.radius))/100. # convert to meter 
