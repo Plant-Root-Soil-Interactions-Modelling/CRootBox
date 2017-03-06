@@ -20,16 +20,43 @@ import xylem_flux
 #
 # initialize (root system)
 #
-path = parameterPath()
-rsname = "Lupinus_albus_Leitner_2014" 
 rs = rb.RootSystem()
-rs.openFile(rsname,path)
+rsname = "Lupinus_albus_Leitner_2014" 
+
+# path = parameterPath()
+# rs.openFile(rsname,path) 
+
+p0 = rb.RootTypeParameter()
+p1 = rb.RootTypeParameter()
+# Taproot
+p0.name = "taproot"
+p0.type = 1
+p0.lb = 1
+p0.la = 10
+p0.nob = 20
+p0.ln = 89./19.
+p0.r = 1
+p0.dx = 0.5
+# p0.k = maxRootLength(p0.la,p0.lb,p0.ln,p0.nob)
+# print(p0)
+# 1st order lateral
+p1.name = "lateral"
+p1.type = 2
+p1.la = 25
+p1.ln = 0
+p1.r = 2
+p1.k = 25
+p1.dx = 0.1
+rs.setRootTypeParameter(p0)
+rs.setRootTypeParameter(p1)
+
 rs.initialize() # hydrotropism is not set right now, link to soil is missing
+
 
 #
 # simulate
 #
-rs.simulate(15)
+rs.simulate(30)
 
 #
 # results 
@@ -56,7 +83,7 @@ kz = np.array(list(map(lambda t: rs_Kz[int(t)-1], type)))
 rho = 1e3 # kg / m^3      
 g = 9.8  # m / s^2   
 
-soil_p = lambda x,y,z : -500 # 
+soil_p = lambda x,y,z : -100 # 
 
 #
 # create linear system
@@ -89,6 +116,10 @@ print("spsolve: " + str(time.time()-t) +" sec" )
 #
 # output
 # 
+f0 = xylem_flux.axial_flux0(x, seg, nodes, kz, rho, g)
+print("Effective transpiration.: ", f0, " [?]")
+
+
 segP = nodes2seg(nodes,seg,x) 
 axial_flux = xylem_flux.axial_flux(x, seg, nodes, kz, rho, g)
 radial_flux = xylem_flux.radial_flux(x, seg, nodes, radius, kr, soil_p)

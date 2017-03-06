@@ -74,6 +74,8 @@ public:
     /* kids */
     std::vector<Root*> laterals; ///< The lateral roots of this root
 
+    const double smallDx = 1e-6; // otherwise direction can become naN
+
 protected:
 
     void createSegments(double l); ///< creates segments of length l, called by Root::simulate()

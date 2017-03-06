@@ -153,22 +153,22 @@ while (time < simTime):
     
     Q, b = xylem_flux.linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p2)  
     
-    Tpot = np.array([-5.79e-4]) # m^3 s^-1 
-
+    pot_trans = np.array([-5.79e-4]) # m^3 s^-1 
+    top_pot = -15000
     
     if dirichlet == False:
-        Q, b = xylem_flux.bc_neumann(Q, b, np.array([0]), Tpot, seg, nodes)
+        Q, b = xylem_flux.bc_neumann(Q, b, np.array([0]), pot_trans, seg, nodes)
         x = LA.spsolve(Q, b) # direct
-        Teff = xylem_flux.axial_flux0(x, seg, nodes, kz, rho, g) # verify that Teff == Tpot        
-        print("using neumann ( Effective Transpiration = " +str(Teff)+" m^3 s^-1)" )        
+        eff_trans = xylem_flux.axial_flux0(x, seg, nodes, kz, rho, g) # verify that eff_trans == pot_trans        
+        print("using neumann ( Effective Transpiration = " +str(eff_trans)+" m^3 s^-1)" )        
         
-    if dirichlet or (x[0]<-1500):        
+    if dirichlet or (x[0]<top_pot):        
         dirichlet = True
-        Q, b = xylem_flux.bc_dirichlet(Q, b, np.array([0]), np.array([-1500])) # J/kg
+        Q, b = xylem_flux.bc_dirichlet(Q, b, np.array([0]), np.array([top_pot])) # J/kg
         x = LA.spsolve(Q, b) # direct
-        Teff = xylem_flux.axial_flux0(x, seg, nodes, kz, rho, g)
-        dirichlet = Teff>Tpot
-        print("using dirichlet ( Effective Transpiration = "+str(Teff)+" m^3 s^-1)")
+        eff_trans = xylem_flux.axial_flux0(x, seg, nodes, kz, rho, g)
+        dirichlet = eff_trans>pot_trans
+        print("using dirichlet ( Effective Transpiration = "+str(eff_trans)+" m^3 s^-1)")
         
     radial_flux = xylem_flux.radial_flux(x, seg, nodes, radius, kr, soil_p2)    
     
@@ -247,11 +247,18 @@ while (time < simTime):
 #         ax3.set_ylabel("Root water uptake [1]") 
 #         ax3.plot([time/3600/24,out_next/3600/24], [cflux,cflux], 'k-')
     
-        # Subplot 4 - THETA
+#         # Subplot 4 - THETA
+#         ax4.set_ylim(-1, 0)
+#         ax4.set_xlabel("Water content");
+#         ax4.set_ylabel("Depth [m]")         
+#         ax4.plot(inf.theta,-inf.z)   
+    
+        # Subplot 4 - psi
         ax4.set_ylim(-1, 0)
-        ax4.set_xlabel("Water content");
+        ax4.set_xlabel("Water matric potential");
         ax4.set_ylabel("Depth [m]")         
-        ax4.plot(inf.theta,-inf.z)   
+        ax4.plot(inf.psi,-inf.z)   
+    
     
         plt.pause(0.0001)
             

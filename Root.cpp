@@ -284,12 +284,18 @@ void Root::createSegments(double l)
 			double et = this->getCreationTime(length+sl);
 			nodes[nodes.size()-1] = newnode;
 			netimes[netimes.size()-1] = et;
+			//std::cout << "shift" << newnode.toString() << "\n";
 
 			l -= sdx;
 			if (l<=0) { // ==0 should be enough
 				return;
 			}
 		}
+	}
+
+	if (l<smallDx) {
+		std::cout << "skipped small segment (<"<< smallDx << ") \n";
+		return;
 	}
 
 	int n = floor(l/dx());
@@ -309,6 +315,10 @@ void Root::createSegments(double l)
 			sdx = dx();
 		} else { // last segment
 			sdx = l-n*dx();
+			if (sdx<smallDx) {
+				std::cout << "skipped small segment (<"<< smallDx << ") \n";
+				return;
+			}
 		}
 		sl+=sdx;
 

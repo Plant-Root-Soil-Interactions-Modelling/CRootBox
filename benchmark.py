@@ -47,6 +47,14 @@ def a2i(a): #  numpy array to rb.std_int_double
         l.append(i)
     return l
 
+def vv2a(vd): # rb.std_vector_Vector3_ to numpy array
+    N  = len(vd)
+    l = np.zeros((N,3)) 
+    for i in range(0,N):
+        l[i,:] = [vd[i].x,vd[i].y,vd[i].z]
+    return l
+
+
 #
 # Root parameter
 #
@@ -113,7 +121,7 @@ for t in dt:
     non[c] = rs.getNumberOfNodes()
     c += 1
 
-# Numerical, same again, but with tiny time stepping 
+# Numerical, same, but with tiny time stepping 
 rs.initialize() # resets everything 
 c = 0
 nl2 = np.zeros(len(times))
@@ -127,7 +135,7 @@ for t in dt:
     non2[c] = rs.getNumberOfNodes()
     c += 1
 
-print("\ntimes \t\t\t", times)
+print("times \t\t\t", times)
 print("analytical lenghts \t", l)
 print("numerical lenghts \t", nl)
 print("numerical lenghts 2 \t", nl2, "\n")
@@ -157,8 +165,7 @@ j = 0
 for t in times :
     l1[j] = rootLateralLength(t,et,p1.r,p1.k)
     j=j+1
-    
-    
+        
 # Numerical
 p0.successor = a2i([2]) # add successors
 p0.successorP = a2v([1])
@@ -166,6 +173,10 @@ rs = rb.RootSystem()
 rs.setRootTypeParameter(p0)
 rs.setRootTypeParameter(p1)
 rs.initialize()
+# rs.simulate(1.5)
+# print(vv2a(rs.getNodes()))
+# print(v2a(rs.getScalar()))
+# quit()
 
 c = 0
 nl = np.zeros(len(times))
@@ -173,7 +184,7 @@ nl0 = np.zeros(len(times))
 non = np.zeros(len(times))
 for t in dt: 
     rs.simulate(t, True)
-    d = v2a(rs.getScalar())
+    d = v2a(rs.getScalar()) 
     nl[c] = sum(d)
     nl0[c] = d[0]   
     non[c] = rs.getNumberOfNodes() 
@@ -194,7 +205,7 @@ for t in dt:
     non2[c] = rs.getNumberOfNodes() 
     c += 1
 
-print("\ntimes \t\t\t\t", times)
+print("times \t\t\t\t", times)
 print("analytical zero order length \t", l)
 print("numerical zero order length \t", nl0)
 print("analytical first order length \t", l1)
