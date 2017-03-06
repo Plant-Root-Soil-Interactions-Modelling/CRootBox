@@ -9,7 +9,7 @@
 #
 
 import py_rootbox as rb
-
+from evtk.hl import gridToVTK
 import numpy as np
 
 
@@ -74,4 +74,4 @@ print(X_.shape)
 print(Y_.shape)
 print(Z_.shape)
 
-
+gridToVTK("./Exudates",X_,Y_,Z_,pointData={"Exudates":C})
