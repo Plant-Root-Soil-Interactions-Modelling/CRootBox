@@ -20,10 +20,6 @@ def v2a(vd): # rb.std_vector_double_ to numpy array
         l[i] = vd[i]
     return l
 
-
-
-
-
 rootsystem = rb.RootSystem()
 name = "Anagallis_straight" 
 
@@ -53,10 +49,13 @@ rootsystem.write("results/"+name+".vtp",rb.OutputType.segments) # use ot_polylin
 
 
 params = rb.ExudationParameters()  
+params.Dt = 8.64   #cm2/d
+params.Dl=8.64     # cm2/d
+params.lambda_=8.64e-2  # d-1
 
-nx = 30
-ny = 30
-nz = 30
+nx = 50
+ny = 50
+nz = 50
 width = 30 # cm
 depth = 50 # cm
 
@@ -75,4 +74,4 @@ X_,Y_,Z_=np.meshgrid(X,Y,Z,indexing="ij") # stupid matlab default
 #print(Z_.shape)
 
 gridToVTK("./Exudates",X,Y,Z,pointData={"Exudates":C})
-print(C[0:10,0:10,0])
+print((C>0).sum())
