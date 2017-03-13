@@ -9,7 +9,7 @@
 #
 
 import py_rootbox as rb
-
+from evtk.hl import gridToVTK
 import numpy as np
 
 
@@ -20,12 +20,8 @@ def v2a(vd): # rb.std_vector_double_ to numpy array
         l[i] = vd[i]
     return l
 
-
-
-
-
 rootsystem = rb.RootSystem()
-name = "Anagallis_femina_Leitner_2010" 
+name = "Anagallis_straight" 
 
 #
 # Open plant and root parameter from a file
@@ -40,7 +36,7 @@ rootsystem.initialize()
 #
 # Simulate
 #
-simtime = 30  # or 20, 40, 60 days
+simtime = 10  # or 20, 40, 60 days
 dt = 10 # try other values here
 N = round(simtime/dt) # steps
 for i in range(0,int(N)):
@@ -53,10 +49,13 @@ rootsystem.write("results/"+name+".vtp",rb.OutputType.segments) # use ot_polylin
 
 
 params = rb.ExudationParameters()  
+params.Dt = 8.64   #cm2/d
+params.Dl=8.64     # cm2/d
+params.lambda_=8.64e-2  # d-1
 
-nx = 10
-ny = 20
-nz = 100
+nx = 50
+ny = 50
+nz = 50
 width = 30 # cm
 depth = 50 # cm
 
@@ -70,8 +69,9 @@ Z=np.linspace(0,-depth,nz)
 
 X_,Y_,Z_=np.meshgrid(X,Y,Z,indexing="ij") # stupid matlab default
 
-print(X_.shape)
-print(Y_.shape)
-print(Z_.shape)
+#print(X_.shape)
+#print(Y_.shape)
+#print(Z_.shape)
 
-
+gridToVTK("./Exudates",X,Y,Z,pointData={"Exudates":C})
+print((C>0).sum())
