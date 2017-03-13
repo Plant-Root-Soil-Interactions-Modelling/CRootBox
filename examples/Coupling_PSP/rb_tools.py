@@ -77,7 +77,7 @@ def plotRSscatter(ax,nodes): # plots the root system nodes (rather slow)
     
 def parameterPath(): # works only if everything is located in folder CRootBox
     cwd = os.getcwd()
-    i = cwd.index("CRootBox")
+    i = cwd.index("CRootBox"+os.sep)
     return cwd[0:i] + "CRootBox"+os.sep+"modelparameter"+os.sep            
     
     

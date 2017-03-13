@@ -18,20 +18,19 @@ import PSP_infiltration1D as inf
 import py_rootbox as rb    
 from rb_tools import *
 import xylem_flux 
-    
-    
+        
 #
 # look up function for soil matric potential
 #    
 def soil_p(x,y,z,psi,depth):
-    i = round(-z/depth*inf.n)
+    i = round(-z/depth*inf.n) # i \in [0, n]    TODO ????????????????????
     # print(i, z, inf.n, depth)
     return psi[i+1]
              
 #
 # Initialize soil domain (from Soil Physics with Python)
 #    
-isSuccess, soil = inf.readSoil("clay.txt")
+isSuccess, soil = inf.readSoil("soilUniform.txt") # clay.txt
 if not isSuccess: 
     print("warning: wrong soil file.")
     quit()        
@@ -54,7 +53,7 @@ totalIterationNr = 0
 # Initialize root domain
 #
 # rsname = "Anagallis_femina_Leitner_2010" 
-rsname = "Anagallis_femina_Leitner_2010"
+rsname = "Brassica_napus_a_Leitner_2010"
 rs = rb.RootSystem()
 rs.openFile(rsname,parameterPath())
 rs.initialize() # hydrotropism is not set right now, link to soil is missing
