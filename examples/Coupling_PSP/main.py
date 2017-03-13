@@ -3,7 +3,7 @@ import time as timer
 import os # add the search path for py_rootbox.so (probably there is a nicer way to do it?)
 import sys
 cwd = os.getcwd()
-i = cwd.index("CRootBox")
+i = cwd.index("CRootBox"+os.sep)
 sys.path.append(cwd[0:i+8])
 
 import numpy as np
@@ -23,9 +23,9 @@ import xylem_flux
 # look up function for soil matric potential
 #    
 def soil_p(x,y,z,psi,depth):
-    i = round(-z/depth*inf.n) # i \in [0, n]    TODO ????????????????????
+    i = round(-z/depth*(inf.n-1)) # i \in [0, n-1]
     # print(i, z, inf.n, depth)
-    return psi[i+1]
+    return psi[i+1] # (i+1) \in [1,n], boundaries are psi[0] and psi[n+1]
              
 #
 # Initialize soil domain (from Soil Physics with Python)

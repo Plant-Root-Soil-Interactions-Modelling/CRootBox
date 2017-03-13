@@ -3,7 +3,7 @@ import time
 import os # add the search path for py_rootbox.so (probably there is a nicer way to do it?)
 import sys
 cwd = os.getcwd()
-i = cwd.index("CRootBox")
+i = cwd.index("CRootBox"+os.sep)
 sys.path.append(cwd[0:i+8]) 
 
 import numpy as np
