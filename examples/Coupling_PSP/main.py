@@ -27,9 +27,7 @@ def soil_p(x,y,z,psi,depth):
     i = round(-z/depth*inf.n)
     # print(i, z, inf.n, depth)
     return psi[i+1]
-     
-     
-        
+             
 #
 # Initialize soil domain (from Soil Physics with Python)
 #    
