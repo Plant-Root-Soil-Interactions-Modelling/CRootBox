@@ -24,7 +24,6 @@ import xylem_flux
 #    
 def soil_p(x,y,z,psi,depth):
     i = round(-z/depth*(inf.n-1)) # i \in [0, n-1]
-    # print(i, z, inf.n, depth)
     return psi[i+1] # (i+1) \in [1,n], boundaries are psi[0] and psi[n+1]
              
 #
@@ -41,13 +40,17 @@ Se = 0.5  # Initial degree of saturation ]0-1]
 
 inf.initializeWater(funcType, soil, Se, inf.CELL_CENT_FIN_VOL) # for simplicity we use a linear grid
         
-# ubPotential = inf.airEntryPotential(funcType, soil[0]) # [J kg^-1] upper boundary condition INFILTRATION
-ubPotential = inf.waterPotential(funcType, soil[0],inf.thetaFromSe(funcType, soil[0],0.3))    
+ubPotential = inf.airEntryPotential(funcType, soil[0]) # [J kg^-1] upper boundary condition INFILTRATION
+# ubPotential = inf.waterPotential(funcType, soil[0],inf.thetaFromSe(funcType, soil[0], 0.3))    
 print("Upper boundary potential ", ubPotential)
 isFreeDrainage = True
 
 sumInfiltration = 0
 totalIterationNr = 0
+
+print(inf.theta)
+quit()
+
 
 #
 # Initialize root domain
@@ -83,7 +86,6 @@ cflux = 0 # cumulative TODO
 #
 plt.ion()
 fig = plt.figure() 
-
 ax1 = fig.add_subplot(2, 2, 1)
 ax2 = fig.add_subplot(2, 2, 2, projection='3d')  
 ax3 = fig.add_subplot(2, 2, 3)
@@ -150,10 +152,10 @@ while (time < simTime):
     
     Q, b = xylem_flux.linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p2)  
     
-    pot_trans = np.array([-5.79e-4]) # m^3 s^-1 
-    top_pot = -15000
+    pot_trans = np.array([-5.79e-4]) # m^3 s^-1 # TODO could be sinus
+    top_pot = -1500
     
-    if dirichlet == False:
+    if dirichlet == False: # Neumann - TODO TODO 
         Q, b = xylem_flux.bc_neumann(Q, b, np.array([0]), pot_trans, seg, nodes)
         x = LA.spsolve(Q, b) # direct
         eff_trans = xylem_flux.axial_flux0(x, seg, nodes, kz, rho, g) # verify that eff_trans == pot_trans        
@@ -181,7 +183,7 @@ while (time < simTime):
         z1 = nodes[seg[i,0],2]
         z2 = nodes[seg[i,1],2]
         z = 0.5*(z1+z2)
-        ind = round(-z/soil[-1].lowerDepth*inf.n)
+        ind = round(-z/soil[-1].lowerDepth*(inf.n-1))
         sink[ind] += radial_flux[i] * dt       
     
     for i in range(0,inf.n):
