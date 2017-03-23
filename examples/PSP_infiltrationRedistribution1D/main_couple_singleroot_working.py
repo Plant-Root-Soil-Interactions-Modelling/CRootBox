@@ -23,9 +23,9 @@ import xylem_flux
 # look up function for soil matric potential
 #    
 def soil_p(x,y,z,psi,depth):
-    z = min(z,0)
-    z = max(z,-depth)
-    i = round(-z/depth*(inf.n-1)) # i \in [0, n-1]
+    z = min(z,0.)
+    z = max(z,-depth+1.e-9)
+    i = math.floor(float(-z/depth*(inf.n))) # i \in [0, n-1]
     return psi[i+1] # (i+1) \in [1,n], boundaries are psi[0] and psi[n+1]
              
 #
@@ -198,8 +198,8 @@ while (time < simTime):
         z2 = nodes[seg[i,1],2]
         z = 0.5*(z1+z2)
         if z>-1: 
-            ind = round(-z/soil[-1].lowerDepth*(inf.n-1))
-            sink[ind] += radial_flux[i] * dt       
+            ind = math.floor(-z/soil[-1].lowerDepth*inf.n)
+            sink[ind] += radial_flux[i] * dt        
     
     for i in range(0,inf.n):
         inf.theta[i+1] += sink[i] 

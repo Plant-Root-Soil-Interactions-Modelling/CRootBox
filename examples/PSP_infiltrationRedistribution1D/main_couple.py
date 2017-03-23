@@ -23,9 +23,9 @@ import xylem_flux
 # look up function for soil matric potential
 #    
 def soil_p(x,y,z,psi,depth):
-    z = min(z,0)
-    z = max(z,-depth)
-    i = math.floor(-z/depth*inf.n) # i \in [0, n-1]
+    z = min(z,0.)
+    z = max(z,-depth+1.e-9) # z \in (-depth, 0]
+    i = math.floor(float(-z/depth*(inf.n))) # i \in [0, n-1]
     return psi[i+1] # (i+1) \in [1,n], boundaries are psi[0] and psi[n+1]
              
 #
