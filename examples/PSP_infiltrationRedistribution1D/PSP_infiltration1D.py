@@ -9,7 +9,7 @@ waterDensity = 1000.
 area = 1                    
 maxNrIterations = 100
 tolerance = 1e-6
-n = 50
+n = 100
  
 hor = np.zeros(n+2, int)                      
 z = np.zeros(n+2, float) 
@@ -36,7 +36,7 @@ def initializeWater(funcType, soil, se_0, solver):
     global z
     # vector depth [m]
     lastHorizon = len(soil)-1
-    z = grid.geometric(n, soil[lastHorizon].lowerDepth)    
+    z = grid.linear(n, soil[lastHorizon].lowerDepth)    
     vol[0] = 0
     for i in range(n+1): 
         dz[i] = z[i+1]-z[i]

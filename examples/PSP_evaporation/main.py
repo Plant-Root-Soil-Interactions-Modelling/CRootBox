@@ -52,7 +52,7 @@ def main():
             myPlot[0].set_ylabel("Depth [m]",fontsize=16,labelpad=8)
             myPlot[0].plot(vap.theta, -vap.z, 'yo')
             myPlot[1].plot(time/3600., evaporationFlux*3600., 'ro')
-	    plt.pause(0.0001)
+            plt.pause(0.0001)
             
             if (float(iterations / vap.maxNrIterations) < 0.1): 
                     dt = min(dt*2.0, maxTimeStep)  

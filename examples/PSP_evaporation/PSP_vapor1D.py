@@ -11,7 +11,7 @@ maxNrIterations = 100
 tolerance = 1e-9
 
 #vectors of numerical solution
-n = 40                        
+n = 100                        
 z = np.zeros(n+2, float)      
 vol = np.zeros(n+2, float)     
 a = np.zeros(n+2, float)      
@@ -39,7 +39,7 @@ def initializeWater(funcType, soil, theta_0):
     global z
     
     # vector depth [m]
-    z = grid.geometric(n, soil.lowerDepth)
+    z = grid.linear(n, soil.lowerDepth)
     vol[0] = 0
     for i in range(n+1): 
         dz[i] = z[i+1]-z[i]

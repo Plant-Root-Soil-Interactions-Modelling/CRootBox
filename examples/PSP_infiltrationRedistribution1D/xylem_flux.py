@@ -98,7 +98,7 @@ def bc_dirichlet(Q, b, n0, d):
     c = 0
     for c in range(0, len(n0)):
         i = n0[c]      
-        print("Dirichlet BC at node "+str(i)) 
+        # print("Dirichlet BC at node "+str(i)) 
         e0 = np.zeros((1,Q.shape[1])) # build zero vector
         Q[i,:] = sparse.csr_matrix(e0) # replace row i with ei
         Q[i,i] = 1
@@ -119,7 +119,7 @@ def bc_neumann(Q, b, seg0, aflux, seg, nodes):
     c = 0
     for c in range(0, len(seg0)):                
         i = seg[seg0[c],0]  
-        print("Neumann BC at node "+str(i))
+        # print("Neumann BC at node "+str(i))
         b[i] += aflux[c]        
         c += 1
 
