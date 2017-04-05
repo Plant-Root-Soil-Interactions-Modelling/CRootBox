@@ -7,7 +7,7 @@
 import py_rootbox as rb
 
 rootsystem = rb.RootSystem()
-name = "Maize_Pheno1_Leitner_et_al_2014" 
+name = "Anagallis_femina_Leitner_2010" 
 
 #
 # Plant and root parameter from a file
@@ -17,7 +17,7 @@ rootsystem.openFile(name);
 # "manually" set tropism to hydrotropism for the first ten root types
 for i in range(0,10):    
     rootsystem.getRootTypeParameter(i+1).tropismT = rb.TropismType.hydro;
-    rootsystem.getRootTypeParameter(i+1).tropismN = 1; # N
+    rootsystem.getRootTypeParameter(i+1).tropismN = 3; # N
     rootsystem.getRootTypeParameter(i+1).tropismS = 0.4; # sigma
 
 # check if it worked

@@ -67,8 +67,8 @@ rs.initialize() # hydrotropism is not set right now, link to soil is missing
 
 # rs_Kr = np.array([ 1.16e-6, 1.74e-5, 1.74e-5, 1.74e-5, 11.74e-5, 1.74e-5, 1.74e-5 ]) # s/m; root hydraulic radial conductivity per root type 
 # rs_Kz = np.array([ 2.3e-8, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11 ]) # m²*s; root hydraulic axial conductivity per root type  
-rs_Kr = np.array([ 1.16e-9, 1.74e-8, 1.74e-7, 1.74e-6, 11.74e-5, 1.74e-5, 1.74e-5 ]) # s/m; root hydraulic radial conductivity per root type 
-rs_Kz = np.array([ 2.3e-8, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11 ]) # m²*s; root hydraulic axial conductivity per root type  
+rs_Kr = np.array([ 2.e-10, 2.e-10, 2.e-10, 2.e-10, 2.e-10, 2.e-11, 2.e-11 ])  # m²*s; root hydraulic axial conductivity per root type  
+rs_Kz = np.array([ 5.e-14, 5.e-14, 5.e-14, 5.e-14, 5e-14, 5e-14, 5e-14 ]) 
 
 dirichlet = False
 
@@ -86,8 +86,8 @@ out_img = np.zeros((inf.n+2,round(simTime/out_delay)))
 out_c = 0
 
 rho = 1e3 # kg / m^3      
-g = 9.8065 # m / s^2    
-pot_trans = 1e-3*np.array([-5.79e-4]) # ?/(24.*3600.) # m^3 s^-1 potential transpiration
+g = 1.e-3*9.8065 # m / s^2   
+pot_trans = np.array([-1.15741e-10]) # ?/(24.*3600.) # m^3 s^-1 potential transpiration
 top_pot = -1e-6 # -1500 # # J kg^-1 top potential (wilting point)
 
 ctflux = 0 # cumulative transpiration
@@ -238,18 +238,18 @@ while (time < simTime):
         # Subplot2 - ROOT SYSTEM
         # plotRSscatter(ax2, rs.getRootTips()) # set projection3d in initialization
 
-        # Subplot2 - root length distribution
-        rsl = v2a(rs_ana.distribution(rb.ScalarType.length,0.,100.,inf.n,False))
-        ax2.set_ylim(-1, 0)
-        ax2.set_xlabel("Root system length [m]");
-        ax2.set_ylabel("Depth [m]")         
-        ax2.plot(rsl/100,-inf.z[1:len(inf.z)-1])  
-        
-#         # Subplot 2 - PSI
+#         # Subplot2 - root length distribution
+#         rsl = v2a(rs_ana.distribution(rb.ScalarType.length,0.,100.,inf.n,False))
 #         ax2.set_ylim(-1, 0)
-#         ax2.set_xlabel("Water matric potential");
+#         ax2.set_xlabel("Root system length [m]");
 #         ax2.set_ylabel("Depth [m]")         
-#         ax2.plot(inf.psi,-inf.z)           
+#         ax2.plot(rsl/100,-inf.z[1:len(inf.z)-1])  
+        
+        # Subplot 2 - PSI
+        ax2.set_ylim(-1, 0)
+        ax2.set_xlabel("Water matric potential");
+        ax2.set_ylabel("Depth [m]")         
+        ax2.plot(inf.psi,-inf.z)           
         
         # Subplot3  -SINK
         ax3.set_ylim(-1, 0)

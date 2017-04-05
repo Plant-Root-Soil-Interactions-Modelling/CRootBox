@@ -78,8 +78,8 @@ rs = rb.RootSystem()
 rs.setRootTypeParameter(p0)
 rs.initialize() # hydrotropism is not set right now, link to soil is missing
 
-rs_Kr = np.array([ 1.16e-8, 1.74e-5, 1.74e-5, 1.74e-5, 11.74e-5, 1.74e-5, 1.74e-5 ]) # s/m; root hydraulic radial conductivity per root type 
-rs_Kz = np.array([ 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11 ]) # m²*s; root hydraulic axial conductivity per root type  
+rs_Kr = np.array([ 2.e-10, 2.e-10, 2.e-10, 2.e-10, 2.e-10, 2.e-11, 2.e-11 ])  # m²*s; root hydraulic axial conductivity per root type  
+rs_Kz = np.array([ 5.e-14, 5.e-14, 5.e-14, 5.e-14, 5e-14, 5e-14, 5e-14 ]) # s/m; root hydraulic radial conductivity per root type 
 
 dirichlet = False
 
@@ -97,8 +97,8 @@ out_img = np.zeros((inf.n+2,round(simTime/out_delay)))
 out_c = 0
 
 rho = 1e3 # kg / m^3      
-g = 9.8065 # m / s^2    
-pot_trans = 1e-3*np.array([-5.79e-4]) # ?/(24.*3600.) # m^3 s^-1 potential transpiration
+g = 1.e-3*9.8065 # m / s^2    
+pot_trans =  np.array([-1.15741e-10])  # ?/(24.*3600.) # m^3 s^-1 potential transpiration
 top_pot = -1e6 # -1500 # # J kg^-1 top potential (wilting point)
 
 ctflux = 0 # cumulative transpiration

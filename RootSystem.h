@@ -100,29 +100,27 @@ public:
 	int rsmlReduction = 5; ///< only each n-th node is written to the rsml file (to coarsely adjust axial resolution for output)
 
 private:
-	void initRTP();
+
+	RootSystemParameter rsparam; ///< Plant parameter
+	std::vector<RootTypeParameter> rtparam; ///< Parameter set for each root type
+	std::vector<Root*> baseRoots;  ///< Base roots of the root system
+	std::vector<GrowthFunction*> gf; ///< Growth function per root type
+	std::vector<TropismFunction*> tf;  ///< Tropism per root type
+	SignedDistanceFunction* geometry = new SignedDistanceFunction(); ///< Confining geometry (unconfined by default)
+	SoilProperty* soil = nullptr; ///< callback for hydro, or chemo tropism (needs to set before initialize()) TODO should be a part of tf, or rtparam
+
+	double simtime = 0;
+	int rid = -1; // unique root id counter
+	int nid = -1; // unique root id counter
 
 	const int maxtypes = 100;
-	std::vector<RootTypeParameter> rtparam; ///< Parameter set for each root type
-	RootSystemParameter rsparam; ///< Plant parameter
+	void initRTP();
 
 	void writeRSMLMeta(std::ostream & os) const;
 	void writeRSMLPlant(std::ostream & os) const;
 
 	int getRootIndex() { rid++; return rid; } ///< returns next unique root id, called by the constructor of Root
 	int getNodeIndex() { nid++; return nid; } ///< returns next unique node id, called by Root::addNode()
-
-	std::vector<Root*> baseRoots;  ///< Base roots of the root system
-
-	std::vector<GrowthFunction*> gf; ///< Growth function per root type
-	std::vector<TropismFunction*> tf;  ///< Tropism per root type
-
-	SignedDistanceFunction* geometry = new SignedDistanceFunction(); ///< Confining geometry (unconfined by default)
-	SoilProperty* soil = nullptr; ///< callback for hydro, or chemo tropism (needs to set before initialize())
-
-	double simtime = 0;
-	int rid = -1; // unique root id counter
-	int nid = -1; // unique root id counter
 
 	std::mt19937 gen = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());
 	std::uniform_real_distribution<double> UD = std::uniform_real_distribution<double>(0,1);

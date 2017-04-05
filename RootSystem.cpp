@@ -192,11 +192,11 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
         int type = rtparam.at(i).tropismT;
         double N = rtparam.at(i).tropismN;
         double sigma = rtparam.at(i).tropismS;
-        TropismFunction* tropism = createTropismFunction(type,N,sigma);
+        TropismFunction* tropism = this->createTropismFunction(type,N,sigma);
         // std::cout << "#" << i << ": type " << type << ", N " << N << ", sigma " << sigma << "\n";
         tf.push_back(new ConfinedTropism(tropism, geometry)); // wrap confinedTropism around baseTropism
         int gft = rtparam.at(i).gf;
-        GrowthFunction* gf_ = createGrowthFunction(gft);
+        GrowthFunction* gf_ = this->createGrowthFunction(gft);
         gf_->getAge(1,1,1,nullptr);  // check if getAge is implemented (ohterwise an exception is thrown)
         gf.push_back(gf_);
     }
