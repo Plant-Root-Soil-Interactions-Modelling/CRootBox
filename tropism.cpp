@@ -39,7 +39,6 @@ Vector2d TropismFunction::getHeading(const Vector3d& pos, Matrix3d old, double d
 
     double n_=n;
     if (n_>0) {
-        n_=n_*sqrt(dx); // TODO ?!
         double dn = n_-floor(n_);
         if (rand()<dn) {
             n_ = ceil(n_);

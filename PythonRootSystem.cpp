@@ -12,12 +12,17 @@
  *  build a shared library from this file
  *  put comment to line 16 to ignore this file
  */
-// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
+
+#include <boost/python/module.hpp>
+#include <boost/python/class.hpp>
+#include <boost/python/wrapper.hpp>
+#include <boost/python/call.hpp>
 
 #include "mymath.h"
 #include "sdf.h"
@@ -26,6 +31,27 @@
 #include "examples/Exudation/example_exudation.h"
 
 using namespace boost::python;
+
+
+
+// tricky booom boom
+struct SoilPropertyCallback : SoilProperty, wrapper<SoilProperty> {
+
+    double getRelativeValue(const Vector3d& pos, const Root* root = nullptr) const {
+    	return this->get_override("getRelativeValue")(pos, root);
+    }
+
+    double getAbsoluteValue(const Vector3d& pos, const Root* root = nullptr) const {
+    	return this->get_override("getAbsoluteValue")(pos, root);
+    }
+
+    std::string toString() const {
+    	return this->get_override("toString")();
+    }
+
+};
+
+
 
 /*
  * Functions overloading (by hand, there are also macros available)
@@ -102,7 +128,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(write_overloads,write,1,2); // for RootSy
 
 
 /**
- * Expose classes to Pyhton module
+ * Expose classes to Python module
  */
 BOOST_PYTHON_MODULE(py_rootbox)
 {
@@ -228,10 +254,10 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	/*
 	 * soil.h
 	 */
-	class_<SoilProperty>("SoilProperty",init<>())
-			.def("getRelativeValue",&SoilProperty::getRelativeValue)
-			.def("getAbsoluteValue",&SoilProperty::getAbsoluteValue)
-			.def("__str__",&SoilProperty::toString)
+	class_<SoilPropertyCallback,boost::noncopyable>("SoilProperty",init<>())
+			.def("getRelativeValue",pure_virtual(&SoilProperty::getRelativeValue))
+			.def("getAbsoluteValue",pure_virtual(&SoilProperty::getAbsoluteValue))
+			.def("__str__",pure_virtual(&SoilProperty::toString))
 	;
 	class_<SoilPropertySDF, bases<SoilProperty>>("SoilPropertySDF",init<>())
 			.def(init<SignedDistanceFunction*, double, double, double>())
@@ -329,7 +355,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getRootSystemParameter", &RootSystem::getRootSystemParameter, return_value_policy<reference_existing_object>()) // tutorial "naive (dangerous) approach"
 		.def("openFile", &RootSystem::openFile, openFile_overloads())
 		.def("setGeometry", &RootSystem::setGeometry)
-		.def("setSoil", &RootSystem::setSoil)
+		.def("setSoil", &RootSystem::setPySoil) // cheated here, might work...
 		.def("reset", &RootSystem::reset)
 		.def("initialize", &RootSystem::initialize, initialize_overloads())
 		.def("simulate",simulate1, simulate1_overloads())

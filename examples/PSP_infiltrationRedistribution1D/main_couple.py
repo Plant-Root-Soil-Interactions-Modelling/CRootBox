@@ -19,14 +19,38 @@ import py_rootbox as rb
 from rb_tools import *
 import xylem_flux 
         
+        
+        
 #
-# look up function for soil matric potential
+# look up function for radial xylem fluxes for soil matric potential
 #    
 def soil_p(x,y,z,psi,depth):
     z = min(z,0.)
     z = max(z,-depth+1.e-9) # z \in (-depth, 0]
     i = math.floor(float(-z/depth*(inf.n))) # i \in [0, n-1]
     return psi[i+1] # (i+1) \in [1,n], boundaries are psi[0] and psi[n+1]
+ 
+#
+# look up function for hydrotropism for soil matric potential SINCE I DONT GET IT RUNNING MOVE IT TO C++
+#    
+class soil_watercontent(rb.SoilProperty):
+
+    def __init__(self, depth):
+        self.depth = depth
+        self.theta = []
+        
+    def setTheta(self, theta):
+        self.theta=theta
+        
+    def getRelativeValue(v3, root): # override callback function        
+        z =v3.z / 100 # cm -> m
+        print("it worked") # debug 
+        z = min(z,0.)
+        z = max(z,-depth+1.e-9) # z \in (-depth, 0]
+        i = math.floor(float(-z/depth*(inf.n))) # i \in [0, n-1]     
+        return theta[i+1] # (i+1) \in [1,n], boundaries are psi[0] and psi[n+1]
+ 
+ 
              
 #
 # Initialize soil domain (from Soil Physics with Python)
@@ -63,7 +87,29 @@ totalIterationNr = 0
 rsname = "Brassica_napus_a_Leitner_2010"
 rs = rb.RootSystem()
 rs.openFile(rsname,parameterPath())
+
+# "manually" set tropism to hydrotropism for the first ten root types
+for i in range(0,10):    
+    rs.getRootTypeParameter(i+1).tropismT = rb.TropismType.gravi;
+    rs.getRootTypeParameter(i+1).tropismN = 2; # N
+    rs.getRootTypeParameter(i+1).tropismS = 0.7; # sigma
+    rs.getRootTypeParameter(i+1).dx = 0.2
+
+for i in range(0,10):
+    print(rs.getRootTypeParameter(i+1))
+
+# soil_wc = soil_watercontent(soil[-1].lowerDepth)
+soil_wc = rb.SoilProperty()
+rs.setSoil(soil_wc)
+
 rs.initialize() # hydrotropism is not set right now, link to soil is missing
+
+# dt__=0.0001
+# for i in range(0,int(30./dt__)):
+#     rs.simulate(dt__)
+# 
+# rs.write(rsname+".vtp")
+# quit()
 
 # rs_Kr = np.array([ 1.16e-6, 1.74e-5, 1.74e-5, 1.74e-5, 11.74e-5, 1.74e-5, 1.74e-5 ]) # s/m; root hydraulic radial conductivity per root type 
 # rs_Kz = np.array([ 2.3e-8, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11, 1.16e-11 ]) # m²*s; root hydraulic axial conductivity per root type  
@@ -88,7 +134,7 @@ out_c = 0
 rho = 1e3 # kg / m^3      
 g = 1.e-3*9.8065 # m / s^2   
 pot_trans = np.array([-1.15741e-10]) # ?/(24.*3600.) # m^3 s^-1 potential transpiration
-top_pot = -1e-6 # -1500 # # J kg^-1 top potential (wilting point)
+top_pot = -1500 # J kg^-1 top potential (wilting point)
 
 ctflux = 0 # cumulative transpiration
   
@@ -102,6 +148,8 @@ ax1 = fig.add_subplot(2, 2, 1)
 ax2 = fig.add_subplot(2, 2, 2)
 ax3 = fig.add_subplot(2, 2, 3)
 ax4 = fig.add_subplot(2, 2, 4)
+
+
 
 #
 # Simulation loop
@@ -280,7 +328,18 @@ while (time < simTime):
     if (float(nrIterations/inf.maxNrIterations) < 0.1): 
         dt = min(dt*2, maxTimeStep) # go fasetr        
            
+print("fin, exporting results...")
+
+segP = nodes2seg(nodes,seg,x) 
+axial_flux = xylem_flux.axial_flux(x, seg, nodes, kz, rho, g)
+radial_flux = xylem_flux.radial_flux(x, seg, nodes, radius, kr, soil_p2)
+net_flux = axial_flux+radial_flux
+
+rs_ana.addUserData(a2v(segP),"pressure")
+rs_ana.addUserData(a2v(axial_flux),"axial_flux")
+rs_ana.addUserData(a2v(radial_flux),"radial_flux")
+rs_ana.addUserData(a2v(net_flux),"net_flux")
+rs_ana.write(rsname+".vtp")
+
 plt.ioff()
 plt.show()
-
-rs_ana.write(rsname+".vtp")

@@ -258,7 +258,8 @@ void Root::createSegments(double l)
 		auto n2 = nodes.at(nn-2);
 		auto n1 = nodes.at(nn-1);
 		double olddx = n1.minus(n2).length();
-		if (olddx<dx()*0.99) { // shift node instead of newnode
+		if (olddx<dx()*0.99) { // shift node instead of creating a new node
+
 			Vector3d h; // current heading
 			if (nn>2) {
 				h = n2.minus(nodes.at(nn-3));
@@ -266,12 +267,7 @@ void Root::createSegments(double l)
 			} else {
 				h = iheading;
 			}
-
-			// repeat down stuff
-			double sdx = dx()-olddx;
-			if (l<sdx) {
-				sdx = l;
-			}
+			double sdx = std::min(dx()-olddx,l);
 
 			Matrix3d ons = Matrix3d::ons(h);
 			Vector2d ab = rootsystem->tf.at(param.type-1)->getHeading(nodes.back(),ons,sdx,this);

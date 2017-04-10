@@ -52,6 +52,7 @@ public:
 	// Simulation
 	void setGeometry(SignedDistanceFunction* geom) { geometry = geom; }; ///< Optionally, sets a confining geometry (call before RootSystem::initialize())
 	void setSoil(SoilProperty* soil_) { soil = soil_; }; ///< Optionally sets a soil for hydro tropism (call before RootSystem::initialize())
+	void setPySoil(SoilProperty soil_) { soil = &soil_; };
 	void reset(); ///< Resets the root class, keeps the root type parameters
 	void initialize(int basal=4, int shootborne=5); ///< Creates the base roots, call before simulation and after setting the plant and root parameters
 	void simulate(double dt, bool silence = false); ///< Simulates root system growth for time span dt

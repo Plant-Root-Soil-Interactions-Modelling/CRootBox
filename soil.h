@@ -25,7 +25,7 @@ public:
      *                  in some situation this might be usefull (e.g. could increase look up speed from a unstructured mesh)
      * \return          scalar soil property
      */
-    virtual double getRelativeValue(const Vector3d& pos, const Root* root = nullptr) const { return 1.; }; ///< Returns a scalar poperty of the soil
+    virtual double getRelativeValue(const Vector3d& pos, const Root* root = nullptr) const { return 1.; } ///< Returns a scalar property of the soil
 
     /**
      * Returns an unscaled scalar property of the soil
@@ -35,7 +35,7 @@ public:
      *                  in some situation this might be usefull (e.g. could increase look up speed from a unstructured mesh)
      * \return          scalar soil property
      */
-    virtual double getAbsoluteValue(const Vector3d& pos, const Root* root = nullptr) const { return 1.; } ///< Returns a scalar poperty of the soil
+    virtual double getAbsoluteValue(const Vector3d& pos, const Root* root = nullptr) const { return 1.; } ///< Returns a scalar property of the soil
 
     virtual std::string toString() const { return "SoilProperty base class"; } ///< Quick info about the object for debugging
 
