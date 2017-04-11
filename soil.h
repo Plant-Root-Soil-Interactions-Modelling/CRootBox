@@ -25,17 +25,7 @@ public:
      *                  in some situation this might be usefull (e.g. could increase look up speed from a unstructured mesh)
      * \return          scalar soil property
      */
-    virtual double getRelativeValue(const Vector3d& pos, const Root* root = nullptr) const { return 1.; } ///< Returns a scalar property of the soil
-
-    /**
-     * Returns an unscaled scalar property of the soil
-     *
-     * @param pos       position [cm], (normally, root->getNode(root->getNumberOfNodes()-1))
-     * @param root      the root that wants to know the scalar property
-     *                  in some situation this might be usefull (e.g. could increase look up speed from a unstructured mesh)
-     * \return          scalar soil property
-     */
-    virtual double getAbsoluteValue(const Vector3d& pos, const Root* root = nullptr) const { return 1.; } ///< Returns a scalar property of the soil
+    virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const { return 1.; } ///< Returns a scalar property of the soil, 1. per default
 
     virtual std::string toString() const { return "SoilProperty base class"; } ///< Quick info about the object for debugging
 
@@ -67,11 +57,7 @@ public:
         slope = slope_;
     } ///< Creates the soil property from a signed distance function
 
-    virtual double getRelativeValue(const Vector3d& pos, const Root* root = nullptr) const override {
-        return (this->getAbsoluteValue(pos,root)-fmin)/(fmax-fmin);
-    } ///<@see SoilProperty::getRelativeValue
-
-    virtual double getAbsoluteValue(const Vector3d& pos, const Root* root = nullptr) const override {
+    virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
         double c = -sdf->getDist(pos)/slope*2.; ///< *(-1), because inside the geometry the value is largest
         c += (fmax-fmin)/2.; // thats the value at the boundary
         return std::max(std::min(c,fmax),fmin);

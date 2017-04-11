@@ -247,7 +247,7 @@ void Root::createSegments(double l)
 {
 	// std::cout << "createSegments("<< l << ")\n";
 	assert(l>0);
-	double scale = rootsystem->getRootTypeParameter(param.type)->sef->getRelativeValue(nodes.back(),this); // hope this optimized out if not set
+	double scale = rootsystem->getRootTypeParameter(param.type)->se->getValue(nodes.back(),this); // hope this optimized out if not set
 	l = l*scale;
 
 	double sl=0; // summed length of created segment

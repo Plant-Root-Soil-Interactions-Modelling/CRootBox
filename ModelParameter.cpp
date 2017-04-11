@@ -85,7 +85,7 @@ RootParameter RootTypeParameter::realize() {
 int RootTypeParameter::getLateralType(const Vector3d& pos)
 {
 	assert(successor.size()==successorP.size());
-	double scale = sbpf->getRelativeValue(pos);  //the current model makes not a lot of sense, we may come up with something more clever
+	double scale = sbp->getValue(pos);  //the current model makes not a lot of sense, we may come up with something more clever
 	if (successorP.size()>0) { // at least 1 successor type
 		if (successorP.size()>1) { // if there are more than one lateral we have to dice
 			double d = rand();

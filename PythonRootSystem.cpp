@@ -37,12 +37,8 @@ using namespace boost::python;
 // tricky booom boom
 struct SoilPropertyCallback : SoilProperty, wrapper<SoilProperty> {
 
-    double getRelativeValue(const Vector3d& pos, const Root* root = nullptr) const {
-    	return this->get_override("getRelativeValue")(pos, root);
-    }
-
-    double getAbsoluteValue(const Vector3d& pos, const Root* root = nullptr) const {
-    	return this->get_override("getAbsoluteValue")(pos, root);
+    double getValue(const Vector3d& pos, const Root* root = nullptr) const {
+    	return this->get_override("getValue")(pos, root);
     }
 
     std::string toString() const {
@@ -255,8 +251,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	 * soil.h
 	 */
 	class_<SoilPropertyCallback,boost::noncopyable>("SoilProperty",init<>())
-			.def("getRelativeValue",pure_virtual(&SoilProperty::getRelativeValue))
-			.def("getAbsoluteValue",pure_virtual(&SoilProperty::getAbsoluteValue))
+			.def("getValue",pure_virtual(&SoilProperty::getValue))
 			.def("__str__",pure_virtual(&SoilProperty::toString))
 	;
 	class_<SoilPropertySDF, bases<SoilProperty>>("SoilPropertySDF",init<>())
@@ -303,9 +298,9 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def_readwrite("name", &RootTypeParameter::name)
 			.def_readwrite("successor", &RootTypeParameter::successor)
 			.def_readwrite("successorP", &RootTypeParameter::successorP)
-			.def_readwrite("sef", &RootTypeParameter::sef)
-			.def_readwrite("sbpf", &RootTypeParameter::sbpf)
-			.def_readwrite("saf", &RootTypeParameter::saf)
+			.def_readwrite("se", &RootTypeParameter::se)
+			.def_readwrite("sbp", &RootTypeParameter::sbp)
+			.def_readwrite("sa", &RootTypeParameter::sa)
 			.def("__str__",&RootTypeParameter::toString)
 	;
 	class_<RootParameter>("RootParameter", init<>())

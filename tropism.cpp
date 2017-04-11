@@ -150,7 +150,7 @@ double Hydrotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double 
 {
     assert(soil!=nullptr);
     Vector3d newpos = this->getPosition(pos,old,a,b,dx);
-    double v = soil->getRelativeValue(newpos,root);
+    double v = soil->getValue(newpos,root);
     // std::cout << "\n" << newpos.getString() << ", = "<< v;
     return -v; ///< (-1) because we want to maximize the soil property
 }

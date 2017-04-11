@@ -85,9 +85,9 @@ public:
 	std::vector<int> successor;			///< Lateral types [1]
 	std::vector<double> successorP; 	///< Probabiltities of lateral type to emerge (sum of values == 1) [1]
 
-	SoilProperty* sef = new SoilProperty(); ///< scale elongation function
-	SoilProperty* sbpf = new SoilProperty(); ///< scale branching probability function
-	SoilProperty* saf = new SoilProperty(); ///< scale angle function
+	SoilProperty* se = new SoilProperty(); ///< scale elongation function
+	SoilProperty* sa = new SoilProperty(); ///< scale angle function
+	SoilProperty* sbp = new SoilProperty(); ///< scale branching probability function
 
 private:
 	std::mt19937 gen = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());  // random stuff
