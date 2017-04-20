@@ -614,16 +614,16 @@ void RootSystem::writeRSML(std::ostream & os) const
 void RootSystem::writeRSMLMeta(std::ostream & os) const
 {
     os << "<metadata>\n";
-    os << "<version>" << 1 << "</version>\n";
-    os << "<unit>" << "cm" << "</unit>\n";
-    os << "<resolution>" << 1 << "</resolution>\n";
+    os << "\t<version>" << 1 << "</version>\n";
+    os << "\t<unit>" << "cm" << "</unit>\n";
+    os << "\t<resolution>" << 1 << "</resolution>\n";
     // fetch time
     //    os << "<last-modified>";
     //    auto t = std::time(nullptr);
     //    auto tm = *std::localtime(&t);
     //    os << std::put_time(&tm, "%d-%m-%Y"); // %H-%M-%S" would do the job for gcc 5.0
     //    os << "</last-modified>\n";
-    os << "<software>CRootBox</software>\n";
+    os << "\t<software>CRootBox</software>\n";
     os << "</metadata>\n";
 }
 
