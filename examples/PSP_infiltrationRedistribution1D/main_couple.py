@@ -215,7 +215,7 @@ while (time < simTime):
         rs_ana.addUserData(a2v(net_flux),"net_flux")
         rs_ana.write(rsname+"_"+str(round(time/(24*3600)))+".vtp")                
               
-        fig1a = plt.figure() # plot root length distribution          
+        fig1a = plt.figure(figsize=(0.6*14.,0.6*12.)) # plot root length distribution          
         ax1 = fig1a.gca()
         ax2 = ax1.twiny()          
         rsl = v2a(rs_ana.distribution(rb.ScalarType.length,0.,50.,inf.n,False))
@@ -223,14 +223,14 @@ while (time < simTime):
         ax2.set_xlim(0, 0.6)
         ax2.set_xlabel("Root system length (m)",color='green',fontsize=18)
         ax2.set_ylabel("Depth (m)",fontsize=16)         
-        l2 = ax2.plot(rsl/100,0.5*-inf.z[1:len(inf.z)-1],color='green')     
+        l2 = ax2.plot(rsl/100,0.5*-inf.z[1:len(inf.z)-1],color='green') # for greyscale...     
         plt.setp(l2, linewidth=2)     
         
         ax1.set_ylim(-0.25, 0) # plot sink
         ax1.set_xlim(-6.e-8,0)
         ax1.set_xlabel("Sink (1)",color='blue',fontsize=18)
         ax1.set_ylabel("Depth (m)",fontsize=18)         
-        l1 = ax1.plot(sink,0.5*-inf.z[1:len(inf.z)-1],color='blue')   
+        l1 = ax1.plot(sink,0.5*-inf.z[1:len(inf.z)-1],'-',color='blue')   
         plt.setp(l1, linewidth=2)
                                
         fig1a.show()                        
