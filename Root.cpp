@@ -391,6 +391,8 @@ void Root::writeRSML(std::ostream & cout, std::string indent) const
 {
 	if (this->nodes.size()>1) {
 		cout << indent << "<root id=\"" <<  id << "\">\n";  // open root
+
+
 		/* geometry tag */
 		cout << indent << "\t<geometry>\n"; // open geometry
 		cout << indent << "\t\t<polyline>\n"; // open polyline
@@ -409,17 +411,32 @@ void Root::writeRSML(std::ostream & cout, std::string indent) const
 		cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
 		cout << indent << "\t\t</polyline>\n"; // close polyline
 		cout << indent << "\t</geometry>\n"; // close geometry
+
+
 		/* properties */
 		cout << indent <<"\t<properties>\n"; // open properties
 		// TODO
 		cout << indent << "\t</properties>\n"; // close properties
+
+
+		cout << indent << "\t<functions>\n"; // open functions
+		cout << indent << "\t\t<function name='emergence_time' domain='polyline'>\n"; // open functions
+		cout << indent << "\t\t\t" << "<sample>" << netimes.at(0) << "</sample>\n";
+		for (size_t i = 1; i<netimes.size()-1; i+=n) {
+			cout << indent << "\t\t\t" << "<sample>" << netimes.at(i) << "</sample>\n";
+
+		}
+		cout << indent << "\t\t\t" << "<sample>" << netimes.at(netimes.size()-1) << "</sample>\n";
+
+		cout << indent << "\t\t</function>\n"; // close functions
+		cout << indent << "\t</functions>\n"; // close functions
+
+
 		/* laterals roots */
 		for (size_t i = 0; i<laterals.size(); i++) {
 			laterals[i]->writeRSML(cout,indent+"\t");
 		}
-		cout << indent << "\t<functions>\n"; // open functions
-		// TODO
-		cout << indent << "\t</functions>\n"; // close functions
+
 		cout << indent << "</root>\n"; // close root
 	}
 }
