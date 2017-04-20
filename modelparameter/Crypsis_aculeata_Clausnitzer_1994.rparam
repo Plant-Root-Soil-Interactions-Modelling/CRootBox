@@ -4,7 +4,7 @@ name	Type0
 lb	6.6	0
 la	3	0
 ln	1	0
-lmax	200.6	20
+lmax	200.0	20
 r	2.06	0
 a	0.15	00
 color	1	0	1
@@ -38,7 +38,7 @@ name	Type2
 lb	0	0
 la	10	0
 ln	0	0
-lmax	10	1
+lmax	0.8	0.08
 r	0.94	0
 a	0.05	00
 color	0	0	0

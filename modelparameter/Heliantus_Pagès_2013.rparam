@@ -5,7 +5,7 @@ lb	1	0
 la	10	0
 ln	0.4	0.2
 lmax	101.46	10.1
-r	2.965	0
+r	2.76	0
 a	0.023	00
 color	1	0	0
 tropism	1	2	0.1
@@ -22,7 +22,7 @@ lb	0	0
 la	5	0
 ln	0.4	0
 lmax	15	1.5
-r	2.965	0
+r	2.76	0
 a	0.023	00
 color	1	1	0
 tropism	2	1	0.2
@@ -39,7 +39,7 @@ lb	0	0
 la	10	0
 ln	0	0
 lmax	10	1
-r	0.3	0
+r	2.76	0
 a	0.008	00
 color	1	1	1
 tropism	2	1	0.4
