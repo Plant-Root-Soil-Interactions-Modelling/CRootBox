@@ -61,7 +61,7 @@ public:
         double c = -sdf->getDist(pos)/slope*2.; ///< *(-1), because inside the geometry the value is largest
         c += (fmax-fmin)/2.; // thats the value at the boundary
         return std::max(std::min(c,fmax),fmin);
-    } ///<@see SoilProperty::getAbsoluteValue
+    } ///< TODO
 
     virtual std::string toString() const { return "SoilPropertySDF"; } ///< Quick info about the object for debugging
 
@@ -70,6 +70,49 @@ public:
     double fmin;
     double slope;
 };
+
+
+
+/**
+ * SoilPropertySDF scaled from 0..1
+ */
+class ScaledSoilPropertySDF : public SoilPropertySDF
+{
+public:
+	virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
+		double v = SoilPropertySDF::getValue(pos, root);
+		return (v-fmin)/(fmax-fmin);
+	} ///< TODO
+
+	virtual std::string toString() const { return "ScaledSoilPropertySDF"; } ///< Quick info about the object for debugging
+
+};
+
+
+/**
+ *  1D
+ */
+class SoilProperty1DTable : public SoilProperty
+{
+public:
+
+	void linspace(double min, double max, double n) {
+
+	};
+
+	int map(double z) const {
+		return 0;
+	}
+
+	virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
+		return data[map(pos.z)];
+	}
+
+	std::vector<double> data;
+
+};
+
+
 
 
 

@@ -270,7 +270,7 @@ void Root::createSegments(double l)
 			double sdx = std::min(dx()-olddx,l);
 
 			Matrix3d ons = Matrix3d::ons(h);
-			Vector2d ab = rootsystem->tf.at(param.type-1)->getHeading(nodes.back(),ons,sdx,this);
+			Vector2d ab = rootsystem->tf.at(param.type-1)->getHeading(nodes.back(),ons,olddx+sdx,this);
 			ons.times(Matrix3d::rotX(ab.y));
 			ons.times(Matrix3d::rotZ(ab.x));
 			Vector3d newdx = Vector3d(ons.column(0).times(sdx));
