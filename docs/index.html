@@ -67,7 +67,8 @@
           <div class="intro-text">
             <h1>CRootBox</h1>
             <p>Root modelling made easy</p>
-            <a href="#about" class="btn btn-custom btn-lg page-scroll">Discover CRootBox</a>  <a href="https://plantmodelling.shinyapps.io/shinyRootBox/" class="btn btn-custom btn-lg"><i class="fa fa-external-link" aria-hidden="true"></i>  Try it online</a> </br></br></br></br>
+            <a href="#about" class="btn btn-custom btn-lg page-scroll">Discover CRootBox</a>  <a href="https://plantmodelling.shinyapps.io/shinyRootBox/" class="btn btn-custom btn-lg"><i class="fa fa-external-link" aria-hidden="true"></i>  Try it online</a> </br>
+            <a href="https://figshare.com/collections/CRootBox_parameter_files/3745478" class="btn btn-custom btn-lg"><i class="fa fa-external-link" aria-hidden="true"></i>  Root architecture parameter database</a> </br></br></br></br>
               <img src="img/juelich_logo.jpg" class="img-responsive img-thumbnail" style="height:70px"> 
 
             </div>
@@ -87,13 +88,13 @@
         <div class="about-text">
           <h2>About CRootBox</h2>
           <hr>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed dapibus leo nec ornare diam. Sed commodo nibh ante facilisis bibendum dolor feugiat at. Duis sed dapibus leo nec ornare diam commodo nibh.</p>
+          <p>The focus of CRootBox is the simulation of different types of root architecture, and to provide a generic interface for coupling with arbitrary soil/environmental models, e.g., in order to determine the impact of specific root architectures on function. CRootBox is based on the earlier RootBox code that had been implemented in Matlab (Leitner et al. 2010), but now has an object oriented implementation which is more flexible and faster so that field-scale modelling became feasible.</p>
 
           <h3>Root architecture database</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed dapibus leo nec ornare diam. Sed commodo nibh ante facilisis bibendum dolor feugiat at. Duis sed dapibus leo nec ornare.</p>
+          <p>Based on published data, we created a database of root architectural parameters, simulated all of them using CRootBox (with adapted parameters where necessary) in a setting of a single root system growing in unconfined space. <a href="https://figshare.com/collections/CRootBox_parameter_files/3745478">All the parameter files can be found here</a></p>
 
           <h3>Roots in a box</h3>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis sed dapibus leo nec ornare diam. Sed commodo nibh ante facilisis bibendum dolor feugiat at. Duis sed dapibus leo nec ornare.</p>          
+          <p>The root growth modelling in containers based on signed distance functions allows to mimic experiments that use specific containers, also split-root boxes, and it also works to simulate root growth around obstacles. It may for example be helpful to anticipate wall effects in a given container size.</p>          
         </div>
       </div>
     </div>
@@ -109,74 +110,124 @@
   </div>
   <div class="container">
     <div class="row">
-      <div class="col-xs-12 col-sm-6">
-        <div class="menu-section">
-          <h2 class="menu-section-title">Requirements</h2>
-          <hr>
-
-
-          <div class="menu-item">
-            <div class="menu-item-name"> C++ </div>
-            <div class="menu-item-description"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, duis sed dapibus leo nec ornare diam. </div>
-          </div>
-
-
-          <div class="menu-item">
-            <div class="menu-item-name"> Python </div>
-            <div class="menu-item-description"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, duis sed dapibus leo nec ornare diam. </div>
-          </div>
-        </div>
-      </div>
-
 
       <div class="col-xs-12 col-sm-6">
         <div class="menu-section">
-          <h2 class="menu-section-title">Installation</h2>
+          <h2 class="menu-section-title">Using CRootBox in C++</h2>
           <hr>
           <div class="menu-item">
-            <div class="menu-item-name"> Unix </div>
-            <div class="menu-item-description"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, duis sed dapibus leo nec ornare diam. 
-            <pre>Test code here</pre>
-            </div>
+            <div class="menu-item-name"> Download </div>
+            <div class="menu-item-description"> Download the code from the Github repo</div>
+            <a type="button" class="btn btn-default" href="https://github.com/Plant-Root-Soil-Interactions-Modelling/CRootBox"><i class="fa fa-download" aria-hidden="true"></i> CRootBox source files</a>          
           </div>
+
           <div class="menu-item">
-            <div class="menu-item-name"> Mac </div>
-            <div class="menu-item-description"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, duis sed dapibus leo nec ornare diam. </div>
+            <div class="menu-item-name"> Terminal </div>
+            <div class="menu-item-description"> Open the Terminal (Linux, Mac) or Console (Windows) application and type the following:</div>
+            <pre>cd $PATH_TO_CROOTBOX_FOLDED</pre>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <div class="row">
-
-
-      <div class="col-xs-12 col-sm-6">
-        <div class="menu-section">
-          <h2 class="menu-section-title">Using CRootBox</h2>
-          <hr>
           <div class="menu-item">
             <div class="menu-item-name"> Compiling </div>
-            <div class="menu-item-description"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, duis sed dapibus leo nec ornare diam. </div>
-            <pre>Test code here</pre>
+            <div class="menu-item-description"> The code will compile with any c++11 compiler</div>
+            <pre>g++ *.cpp -std=c++11</pre>
           </div>
+
           <div class="menu-item">
             <div class="menu-item-name">Running</div>
-            <div class="menu-item-description"> Lorem ipsum dolor sit amet, consectetur adipiscing elit, duis sed dapibus leo nec ornare diam. </div>
-            <pre>Test code here</pre>
+            <div class="menu-item-description"> Call the newly compiled file</div>
+            <pre>./a.out</pre>
           </div>
         </div>
-      </div>
 
-      <div class="col-xs-12 col-sm-6">
         <div class="menu-section">
           <h2 class="menu-section-title">Downloads</h2>
           <hr>
           <div class="menu-item">
-            <a type="button" class="btn btn-primary" href="https://github.com/Plant-Root-Soil-Interactions-Modelling/CRootBox"><i class="fa fa-download" aria-hidden="true"></i> CRootBox source files</a>   <a type="button" class="btn btn-success" href="https://plantmodelling.shinyapps.io/shinyRootBox/" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Try CRootBox online</a>
+            <a type="button" class="btn btn-primary" href="https://github.com/Plant-Root-Soil-Interactions-Modelling/CRootBox"><i class="fa fa-download" aria-hidden="true"></i> CRootBox source files</a>   <a type="button" class="btn btn-success" href="https://plantmodelling.shinyapps.io/shinyRootBox/" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Try CRootBox online</a>  </br></br>
+            <a type="button" class="btn btn-primary" href="https://figshare.com/collections/CRootBox_parameter_files/3745478" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i> Parameter file database</a>
           </div>
 
         </div>
-      </div>      
+
+
+      </div>
+
+
+      <div class="col-xs-12 col-sm-6">
+        <div class="menu-section">
+          <h2 class="menu-section-title">Using CRootBoxin Python</h2>
+          <hr>
+
+          <div class="menu-item">
+            <div class="menu-item-name"> Comment line 16 in PythonRootSystem.cpp </div>
+            <div class="menu-item-description"> </br></div>
+            <pre>// #define PYTHON_WRAPPER ...</pre>
+          </div>
+
+          <div class="menu-item">
+            <div class="menu-item-name">Compile</div>
+            <div class="menu-item-description"></br>compile the CRootBox model with the following command line</div>
+            <pre>g++ examples/Exudation/gauss_legendre.cpp 
+    *.cpp -std=c++11 -c -fpic </pre>
+          </div>
+
+          <div class="menu-item">
+            <div class="menu-item-name"> Out comment line 16 in PythonRootSystem.cpp </div>
+            <div class="menu-item-description"></br></div>
+          </div>      
+
+          <div class="menu-item">
+            <div class="menu-item-name">Compile again</div>
+            <div class="menu-item-description"> compile the CRootBox model with the following command line.
+            <emph>/usr/include/python3.4</emph> is the path to the file pyconfig.h. <emph>boost_python</emph> needs to be installed, there will be a file /usr/lib/x86_64-linux-gnu/libboost_python-py34.so
+            </div>
+            <pre>g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,
+"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.4 
+-lboost_python-py34 ModelParameter.o Root.o RootSystem.o 
+analysis.o sdf.o tropism.o gauss_legendre.o </pre>
+          </div>    
+
+        </div>
+      </div>
+
+
+    </div>
+
+    <div class="row">
+
+      <div class="col-xs-12 col-sm-6">
+        <div class="menu-section">
+          <h2 class="menu-section-title">Other informations</h2>
+          <hr>
+          <div class="menu-item">
+            <div class="menu-item-name"> Folder structure </div>
+            <div class="menu-item-description"> 
+              </br>
+              <ul>
+                <li><b>/CRootBox:</b>  C++ codes </li>
+                <li><b>/examples:</b> Some examples how to use the CRootBox </li>
+                <li><b>/modelparameter:</b>  Some root parameter, and a plant parameter files </li>
+                <li><b>/scripts:</b> Python scripts for visualization with Paraview, and Matlab scripts for parameter export </li>
+                <li><b>/results:</b> Nice result images</li>
+              </ul>
+            </div>
+          <div class="menu-item">
+            <div class="menu-item-name">Documentation</div>
+            <div class="menu-item-description"> Create the documentation by running doxygen in the folder. The documentation should now be located in the folder /doc</div>
+            <pre>doxygen doxy_config</pre>
+          </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="col-xs-12 col-sm-6">
+
+      </div>  
+
+
+
       
     </div>
   </div>
@@ -359,9 +410,8 @@
 
         <h3>How to cite us</h3>
 
-        <blockquote>Leitner, D., Klepsch, S., Bodner, G., and Schnepf, A. (2010). A dynamic root system growth model based on L-Systems. Plant Soil 332: 117–192.</blockquote>
+        <blockquote><b>CRootBox: A structural-functional modelling framework for root systems.</b></br> Andrea Schnepf , Daniel Leitner, Guillaume Lobet, Trung Hieu Mai, Mirjam Zörner, Magdalena Landl, Cheng Sheng, Shehan Morandage, Jan Vanderborght, Harry Vereecken. </br>bioRxiv, 2017</blockquote>
 
-        <hr>
         <img src="img/juelich_logo.jpg" class="img-responsive img-thumbnail" style="height:70px"> 
 
     </div>    
@@ -371,37 +421,23 @@
 </div>
 <div id="footer">
   <div class="container text-center">
-    <div class="col-md-4">
+    <div class="col-md-6">
       <h3>Forschungszentrum Juelich</h3>
       <div class="contact-item">
         <p>Agrosphere, IBG3</p>
         <p>52428 Jülich, Germany</p>
       </div>
     </div>
-    <div class="col-md-4">
-      <h3>Opening Hours</h3>
-      <div class="contact-item">
-        <p>Mon-Thurs: 10:00 AM - 11:00 PM</p>
-        <p>Fri-Sun: 11:00 AM - 02:00 AM</p>
-      </div>
-    </div>
-    <div class="col-md-4">
+    <div class="col-md-6">
       <h3>Contact Info</h3>
       <div class="contact-item">
-        <p>Phone: +1 123 456 1234</p>
-        <p>Email: info@company.com</p>
+        <p>a.schnepf [ta] fz-juelich.de</p>
       </div>
     </div>
   </div>
   <div class="container-fluid text-center copyrights">
     <div class="col-md-8 col-md-offset-2">
-      <div class="social">
-        <ul>
-          <li><a href="#"><i class="fa fa-facebook"></i></a></li>
-          <li><a href="#"><i class="fa fa-twitter"></i></a></li>
-          <li><a href="#"><i class="fa fa-google-plus"></i></a></li>
-        </ul>
-      </div>
+
     </div>
   </div>
 </div>
