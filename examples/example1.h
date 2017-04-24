@@ -16,6 +16,7 @@ void example1()
 
     string name = "Anagallis_femina_Leitner_2010";
 
+
     /*
      * Open plant and root parameter from a file
      */
@@ -42,18 +43,18 @@ void example1()
     /*
      * Export final result (as vtp)
      */
-    rootsystem.write("www/rootsystem.vtp",RootSystem::ot_segments); // use ot_polylines for nicer visualization, ot_segments for animations
+    rootsystem.write("rootsystem.vtp",RootSystem::ot_segments); // use ot_polylines for nicer visualization, ot_segments for animations
 
     /*
      * Export segments in RSML format
      */
-    rootsystem.write("www/rootsystem.rsml");
+    rootsystem.write("rootsystem.rsml");
 
     /*
      * Export segments for Matlab analysis
      */
     SegmentAnalyser analysis(rootsystem);
-    analysis.write("www/rootsystem.txt");
+    analysis.write("rootsystem.txt");
 
     /*
      * Export dgf file
