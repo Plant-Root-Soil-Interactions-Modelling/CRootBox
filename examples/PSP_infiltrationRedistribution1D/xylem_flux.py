@@ -89,7 +89,10 @@ def linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p):
 #
 # Modifies the linear system to describe Diriclet BC at the node indices n0
 #
-# in: TODO
+# in:
+# Q, b    the linear system
+# n0      node indices where to apply the Dirichlet BC
+# d       fixed potential at n0, i.e. len(d)==len(n0)
 #
 # out:
 # Q, b    the updated linear system
@@ -97,38 +100,43 @@ def linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p):
 def bc_dirichlet(Q, b, n0, d):
     c = 0
     for c in range(0, len(n0)):
-        i = n0[c]      
-        # print("Dirichlet BC at node "+str(i)) 
+        i = n0[c]# print("Dirichlet BC at node "+str(i))             
         e0 = np.zeros((1,Q.shape[1])) # build zero vector
         Q[i,:] = sparse.csr_matrix(e0) # replace row i with ei
         Q[i,i] = 1
         b[i] = d[c]    
-        c += 1
 
     return Q, b 
 
 #
 # Modifies the linear system to describe a Neumann BC at the segments seg0
 #
-# in: TODO
+# in:
+# Q, b    the linear system
+# n0      node indices where to apply the Dirichlet BC
+# f       flux at n0, i.e. len(d)==len(n0)
 #
 # out:
 # Q, b    the updated linear system
 #
-def bc_neumann(Q, b, seg0, aflux, seg, nodes):
+def bc_neumann(Q, b, n0, f):
     c = 0
-    for c in range(0, len(seg0)):                
-        i = seg[seg0[c],0]  
-        # print("Neumann BC at node "+str(i))
-        b[i] += aflux[c]        
-        c += 1
+    for c in range(0, len(n0)):                
+        i = n0[c]  # print("Neumann BC at node "+str(i))       
+        b[i] += f[c]        
 
     return Q, b 
 
 #
 # Calculates the axial flux for each segment
 #
-# in: TODO
+# in: 
+# p       xylem pressure (i.e. solution vector)
+# seg     numpy array (Ns,2) of segment indices [1]
+# nodes   numpy array (N,3) of the node coordinates [L]
+# kz      axial conductivity for each segment [L5 T]
+# rho     density of soil water [M L-3]
+# g       gravitational acceleration [L T−2]
 #
 # out:
 # the axial flux
@@ -149,7 +157,13 @@ def axial_flux(p, seg, nodes, kz, rho, g):
 #
 # Calculates the axial flux for the top segment
 #
-# in: TODO
+# in:
+# p       xylem pressure (i.e. solution vector) 
+# seg     numpy array (Ns,2) of segment indices [1]
+# nodes   numpy array (N,3) of the node coordinates [L]1]
+# kz      axial conductivity for each segment [L5 T]
+# rho     density of soil water [M L-3]
+# g       gravitational acceleration [L T−2]
 #
 # out:
 # the axial flux
@@ -163,12 +177,16 @@ def axial_flux0(p, seg, nodes, kz, rho, g):
     af = -kz[0]*((p[j]-p[i])/l+rho*g*v[2])  # Eqn (6)
     return af
 
-
-
 #
 # Calculates the radial flux for each segment
 #
-# in: TODO
+# in:
+# p       xylem pressure (i.e. solution vector) 
+# seg     numpy array (Ns,2) of segment indices [1]
+# nodes   numpy array (N,3) of the node coordinates [L]
+# radius  segment radii [L]
+# kr      radial conductivity for each segment [L2 T M−1]
+# soil_p  lambda funciton returning the soil matric potential at a given location, p=soil_p(x,y,z) [M L−1 T−2]
 #
 # out:
 # the radial flux
@@ -192,12 +210,20 @@ def radial_flux(p, seg, nodes, radius, kr, soil_p):
 #
 # Calculates the radial net for each segment
 #
-# in: TODO
+# in:
+# p       xylem pressure (i.e. solution vector) 
+# seg     numpy array (Ns,2) of segment indices [1]
+# nodes   numpy array (N,3) of the node coordinates [L]
+# radius  segment radii [L]
+# kr      radial conductivity for each segment [L2 T M−1]
+# kz      axial conductivity for each segment [L5 T]
+# rho     density of soil water [M L-3]
+# g       gravitational acceleration [L T−2]
+# soil_p  lambda funciton returning the soil matric potential at a given location, p=soil_p(x,y,z) [M L−1 T−2]
 #
 # out:
 # the net flux
 def net_flux(p,seg, nodes, radius, kr, kz, rho, g, soil_p):
     return axial_flux(p, seg, nodes, radius, kr, kz, rho, g, soil_p) + radial_flux(p,seg, nodes, radius, kr, kz, rho, g, soil_p)
-
 
 

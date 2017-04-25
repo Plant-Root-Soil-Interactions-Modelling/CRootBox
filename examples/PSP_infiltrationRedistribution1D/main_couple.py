@@ -93,7 +93,8 @@ ctflux = 0 # cumulative transpiration
   
 plt.ion()
 fig1 = plt.figure() # Prepare output 
-
+plt.rc('xtick', labelsize=24) # bigger
+plt.rc('ytick', labelsize=24) 
 
 
 #
@@ -146,7 +147,7 @@ while (time < simTime):
                     
     if dirichlet == False: # Neumann
         Q, b = xylem_flux.linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p2) 
-        Q, b = xylem_flux.bc_neumann(Q, b, np.array([0]), pot_trans, seg, nodes)
+        Q, b = xylem_flux.bc_neumann(Q, b, np.array([0]), np.array([pot_trans]))
         x = LA.spsolve(Q, b) # direct
         eff_trans = xylem_flux.axial_flux0(x, seg, nodes, kz, rho, g) # verify that eff_trans == pot_trans        
         print("using neumann ( Effective Transpiration = " +str(eff_trans)+" m^3 s^-1)", "top potential", x[0] )        
@@ -172,7 +173,7 @@ while (time < simTime):
         z1 = nodes[seg[i,0],2]
         z2 = nodes[seg[i,1],2]
         z = 0.5*(z1+z2)
-        if z>-1: 
+        if z>-soil[-1].lowerDepth: # -1 meter
             ind = math.floor(-z/soil[-1].lowerDepth*inf.n)
             sink[ind] += radial_flux[i] * dt       
     
@@ -200,7 +201,7 @@ while (time < simTime):
     s2 = str(format((t3-t2)/t0, '.3f'))
     s3 = str(format((t4-t3)/t0, '.3f'))
     s4 = str(format((t -t4)/t0, '.3f'))
-    print("simtime =", format(time/3600./24., '.3f'), "days, spent ="+ s0 +"s ("+s1+", "+s2+", "+s3+", "+s4+")", rs.getNumberOfNodes(), "nodes,", "dt =", dt, " iterations =", int(nrIterations), "tranpsiration",ctflux,  "summed infiltration:", format(sumInfiltration, '.3f'))
+    print("simtime =", format(time/3600./24., '.3f'), "days, spent ="+ s0 +"s ("+s1+", "+s2+", "+s3+", "+s4+")", rs.getNumberOfNodes(), "nodes,", "dt =", dt, " iterations =", int(nrIterations), "cum trans",ctflux,  "summed infiltration:", format(sumInfiltration, '.3f'))
     
     if time>=rs_out_next: 
         rs_out_next += (7*24*3600)  
@@ -218,19 +219,24 @@ while (time < simTime):
         fig1a = plt.figure(figsize=(0.6*14.,0.6*12.)) # plot root length distribution          
         ax1 = fig1a.gca()
         ax2 = ax1.twiny()          
-        rsl = v2a(rs_ana.distribution(rb.ScalarType.length,0.,50.,inf.n,False))
+        rsl = v2a(rs_ana.distribution(rb.ScalarType.length,0.,100.,inf.n,False))
+#         print(rsl[0:10])
+#         print(sink[0:10])
+#         print("press key")
+#         input()
+
         ax2.set_ylim(-0.25, 0)
-        ax2.set_xlim(0, 0.6)
-        ax2.set_xlabel("Root system length (m)",color='green',fontsize=18)
-        ax2.set_ylabel("Depth (m)",fontsize=16)         
-        l2 = ax2.plot(rsl/100,0.5*-inf.z[1:len(inf.z)-1],color='green') # for greyscale...     
+        ax2.set_xlim(0, 1.2)
+        #ax2.set_xlabel("Root system length (m)",color='green',fontsize=32)
+        #ax2.set_ylabel("Depth (m)",fontsize=32)         
+        l2 = ax2.plot(rsl/100,-inf.z[1:len(inf.z)-1],color='green') # for greyscale...     
         plt.setp(l2, linewidth=2)     
         
         ax1.set_ylim(-0.25, 0) # plot sink
-        ax1.set_xlim(-6.e-8,0)
-        ax1.set_xlabel("Sink (1)",color='blue',fontsize=18)
-        ax1.set_ylabel("Depth (m)",fontsize=18)         
-        l1 = ax1.plot(sink,0.5*-inf.z[1:len(inf.z)-1],'-',color='blue')   
+        ax1.set_xlim(0.,6.e-8)
+        #ax1.set_xlabel("Sink (1)",color='blue',fontsize=32)
+        #ax1.set_ylabel("Depth (m)",fontsize=32)         
+        l1 = ax1.plot(-sink,-inf.z[1:len(inf.z)-1],'-',color='blue')   
         plt.setp(l1, linewidth=2)
                                
         fig1a.show()                        
