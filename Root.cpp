@@ -23,10 +23,10 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
 	Matrix3d ons = Matrix3d::ons(pheading);
 	ons.times(Matrix3d::rotX(beta));
 	double theta = param.theta;
-	//  if (parent!=nullptr) { // scale if not a baseRoot
-	//      double scale = rs->getRootParameter(type)->saf->getRelativeValue(parent->getNode(pni),this);
-	//      theta*=scale;
-	//  }
+	if (parent!=nullptr) { // scale if not a baseRoot
+		double scale = rs->getRootTypeParameter(type)->sa->getValue(parent->getNode(pni),this);
+		theta*=scale;
+	}
 	ons.times(Matrix3d::rotZ(theta));
 	this->iheading = ons.column(0);  // new initial heading
 	//
