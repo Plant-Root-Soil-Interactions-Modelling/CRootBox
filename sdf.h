@@ -220,8 +220,8 @@ class SDF_HalfPlane : public SignedDistanceFunction
 {
 
 public:
-	SDF_HalfPlane(const Vector3d& o, const Vector3d& n_);
-    SDF_HalfPlane(const Vector3d& o, const Vector3d& p1, const Vector3d& p2);  // half plane
+	SDF_HalfPlane(const Vector3d& o, const Vector3d& n_); ///< half plane by origin and normal vector
+    SDF_HalfPlane(const Vector3d& o, const Vector3d& p1, const Vector3d& p2);  ///< half plane by origin and two linear independent vectors
 
     virtual double getDist(const Vector3d& v) const { return n.times(v.minus(o)); } ///< @see SignedDistanceFunction::getDist
 
@@ -229,10 +229,10 @@ public:
 
     virtual std::string toString() { return "SDF_HalfPlane"; } ///< @see SignedDistanceFunction::toString
 
-    Vector3d o; // origin of the plane
-    Vector3d n; // normal of the plane p1xp2
-    Vector3d p1; // for visualisation (plane is a simplex: o,p1,p2)
-    Vector3d p2;
+    Vector3d o; ///< origin of the plane
+    Vector3d n; ///< normal of the plane p1xp2
+    Vector3d p1; ///< for visualisation (plane is a simplex: o,p1,p2)
+    Vector3d p2; ///< for visualisation (plane is a simplex: o,p1,p2)
 
 };
 

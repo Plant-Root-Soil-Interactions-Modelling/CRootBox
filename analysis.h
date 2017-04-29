@@ -6,17 +6,15 @@
 
 /**
  * Meshfree analysis of the root system based on signed distance functions.
- *
- * for a start this class should contain what Shehan needs for his experimental set-up
  */
 class SegmentAnalyser
 {
 
 public:
 
-    SegmentAnalyser() { }; ///< Creates an empty object (use AnalysisSDF::addSegments)
-    SegmentAnalyser(const RootSystem& rs); ///< Creates an analyser object containing the segments from the root system
-    SegmentAnalyser(const SegmentAnalyser& a) : nodes(a.nodes), segments(a.segments), ctimes(a.ctimes), segO(a.segO) { }; ///< Copy constructor, does not copy user data
+    SegmentAnalyser() { }; ///< creates an empty object (use AnalysisSDF::addSegments)
+    SegmentAnalyser(const RootSystem& rs); ///< creates an analyser object containing the segments from the root system
+    SegmentAnalyser(const SegmentAnalyser& a) : nodes(a.nodes), segments(a.segments), ctimes(a.ctimes), segO(a.segO) { } ///< copy constructor, does not copy user data
     virtual ~SegmentAnalyser() { }; ///< nothing to do here
 
     // merge segments
@@ -36,19 +34,19 @@ public:
     double getSummed(int st, SignedDistanceFunction* geometry) const; ///< Sums up the parameter within the geometry
     std::vector<double> distribution(int st, double top, double bot, int n, bool exact=false) const; ///< vertical distribution of a parameter
     std::vector<SegmentAnalyser> distribution(double top, double bot, int n) const; ///< vertical distribution of a parameter
-    std::vector<std::vector<double>> distribution2(int st, double top, double bot, double left, double right, int n, int m, bool exact=false) const; // 2d distribution (x,z) of a parameter
-    std::vector<std::vector<SegmentAnalyser>> distribution2(double top, double bot, double left, double right, int n, int m) const; // 2d distribution (x,z) of a parameter
+    std::vector<std::vector<double>> distribution2(int st, double top, double bot, double left, double right, int n, int m, bool exact=false) const; ///< 2d distribution (x,z) of a parameter
+    std::vector<std::vector<SegmentAnalyser>> distribution2(double top, double bot, double left, double right, int n, int m) const; ///< 2d distribution (x,z) of a parameter
     // todo distribution3
 
     // rather specialized things we want to know
     int getNumberOfRoots() const; ///< number of different roots
-    SegmentAnalyser foto(const Vector3d& pos, const Matrix3d& ons, double height) const; ///< takes a picture  // TODO unfinished
+    SegmentAnalyser foto(const Vector3d& pos, const Matrix3d& ons, double height) const; ///< takes a picture TODO unfinished, and to test
     SegmentAnalyser cut(const SDF_HalfPlane& plane) const; ///< returns the segments intersecting with a plane (e.g. for trenches)
 
     // User data for export or distributions
     void addUserData(std::vector<double> data, std::string name) { assert(data.size()==segments.size()); userData.push_back(data); userDataNames.push_back(name);}
-    //< adds user data that are written inot the VTP file, @see SegmentAnalyser::writeVTP
-    void clearUserData() { userData.clear(); userDataNames.clear(); } //< resets the user data
+    ///< adds user data that are written inot the VTP file, @see SegmentAnalyser::writeVTP
+    void clearUserData() { userData.clear(); userDataNames.clear(); } ///< resets the user data
 
     // some exports
     void write(std::string name); ///< writes simulation results (type is determined from file extension in name)
@@ -66,8 +64,8 @@ public:
 
 protected:
 
-    std::vector<std::vector<double>> userData;
-    std::vector<std::string> userDataNames;
+    std::vector<std::vector<double>> userData; ///< user data attached to the segments (for vtp file), e.g. flux, pressure, etc.
+    std::vector<std::string> userDataNames; ///< names of the data added, e.g. "Flux", "Pressure", etc.
 
 };
 

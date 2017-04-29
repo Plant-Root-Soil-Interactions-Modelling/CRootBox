@@ -255,6 +255,7 @@ void RootSystemParameter::write(std::ostream & cout) const {
  * @param dSB         Time delay between the shoot borne roots [day]
  * @param dRC         Delay between the root crowns [day]
  * @param nz          Distance between the root crowns along the shoot [cm]
+ * @param simtime 	  Recommended final simulation time (e.g. used in the web interface)
  */
 void RootSystemParameter::set(double pd, double fB, double dB, int mB, int nC, double fSB, double dSB, double dRC, double nz, double simtime) {
 	seedPos=Vector3d(0,0,-pd);

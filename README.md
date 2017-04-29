@@ -9,11 +9,11 @@ $ ./a.out
 
 # Folder sructure
 
-/				          CRootBox C++ codes
-/examples 			  Some examples how to use the CRootBox
+/			CRootBox C++ codes
+/examples 		Some examples how to use the CRootBox
 /modelparameter		Some root parameter, and a plant parameter files
-/scripts 			    Pyhthon scripts for visualization with Paraview, and Matlab scripts for parameter export
-/results 			    Nice result images
+/scripts 		Pyhthon scripts for visualization with Paraview, and Matlab scripts for parameter export
+/results 		Nice result images
 
 
 # Documentation

@@ -30,23 +30,23 @@ class RootTypeParameter
 
 public:
 
-	RootTypeParameter(); ///< Default constructor
-	RootTypeParameter(const RootTypeParameter& rp); ///< Copy constructor
+	RootTypeParameter(); ///< default constructor
+	RootTypeParameter(const RootTypeParameter& rp); ///< copy constructor
 	virtual ~RootTypeParameter() { };
 
 	void set(int type, double lb, double lbs, double la, double las, double ln, double lns, double nob, double nobs,
 			double r, double rs, double a, double as,  double colorR, double colorG, double colorB, double tropismT, double tropismN, double tropsimS,
 			double dx, const std::vector<int>& successor, const std::vector<double>& successorP, double theta, double thetas, double rlt, double rlts,
-			int gf, const std::string& name); ///< Sets all parameters
+			int gf, const std::string& name); ///< sets all parameters
 
 	RootParameter realize(); ///< Creates a specific root from the root parameter set
 	int getLateralType(const Vector3d& pos); ///< Choose (dice) lateral type based on root parameter set
 	double getK() const { return std::max(nob-1,double(0))*ln+la+lb; }  ///< returns the mean maximal root length [cm]
 
 	// IO
-	void read(std::istream & cin); ///< Reads a single root parameter set
-	void write(std::ostream & cout) const; ///< Writes a single root parameter set
-	std::string toString() const { std::stringstream ss; write(ss); return ss.str(); }
+	void read(std::istream & cin); ///< reads a single root parameter set
+	void write(std::ostream & cout) const; ///< writes a single root parameter set
+	std::string toString() const { std::stringstream ss; write(ss); return ss.str(); } ///< writes parameter to a string
 
 	// random numbers
 	void setSeed(double seed) { gen.seed(seed); } ///< Sets the seed of the random number generator
@@ -154,7 +154,7 @@ public:
 
 	virtual void read(std::istream & cin); ///< Read plant parameters
 	virtual void write(std::ostream & cout) const; ///< Write plant parameters
-	std::string toString() const { std::stringstream ss; write(ss); return ss.str(); }
+	std::string toString() const { std::stringstream ss; write(ss); return ss.str(); } ///< writes parameter to a string
 
 	/* Plant parameters */
 	Vector3d seedPos;   ///< Position of the seed [cm]
@@ -172,7 +172,7 @@ public:
 	double nz; 		    ///< Distance between the root crowns along the shoot [cm]
 
 	//Simulation parameters
-	double simtime;    // simulation time
+	double simtime;    ///< recommended final simulation time
 };
 
 

@@ -297,8 +297,9 @@ double SegmentAnalyser::getSummed(int st) const {
 }
 
 /**
- * \return The summed parameter of type @param st (@see RootSystem::ScalarType), that is within geometry @param g ,
- * based on the segment mid point (i.e. not exact). To sum exatly, first crop to the geometry, then run SegmentAnalyser::getSummed(st).
+ * \return The summed parameter of type @param st (@see RootSystem::ScalarType),
+ * that is within geometry @param g based on the segment mid point (i.e. not exact).
+ * To sum exactly, first crop to the geometry, then run SegmentAnalyser::getSummed(st).
  */
 double SegmentAnalyser::getSummed(int st, SignedDistanceFunction* g) const {
 	std::vector<double> data = getScalar(st);
@@ -332,7 +333,7 @@ int SegmentAnalyser::getNumberOfRoots() const
  * Projects the segments to an image plane (todo verify this code)
  *
  * @param pos       position of camera
- * @parma ons       orthonormal system, row 1 is orthogonal to the image plane given by [row 2,row 3]
+ * @param ons       orthonormal system, row 1 is orthogonal to the image plane given by [row 2,row 3]
  * @param fl        focal length, alpha = 2*arctan(d/(2*fl)), were alpha is the angle of field, and d the image diagonal
  *
  * \return The image segments in the x-y plane (z=0)
@@ -422,12 +423,10 @@ std::vector<double> SegmentAnalyser::distribution(int st, double top, double bot
 /**
  *  Creates a vertical distribution
  *
- * @param st        parameter type @see RootSystem::ScalarType
  * @param top       vertical top position (cm)
  * @param bot       vertical bot position (cm)
  * @param n         number of layers (each with a height of (bot-top)/n )
- * @param exact     calculates the intersection with the layer boundaries (true), only based on segment midpoints (false)
- * \return Vector of size @param n containing an Analysis object of the layer (cropped exactly)
+ * \return Vector of size @param n containing an Analysis object of the layers (cropped exactly)
  */
 std::vector<SegmentAnalyser> SegmentAnalyser::distribution(double top, double bot, int n) const
 {
@@ -452,7 +451,7 @@ std::vector<SegmentAnalyser> SegmentAnalyser::distribution(double top, double bo
  * @param top       vertical top position (cm)
  * @param bot       vertical bot position (cm)
  * @param left      left along x-axis (cm)
- * @param rigth     right along x-axis (cm)
+ * @param right     right along x-axis (cm)
  * @param n         number of vertical grid elements (each with height of (bot-top)/n )
  * @param m 		number of horizontal grid elements (each with length of (right-left)/m)
  * @param exact     calculates the intersection with the layer boundaries (true), only based on segment midpoints (false)
@@ -490,12 +489,14 @@ std::vector<std::vector<double>> SegmentAnalyser::distribution2(int st, double t
 }
 
 /**
- *  Creates a vertical distribution of the parameter of type @param st (@see RootSystem::ScalarType)
+ *  Creates a vertical distribution
  *
- * @param st        parameter type @see RootSystem::ScalarType
  * @param top       vertical top position (cm)
  * @param bot       vertical bot position (cm)
- * @param n         number of layers (each with a height of (bot-top)/n )
+ * @param left      left along x-axis (cm)
+ * @param right     right along x-axis (cm)
+ * @param n         number of vertical grid elements (each with height of (bot-top)/n )
+ * @param m 		number of horizontal grid elements (each with length of (right-left)/m)
  * \return Vector of size @param n containing the summed parameter in this layser
  */
 std::vector<std::vector<SegmentAnalyser>> SegmentAnalyser::distribution2(double top, double bot, double left, double right, int n, int m) const

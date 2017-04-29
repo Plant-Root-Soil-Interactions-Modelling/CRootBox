@@ -206,7 +206,8 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 /**
  * Simulates root system growth for time span dt
  *
- * @param dt    time step [days]
+ * @param dt    	time step [days]
+ * @param silence 	indicates if status is written to the console (cout) (default = false)
  */
 void RootSystem::simulate(double dt, bool silence)
 {
@@ -569,6 +570,7 @@ std::vector<double> RootSystem::getScalar(int ot, int stype, std::vector<Root*> 
  * (that must be lower case)
  *
  * @param name      file name e.g. output.vtp
+ * @param type 		only relevant for vtp files. Options are RootSystem::ot_polylines (default) or RootSystem::ot_segments
  */
 void RootSystem::write(std::string name, int type) const
 {

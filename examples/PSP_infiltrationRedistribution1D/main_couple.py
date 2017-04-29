@@ -226,10 +226,10 @@ while (time < simTime):
 #         input()
 
         ax2.set_ylim(-0.25, 0)
-        ax2.set_xlim(0, 1.2)
+        ax2.set_xlim(0, 1.2*100)
         #ax2.set_xlabel("Root system length (m)",color='green',fontsize=32)
         #ax2.set_ylabel("Depth (m)",fontsize=32)         
-        l2 = ax2.plot(rsl/100,-inf.z[1:len(inf.z)-1],color='green') # for greyscale...     
+        l2 = ax2.plot(rsl,-inf.z[1:len(inf.z)-1],color='green') # for greyscale...     
         plt.setp(l2, linewidth=2)     
         
         ax1.set_ylim(-0.25, 0) # plot sink

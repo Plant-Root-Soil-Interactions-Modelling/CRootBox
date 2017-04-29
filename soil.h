@@ -46,8 +46,8 @@ public:
      * inside the geometry the value is largest
      *
      * @param sdf_      the signed distance function representing the geometry
-     * @param max_      the maximal value of the property
-     * @param min_      the minimal value of the property
+     * @param max_      the maximal value of the soil property
+     * @param min_      the minimal value of the soil property
      * @param slope_    scales the linear gradient of the sdf (note that |grad(sdf)|= 1)
      */
     SoilPropertySDF(SignedDistanceFunction* sdf_, double max_=1, double min_=0, double slope_=1) {
@@ -61,14 +61,14 @@ public:
         double c = -sdf->getDist(pos)/slope*2.; ///< *(-1), because inside the geometry the value is largest
         c += (fmax-fmin)/2.; // thats the value at the boundary
         return std::max(std::min(c,fmax),fmin);
-    } ///< TODO
+    } ///< returns fmin outside of the domain and fmax inside, and a linear ascend according slope
 
     virtual std::string toString() const { return "SoilPropertySDF"; } ///< Quick info about the object for debugging
 
-    SignedDistanceFunction* sdf;
-    double fmax;
-    double fmin;
-    double slope;
+    SignedDistanceFunction* sdf; ///< signed distance function representing the geometry
+    double fmax; ///< maximum is reached within the geometry at the distance slope
+    double fmin; ///< minimum is reached outside of the geometry at the distance slope
+    double slope; ///< half length of linear interpolation between fmax and fmin
 };
 
 
@@ -82,7 +82,7 @@ public:
 	virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
 		double v = SoilPropertySDF::getValue(pos, root);
 		return (v-fmin)/(fmax-fmin);
-	} ///< TODO
+	} ///< SoilPropertySDF::getValue() but scaled from 0 to 1
 
 	virtual std::string toString() const { return "ScaledSoilPropertySDF"; } ///< Quick info about the object for debugging
 
@@ -90,7 +90,7 @@ public:
 
 
 /**
- *  1D
+ *  1D Look up table (todo)
  */
 class SoilProperty1DTable : public SoilProperty
 {
@@ -98,21 +98,21 @@ public:
 
 	void linspace(double min, double max, double n) {
 
-	};
+	} ///< todo sets the mesh
 
 	int map(double z) const {
 		return 0;
-	}
+	} ///< todo corresponding mapping
 
 	virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
 		return data[map(pos.z)];
-	}
+	} ///< todo
 
-	std::vector<double> data;
+    virtual std::string toString() const { return "SoilProperty1DTable"; } ///< Quick info about the object for debugging
+
+	std::vector<double> data; ///< look up data todo we will need a setter
 
 };
-
-
 
 
 
