@@ -23,10 +23,10 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
 	Matrix3d ons = Matrix3d::ons(pheading);
 	ons.times(Matrix3d::rotX(beta));
 	double theta = param.theta;
-	//  if (parent!=nullptr) { // scale if not a baseRoot
-	//      double scale = rs->getRootParameter(type)->saf->getRelativeValue(parent->getNode(pni),this);
-	//      theta*=scale;
-	//  }
+	if (parent!=nullptr) { // scale if not a baseRoot
+		double scale = rs->getRootTypeParameter(type)->sa->getValue(parent->getNode(pni),this);
+		theta*=scale;
+	}
 	ons.times(Matrix3d::rotZ(theta));
 	this->iheading = ons.column(0);  // new initial heading
 	//
@@ -247,7 +247,7 @@ void Root::createSegments(double l)
 {
 	// std::cout << "createSegments("<< l << ")\n";
 	assert(l>0);
-	double scale = rootsystem->getRootTypeParameter(param.type)->sef->getRelativeValue(nodes.back(),this); // hope this optimized out if not set
+	double scale = rootsystem->getRootTypeParameter(param.type)->se->getValue(nodes.back(),this); // hope this optimized out if not set
 	l = l*scale;
 
 	double sl=0; // summed length of created segment
@@ -258,7 +258,8 @@ void Root::createSegments(double l)
 		auto n2 = nodes.at(nn-2);
 		auto n1 = nodes.at(nn-1);
 		double olddx = n1.minus(n2).length();
-		if (olddx<dx()*0.99) { // shift node instead of newnode
+		if (olddx<dx()*0.99) { // shift node instead of creating a new node
+
 			Vector3d h; // current heading
 			if (nn>2) {
 				h = n2.minus(nodes.at(nn-3));
@@ -266,15 +267,10 @@ void Root::createSegments(double l)
 			} else {
 				h = iheading;
 			}
-
-			// repeat down stuff
-			double sdx = dx()-olddx;
-			if (l<sdx) {
-				sdx = l;
-			}
+			double sdx = std::min(dx()-olddx,l);
 
 			Matrix3d ons = Matrix3d::ons(h);
-			Vector2d ab = rootsystem->tf.at(param.type-1)->getHeading(nodes.back(),ons,sdx,this);
+			Vector2d ab = rootsystem->tf.at(param.type-1)->getHeading(nodes.back(),ons,olddx+sdx,this);
 			ons.times(Matrix3d::rotX(ab.y));
 			ons.times(Matrix3d::rotZ(ab.x));
 			Vector3d newdx = Vector3d(ons.column(0).times(sdx));
@@ -395,6 +391,8 @@ void Root::writeRSML(std::ostream & cout, std::string indent) const
 {
 	if (this->nodes.size()>1) {
 		cout << indent << "<root id=\"" <<  id << "\">\n";  // open root
+
+
 		/* geometry tag */
 		cout << indent << "\t<geometry>\n"; // open geometry
 		cout << indent << "\t\t<polyline>\n"; // open polyline
@@ -413,17 +411,32 @@ void Root::writeRSML(std::ostream & cout, std::string indent) const
 		cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
 		cout << indent << "\t\t</polyline>\n"; // close polyline
 		cout << indent << "\t</geometry>\n"; // close geometry
+
+
 		/* properties */
 		cout << indent <<"\t<properties>\n"; // open properties
 		// TODO
 		cout << indent << "\t</properties>\n"; // close properties
+
+
+		cout << indent << "\t<functions>\n"; // open functions
+		cout << indent << "\t\t<function name='emergence_time' domain='polyline'>\n"; // open functions
+		cout << indent << "\t\t\t" << "<sample>" << netimes.at(0) << "</sample>\n";
+		for (size_t i = 1; i<netimes.size()-1; i+=n) {
+			cout << indent << "\t\t\t" << "<sample>" << netimes.at(i) << "</sample>\n";
+
+		}
+		cout << indent << "\t\t\t" << "<sample>" << netimes.at(netimes.size()-1) << "</sample>\n";
+
+		cout << indent << "\t\t</function>\n"; // close functions
+		cout << indent << "\t</functions>\n"; // close functions
+
+
 		/* laterals roots */
 		for (size_t i = 0; i<laterals.size(); i++) {
 			laterals[i]->writeRSML(cout,indent+"\t");
 		}
-		cout << indent << "\t<functions>\n"; // open functions
-		// TODO
-		cout << indent << "\t</functions>\n"; // close functions
+
 		cout << indent << "</root>\n"; // close root
 	}
 }

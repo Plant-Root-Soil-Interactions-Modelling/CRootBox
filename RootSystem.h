@@ -42,7 +42,7 @@ public:
 	// Parameter input output
 	void setRootTypeParameter(RootTypeParameter p) { rtparam.at(p.type-1) = p; } ///< set the root type parameter to the index type-1
 	RootTypeParameter* getRootTypeParameter(int type) { return &rtparam.at(type-1); } ///< Returns the i-th root parameter set (i=1..n)
-	void setRootSystemParameter(const RootSystemParameter& rsp) { rsparam = rsp; }; ///< sets the root system parameters
+	void setRootSystemParameter(const RootSystemParameter& rsp) { rsparam = rsp; } ///< sets the root system parameters
 	RootSystemParameter* getRootSystemParameter() { return &rsparam; } ///< gets the root system parameters
 
 	void openFile(std::string filename, std::string subdir="modelparameter/"); ///< Reads root paramter and plant parameter
@@ -50,13 +50,14 @@ public:
 	void writeParameters(std::ostream & os) const; ///< Writes root parameters
 
 	// Simulation
-	void setGeometry(SignedDistanceFunction* geom) { geometry = geom; }; ///< Optionally, sets a confining geometry (call before RootSystem::initialize())
-	void setSoil(SoilProperty* soil_) { soil = soil_; }; ///< Optionally sets a soil for hydro tropism (call before RootSystem::initialize())
-	void reset(); ///< Resets the root class, keeps the root type parameters
-	void initialize(int basal=4, int shootborne=5); ///< Creates the base roots, call before simulation and after setting the plant and root parameters
-	void simulate(double dt, bool silence = false); ///< Simulates root system growth for time span dt
-	void simulate(); ///< Simulates root system growth for the time defined in the parameters
-	double getSimTime() const { return simtime; }
+	void setGeometry(SignedDistanceFunction* geom) { geometry = geom; } ///< optionally, sets a confining geometry (call before RootSystem::initialize())
+	void setSoil(SoilProperty* soil_) { soil = soil_; } ///< optionally sets a soil for hydro tropism (call before RootSystem::initialize())
+	void setPySoil(SoilProperty soil_) { soil = &soil_; } ///< experimental setter for the Python binding (todo)
+	void reset(); ///< resets the root class, keeps the root type parameters
+	void initialize(int basal=4, int shootborne=5); ///< creates the base roots, call before simulation and after setting the plant and root parameters
+	void simulate(double dt, bool silence = false); ///< simulates root system growth for time span dt
+	void simulate(); ///< simulates root system growth for the time defined in the root system parameters
+	double getSimTime() const { return simtime; } ///< returns the current simulation time
 
 	// TODO
 	// dynamic information what happened last time step

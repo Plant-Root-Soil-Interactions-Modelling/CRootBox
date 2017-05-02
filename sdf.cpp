@@ -129,10 +129,10 @@ int SDF_PlantContainer::writePVPScript(std::ostream & cout, int c) const
 /**
  * Rotates the base geometry pot around a main axis and then translates it
  *
- * @param sdf           points to the original geometry
+ * @param sdf_          points to the original geometry
  * @param a             rotation angle [degree]
- * @param axis          rotation axis (SDF_Axes: sdf_xaxis, sdf_yaxis, or sdf_zaxis)
- * @param pos           position of origin [cm], default=(0,0,0)
+ * @param axis_         rotation axis (SDF_Axes: sdf_xaxis, sdf_yaxis, or sdf_zaxis)
+ * @param pos_          position of origin [cm], default=(0,0,0)
  */
 SDF_RotateTranslate::SDF_RotateTranslate(SignedDistanceFunction* sdf_, double a, int axis_, const Vector3d& pos_)
 {

@@ -85,7 +85,7 @@ RootParameter RootTypeParameter::realize() {
 int RootTypeParameter::getLateralType(const Vector3d& pos)
 {
 	assert(successor.size()==successorP.size());
-	double scale = sbpf->getRelativeValue(pos);  //the current model makes not a lot of sense, we may come up with something more clever
+	double scale = sbp->getValue(pos);  //the current model makes not a lot of sense, we may come up with something more clever
 	if (successorP.size()>0) { // at least 1 successor type
 		if (successorP.size()>1) { // if there are more than one lateral we have to dice
 			double d = rand();
@@ -255,6 +255,7 @@ void RootSystemParameter::write(std::ostream & cout) const {
  * @param dSB         Time delay between the shoot borne roots [day]
  * @param dRC         Delay between the root crowns [day]
  * @param nz          Distance between the root crowns along the shoot [cm]
+ * @param simtime 	  Recommended final simulation time (e.g. used in the web interface)
  */
 void RootSystemParameter::set(double pd, double fB, double dB, int mB, int nC, double fSB, double dSB, double dRC, double nz, double simtime) {
 	seedPos=Vector3d(0,0,-pd);

@@ -11,7 +11,7 @@ from math import sqrt
 def simOnce(name,simtime,lbins,lrange,zbins,zrange):
     rootsystem = rb.RootSystem()
     rootsystem.openFile(name,"modelparameter/")
-    rootsystem.initialize(4,5) # TODO expose default values
+    rootsystem.initialize() 
     rootsystem.simulate(simtime);
     tips = rootsystem.getRootTips()
     notips = sum(1 for _ in tips) # is there a more clever way?

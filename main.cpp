@@ -8,7 +8,6 @@
 #include <unistd.h>
 
 #include "examples/example1.h"
-#include "examples/example1_wb.h"
 #include "examples/example1_wb_dgf.h"
 #include "examples/example2.h"
 #include "examples/example3.h"

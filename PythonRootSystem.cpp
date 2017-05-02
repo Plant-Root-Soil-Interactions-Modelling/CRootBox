@@ -19,6 +19,11 @@
 #include <boost/python.hpp>
 #include <boost/python/suite/indexing/vector_indexing_suite.hpp>
 
+#include <boost/python/module.hpp>
+#include <boost/python/class.hpp>
+#include <boost/python/wrapper.hpp>
+#include <boost/python/call.hpp>
+
 #include "mymath.h"
 #include "sdf.h"
 #include "RootSystem.h"
@@ -26,6 +31,23 @@
 #include "examples/Exudation/example_exudation.h"
 
 using namespace boost::python;
+
+
+
+// tricky booom boom
+struct SoilPropertyCallback : SoilProperty, wrapper<SoilProperty> {
+
+    double getValue(const Vector3d& pos, const Root* root = nullptr) const {
+    	return this->get_override("getValue")(pos, root);
+    }
+
+    std::string toString() const {
+    	return this->get_override("toString")();
+    }
+
+};
+
+
 
 /*
  * Functions overloading (by hand, there are also macros available)
@@ -102,7 +124,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(write_overloads,write,1,2); // for RootSy
 
 
 /**
- * Expose classes to Pyhton module
+ * Expose classes to Python module
  */
 BOOST_PYTHON_MODULE(py_rootbox)
 {
@@ -228,10 +250,9 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	/*
 	 * soil.h
 	 */
-	class_<SoilProperty>("SoilProperty",init<>())
-			.def("getRelativeValue",&SoilProperty::getRelativeValue)
-			.def("getAbsoluteValue",&SoilProperty::getAbsoluteValue)
-			.def("__str__",&SoilProperty::toString)
+	class_<SoilPropertyCallback,boost::noncopyable>("SoilProperty",init<>())
+			.def("getValue",pure_virtual(&SoilProperty::getValue))
+			.def("__str__",pure_virtual(&SoilProperty::toString))
 	;
 	class_<SoilPropertySDF, bases<SoilProperty>>("SoilPropertySDF",init<>())
 			.def(init<SignedDistanceFunction*, double, double, double>())
@@ -277,9 +298,9 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def_readwrite("name", &RootTypeParameter::name)
 			.def_readwrite("successor", &RootTypeParameter::successor)
 			.def_readwrite("successorP", &RootTypeParameter::successorP)
-			.def_readwrite("sef", &RootTypeParameter::sef)
-			.def_readwrite("sbpf", &RootTypeParameter::sbpf)
-			.def_readwrite("saf", &RootTypeParameter::saf)
+			.def_readwrite("se", &RootTypeParameter::se)
+			.def_readwrite("sbp", &RootTypeParameter::sbp)
+			.def_readwrite("sa", &RootTypeParameter::sa)
 			.def("__str__",&RootTypeParameter::toString)
 	;
 	class_<RootParameter>("RootParameter", init<>())
@@ -329,7 +350,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getRootSystemParameter", &RootSystem::getRootSystemParameter, return_value_policy<reference_existing_object>()) // tutorial "naive (dangerous) approach"
 		.def("openFile", &RootSystem::openFile, openFile_overloads())
 		.def("setGeometry", &RootSystem::setGeometry)
-		.def("setSoil", &RootSystem::setSoil)
+		.def("setSoil", &RootSystem::setPySoil) // cheated here, might work...
 		.def("reset", &RootSystem::reset)
 		.def("initialize", &RootSystem::initialize, initialize_overloads())
 		.def("simulate",simulate1, simulate1_overloads())

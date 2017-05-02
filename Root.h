@@ -36,8 +36,8 @@ public:
     double getLength(double age); ///< exact length of the root
     double getAge(double length); ///< exact age of the root
 
-    RootTypeParameter* getRootTypeParameter() const;  ///< Returns the root type parameter of the root
-    double dx() const { return getRootTypeParameter()->dx; }; // returns the axial resolution
+    RootTypeParameter* getRootTypeParameter() const;  ///< returns the root type parameter of the root
+    double dx() const { return getRootTypeParameter()->dx; } ///< returns the axial resolution
 
     std::vector<Root*> getRoots(); ///< return the root system as sequential vector
     void getRoots(std::vector<Root*>& v); ///< return the root system as sequential vector
@@ -72,9 +72,9 @@ public:
     int parent_ni; ///< parent node index
 
     /* kids */
-    std::vector<Root*> laterals; ///< The lateral roots of this root
+    std::vector<Root*> laterals; ///< the lateral roots of this root
 
-    const double smallDx = 1e-6; // otherwise direction can become naN
+    const double smallDx = 1e-6; ///< threshold value, smaller segments will be skipped (otherwise root tip direction can become NaN)
 
 protected:
 

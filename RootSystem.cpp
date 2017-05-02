@@ -206,7 +206,8 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 /**
  * Simulates root system growth for time span dt
  *
- * @param dt    time step [days]
+ * @param dt    	time step [days]
+ * @param silence 	indicates if status is written to the console (cout) (default = false)
  */
 void RootSystem::simulate(double dt, bool silence)
 {
@@ -569,6 +570,7 @@ std::vector<double> RootSystem::getScalar(int ot, int stype, std::vector<Root*> 
  * (that must be lower case)
  *
  * @param name      file name e.g. output.vtp
+ * @param type 		only relevant for vtp files. Options are RootSystem::ot_polylines (default) or RootSystem::ot_segments
  */
 void RootSystem::write(std::string name, int type) const
 {
@@ -614,16 +616,16 @@ void RootSystem::writeRSML(std::ostream & os) const
 void RootSystem::writeRSMLMeta(std::ostream & os) const
 {
     os << "<metadata>\n";
-    os << "<version>" << 1 << "</version>\n";
-    os << "<unit>" << "cm" << "</unit>\n";
-    os << "<resolution>" << 1 << "</resolution>\n";
+    os << "\t<version>" << 1 << "</version>\n";
+    os << "\t<unit>" << "cm" << "</unit>\n";
+    os << "\t<resolution>" << 1 << "</resolution>\n";
     // fetch time
     //    os << "<last-modified>";
     //    auto t = std::time(nullptr);
     //    auto tm = *std::localtime(&t);
     //    os << std::put_time(&tm, "%d-%m-%Y"); // %H-%M-%S" would do the job for gcc 5.0
     //    os << "</last-modified>\n";
-    os << "<software>CRootBox</software>\n";
+    os << "\t<software>CRootBox</software>\n";
     os << "</metadata>\n";
 }
 
