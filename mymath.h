@@ -107,6 +107,7 @@ inline bool operator==(const Vector3d& lhs, const Vector3d& rhs){ return ((lhs.x
 inline bool operator!=(const Vector3d& lhs, const Vector3d& rhs){ return !(lhs == rhs); }
 
 
+
 /**
  * 3x3 Matrix class, compatible with Vector3d for basic linear algebra
  * (i.e. exactly the operations needed for CRootBox)
@@ -171,11 +172,10 @@ public:
 
     double det() const {
         return  r0.x*(r1.y*r2.z-r2.y*r1.z)-r0.y*(r1.x*r2.z-r1.z*r2.x)+r0.z*(r1.x*r2.y-r1.y*r2.x);
-    }
+    } ///< determinant of the matrix
 
     Matrix3d inverse() const {
         double d = det();
-        assert(d>0); // regular matrix?
         double idet = 1. / d;
         Matrix3d A;
         A.r0.x = (r1.y*r2.z-r2.y*r1.z)*idet;

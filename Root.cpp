@@ -57,56 +57,6 @@ Root::~Root()
 	}
 }
 
-/**
- * Analytical length of the root at a given age
- *
- * @param age          age of the root [day]
- */
-double Root::getLength(double age)
-{
-	assert(age>=0);
-	return rootsystem->gf.at(param.type-1)->getLength(age,param.r,param.getK(),this);
-}
-
-/**
- * Analytical creation (=emergence) time of a node at a length along the root
- *
- * @param length   length of the root [cm]
- */
-double Root::getCreationTime(double length)
-{
-	assert(length>=0);
-	double rootage = getAge(length);
-	if (rootage<0) {
-		std::cout << "negative root age "<<rootage<<" at length "<< length;
-		std::cout.flush();
-		throw std::invalid_argument( "bugbugbug" );
-	}
-	if (parent!=nullptr) {
-		double pl = parent_base_length+parent->param.la; // parent length, when this root was created
-		double page=parent->getCreationTime(pl);
-		assert(page>=0);
-		return rootage+page;
-	} else {
-		return rootage;
-	}
-}
-
-/**
- * Analytical age of the root at a given length
- *
- * @param length   length of the root [cm]
- */
-double Root::getAge(double length)
-{
-	assert(length>=0);
-	return rootsystem->gf.at(param.type-1)->getAge(length,param.r,param.getK(),this);
-}
-
-RootTypeParameter* Root::getRootTypeParameter() const
-{
-	return rootsystem->getRootTypeParameter(param.type);
-}
 
 /**
  * Simulates growth of this root for a time span dt
@@ -115,32 +65,46 @@ RootTypeParameter* Root::getRootTypeParameter() const
  */
 void Root::simulate(double dt)
 {
-	newnodes = 0; // reset
+	newnodes = 0; // reset new node counter
 
 	const RootParameter &p = param; // rename
 	// std::cout << "Root.simulate(dt) \n" << p.toString();
 
 	// increase age
 	if (age+dt>p.rlt) { // root life time
-		dt=p.rlt-age; // dt might be 0
-		alive = false; // this root is dead TODO
+		dt=p.rlt-age; // remaining life span
+		alive = false; // this root is dead
 	}
 	age+=dt;
 
 	if (alive) { // dead roots wont grow
 
+		// probablistic branching model
+		if ((age>0) && (age-dt<=0)) { // the root emerges in this time step
+			double P = rootsystem->getRootTypeParameter(param.type)->sbp->getValue(nodes.back(),this);
+			if (P<1.) { // P==1 means the lateral emerges with probability 1 (default case)
+				double p = 1-std::pow((1-P), dt); //probabiltiy of emergence in this time step
+				if (rand()>p) { // not rand()<p
+					age -= dt; // the root does not emerge in this time step
+				}
+			}
+		}
+
 		if (age>0) {
 
-			// children first (always care for the children, even if inactive)
+			// children first (lateral roots grow even if base root is inactive)
 			for (auto l:laterals) {
 				l->simulate(dt);
 			}
 
 			if (active) {
+
 				// length increment
+				double length_ = getLength(std::max(age-dt,0.)); // length of the root for unimpeded growth (i.e. length_==length for unimpeded growth)
 				double targetlength = getLength(age);
-				//cout << "targetlength: "<< targetlength << " at age " << age <<", r="<<p.r<< ", k="<<p.getK()<<"\n";
-				double dl = std::max(targetlength-length, double(0)); // length increment
+				double e = targetlength-length_; //elongation in time step dt
+				double scale = rootsystem->getRootTypeParameter(param.type)->se->getValue(nodes.back(),this); // hope some of this is optimized out if not set
+				double dl = std::max(scale*e, double(0)); // length increment, dt is not used anymore
 
 				// create geometry
 				if (p.nob>0) { // root has laterals
@@ -202,6 +166,57 @@ void Root::simulate(double dt)
 }
 
 /**
+ * Analytical creation (=emergence) time of a node at a length along the root
+ *
+ * @param length   length of the root [cm]
+ */
+double Root::getCreationTime(double length)
+{
+	assert(length>=0);
+	double rootage = getAge(length);
+	if (rootage<0) {
+		std::cout << "negative root age "<<rootage<<" at length "<< length;
+		std::cout.flush();
+		throw std::invalid_argument( "bugbugbug" );
+	}
+	if (parent!=nullptr) {
+		double pl = parent_base_length+parent->param.la; // parent length, when this root was created
+		double page=parent->getCreationTime(pl);
+		assert(page>=0);
+		return rootage+page;
+	} else {
+		return rootage;
+	}
+}
+
+/**
+ * Analytical length of the root at a given age
+ *
+ * @param age          age of the root [day]
+ */
+double Root::getLength(double age)
+{
+	assert(age>=0);
+	return rootsystem->gf.at(param.type-1)->getLength(age,param.r,param.getK(),this);
+}
+
+/**
+ * Analytical age of the root at a given length
+ *
+ * @param length   length of the root [cm]
+ */
+double Root::getAge(double length)
+{
+	assert(length>=0);
+	return rootsystem->gf.at(param.type-1)->getAge(length,param.r,param.getK(),this);
+}
+
+RootTypeParameter* Root::getRootTypeParameter() const
+{
+	return rootsystem->getRootTypeParameter(param.type);
+}
+
+/**
  * Creates a new lateral by calling RootSystem::createNewRoot().
  *
  * Overwrite this method to implement more sezialized root classes.
@@ -247,9 +262,6 @@ void Root::createSegments(double l)
 {
 	// std::cout << "createSegments("<< l << ")\n";
 	assert(l>0);
-	double scale = rootsystem->getRootTypeParameter(param.type)->se->getValue(nodes.back(),this); // hope this optimized out if not set
-	l = l*scale;
-
 	double sl=0; // summed length of created segment
 
 	// shift first node to axial resolution
@@ -295,7 +307,7 @@ void Root::createSegments(double l)
 	}
 
 	int n = floor(l/dx());
-
+	// create n+1 new nodes
 	for (int i=0; i<n+1; i++) {
 
 		Vector3d h; // current heading
@@ -326,11 +338,7 @@ void Root::createSegments(double l)
 
 		Vector3d newnode = Vector3d(nodes.back().plus(newdx));
 		double et = this->getCreationTime(length+sl);
-//		if (std::isnan(et)) {
-//			std::cout << "Creation time is nan \n";
-//			std::cout.flush();
-//		}
-		addNode(newnode,et);
+		addNode(newnode,et); // increases newnode counter
 	} // for
 
 }
@@ -378,7 +386,7 @@ void Root::addNode(Vector3d n, double t)
 	nodes.push_back(n); // node
 	nodeIds.push_back(rootsystem->getNodeIndex()); // new unique id
 	netimes.push_back(t); // exact creation time
-	newnodes++;
+	newnodes++; // increase new node counter
 }
 
 /**
@@ -391,7 +399,6 @@ void Root::writeRSML(std::ostream & cout, std::string indent) const
 {
 	if (this->nodes.size()>1) {
 		cout << indent << "<root id=\"" <<  id << "\">\n";  // open root
-
 
 		/* geometry tag */
 		cout << indent << "\t<geometry>\n"; // open geometry
@@ -412,12 +419,10 @@ void Root::writeRSML(std::ostream & cout, std::string indent) const
 		cout << indent << "\t\t</polyline>\n"; // close polyline
 		cout << indent << "\t</geometry>\n"; // close geometry
 
-
 		/* properties */
 		cout << indent <<"\t<properties>\n"; // open properties
 		// TODO
 		cout << indent << "\t</properties>\n"; // close properties
-
 
 		cout << indent << "\t<functions>\n"; // open functions
 		cout << indent << "\t\t<function name='emergence_time' domain='polyline'>\n"; // open functions
@@ -430,7 +435,6 @@ void Root::writeRSML(std::ostream & cout, std::string indent) const
 
 		cout << indent << "\t\t</function>\n"; // close functions
 		cout << indent << "\t</functions>\n"; // close functions
-
 
 		/* laterals roots */
 		for (size_t i = 0; i<laterals.size(); i++) {
@@ -447,10 +451,8 @@ void Root::writeRSML(std::ostream & cout, std::string indent) const
 std::string Root::toString() const
 {
 	std::stringstream str;
-	str << "Root #"<< id <<": type "<<param.type << ", length: "<< length << ", age: " <<age<<" with "<< laterals.size() <<"laterals\n";
+	str << "Root #"<< id <<": type "<<param.type << ", length: "<< length << ", age: " <<age<<" with "<< laterals.size() << " laterals\n";
 	return str.str();
-
-
 }
 
 
