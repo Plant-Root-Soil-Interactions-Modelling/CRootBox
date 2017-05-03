@@ -2,6 +2,7 @@
 #define SOIL_H
 
 #include "mymath.h"
+#include <cmath>
 #include "sdf.h"
 
 class Root;
@@ -90,27 +91,31 @@ public:
 
 
 /**
- *  1D Look up table (todo)
+ *  1D linear look up
  */
-class SoilProperty1DTable : public SoilProperty
+class SoilProperty1Dlinear : public SoilProperty
 {
 public:
 
-	void linspace(double min, double max, double n) {
+	SoilProperty1Dlinear(double a, double b, size_t n): a(a), b(b), n(n), data(n) { };
+	void setData(std::vector<double>& data_) { assert(data.size()==n); data=data_; }
 
-	} ///< todo sets the mesh
-
-	int map(double z) const {
-		return 0;
-	} ///< todo corresponding mapping
+	double mapIZ(size_t i) const { return a + (i+0.5)*(b-a)/(n-1); }
+	size_t mapZI(double z) const { return std::round((z-a)*(n-1)/(b-a)-0.5); }
 
 	virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
-		return data[map(pos.z)];
-	} ///< todo
+		size_t i =mapZI(pos.z);
+		assert(i>=0);
+		assert(i<n);
+		return data[i];
+	}
 
-    virtual std::string toString() const { return "SoilProperty1DTable"; } ///< Quick info about the object for debugging
+    virtual std::string toString() const { return "SoilProperty1Dlinear"; } ///< Quick info about the object for debugging
 
-	std::vector<double> data; ///< look up data todo we will need a setter
+    double a;
+	double b;
+	size_t n;
+	std::vector<double> data; ///< look up data
 
 };
 
