@@ -67,9 +67,9 @@ public:
 
 	// call back functions
 	virtual Root* createRoot(int lt, Vector3d  h, double delay, Root* parent, double pbl, int pni);
-	///< Creates a new lateral root, overwrite or change this method to use more spezialised root classes
+	///< Creates a new lateral root, overwrite or change this method to use more specialized root classes
 	virtual TropismFunction* createTropismFunction(int tt, double N, double sigma);
-	///< Creates the tropisms, overwrite or change this method to add more tropisms
+	///< Creates the tropisms, overwrite or change this method to add more tropisms TODO a vector<tropism*> might be easier to use
 	virtual GrowthFunction* createGrowthFunction(int gft);
 	///< Creates the growth function per root type, overwrite or change this method to add more tropisms
 
@@ -115,7 +115,7 @@ private:
 	int nid = -1; // unique root id counter
 
 	const int maxtypes = 100;
-	void initRTP();
+	void initRTP(); // default values for rtparam vector
 
 	void writeRSMLMeta(std::ostream & os) const;
 	void writeRSMLPlant(std::ostream & os) const;
