@@ -43,7 +43,7 @@ void example1()
     /*
      * Export final result (as vtp)
      */
-    rootsystem.write("rootsystem.vtp",RootSystem::ot_segments); // use ot_polylines for nicer visualization, ot_segments for animations
+    rootsystem.write("rootsystem.vtp");
 
     /*
      * Export segments in RSML format

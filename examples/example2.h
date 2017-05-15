@@ -66,7 +66,7 @@ void example2()
     /*
      * Export results (as vtp)
      */
-    rootsystem.write(name+".vtp",RootSystem::ot_polylines);
+    rootsystem.write(name+".vtp");
 
     /*
      * Export container geometry as Paraview Python script (run file in Paraview by Tools->Python Shell, Run Script)

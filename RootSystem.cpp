@@ -1,13 +1,13 @@
 #include "RootSystem.h"
 
-const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","1","user data 1", "user data 2", "user data 3" };
+const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","1","userdata 1", "userdata 2", "userdata 3", "parent type"  };
 
 /**
  * Destructor
  */
 RootSystem::~RootSystem()
 {
-    reset();
+	reset();
 }
 
 /**
@@ -15,21 +15,21 @@ RootSystem::~RootSystem()
  */
 void RootSystem::reset()
 {
-    for(auto b :baseRoots) {
-        delete b;
-    }
-    for(auto f:gf) {
-        delete f;
-    }
-    for(auto f:tf) {
-        delete f;
-    }
-    baseRoots.clear();
-    gf.clear();
-    tf.clear();
-    simtime=0;
-    rid = -1;
-    nid = -1;
+	for(auto b :baseRoots) {
+		delete b;
+	}
+	for(auto f:gf) {
+		delete f;
+	}
+	for(auto f:tf) {
+		delete f;
+	}
+	baseRoots.clear();
+	gf.clear();
+	tf.clear();
+	simtime=0;
+	rid = -1;
+	nid = -1;
 }
 
 /**
@@ -37,12 +37,11 @@ void RootSystem::reset()
  */
 void RootSystem::initRTP()
 {
-  rtparam = std::vector<RootTypeParameter> (maxtypes);
-  for (auto& rtp:rtparam) {
-      rtp = RootTypeParameter();
-  }
+	rtparam = std::vector<RootTypeParameter> (maxtypes);
+	for (auto& rtp:rtparam) {
+		rtp = RootTypeParameter();
+	}
 }
-
 
 /**
  * Reads the root parameter from a file. Opens plant parameters with the same filename if available,
@@ -53,34 +52,34 @@ void RootSystem::initRTP()
  */
 void RootSystem::openFile(std::string name, std::string subdir)
 {
-    std::ifstream fis;
-    // open root parameter
-    std::string rp_name = subdir;
-    rp_name.append(name);
-    rp_name.append(".rparam");
-    fis.open(rp_name.c_str());
-    int c = 0;
-    if (fis.good()) { // did it work?
-        c = readParameters(fis);
-        fis.close();
-    } else {
-        std::string s = "RootSystem::openFile() could not open root parameter file ";
-        throw std::invalid_argument(s.append(rp_name));
-    }
-    std::cout << "Read " << c << " root type parameters \n"; // debug
+	std::ifstream fis;
+	// open root parameter
+	std::string rp_name = subdir;
+	rp_name.append(name);
+	rp_name.append(".rparam");
+	fis.open(rp_name.c_str());
+	int c = 0;
+	if (fis.good()) { // did it work?
+		c = readParameters(fis);
+		fis.close();
+	} else {
+		std::string s = "RootSystem::openFile() could not open root parameter file ";
+		throw std::invalid_argument(s.append(rp_name));
+	}
+	std::cout << "Read " << c << " root type parameters \n"; // debug
 
-    // open plant parameter
-    std::string pp_name = subdir;
-    pp_name.append(name);
-    pp_name.append(".pparam");
-    fis.open(pp_name.c_str());
-    if (fis.good()) { // did it work?
-        rsparam.read(fis);
-        fis.close();
-    } else { // create a tap root system
-        std::cout << "No root system parameters found, using default tap root system \n";
-        rsparam = RootSystemParameter();
-    }
+	// open plant parameter
+	std::string pp_name = subdir;
+	pp_name.append(name);
+	pp_name.append(".pparam");
+	fis.open(pp_name.c_str());
+	if (fis.good()) { // did it work?
+		rsparam.read(fis);
+		fis.close();
+	} else { // create a tap root system
+		std::cout << "No root system parameters found, using default tap root system \n";
+		rsparam = RootSystemParameter();
+	}
 }
 
 /**
@@ -90,15 +89,15 @@ void RootSystem::openFile(std::string name, std::string subdir)
  */
 int RootSystem::readParameters(std::istream& cin)
 {
-  initRTP();
-  int c = 0;
-  while (cin.good()) {
-      RootTypeParameter p;
-      p.read(cin);
-      setRootTypeParameter(p); // sets the param to the index (p.type-1)
-      c++;
-  }
-  return c;
+	initRTP();
+	int c = 0;
+	while (cin.good()) {
+		RootTypeParameter p;
+		p.read(cin);
+		setRootTypeParameter(p); // sets the param to the index (p.type-1)
+		c++;
+	}
+	return c;
 }
 
 /**
@@ -108,14 +107,14 @@ int RootSystem::readParameters(std::istream& cin)
  */
 void RootSystem::writeParameters(std::ostream& os) const
 {
-    int t = 0;
-    for (auto const& rp:rtparam) {
-        t++;
-        if (rp.type>0) {
-            assert(rp.type==t); // check if index is really type-1
-            rp.write(os); // only write if defined
-        }
-    }
+	int t = 0;
+	for (auto const& rp:rtparam) {
+		t++;
+		if (rp.type>0) {
+			assert(rp.type==t); // check if index is really type-1
+			rp.write(os); // only write if defined
+		}
+	}
 }
 
 /**
@@ -126,80 +125,80 @@ void RootSystem::writeParameters(std::ostream& os) const
  */
 void RootSystem::initialize(int basaltype, int shootbornetype)
 {
-    //cout << "Root system initialize\n";
-    reset(); // just in case
+	//cout << "Root system initialize\n";
+	reset(); // just in case
 
-    // Create root system
-    const double maxT = 365.; // maximal simulation time
-    const double dzB = 0.1; // distance of basal roots up the mesocotyl [cm] (hardcoded in the orginal version, hardcoded here)
-    RootSystemParameter const &rs = rsparam; // rename
-    Vector3d iheading(0,0,-1);
+	// Create root system
+	const double maxT = 365.; // maximal simulation time
+	const double dzB = 0.1; // distance of basal roots up the mesocotyl [cm] (hardcoded in the orginal version, hardcoded here)
+	RootSystemParameter const &rs = rsparam; // rename
+	Vector3d iheading(0,0,-1);
 
-    // Taproot
-    Root* taproot = new Root(this, 1, iheading ,0, nullptr, 0, 0); // tap root has root type 1
-    taproot->addNode(rs.seedPos,0);
-    baseRoots.push_back(taproot);
+	// Taproot
+	Root* taproot = new Root(this, 1, iheading ,0, nullptr, 0, 0); // tap root has root type 1
+	taproot->addNode(rs.seedPos,0);
+	baseRoots.push_back(taproot);
 
-    // Basal roots
-    if (rs.maxB>0) {
-        if (getRootTypeParameter(basaltype)->type<1) { // if the type is not defined, copy tap root
-            std::cout << "Basal root type #" << basaltype << " was not defined, using tap root parameters instead\n";
-            RootTypeParameter brtp = RootTypeParameter(*getRootTypeParameter(1));
-            brtp.type = basaltype;
-            setRootTypeParameter(brtp);
-        }
-        int maxB = rs.maxB;
-        if (rs.delayB>0) {
-            maxB = std::min(maxB,int(ceil((maxT-rs.firstB)/rs.delayB))); // maximal for simtime maxT
-        }
-        double delay = rs.firstB;
-        for (int i=0; i<maxB; i++) {
-            Root* basalroot = new Root(this, basaltype, iheading ,delay, nullptr, 0, 0);
-            Vector3d node = rs.seedPos.minus(Vector3d(0.,0.,dzB));
-            basalroot->addNode(node,delay);
-            baseRoots.push_back(basalroot);
-            delay += rs.delayB;
-        }
-    }
+	// Basal roots
+	if (rs.maxB>0) {
+		if (getRootTypeParameter(basaltype)->type<1) { // if the type is not defined, copy tap root
+			std::cout << "Basal root type #" << basaltype << " was not defined, using tap root parameters instead\n";
+			RootTypeParameter brtp = RootTypeParameter(*getRootTypeParameter(1));
+			brtp.type = basaltype;
+			setRootTypeParameter(brtp);
+		}
+		int maxB = rs.maxB;
+		if (rs.delayB>0) {
+			maxB = std::min(maxB,int(ceil((maxT-rs.firstB)/rs.delayB))); // maximal for simtime maxT
+		}
+		double delay = rs.firstB;
+		for (int i=0; i<maxB; i++) {
+			Root* basalroot = new Root(this, basaltype, iheading ,delay, nullptr, 0, 0);
+			Vector3d node = rs.seedPos.minus(Vector3d(0.,0.,dzB));
+			basalroot->addNode(node,delay);
+			baseRoots.push_back(basalroot);
+			delay += rs.delayB;
+		}
+	}
 
-    // Shoot borne roots
-    if ((rs.nC>0) && (rs.delaySB<maxT)) { // if the type is not defined, copy basal root
-        if (getRootTypeParameter(shootbornetype)->type<1) {
-            std::cout << "Shootborne root type #" << shootbornetype << " was not defined, using tap root parameters instead\n";
-            RootTypeParameter srtp = RootTypeParameter(*getRootTypeParameter(1));
-            srtp.type = shootbornetype;
-            setRootTypeParameter(srtp);
-        }
-        Vector3d sbpos = rs.seedPos;
-        sbpos.z=sbpos.z/2.; // half way up the mesocotyl
-        int maxSB = ceil((maxT-rs.firstSB)/rs.delayRC); // maximal number of root crowns
-        double delay = rs.firstSB;
-        for (int i=0; i<maxSB; i++) {
-            for (int j=0; j<rs.nC; j++) {
-                Root* shootborne = new Root(this, shootbornetype, iheading ,delay, nullptr, 0, 0);
-                // TODO fix the initial radial heading
-                shootborne->addNode(sbpos,delay);
-                baseRoots.push_back(shootborne);
-                delay += rs.delaySB;
-            }
-            sbpos.z+=rs.nz;  // move up, for next root crown
-            delay = rs.firstSB + i*rs.delayRC; // reset age
-        }
-    }
+	// Shoot borne roots
+	if ((rs.nC>0) && (rs.delaySB<maxT)) { // if the type is not defined, copy basal root
+		if (getRootTypeParameter(shootbornetype)->type<1) {
+			std::cout << "Shootborne root type #" << shootbornetype << " was not defined, using tap root parameters instead\n";
+			RootTypeParameter srtp = RootTypeParameter(*getRootTypeParameter(1));
+			srtp.type = shootbornetype;
+			setRootTypeParameter(srtp);
+		}
+		Vector3d sbpos = rs.seedPos;
+		sbpos.z=sbpos.z/2.; // half way up the mesocotyl
+		int maxSB = ceil((maxT-rs.firstSB)/rs.delayRC); // maximal number of root crowns
+		double delay = rs.firstSB;
+		for (int i=0; i<maxSB; i++) {
+			for (int j=0; j<rs.nC; j++) {
+				Root* shootborne = new Root(this, shootbornetype, iheading ,delay, nullptr, 0, 0);
+				// TODO fix the initial radial heading
+				shootborne->addNode(sbpos,delay);
+				baseRoots.push_back(shootborne);
+				delay += rs.delaySB;
+			}
+			sbpos.z+=rs.nz;  // move up, for next root crown
+			delay = rs.firstSB + i*rs.delayRC; // reset age
+		}
+	}
 
-    // Create tropisms and growth functions per root type
-    for (size_t i=0; i<rtparam.size(); i++) {
-        int type = rtparam.at(i).tropismT;
-        double N = rtparam.at(i).tropismN;
-        double sigma = rtparam.at(i).tropismS;
-        TropismFunction* tropism = this->createTropismFunction(type,N,sigma);
-        // std::cout << "#" << i << ": type " << type << ", N " << N << ", sigma " << sigma << "\n";
-        tf.push_back(new ConfinedTropism(tropism, geometry)); // wrap confinedTropism around baseTropism
-        int gft = rtparam.at(i).gf;
-        GrowthFunction* gf_ = this->createGrowthFunction(gft);
-        gf_->getAge(1,1,1,nullptr);  // check if getAge is implemented (ohterwise an exception is thrown)
-        gf.push_back(gf_);
-    }
+	// Create tropisms and growth functions per root type
+	for (size_t i=0; i<rtparam.size(); i++) {
+		int type = rtparam.at(i).tropismT;
+		double N = rtparam.at(i).tropismN;
+		double sigma = rtparam.at(i).tropismS;
+		TropismFunction* tropism = this->createTropismFunction(type,N,sigma);
+		// std::cout << "#" << i << ": type " << type << ", N " << N << ", sigma " << sigma << "\n";
+		tf.push_back(new ConfinedTropism(tropism, geometry)); // wrap confinedTropism around baseTropism
+		int gft = rtparam.at(i).gf;
+		GrowthFunction* gf_ = this->createGrowthFunction(gft);
+		gf_->getAge(1,1,1,nullptr);  // check if getAge is implemented (ohterwise an exception is thrown)
+		gf.push_back(gf_);
+	}
 
 }
 
@@ -211,13 +210,16 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
  */
 void RootSystem::simulate(double dt, bool silence)
 {
-    if (!silence) {
-    	std::cout << "RootSystem.simulate(dt) from "<< simtime << " to " << simtime+dt << " days \n";
-    }
-    simtime+=dt;
-    for (auto const& r: baseRoots) {
-        r->simulate(dt);
-    }
+	if (!silence) {
+		std::cout << "RootSystem.simulate(dt) from "<< simtime << " to " << simtime+dt << " days \n";
+	}
+	old_non = getNumberOfNodes();
+	old_nor = getRoots().size();
+	for (auto const& r: baseRoots) {
+		r->simulate(dt, silence);
+	}
+	simtime+=dt;
+	roots.clear(); // empty buffer
 }
 
 /**
@@ -236,16 +238,16 @@ void RootSystem::simulate()
  * @param seed      random number generator seed
  */
 void RootSystem::setSeed(double seed) {
-    std::cout << "Setting random seed "<< seed <<"\n";
-    gen.seed(seed);
-    for (auto t : tf) {
-        double s  = rand();
-        t->setSeed(s);
-    }
-    for (auto rp : rtparam) {
-        double s  = rand();
-        rp.setSeed(s);
-    }
+	std::cout << "Setting random seed "<< seed <<"\n";
+	gen.seed(seed);
+	for (auto t : tf) {
+		double s  = rand();
+		t->setSeed(s);
+	}
+	for (auto rp : rtparam) {
+		double s  = rand();
+		rp.setSeed(s);
+	}
 }
 
 /**
@@ -260,8 +262,8 @@ void RootSystem::setSeed(double seed) {
  *
  */
 Root* RootSystem::createRoot(int lt, Vector3d  h, double delay, Root* parent, double pbl, int pni) {
-// call Root* lateral = rootsystem->createRoot(lt,  h, delay,  this, length, nodes.size()-1);
-  return new Root(this,lt,h,delay,parent,pbl,pni);
+	// call Root* lateral = rootsystem->createRoot(lt,  h, delay,  this, length, nodes.size()-1);
+	return new Root(this,lt,h,delay,parent,pbl,pni);
 }
 
 /**
@@ -269,18 +271,18 @@ Root* RootSystem::createRoot(int lt, Vector3d  h, double delay, Root* parent, do
  * the function must be extended or overwritten to add more tropisms
  */
 TropismFunction* RootSystem::createTropismFunction(int tt, double N, double sigma) {
-    switch (tt) {
-    case tt_plagio: return new Plagiotropism(N,sigma);
-    case tt_gravi: return new Gravitropism(N,sigma);
-    case tt_exo: return new Exotropism(N,sigma);
-    case tt_hydro: {
-        TropismFunction* gt =  new Gravitropism(N,sigma);
-        TropismFunction* ht= new Hydrotropism(N,sigma,soil);
-        TropismFunction* cht = new CombinedTropism(N,sigma,ht,10.,gt,1.); // does only use the objective functions from gravitropism and hydrotropism
-        return cht;
-    }
-    default: throw std::invalid_argument( "RootSystem::createTropismFunction() tropism type not implemented" );
-    }
+	switch (tt) {
+	case tt_plagio: return new Plagiotropism(N,sigma);
+	case tt_gravi: return new Gravitropism(N,sigma);
+	case tt_exo: return new Exotropism(N,sigma);
+	case tt_hydro: {
+		TropismFunction* gt =  new Gravitropism(N,sigma);
+		TropismFunction* ht= new Hydrotropism(N,sigma,soil);
+		TropismFunction* cht = new CombinedTropism(N,sigma,ht,10.,gt,1.); // does only use the objective functions from gravitropism and hydrotropism
+		return cht;
+	}
+	default: throw std::invalid_argument( "RootSystem::createTropismFunction() tropism type not implemented" );
+	}
 }
 
 /**
@@ -288,308 +290,321 @@ TropismFunction* RootSystem::createTropismFunction(int tt, double N, double sigm
  * the function must bee extended or overwritten to add more growth function
  */
 GrowthFunction* RootSystem::createGrowthFunction(int gft) {
-    switch (gft) {
-    case gft_negexp: return new ExponentialGrowth();
-    case gft_linear: return new LinearGrowth();
-    default: throw std::invalid_argument( "RootSystem::createGrowthFunction() growth function type not implemented" );
-    }
+	switch (gft) {
+	case gft_negexp: return new ExponentialGrowth();
+	case gft_linear: return new LinearGrowth();
+	default: throw std::invalid_argument( "RootSystem::createGrowthFunction() growth function type not implemented" );
+	}
 }
 
 /**
  * Represents the root system as sequential vector of roots,
- * copies the root only, if it has more than 1 node
+ * copies the root only, if it has more than 1 node.
+ * buffers the result, until next call of simulate(dt)
  *
  * \return sequential vector of roots with more than 1 node
  */
 std::vector<Root*> RootSystem::getRoots() const
 {
-    std::vector<Root*> v = std::vector<Root*>();
-    for (auto const& br:this->baseRoots) {
-        br->getRoots(v);
-    }
-    return v;
+	if (roots.empty()) { // create buffer
+		for (auto const& br:this->baseRoots) {
+			br->getRoots(roots);
+		}
+		return roots;
+	} else { // return buffer
+		return roots;
+	}
 }
 
 /**
- * Returns the positions of the root tips
- *
- * @param roots		a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
+ * Returns the node indices of the root tips
  */
-std::vector<Vector3d> RootSystem::getRootTips(std::vector<Root*> roots) const
+std::vector<int> RootSystem::getRootTips() const
 {
-	if (roots.empty()) {
-		roots = this->getRoots();
-	}
-	std::vector<Vector3d> tips;
+	this->getRoots(); // update roots (if necessary)
+	std::vector<int> tips;
 	for (auto& r : roots) {
-		tips.push_back(r->getNode(r->getNumberOfNodes()-1));
+		tips.push_back(r->getNodeId(r->getNumberOfNodes()-1));
 	}
 	return tips;
 }
 
 /**
  * Returns the positions of the root bases
- *
- * @param roots         a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
  */
-std::vector<Vector3d> RootSystem::getRootBases(std::vector<Root*> roots) const
+std::vector<int> RootSystem::getRootBases() const
 {
-        if (roots.empty()) {
-                roots = this->getRoots();
-        }
-	std::vector<Vector3d> bases;
+	this->getRoots(); // update roots (if necessary)
+	std::vector<int> bases;
 	for (auto& r : roots) {
-	        bases.push_back(r->getNode(0));
+		bases.push_back(r->getNodeId(0));
 	}
 	return bases;
 }
 
 /**
  * Copies the nodes of the root systems into a sequential vector,
- * there are two different node numberings
- *
- * @param ot        ot_segments: each segment is a line, nodes are unique (default)
- *                  ot_polyline: each root is a line, nodes are not unique
- * @param roots     a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
+ * nodes are unique (default). See also RootSystem::getSegments
  */
-std::vector<Vector3d> RootSystem::getNodes(int ot, std::vector<Root*> roots) const
+std::vector<Vector3d> RootSystem::getNodes() const
 {
-	if (roots.empty()) {
-		roots = this->getRoots();
+	this->getRoots(); // update roots (if necessary)
+	int non = getNumberOfNodes();
+	std::vector<Vector3d> nv = std::vector<Vector3d>(non); // reserve big enough vector
+	for (auto const& r: roots) {
+		for (size_t i=0; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
+			nv.at(r->getNodeId(i)) = r->getNode(i); // pray that ids are correct
+		}
 	}
-    switch (ot) {
-    case ot_segments: {
-        int non = getNumberOfNodes();
-        std::vector<Vector3d> nv = std::vector<Vector3d>(non); // reserve big enough vector
-        for (auto const& r: roots) {
-            for (size_t i=0; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
-                nv.at(r->getNodeId(i)) = r->getNode(i); // pray that ids are correct
-            }
-        }
-        return nv;
-    }
-    case ot_polylines: {
-        int non = 0;
-        for (auto const& r : roots) {
-            non += r->getNumberOfNodes();
-        }
-        std::vector<Vector3d> nv = std::vector<Vector3d>(non); // reserve big enough vector
-        int c=0;
-        for (auto const& r: roots) {
-            for (size_t i=0; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
-                nv.at(c) = r->getNode(i);
-                c++;
-            }
-        }
-        return nv;
-    }
-    default: throw std::invalid_argument( "RootSystem::getNodes() output type not implemented" );
-    }
+	return nv;
+}
+
+/**
+ * TODO test and comment
+ */
+std::vector<std::vector<Vector3d>> RootSystem::getPolylines() const
+{
+	this->getRoots(); // update roots (if necessary)
+	std::vector<std::vector<Vector3d>> nodes = std::vector<std::vector<Vector3d>>(roots.size()); // reserve big enough vector
+	for (size_t j=0; j<roots.size(); j++) {
+		std::vector<Vector3d>  rn = std::vector<Vector3d>(roots[j]->getNumberOfNodes());
+		for (size_t i=0; i<roots[j]->getNumberOfNodes(); i++) { // loop over all nodes of all roots
+			rn.at(i) = roots[j]->getNode(i);
+		}
+		nodes[j] = rn;
+	}
+	return nodes;
 }
 
 /**
  * Return the segments of the root system at the current simulation time
- *
- * @param ot        ot_segments: each segment connects two unique nodes
- *                  ot_polyline: not implemented
- * @param roots     a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
  */
-std::vector<Vector2i> RootSystem::getSegments(int ot, std::vector<Root*> roots) const
+std::vector<Vector2i> RootSystem::getSegments() const
 {
-	if (roots.empty()) {
-		roots = this->getRoots();
+	this->getRoots(); // update roots (if necessary)
+	int non=getNumberOfNodes()-1;
+	std::vector<Vector2i> s(non);
+	int c=0;
+	for (auto const& r:roots) {
+		for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
+			Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
+			s.at(c) = v;
+			c++;
+		}
 	}
-    switch (ot) {
-    case ot_segments: {
-        int non=0;
-        for (auto const& r:roots) {
-            non += r->getNumberOfNodes()-1;
-        }
-        std::vector<Vector2i> s(non);
-        int c=0;
-        for (auto const& r:roots) {
-            for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
-                Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
-                s.at(c) = v;
-                c++;
-            }
-        }
-        return s;
-    }
-    default: throw std::invalid_argument( "RootSystem::getSegments() output type not implemented" );
-    }
+	return s;
 }
 
 /**
  * Returns pointers of the roots corresponding to each segment
- * @param ot        ot_segments: each segment connects two unique nodes
- *                  ot_polyline: not implemented
- * @param roots     a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
  */
-std::vector<Root*> RootSystem::getSegmentsOrigin(int ot, std::vector<Root*> roots) const
+std::vector<Root*> RootSystem::getSegmentsOrigin() const
 {
-	if (roots.empty()) {
-		roots = this->getRoots();
+	this->getRoots(); // update roots (if necessary)
+	int non=getNumberOfNodes()-1;
+	std::vector<Root*> s(non);
+	int c=0;
+	for (auto const& r:roots) {
+		for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
+			s.at(c) = r;
+			c++;
+		}
 	}
-    switch (ot) {
-    case ot_segments: {
-        int non=0;
-        for (auto const& r:roots) {
-            non += r->getNumberOfNodes()-1;
-        }
-        std::vector<Root*> s(non);
-        int c=0;
-        for (auto const& r:roots) {
-            for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
-                s.at(c) = r;
-                c++;
-            }
-        }
-        return s;
-    }
-    default: throw std::invalid_argument( "RootSystem::getSegmentsOrigin() output type not implemented" );
-    }
+	return s;
 }
 
 /**
  * Copies the node emergence times of the root systems into a sequential vector,
- * there are two different node numberings
- *
- * Gives either cell data (in case of segments) or point data (in case of polyline)
- *
- * @param ot        out_segments: each segment is a line, nodes are unique
- *                  out_polyline: each root is a line (and cell), nodes are not unique
- * @param roots     a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
+ * see RootSystem::getNodes()
  */
-std::vector<double> RootSystem::getNETimes(int ot, std::vector<Root*> roots) const
+std::vector<double> RootSystem::getNETimes() const
 {
-	if (roots.empty()) {
-		roots = this->getRoots();
+	this->getRoots(); // update roots (if necessary)
+	int non=getNumberOfNodes()-1;
+	std::vector<double> netv = std::vector<double>(non); // reserve big enough vector
+	int c=0;
+	for (auto const& r: roots) {
+		for (size_t i=1; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
+			netv.at(c) = r->getNodeETime(i); // pray that ids are correct
+			c++;
+		}
 	}
-    switch (ot) {
-    case ot_segments: {
-        int non=0;
-        for (auto const& r:roots) {
-            non += r->getNumberOfNodes()-1;
-        }
-        std::vector<double> netv = std::vector<double>(non); // reserve big enough vector
-        int c=0;
-        for (auto const& r: roots) {
-            for (size_t i=1; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
-                netv.at(c) = r->getNodeETime(i); // pray that ids are correct
-                c++;
-            }
-        }
-        return netv;
-    }
-    case ot_polylines: {
-        int non = 0;
-        for (auto const& r : roots) {
-            non += r->getNumberOfNodes();
-        }
-        std::vector<double> netv = std::vector<double>(non); // reserve big enough vector
-        int c=0;
-        for (auto const& r: roots) {
-            for (size_t i=0; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
-                netv.at(c) = r->getNodeETime(i);
-                c++;
-            }
-        }
-        return netv;
-    }
-    default: throw std::invalid_argument( "RootSystem::getNETimes() output type not implemented" );
-    }
+	return netv;
 }
 
 /**
- * Copies a scalar that is constant per root to a sequential vector (data per cell).
- * st_time is the creation time of the root
- *
- * @param ot        out_segments: scalar for each segment
- *                  out_polyline: scalar for each root
- * @param stype     a scalar type: type, radius, order, red, green, blue,... (@see RootSystem::ScalarTypes)
- * @param roots     a vector of roots, if no roots are specified all roots are returned (@see RootSystem::getRoots)
+ * todo test and comment
  */
-std::vector<double> RootSystem::getScalar(int ot, int stype, std::vector<Root*> roots) const
+std::vector<std::vector<double>> RootSystem::getPolylinesNET() const
 {
-    if (roots.empty()) {
-        roots = this->getRoots();
-    }
-    std::vector<double> scalars(roots.size());
-    for (size_t i=0; i<roots.size(); i++) {
-        double value=0;
-        switch(stype) {
-        case st_type:  // type
-            value = roots[i]->param.type;
-            break;
-        case st_radius: // root radius
-            value = roots[i]->param.a;
-            break;
-        case st_order: { // root order (calculate)
-            value = 0;
-            Root* r_ = roots[i];
-            while (r_->parent!=nullptr) {
-                value++;
-                r_=r_->parent;
-            }
-            break;
-        }
-        case RootSystem::st_time:
-            value = roots[i]->getNodeETime(0); // TODO
-            break;
-        case RootSystem::st_length: // TODO
-            value = roots[i]->length;
-            break;
-        case RootSystem::st_surface: // TODO
-            value =  roots[i]->length*2.*M_PI*roots[i]->param.a;
-            break;
-        default:
-            throw std::invalid_argument( "RootSystem::copyRootParam() type not implemented" );
-        }
-        scalars[i]=value;
-    }
-    if (ot==ot_polylines) {
-        return scalars;
-    } else if (ot==ot_segments) {
-        std::vector<double> values(getNumberOfNodes()-baseRoots.size());
-        int c = 0;
-        for (size_t i=0; i<roots.size(); i++) {
-            for (size_t j=1; j<roots[i]->getNumberOfNodes(); j++) { // loop over all nodes of the root
-                values[c] = scalars[i];
-                c++;
-            }
-        }
-        return values;
-    } else {
-        throw std::invalid_argument( "RootSystem::getScalar() type not implemented" );
-    }
+	this->getRoots(); // update roots (if necessary)
+	std::vector<std::vector<double>> times = std::vector<std::vector<double>>(roots.size()); // reserve big enough vector
+	for (size_t j=0; j<roots.size(); j++) {
+		std::vector<double>  rt = std::vector<double>(roots[j]->getNumberOfNodes());
+		for (size_t i=0; i<roots[j]->getNumberOfNodes(); i++) {
+			rt[i] = roots[j]->getNodeETime(i);
+		}
+		times[j] = rt;
+	}
+	return times;
 }
+
+
+/**
+ * Copies a scalar that is constant per root to a sequential vector (one scalar per root).
+ *
+ * @param stype     a scalar type (@see RootSystem::ScalarTypes). st_time is the emergence time of the root
+ */
+std::vector<double> RootSystem::getScalar(int stype) const
+{
+	this->getRoots(); // update roots (if necessary)
+	std::vector<double> scalars(roots.size());
+	for (size_t i=0; i<roots.size(); i++) {
+		double value=0;
+		switch(stype) {
+		case st_type:  // type
+			value = roots[i]->param.type;
+			break;
+		case st_radius: // root radius
+			value = roots[i]->param.a;
+			break;
+		case st_order: { // root order (calculate)
+			value = 0;
+			Root* r_ = roots[i];
+			while (r_->parent!=nullptr) {
+				value++;
+				r_=r_->parent;
+			}
+			break;
+		}
+		case RootSystem::st_time: // emergence time of the root
+			value = roots[i]->getNodeETime(0);
+			break;
+		case RootSystem::st_length:
+			value = roots[i]->length;
+			break;
+		case RootSystem::st_surface:
+			value =  roots[i]->length*2.*M_PI*roots[i]->param.a;
+			break;
+		case RootSystem::st_one:
+			value =  1;
+			break;
+		case RootSystem::st_parenttype: {
+			Root* r_ = roots[i];
+			if (r_->parent!=nullptr) {
+				value = r_->parent->param.type;
+			} else {
+				value = 0;
+			}
+			break;
+		}
+		default:
+			throw std::invalid_argument( "RootSystem::copyRootParam() type not implemented" );
+		}
+		scalars[i]=value;
+	}
+	return scalars;
+}
+
+/**
+ * todo test comment
+ */
+std::vector<int> RootSystem::getNodeUpdateIndices()
+{
+	this->getRoots(); // update roots (if necessary)
+	std::vector<int> ni = std::vector<int> (old_nor);
+	int c =0;
+	for (auto const& r: roots) {
+		if (r->old_non>0){
+			ni.at(r->getNodeId(r->old_non));
+			c++;
+		}
+	}
+	return ni;
+}
+
+/**
+ *
+ */
+std::vector<Vector3d> RootSystem::getUpdatedNodes()
+{
+	this->getRoots(); // update roots (if necessary)
+	int non = getNumberOfNodes();
+	std::vector<Vector3d> un(non-old_non); // reserve big enough vector
+
+	return un;
+}
+
+/**
+ * Returns a vector of newly created nodes since the last call of RootSystem::simulate(dt),
+ * to dynamically add to the old node vector, see also RootSystem::getNodes
+ */
+std::vector<Vector3d> RootSystem::getNewNodes()
+{
+	this->getRoots(); // update roots (if necessary)
+	int non = getNumberOfNodes();
+	std::vector<Vector3d> nv(non-old_non); // reserve big enough vector
+	for (auto const& r: roots) {
+		for (size_t i=r->old_non+1; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
+			nv.at(r->getNodeId(i)-old_non) = r->getNode(i); // pray that ids are correct
+		}
+	}
+	return nv;
+}
+
+/**
+ * Returns a vector of newly created segments since the last call of RootSystem::simulate(dt),
+ * to dynamically add to the old segment index vector, see also RootSystem::getSegments
+ */
+std::vector<Vector2i> RootSystem::getNewSegments()
+{
+	this->getRoots(); // update roots (if necessary)
+	int non=getNumberOfNodes()-1;
+	std::vector<Vector2i> si(non);
+	int c=0;
+	for (auto const& r:roots) {
+		for (size_t i=r->old_non; i<r->getNumberOfNodes()-1; i++) {
+			Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
+			si.at(c) = v;
+			c++;
+		}
+	}
+	return si;
+}
+
+/**
+ * todo
+ */
+std::string RootSystem::toString() const
+{
+	return "todo";
+}
+
 
 /**
  * Exports the simulation results with the type from the extension in name
  * (that must be lower case)
  *
  * @param name      file name e.g. output.vtp
- * @param type 		only relevant for vtp files. Options are RootSystem::ot_polylines (default) or RootSystem::ot_segments
  */
-void RootSystem::write(std::string name, int type) const
+void RootSystem::write(std::string name) const
 {
-    std::ofstream fos;
-    fos.open(name.c_str());
-    std::string ext = name.substr(name.size()-3,name.size()); // pick the right writer
-    if (ext.compare("sml")==0) {
-        std::cout << "writing RSML... "<< name.c_str() <<"\n";
-        writeRSML(fos);
-    } else if (ext.compare("vtp")==0) {
-        std::cout << "writing VTP... "<< name.c_str() <<"\n";
-        writeVTP(fos,type);
-    } else if (ext.compare(".py")==0)  {
-        std::cout << "writing Geometry ... "<< name.c_str() <<"\n";
-        writeGeometry(fos);
-    } else {
-        throw std::invalid_argument("RootSystem::write(): Unkwown file type");
-    }
-    fos.close();
+	std::ofstream fos;
+	fos.open(name.c_str());
+	std::string ext = name.substr(name.size()-3,name.size()); // pick the right writer
+	if (ext.compare("sml")==0) {
+		std::cout << "writing RSML... "<< name.c_str() <<"\n";
+		writeRSML(fos);
+	} else if (ext.compare("vtp")==0) {
+		std::cout << "writing VTP... "<< name.c_str() <<"\n";
+		writeVTP(fos);
+	} else if (ext.compare(".py")==0)  {
+		std::cout << "writing Geometry ... "<< name.c_str() <<"\n";
+		writeGeometry(fos);
+	} else {
+		throw std::invalid_argument("RootSystem::write(): Unkwown file type");
+	}
+	fos.close();
 }
 
 /**
@@ -599,13 +614,13 @@ void RootSystem::write(std::string name, int type) const
  */
 void RootSystem::writeRSML(std::ostream & os) const
 {
-    os << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n"; // i am not using utf-8, but not sure if ISO-8859-1 is correct
-    os << "<rsml>\n";
-    writeRSMLMeta(os);
-    os<< "<scene>\n";
-    writeRSMLPlant(os);
-    os << "</scene>\n";
-    os << "</rsml>\n";
+	os << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n"; // i am not using utf-8, but not sure if ISO-8859-1 is correct
+	os << "<rsml>\n";
+	writeRSMLMeta(os);
+	os<< "<scene>\n";
+	writeRSMLPlant(os);
+	os << "</scene>\n";
+	os << "</rsml>\n";
 }
 
 /**
@@ -615,18 +630,18 @@ void RootSystem::writeRSML(std::ostream & os) const
  */
 void RootSystem::writeRSMLMeta(std::ostream & os) const
 {
-    os << "<metadata>\n";
-    os << "\t<version>" << 1 << "</version>\n";
-    os << "\t<unit>" << "cm" << "</unit>\n";
-    os << "\t<resolution>" << 1 << "</resolution>\n";
-    // fetch time
-    //    os << "<last-modified>";
-    //    auto t = std::time(nullptr);
-    //    auto tm = *std::localtime(&t);
-    //    os << std::put_time(&tm, "%d-%m-%Y"); // %H-%M-%S" would do the job for gcc 5.0
-    //    os << "</last-modified>\n";
-    os << "\t<software>CRootBox</software>\n";
-    os << "</metadata>\n";
+	os << "<metadata>\n";
+	os << "\t<version>" << 1 << "</version>\n";
+	os << "\t<unit>" << "cm" << "</unit>\n";
+	os << "\t<resolution>" << 1 << "</resolution>\n";
+	// fetch time
+	//    os << "<last-modified>";
+	//    auto t = std::time(nullptr);
+	//    auto tm = *std::localtime(&t);
+	//    os << std::put_time(&tm, "%d-%m-%Y"); // %H-%M-%S" would do the job for gcc 5.0
+	//    os << "</last-modified>\n";
+	os << "\t<software>CRootBox</software>\n";
+	os << "</metadata>\n";
 }
 
 /**
@@ -636,110 +651,90 @@ void RootSystem::writeRSMLMeta(std::ostream & os) const
  */
 void RootSystem::writeRSMLPlant(std::ostream & os) const
 {
-    os << "<plant>\n";
-    for (auto const& root :baseRoots) {
-        root->writeRSML(os,"");
-    }
-    os << "</plant>\n";
+	os << "<plant>\n";
+	for (auto const& root :baseRoots) {
+		root->writeRSML(os,"");
+	}
+	os << "</plant>\n";
 }
 
 /**
  * Writes current simulation results as VTP (VTK polydata file),
- * use vtp_segments for creating a movie (and run the animate.py script)
+ * where each root is represented by a polyline.
+ *
+ * Use SegmentAnalyser::writeVTP() for a representation based on segments,
+ * e.g. for creating a movie (and run the animate.py script), or mapping values to segments
  *
  * @param os      typically a file out stream
- * @param type    vtp_segments: each segment is a line, vtp_polyline: each root is a line
  */
-void RootSystem::writeVTP(std::ostream & os, int type) const
+void RootSystem::writeVTP(std::ostream & os) const
 {
-    auto roots = getRoots();
-    auto nodes = getNodes(type,roots);
-    auto times = getNETimes(type,roots);
+	this->getRoots(); // update roots (if necessary)
+	const auto& nodes = getPolylines();
+	const auto& times = getPolylinesNET();
 
-    os << "<?xml version=\"1.0\"?>";
-    os << "<VTKFile type=\"PolyData\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
-    os << "<PolyData>\n";
-    int non=nodes.size(); // number of nodes
-    int nol=0; // number of lines
-    switch (type) {
-    case ot_segments:
-        nol = non-baseRoots.size(); break; // each tree has number of node -1 segments (the base roots are not connected)
-    case ot_polylines:
-        nol = roots.size();  break; // number of lines = number of roots
-    }
-    os << "<Piece NumberOfLines=\""<< nol << "\" NumberOfPoints=\""<<non<<"\">\n";
+	os << "<?xml version=\"1.0\"?>";
+	os << "<VTKFile type=\"PolyData\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
+	os << "<PolyData>\n";
+	int non = 0; // number of nodes
+	for (auto const& r : roots) {
+		non += r->getNumberOfNodes();
+	}
+	int nol=roots.size(); // number of lines
+	os << "<Piece NumberOfLines=\""<< nol << "\" NumberOfPoints=\""<<non<<"\">\n";
 
-    // POINTDATA
-    if (type==ot_polylines) {
-        os << "<PointData Scalars=\" PointData\">\n" << "<DataArray type=\"Float32\" Name=\"time\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-        for (auto t : times) {
-            os << t << " ";
-        }
-        os << "\n</DataArray>\n" << "\n</PointData>\n";
-    }
-    // CELLDATA (live on the segments or polylines)
-    os << "<CellData Scalars=\" CellData\">\n";
-    if (type==ot_segments) { // TIME
-        os << "<DataArray type=\"Float32\" Name=\"time\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-        for (auto t : times) {
-            os << t << " ";
-        }
-        os << "\n</DataArray>\n";
-    }
-    const size_t N = 3; // SCALARS
-    int types[N] = { st_type, st_order, st_radius };
-    for (size_t i=0; i<N; i++) {
-        os << "<DataArray type=\"Float32\" Name=\"" << scalarTypeNames[types[i]] <<"\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-        auto scalars = getScalar(type,types[i],roots);
-        for (auto s : scalars) {
-            os << s<< " ";
-        }
-        os << "\n</DataArray>\n";
-    }
-    os << "\n</CellData>\n";
+	// POINTDATA
+	os << "<PointData Scalars=\" PointData\">\n" << "<DataArray type=\"Float32\" Name=\"time\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
+	for (const auto& r: times) {
+		for (const auto& t : r) {
+			os << t << " ";
+		}
+	}
+	os << "\n</DataArray>\n" << "\n</PointData>\n";
 
-    // POINTS (=nodes)
-    os << "<Points>\n"<<"<DataArray type=\"Float32\" Name=\"Coordinates\" NumberOfComponents=\"3\" format=\"ascii\" >\n";
-    for (auto const& n:nodes) {
-        os << n.x << " "<< n.y <<" "<< n.z<< " ";
-    }
-    os << "\n</DataArray>\n"<< "</Points>\n";
+	// CELLDATA (live on the polylines)
+	os << "<CellData Scalars=\" CellData\">\n";
+	const size_t N = 3; // SCALARS
+	int types[N] = { st_type, st_order, st_radius };
+	for (size_t i=0; i<N; i++) {
+		os << "<DataArray type=\"Float32\" Name=\"" << scalarTypeNames[types[i]] <<"\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
+		auto scalars = getScalar(types[i]);
+		for (auto s : scalars) {
+			os << s<< " ";
+		}
+		os << "\n</DataArray>\n";
+	}
+	os << "\n</CellData>\n";
 
-    // LINES (=segments or polylines)
-    os << "<Lines>\n"<<"<DataArray type=\"Int32\" Name=\"connectivity\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-    switch (type) {
-    case ot_segments:
-        for (auto const& r:roots) {
-            for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
-                os << r->getNodeId(i) << " " << r->getNodeId(i+1) << " ";
-            }
-        }
-        os << "\n</DataArray>\n"<<"<DataArray type=\"Int32\" Name=\"offsets\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-        for (int i=0; i<(nol); i++) {
-            os << 2*i+2 << " ";
-        }
-        break;
-    case ot_polylines:
-        int c=0;
-        for (auto const& r:roots) {
-            for (size_t i=0; i<r->getNumberOfNodes(); i++) {
-                os << c << " ";
-                c++;
-            }
-        }
-        os << "\n</DataArray>\n"<<"<DataArray type=\"Int32\" Name=\"offsets\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-        c = 0;
-        for (auto const& r:roots) {
-            c += r->getNumberOfNodes();
-            os << c << " ";
-        }
-        break;
-    }
-    os << "\n</DataArray>\n";
-    os << "\n</Lines>\n";
+	// POINTS (=nodes)
+	os << "<Points>\n"<<"<DataArray type=\"Float32\" Name=\"Coordinates\" NumberOfComponents=\"3\" format=\"ascii\" >\n";
+	for (auto const& r:nodes) {
+		for (auto const& n : r) {
+			os << n.x << " "<< n.y <<" "<< n.z<< " ";
+		}
+	}
+	os << "\n</DataArray>\n"<< "</Points>\n";
 
-    os << "</Piece>\n";
-    os << "</PolyData>\n" << "</VTKFile>\n";
+	// LINES (polylines)
+	os << "<Lines>\n"<<"<DataArray type=\"Int32\" Name=\"connectivity\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
+	int c=0;
+	for (auto const& r:roots) {
+		for (size_t i=0; i<r->getNumberOfNodes(); i++) {
+			os << c << " ";
+			c++;
+		}
+	}
+	os << "\n</DataArray>\n"<<"<DataArray type=\"Int32\" Name=\"offsets\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
+	c = 0;
+	for (auto const& r:roots) {
+		c += r->getNumberOfNodes();
+		os << c << " ";
+	}
+	os << "\n</DataArray>\n";
+	os << "\n</Lines>\n";
+
+	os << "</Piece>\n";
+	os << "</PolyData>\n" << "</VTKFile>\n";
 }
 
 /**
@@ -750,9 +745,9 @@ void RootSystem::writeVTP(std::ostream & os, int type) const
  */
 void RootSystem::writeGeometry(std::ostream & os) const
 {
-    os << "from paraview.simple import *\n";
-    os << "paraview.simple._DisableFirstRenderCameraReset()\n";
-    os << "renderView1 = GetActiveViewOrCreate('RenderView')\n\n";
-    geometry->writePVPScript(os);
+	os << "from paraview.simple import *\n";
+	os << "paraview.simple._DisableFirstRenderCameraReset()\n";
+	os << "renderView1 = GetActiveViewOrCreate('RenderView')\n\n";
+	geometry->writePVPScript(os);
 }
 

@@ -1,7 +1,14 @@
 #
-# Compares the analytical lengthes with the rootbox approximation
+# Length Benchmark
 #
-
+# Compares the analytically calculated lengths with the rootbox approximation
+# parameters are set within the code L65- (with no standard deviation)
+#
+# Benchmark 1: single root, no laterals 
+# Benchmark 2: single root with laterals 
+# Benchmark 3: basal roots, no laterals 
+# Benchmark 4: basal roots with laterals 
+#
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -54,9 +61,8 @@ def vv2a(vd): # rb.std_vector_Vector3_ to numpy array
         l[i,:] = [vd[i].x,vd[i].y,vd[i].z]
     return l
 
-
 #
-# Root parameter
+# Root type parameter
 #
 p0 = rb.RootTypeParameter()
 p1 = rb.RootTypeParameter()
@@ -71,7 +77,6 @@ p0.ln = 89./19.
 p0.r = 1
 p0.dx = 0.5
 p0.k = maxRootLength(p0.la,p0.lb,p0.ln,p0.nob)
-
 # print(p0)
 
 # 1st order lateral
@@ -82,15 +87,16 @@ p1.ln = 0
 p1.r = 2
 p1.k = 25
 p1.dx = 0.1
-
 # print(p1)
 
 #
-# Plant parameter (neglecting shoot borne)
+# Root system parameter (neglecting shoot borne)
 #
 maxB = 100
-firstB = 10
-delayB = 3
+firstB = 10.
+delayB = 3.
+rsp = rb.RootSystemParameter()
+rsp.set(-3., firstB, delayB, maxB, 0, 1.e9, 1.e9,  1.e9, 0., 0.)
 
 times = np.array([7.,15.,30.,60.])
 dt = np.zeros(len(times)+1) 
@@ -116,7 +122,7 @@ nl = np.zeros(len(times))
 non = np.zeros(len(times))
 for t in dt: 
     rs.simulate(t, True)
-    d = v2a(rs.getScalar())
+    d = v2a(rs.getScalar(rb.ScalarType.length))
     nl[c] = d[0]
     non[c] = rs.getNumberOfNodes()
     c += 1
@@ -130,7 +136,7 @@ for t in dt:
     dt_ = t/1000.
     for i in range(0,1000):
         rs.simulate(dt_, True)
-    d = v2a(rs.getScalar())
+    d = v2a(rs.getScalar(rb.ScalarType.length))
     nl2[c] = d[0]
     non2[c] = rs.getNumberOfNodes()
     c += 1
@@ -143,14 +149,13 @@ print("numerical lenghts 2 \t", nl2, "\n")
 print("mean axial resoltuion = \t", nl/non) # should be less but in the same order as the defined axial resolution
 print("mean axial resoltuion 2 = \t", nl2/non2,"\n") # should be less but in the same order as the defined axial resolution
 
-
-
 #
 # Benchmark 2: single root
 #
 print("* ")
 print("* Benchmark 2: single root")
 print("*")
+
 # Analytical
 i = 0
 et = np.zeros(int(p0.nob))
@@ -173,23 +178,19 @@ rs = rb.RootSystem()
 rs.setRootTypeParameter(p0)
 rs.setRootTypeParameter(p1)
 rs.initialize()
-# rs.simulate(1.5)
-# print(vv2a(rs.getNodes()))
-# print(v2a(rs.getScalar()))
-# quit()
-
 c = 0
 nl = np.zeros(len(times))
 nl0 = np.zeros(len(times))
 non = np.zeros(len(times))
 for t in dt: 
     rs.simulate(t, True)
-    d = v2a(rs.getScalar()) 
+    d = v2a(rs.getScalar(rb.ScalarType.length)) 
     nl[c] = sum(d)
-    nl0[c] = d[0]   
+    nl0[c] = d[0] # first entry is the tap root
     non[c] = rs.getNumberOfNodes() 
     c += 1
 
+# Numerical, same, but with tiny time stepping 
 rs.initialize() # resets everything 
 c = 0
 nl2 = np.zeros(len(times))
@@ -199,9 +200,9 @@ for t in dt:
     dt_ = t/1000.
     for i in range(0,1000):    
         rs.simulate(dt_, True)
-    d = v2a(rs.getScalar())
+    d = v2a(rs.getScalar(rb.ScalarType.length))
     nl2[c] = sum(d)
-    nl02[c] = d[0]   
+    nl02[c] = d[0] # first entry is the tap root    
     non2[c] = rs.getNumberOfNodes() 
     c += 1
 
@@ -217,68 +218,146 @@ print("numerical total length 2 \t", nl2, "\n")
 print("mean axial resoltuion = \t", nl/non) # should be less but in the same order as the defined axial resolution
 print("mean axial resoltuion 2 = \t", nl2/non2,"\n") # should be less but in the same order as the defined axial resolution
 
+#
+# Benchmark 3: basal roots, no laterals
+#
+print("* ")
+print("* Benchmark 3: basal roots, no laterals")
+print("* ")
 
+# Analytical
+etB = np.array(range(maxB))*delayB + np.ones(maxB)*firstB # basal root emergence times
+bl = np.zeros(times.size)
+j = 0 # time counter
+for t in times:
+    i = 0 # basal root counter
+    while t-etB[i]>0:
+        bl[j] += rootLength(t-etB[i],p0.r,p0.k)
+        i += 1
+    j += 1
 
-# 
+# Numerical
+p0.successor = a2i([]) # remove successors
+p0.successorP = a2v([])
+rs = rb.RootSystem()
+rs.setRootSystemParameter(rsp)
+rs.setRootTypeParameter(p0)
+rs.initialize()
+c = 0
+nl = np.zeros(len(times))
+non = np.zeros(len(times))
+nl_tap = np.zeros(len(times))
+nl_basal = np.zeros(len(times))
+for t in dt: 
+    rs.simulate(t,True) 
+    d = v2a(rs.getScalar(rb.ScalarType.length))
+    nl[c] = sum(d)
+    non[c] = rs.getNumberOfNodes()
+    
+    ana = rb.SegmentAnalyser(rs)    
+    ana.filter(rb.ScalarType.type,1.) # 1 is the type number of the tap root
+    nl_tap[c] = ana.getSummed(rb.ScalarType.length)
+    
+    ana = rb.SegmentAnalyser(rs)
+    ana.filter(rb.ScalarType.type,4.) # 4 is the default type number of basal roots 
+    nl_basal[c] = ana.getSummed(rb.ScalarType.length)
+    
+    c += 1
+ 
+print("times \t\t\t\t", times)
+print("analytical tap root lenght \t", l)
+print("numerical tap root lenght \t", nl_tap)
+print("analytical summed basal length \t", bl)
+print("numerical summed basal length \t", nl_basal)
+print("analytical total length \t", l+bl)
+print("numerical total length \t\t", nl_tap+nl_basal, " (SegmentAnalyser) \n \t\t\t\t", nl, " (RootSystem)\n")
+
+print("mean axial resoltuion = \t", nl/non) # should be less but in the same order as the defined axial resolution
+  
+#
+# Benchmark 4: basal roots, with laterals
+#
+print("\n* ")
+print("* Benchmark 4")
+print("* ")
+
+# Analytical 
+# etB as berfore
+# et a before
+bl = np.zeros(times.size)
+j = 0 # time counter
+for t in times:
+    i = 0 # basal root counter
+    while t-etB[i]>0:
+        bl[j] += ( rootLateralLength(t-etB[i],et,p1.r,p1.k) + rootLength(t-etB[i],p0.r,p0.k) )
+        i += 1
+    j += 1
+
+# Numerical
+p0.successor = a2i([2]) # add successors
+p0.successorP = a2v([1])
+rs = rb.RootSystem()
+rs.setRootSystemParameter(rsp)
+rs.setRootTypeParameter(p0)
+rs.setRootTypeParameter(p1)
+rs.initialize()
+c = 0
+nl = np.zeros(len(times))
+non = np.zeros(len(times))
+nl_tap = np.zeros(len(times))
+nl_taplateral = np.zeros(len(times))
+nl_basal = np.zeros(len(times))
+nl_basallateral = np.zeros(len(times))
+for t in dt: 
+    rs.simulate(t,True) 
+    d = v2a(rs.getScalar(rb.ScalarType.length))
+    nl[c] = sum(d)
+    non[c] = rs.getNumberOfNodes()
+    
+    ana = rb.SegmentAnalyser(rs)    
+    ana.filter(rb.ScalarType.type,1.) # 1 is the type number of the tap root
+    nl_tap[c] = ana.getSummed(rb.ScalarType.length)
+    
+    ana = rb.SegmentAnalyser(rs)    
+    ana.filter(rb.ScalarType.parenttype,1.) # 1 is the type number of the tap root
+    nl_taplateral[c] = ana.getSummed(rb.ScalarType.length)    
+    
+    ana = rb.SegmentAnalyser(rs)
+    ana.filter(rb.ScalarType.type,4.) # 4 is the default type number of basal roots 
+    nl_basal[c] = ana.getSummed(rb.ScalarType.length)
+
+    ana = rb.SegmentAnalyser(rs)
+    ana.filter(rb.ScalarType.parenttype,4.) # 4 is the default type number of basal roots 
+    nl_basallateral[c] = ana.getSummed(rb.ScalarType.length)
+        
+    c += 1
+  
+print("times \t\t\t\t", times)
+print("analytical tap root lenght \t", l+l1, " (...all including their laterals) ")
+print("numerical tap root lenght \t", nl_tap+nl_taplateral)
+print("analytical summed basal length\t", bl)
+print("numerical summed basal length \t", nl_basal+nl_basallateral)
+print("analytical total length \t", l+l1+bl)
+print("numerical total length  \t", nl, "\n")
+  
+print("mean axial resoltuion = \t", nl/non) # should be less but in the same order as the defined axial resolution
+ 
+ 
 # #
-# # Benchmark 3: plant, no laterals
-# #
-# print("Benchmark 3")
-# etB = np.array(range(maxB))*delayB + np.ones(maxB)*firstB # basal root emergence times
-# 
-# bl = np.zeros(times.size)
-# j = 0 # time counter
-# for t in times:
-#     i = 0 # basal root counter
-#     while t-etB[i]>0:
-#         bl[j] += rootLength(t-etB[i],r,k)
-#         i += 1
-#     j += 1
-# 
-# print("times               ", times)
-# print("tap root lenght     ", l)
-# print("summed basal length ", bl)
-# print("total length        ", l+bl, "\n")
-# 
-# #
-# # Benchmark 4: plant, with laterals
-# #
-# print("Benchmark 4")
-# # etB as berfore
-# # et a before
-# 
-# bl = np.zeros(times.size)
-# j = 0 # time counter
-# for t in times:
-#     i = 0 # basal root counter
-#     while t-etB[i]>0:
-#         bl[j] += ( rootLateralLength(t-etB[i],et,r1,k1) + rootLength(t-etB[i],r,k) )
-#         i += 1
-#     j += 1
-# 
-# print("times               ", times)
-# print("tap root lenght     ", l+l1)
-# print("summed basal length ", bl)
-# print("total length        ", l+l1+bl, "\n")
-# 
-# #
-# # Matlab like plotting
+# # Matlab like plotting of analytical sotlution of a single root with laterals
 # #
 # t_ = np.linspace(0,100,100)
-# l_ = rootLength(t_,r,k)
-# 
+# l_ = rootLength(t_,p0.r,p0.k)
 # l1_ = np.zeros(t_.size)
 # i = 0
 # for t in t_:
-#     l1_[i] = rootLateralLength(t, et, r1, k1)
+#     l1_[i] = rootLateralLength(t, et, p1.r, p1.k)
 #     i += 1
-# 
 # plt.plot(t_,l_)
 # plt.plot(t_,l1_,'g')
 # plt.plot(times,l,'ro')
 # h0 = mpatches.Patch(color='blue', label='zero order')
-# h1 = mpatches.Patch(color='green', label='first order')
-# 
+# h1 = mpatches.Patch(color='green', label='first order') 
 # plt.xlabel("Age (days)")
 # plt.ylabel("Length (cm)")
 # plt.legend([h0, h1],['zero order','first order'])

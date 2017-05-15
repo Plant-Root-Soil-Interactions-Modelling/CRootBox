@@ -69,4 +69,7 @@ protected:
 
 };
 
+inline bool operator==(const SegmentAnalyser& lhs, const SegmentAnalyser& rhs){ return (&lhs==&rhs); } // only address wise, needed for boost python indexing suite
+inline bool operator!=(const SegmentAnalyser& lhs, const SegmentAnalyser& rhs){ return !(lhs == rhs); }
+
 #endif

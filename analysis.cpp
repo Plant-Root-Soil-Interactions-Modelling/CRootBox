@@ -9,11 +9,10 @@
  */
 SegmentAnalyser::SegmentAnalyser(const RootSystem& rs)
 {
-	auto roots = rs.getRoots();
-	nodes = rs.getNodes(RootSystem::ot_segments,roots);
-	segments = rs.getSegments(RootSystem::ot_segments,roots);
-	ctimes = rs.getNETimes(RootSystem::ot_segments,roots);
-	segO = rs.getSegmentsOrigin(RootSystem::ot_segments,roots);
+	nodes = rs.getNodes();
+	segments = rs.getSegments();
+	ctimes = rs.getNETimes();
+	segO = rs.getSegmentsOrigin();
 	assert(segments.size()==ctimes.size());
 	assert(segments.size()==segO.size());
 }
@@ -53,8 +52,6 @@ void SegmentAnalyser::addSegments(const SegmentAnalyser& a)
  */
 std::vector<double> SegmentAnalyser::getScalar(int st) const
 {
-	// TODO since segments have know their origin root: segO, pure root segment mapping could be done by using RootSystem::getScalar
-
 	std::vector<double> data(segO.size());
 
 	if (st==RootSystem::st_time) {
@@ -101,13 +98,17 @@ std::vector<double> SegmentAnalyser::getScalar(int st) const
 		}
 		break;
 		case RootSystem::st_one: { // e.g. for counting segments
-			v=1;
+			v = 1;
 		}
 		break;
-		case RootSystem::st_length_times_ud1: { // e.g. raidal flux per length times length
-			v = getSegmentLength(i)*userData.at(0).at(i);
-		}
-		break;
+        case RootSystem::st_parenttype: {
+        	if (r->parent!=nullptr) {
+        		v = r->parent->param.type;
+        	} else {
+        		v = 0;
+        	}
+        	break;
+        }
 		default:
 			throw std::invalid_argument( "AnalysisSDF::getData() type not implemented" );
 		}
@@ -182,7 +183,7 @@ void SegmentAnalyser::crop(SignedDistanceFunction* geometry)
 	segments = seg;
 	segO  = sO;
 	ctimes = ntimes;
-	std::cout << " cropped to " << segments.size() << " segments " << "\n";
+	//std::cout << " cropped to " << segments.size() << " segments " << "\n";
 }
 
 /**
@@ -406,7 +407,7 @@ std::vector<double> SegmentAnalyser::distribution(int st, double top, double bot
 	double dz = (bot-top)/double(n);
 	SDF_PlantBox* layer = new SDF_PlantBox(1e100,1e100,dz);
 	for (int i=0; i<n; i++) {
-		Vector3d t(0,0,-dz/2.-i*dz);
+		Vector3d t(0,0,-(i+0.5)*dz);
 		SDF_RotateTranslate g(layer,t);
 		if (exact) {
 			SegmentAnalyser a(*this); // copy everything
@@ -508,13 +509,12 @@ std::vector<std::vector<SegmentAnalyser>> SegmentAnalyser::distribution2(double 
 	// std::cout << "dx " << dx  <<", dz "<< dz << "\n";
 	for (int i=0; i<n; i++) {
 		for (int j=0; j<m; j++) {
-			Vector3d t(left+dx/2.+j*dx,0.,top-i*dz);
+			Vector3d t(left+(j+0.5)*dx,0.,top-(i+0.5)*dz);
 			//std::cout << i<< "," << j << ", " <<t.getString() << "; ";
 			SDF_RotateTranslate g(layer,t);
 			SegmentAnalyser a(*this); // copy everything
 			a.crop(&g); // crop exactly
 			d.at(i).push_back(a);
-
 		}
 	}
 	delete layer;
