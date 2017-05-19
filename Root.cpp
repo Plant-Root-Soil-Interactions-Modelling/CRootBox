@@ -65,7 +65,7 @@ Root::~Root()
  */
 void Root::simulate(double dt, bool silence)
 {
-	old_non = 0; // is set in Root:createSegments, (the zero indicates the first call of createSegments)
+	old_non = 0; // is set in Root:createSegments, (the zero indicates the first call to createSegments)
 
 	const RootParameter &p = param; // rename
 
@@ -78,7 +78,7 @@ void Root::simulate(double dt, bool silence)
 
 	if (alive) { // dead roots wont grow
 
-		// probabilistic branching model
+		// probabilistic branching model (todo test)
 		if ((age>0) && (age-dt<=0)) { // the root emerges in this time step
 			double P = rootsystem->getRootTypeParameter(param.type)->sbp->getValue(nodes.back(),this);
 			if (P<1.) { // P==1 means the lateral emerges with probability 1 (default case)
@@ -303,7 +303,7 @@ void Root::createSegments(double l, bool silence)
 	}
 
 	if (l<smallDx) {
-		if (! silence) {
+		if (!silence) {
 			std::cout << "skipped small segment (<"<< smallDx << ") \n";
 		}
 		return;
@@ -327,7 +327,9 @@ void Root::createSegments(double l, bool silence)
 		} else { // last segment
 			sdx = l-n*dx();
 			if (sdx<smallDx) {
-				std::cout << "skipped small segment (<"<< smallDx << ") \n";
+				if (!silence) {
+					std::cout << "skipped small segment (<"<< smallDx << ") \n";
+				}
 				return;
 			}
 		}
@@ -338,7 +340,6 @@ void Root::createSegments(double l, bool silence)
 		ons.times(Matrix3d::rotX(ab.y));
 		ons.times(Matrix3d::rotZ(ab.x));
 		Vector3d newdx = Vector3d(ons.column(0).times(sdx));
-
 		Vector3d newnode = Vector3d(nodes.back().plus(newdx));
 		double et = this->getCreationTime(length+sl);
 		et = std::max(et,rootsystem->getSimTime()); // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution

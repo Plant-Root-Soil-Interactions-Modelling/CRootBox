@@ -67,7 +67,8 @@ public:
 	///< Creates the growth function per root type, overwrite or change this method to add more tropisms
 
 	// Analysis of simulation results
-	int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system (the number of segments is number of nodes - 1)
+	int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system
+	int getNumberOfSegments() const { return nid+1-baseRoots.size(); } ///< Number of segments of the root system (the number of nodes-1 for tap root systems)
 	std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots and buffers the result
 	std::vector<Root*> getBaseRoots() const { return baseRoots; } ///< Base roots are tap root, basal roots, and shoot borne roots
     std::vector<Vector3d> getNodes() const; ///< Copies all root system nodes into a vector

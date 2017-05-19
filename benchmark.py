@@ -249,7 +249,7 @@ non = np.zeros(len(times))
 nl_tap = np.zeros(len(times))
 nl_basal = np.zeros(len(times))
 for t in dt: 
-    rs.simulate(t,True) 
+    rs.simulate(t) 
     d = v2a(rs.getScalar(rb.ScalarType.length))
     nl[c] = sum(d)
     non[c] = rs.getNumberOfNodes()

@@ -382,8 +382,8 @@ std::vector<std::vector<Vector3d>> RootSystem::getPolylines() const
 std::vector<Vector2i> RootSystem::getSegments() const
 {
 	this->getRoots(); // update roots (if necessary)
-	int non=getNumberOfNodes()-1;
-	std::vector<Vector2i> s(non);
+	int nos=getNumberOfSegments();
+	std::vector<Vector2i> s(nos);
 	int c=0;
 	for (auto const& r:roots) {
 		for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
@@ -401,8 +401,9 @@ std::vector<Vector2i> RootSystem::getSegments() const
 std::vector<Root*> RootSystem::getSegmentsOrigin() const
 {
 	this->getRoots(); // update roots (if necessary)
-	int non=getNumberOfNodes()-1;
-	std::vector<Root*> s(non);
+	int nos=getNumberOfSegments();
+	std::cout << "Number of segments: " << nos << "\n";
+	std::vector<Root*> s(nos);
 	int c=0;
 	for (auto const& r:roots) {
 		for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
@@ -420,8 +421,8 @@ std::vector<Root*> RootSystem::getSegmentsOrigin() const
 std::vector<double> RootSystem::getNETimes() const
 {
 	this->getRoots(); // update roots (if necessary)
-	int non=getNumberOfNodes()-1;
-	std::vector<double> netv = std::vector<double>(non); // reserve big enough vector
+	int nos=getNumberOfSegments();
+	std::vector<double> netv = std::vector<double>(nos); // reserve big enough vector
 	int c=0;
 	for (auto const& r: roots) {
 		for (size_t i=1; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots

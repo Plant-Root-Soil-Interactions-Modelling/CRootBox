@@ -15,7 +15,7 @@ void example4()
 {
     RootSystem rootsystem;
 
-    string name = "maize";
+    string name = "Zea_mays_5_Leitner_2014";
 
     /*
      * Plant and root parameter from a file

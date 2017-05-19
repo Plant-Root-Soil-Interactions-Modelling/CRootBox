@@ -11,7 +11,7 @@ void example3()
   auto gen = default_random_engine(chrono::system_clock::now().time_since_epoch().count());
   auto UD = uniform_real_distribution<double>(0,1); // random stuff
 
-  string name = "Maize_Pheno1_Leitner_et_al_2014";
+  string name = "Zea_mays_5_Leitner_2014";
 
   /*
    * Creates N*N root systems

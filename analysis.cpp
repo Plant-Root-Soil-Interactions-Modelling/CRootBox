@@ -213,7 +213,7 @@ void SegmentAnalyser::filter(int st, double min, double max)
 }
 
 /**
- * Filters the segments to the ones, where data eqals value, @see AnalysisSDF::getData,
+ * Filters the segments to the ones, where data equals value, @see AnalysisSDF::getData,
  * i.e. all other segments are deleted.
  *
  * @param st        parameter type @see RootSystem::ScalarType
