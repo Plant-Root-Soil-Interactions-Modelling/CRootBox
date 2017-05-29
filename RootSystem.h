@@ -19,8 +19,9 @@ class TropismFunction;
 /**
  * RootSystem
  *
- * This class manages all model parameter, the simulation, stores the base roots, and offers utility functions
- *
+ * This class manages all model parameter and the simulation,
+ * stores the base roots of the root system,
+ * and offers utility functions for post processing
  */
 class RootSystem
 {
@@ -31,9 +32,7 @@ public:
 
 	enum TropismTypes { tt_plagio=0, tt_gravi=1, tt_exo=2, tt_hydro=3 };  ///< root tropism
 	enum GrowthFunctionTypes { gft_negexp=1, gft_linear=2 }; // root growth function
-	enum OutputTypes { ot_segments=0, ot_polylines=1 }; ///< used for postprocessing
-	enum ScalarTypes { st_type=0, st_radius=1, st_order=2,  st_time=3, st_length=4, st_surface=5, st_one=6, st_userdata1=7, st_userdata2=8, st_userdata3=9,
-		st_length_times_ud1=10 }; ///< @see RootSystem::getScalar
+	enum ScalarTypes { st_type=0, st_radius=1, st_order=2, st_time=3, st_length=4, st_surface=5, st_one=6, st_userdata1=7, st_userdata2=8, st_userdata3=9, st_parenttype = 10}; ///< @see RootSystem::getScalar
 	static const std::vector<std::string> scalarTypeNames; ///< the corresponding names
 
 	RootSystem() { initRTP(); };
@@ -59,13 +58,7 @@ public:
 	void simulate(); ///< simulates root system growth for the time defined in the root system parameters
 	double getSimTime() const { return simtime; } ///< returns the current simulation time
 
-	// TODO
-	// dynamic information what happened last time step
-	// getNodeUpdates
-	// getNewNodes
-	// getNewSegments
-
-	// call back functions
+	// call back functions (todo simplify)
 	virtual Root* createRoot(int lt, Vector3d  h, double delay, Root* parent, double pbl, int pni);
 	///< Creates a new lateral root, overwrite or change this method to use more specialized root classes
 	virtual TropismFunction* createTropismFunction(int tt, double N, double sigma);
@@ -75,23 +68,34 @@ public:
 
 	// Analysis of simulation results
 	int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system
-	std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots
-	std::vector<Root*> getBaseRoots() { return baseRoots; } ///< Base roots are tap root, basal roots, and shoot borne roots
-	std::vector<Vector3d> getRootTips(std::vector<Root*> roots=std::vector<Root*>()) const; ///< Positions of the root tips TODO node or segment indices make more sense
-    std::vector<Vector3d> getRootBases(std::vector<Root*> roots=std::vector<Root*>()) const; ///< Positions of the root bases TODO node or segment  indices make more sense
-    std::vector<Vector3d> getNodes(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all root system nodes into a vector
-	std::vector<Vector2i> getSegments(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all segments indices into a vector
-	std::vector<Root*> getSegmentsOrigin(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a pointer to the root containing the segment
-	std::vector<double> getNETimes(int ot=RootSystem::ot_segments, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies all node emergence times into a vector
-	std::vector<double> getScalar(int ot=RootSystem::ot_polylines, int stype=RootSystem::st_length, std::vector<Root*> roots=std::vector<Root*>()) const; ///< Copies a scalar root parameter that is constant per root to a vector
+	int getNumberOfSegments() const { return nid+1-baseRoots.size(); } ///< Number of segments of the root system (the number of nodes-1 for tap root systems)
+	std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots and buffers the result
+	std::vector<Root*> getBaseRoots() const { return baseRoots; } ///< Base roots are tap root, basal roots, and shoot borne roots
+    std::vector<Vector3d> getNodes() const; ///< Copies all root system nodes into a vector
+    std::vector<std::vector<Vector3d>> getPolylines() const; ///< Copies the nodes of each root into a vector return all resulting vectors
+    std::vector<Vector2i> getSegments() const; ///< Copies all segments indices into a vector
+	std::vector<Root*> getSegmentsOrigin() const; ///< Copies a pointer to the root containing the segment
+	std::vector<double> getNETimes() const; ///< Copies all node emergence times into a vector
+	std::vector<std::vector<double>> getPolylinesNET() const; ///< Copies the node emergence times of each root into a vector and returns all resulting vectors
+	std::vector<double> getScalar(int stype=RootSystem::st_length) const; ///< Copies a scalar root parameter that is constant per root to a vector
+	std::vector<int> getRootTips() const; ///< Node indices of the root tips
+    std::vector<int> getRootBases() const; ///< Node indices of the root bases
+
+	// Dynamic information what happened last time step
+	int getNumberOfNewNodes() { return getNumberOfNodes()-old_non; } ///< returns the number of new nodes, which is exactly the same number as new segments
+	int getNumberOfNewRoots() { return getRoots().size() -old_nor; }  ///< returns the number of new roots
+	std::vector<int> getNodeUpdateIndices(); // todo test and comment
+	std::vector<Vector3d> getUpdatedNodes(); // to replace to the old node vector
+	std::vector<Vector3d> getNewNodes(); // to dynamically add to the old node vector
+	std::vector<Vector2i> getNewSegments(); // to dynamically add to the list of segments
 
 	// Output Simulation results
-	void write(std::string name, int type = ot_polylines) const; /// writes simulation results (type is determined from file extension in name)
-	void writeRSML(std::ostream & os) const; ///< Writes current simulation results as RSML
-	void writeVTP(std::ostream & os, int type = ot_polylines) const; ///< Writes current simulation results as VTP (VTK polydata file)
-	void writeGeometry(std::ostream & os) const; ///< Writes the current confining geometry (e.g. a plant container) as paraview python script
+	void write(std::string name) const; /// writes simulation results (type is determined from file extension in name)
+	void writeRSML(std::ostream & os) const; ///< writes current simulation results as RSML
+	void writeVTP(std::ostream & os) const; ///< writes current simulation results as VTP (VTK polydata file)
+	void writeGeometry(std::ostream & os) const; ///< writes the current confining geometry (e.g. a plant container) as paraview python script
 
-	// void std::toString() const; TODO
+	std::string toString() const; ///< infos about current root system state (for debugging)
 
 	// random stuff
 	void setSeed(double seed); ///< help fate (sets the seed of all random generators)
@@ -113,6 +117,10 @@ private:
 	double simtime = 0;
 	int rid = -1; // unique root id counter
 	int nid = -1; // unique root id counter
+
+	int old_non=0;
+	int old_nor=0;
+	mutable std::vector<Root*> roots = std::vector<Root*>(); // buffer for getRoots()
 
 	const int maxtypes = 100;
 	void initRTP(); // default values for rtparam vector

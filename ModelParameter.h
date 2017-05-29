@@ -123,7 +123,7 @@ public:
 	std::string toString() const { std::stringstream ss; write(ss); return ss.str(); } ///< String representation using RootParameter::write
 
 	/* Rootbox parameters per root */
-	int type; 			///< Inde of root type [1]
+	int type; 			///< Index of root type [1]
 	double lb; 			///< Basal zone [cm]
 	double la;			///< Apical zone [cm];
 	int nob; 			///< Number of branches [1]

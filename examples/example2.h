@@ -17,7 +17,7 @@ void example2()
 {
     RootSystem rootsystem;
 
-    string name = "Maize_Pheno1_Leitner_et_al_2014";
+    string name = "Zea_mays_5_Leitner_2014";
 
     /*
      * Plant and root parameter from a file
@@ -66,7 +66,7 @@ void example2()
     /*
      * Export results (as vtp)
      */
-    rootsystem.write(name+".vtp",RootSystem::ot_polylines);
+    rootsystem.write(name+".vtp");
 
     /*
      * Export container geometry as Paraview Python script (run file in Paraview by Tools->Python Shell, Run Script)

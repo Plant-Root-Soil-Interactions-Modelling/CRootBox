@@ -59,9 +59,19 @@ double integrand(double t,void* param) {
  */
 std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationParameters& params, int X, int Y, int Z, double width, double depth) {
 
-    std::vector<Root*> roots = rootsystem.getRoots();
-    auto tips = rootsystem.getRootTips(roots); // nodes
-    auto bases = rootsystem.getRootBases(roots);
+	const auto& roots = rootsystem.getRoots();
+	const auto& nodes = rootsystem.getNodes();
+
+    auto tipsI = rootsystem.getRootTips(); // nodes
+    std::vector<Vector3d> tips;
+    for (auto i : tipsI) {
+    	tips.push_back(nodes[i]);
+    }
+    auto basesI = rootsystem.getRootBases();
+    std::vector<Vector3d> bases;
+    for (auto i : basesI) {
+    	bases.push_back(nodes[i]);
+    }
 
     double simtime = rootsystem.getSimTime();
 
@@ -164,7 +174,7 @@ void example_exudation()
     /*
      * Export final result (as vtp)
      */
-    rootsystem.write(name+".vtp",RootSystem::ot_segments); // use ot_polylines for nicer visualization, ot_segments for animations
+    rootsystem.write(name+".vtp");
 
     /*
      * Exudation

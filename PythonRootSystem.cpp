@@ -32,23 +32,6 @@
 
 using namespace boost::python;
 
-
-
-// tricky booom boom
-struct SoilPropertyCallback : SoilProperty, wrapper<SoilProperty> {
-
-    double getValue(const Vector3d& pos, const Root* root = nullptr) const {
-    	return this->get_override("getValue")(pos, root);
-    }
-
-    std::string toString() const {
-    	return this->get_override("toString")();
-    }
-
-};
-
-
-
 /*
  * Functions overloading (by hand, there are also macros available)
  *
@@ -65,15 +48,24 @@ double (Vector3d::*times2)(const Vector3d&) const = &Vector3d::times;
 void (Matrix3d::*times3)(const Matrix3d&) = &Matrix3d::times;
 Vector3d (Matrix3d::*times4)(const Vector3d&) const = &Matrix3d::times;
 
-std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceFunction::writePVPScript;
+std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceFunction::writePVPScript; // because of default value
 
 void (RootSystem::*simulate1)(double dt, bool silence) = &RootSystem::simulate;
 void (RootSystem::*simulate2)() = &RootSystem::simulate;
 
+void (SegmentAnalyser::*addSegments1)(const RootSystem& rs) = &SegmentAnalyser::addSegments;
+void (SegmentAnalyser::*addSegments2)(const SegmentAnalyser& a) = &SegmentAnalyser::addSegments;
+void (SegmentAnalyser::*filter1)(int st, double min, double max) = &SegmentAnalyser::filter;
+void (SegmentAnalyser::*filter2)(int st, double value) = &SegmentAnalyser::filter;
 double (SegmentAnalyser::*getSummed1)(int st) const = &SegmentAnalyser::getSummed;
 double (SegmentAnalyser::*getSummed2)(int st, SignedDistanceFunction* geometry) const = &SegmentAnalyser::getSummed;
+std::vector<double> (SegmentAnalyser::*distribution_1)(int st, double top, double bot, int n, bool exact) const = &SegmentAnalyser::distribution;
+std::vector<SegmentAnalyser> (SegmentAnalyser::*distribution_2)(double top, double bot, int n) const = &SegmentAnalyser::distribution;
+std::vector<std::vector<double>> (SegmentAnalyser::*distribution2_1)(int st, double top, double bot, double left, double right, int n, int m, bool exact) const = &SegmentAnalyser::distribution2;
+std::vector<std::vector<SegmentAnalyser>> (SegmentAnalyser::*distribution2_2)(double top, double bot, double left, double right, int n, int m) const = &SegmentAnalyser::distribution2;
+SegmentAnalyser (SegmentAnalyser::*cut1)(const SDF_HalfPlane& plane) const = &SegmentAnalyser::cut;
+// static Vector3d (SegmentAnalyser::*cut2)(Vector3d in, Vector3d out, SignedDistanceFunction* geometry) = &SegmentAnalyser::cut; // not working, dont know why, problem with static?
 
-std::vector<double> (SegmentAnalyser::*distribution1)(int st, double top, double bot, int n, bool exact) const = &SegmentAnalyser::distribution;
 
 /**
  * Default arguments: no idea how to do it by hand,  magic everywhere...
@@ -81,14 +73,6 @@ std::vector<double> (SegmentAnalyser::*distribution1)(int st, double top, double
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(initialize_overloads,initialize,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openFile_overloads,openFile,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate1_overloads,simulate,1,2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getRootTips_overloads,getRootTips,0,1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getRootBases_overloads,getRootBases,0,1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNodes_overloads,getNodes,0,2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegments_overloads,getSegments,0,2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentsOrigin_overloads,getSegmentsOrigin,0,2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNETimes_overloads,getNETimes,0,2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getScalar_overloads,getScalar,0,3);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(write_overloads,write,1,2); // for RootSystem
 
 /**
  * Virtual functions (not sure if needed, or only if we derive classes from it in python?), not working...
@@ -120,7 +104,18 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(write_overloads,write,1,2); // for RootSy
 //	class_<SignedDistanceFunction_Wrap, boost::noncopyable>("SignedDistanceFunction")
 //	    .def("getDist", &SignedDistanceFunction_Wrap::getDist, &SignedDistanceFunction_Wrap::default_getDist)
 //	; // TODO how does polymorphism work... (everything works fine, dont ask why)
+// tricky booom boom (?)
+struct SoilPropertyCallback : SoilProperty, wrapper<SoilProperty> {
 
+    double getValue(const Vector3d& pos, const Root* root = nullptr) const {
+    	return this->get_override("getValue")(pos, root);
+    }
+
+    std::string toString() const {
+    	return this->get_override("toString")();
+    }
+
+};
 
 
 /**
@@ -263,7 +258,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("__str__",&SoilPropertySDF::toString)
 	;
 	/*
-	 * ModelParameter
+	 * ModelParameter.h
 	 */
 	class_<RootTypeParameter>("RootTypeParameter", init<>())
 			.def(init<RootTypeParameter&>())
@@ -332,7 +327,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("__str__",&RootSystemParameter::toString)
 	;
 	/**
-	 * Root.h (only pointers, no members) TODO think carefully what to expose
+	 * Root.h (only pointers, no members)
 	 */
     class_<Root>("Root", init<RootSystem*, int, Vector3d, double, Root*, double, int>())
 		.def("__str__",&Root::toString)
@@ -355,18 +350,19 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("initialize", &RootSystem::initialize, initialize_overloads())
 		.def("simulate",simulate1, simulate1_overloads())
 		.def("simulate",simulate2)
+		.def("getSimTime", &RootSystem::getSimTime)
 		.def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
+		.def("getRoots", &RootSystem::getRoots)
+		.def("getBaseRoots", &RootSystem::getBaseRoots)
+		.def("getNodes", &RootSystem::getNodes)
+		.def("getPolylines", &RootSystem::getPolylines)
+		.def("getSegments", &RootSystem::getSegments)
+		.def("getSegmentsOrigin", &RootSystem::getSegmentsOrigin)
+		.def("getNETimes", &RootSystem::getNETimes)
+		.def("getScalar", &RootSystem::getScalar)
 		.def("getRootTips", &RootSystem::getRootTips)
 		.def("getRootBases", &RootSystem::getRootBases)
-		.def("getRoots", &RootSystem::getRoots)
-		.def("getRootTips", &RootSystem::getRootTips, getRootTips_overloads())
-		.def("getRootBases", &RootSystem::getRootBases, getRootBases_overloads())
-		.def("getNodes", &RootSystem::getNodes, getNodes_overloads())
-		.def("getSegments", &RootSystem::getSegments, getSegments_overloads())
-		.def("getSegmentsOrigin", &RootSystem::getSegmentsOrigin, getSegmentsOrigin_overloads())
-		.def("getNETimes", &RootSystem::getNETimes, getNETimes_overloads())
-		.def("getScalar", &RootSystem::getScalar, getScalar_overloads())
-		.def("write", &RootSystem::write,  write_overloads())
+		.def("write", &RootSystem::write)
 		.def("setSeed",&RootSystem::setSeed)
 	;
     enum_<RootSystem::TropismTypes>("TropismType")
@@ -379,10 +375,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
     	.value("negexp", RootSystem::GrowthFunctionTypes::gft_negexp)
 		.value("linear", RootSystem::GrowthFunctionTypes::gft_linear)
     ;
-    enum_<RootSystem::OutputTypes>("OutputType")
-    	.value("segments", RootSystem::OutputTypes::ot_segments)
-    	.value("polylines", RootSystem::OutputTypes::ot_polylines)
-    	;
 	enum_<RootSystem::ScalarTypes>("ScalarType")
 	    .value("type", RootSystem::ScalarTypes::st_type)
 	    .value("radius", RootSystem::ScalarTypes::st_radius)
@@ -390,22 +382,42 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	    .value("time", RootSystem::ScalarTypes::st_time)
 	    .value("length", RootSystem::ScalarTypes::st_length)
 	    .value("surface", RootSystem::ScalarTypes::st_surface)
+		.value("one", RootSystem::ScalarTypes::st_one)
+		.value("userdata1", RootSystem::ScalarTypes::st_userdata1)
+		.value("userdata2", RootSystem::ScalarTypes::st_userdata2)
+		.value("userdata3", RootSystem::ScalarTypes::st_userdata3)
+		.value("parenttype", RootSystem::ScalarTypes::st_parenttype)
 	;
     /*
      * analysis.h
      */
-    class_<SegmentAnalyser>("SegmentAnalyser",init<RootSystem&>()) //
-    	.def(init<SegmentAnalyser&>())
+    class_<SegmentAnalyser>("SegmentAnalyser")
+    .def(init<RootSystem&>())
+    .def(init<SegmentAnalyser&>())
+	.def("addSegments",addSegments1)
+	.def("addSegments",addSegments2)
+	.def("crop", &SegmentAnalyser::crop)
+	.def("filter", filter1)
+	.def("filter", filter2)
 	.def("pack", &SegmentAnalyser::pack)
 	.def("getScalar", &SegmentAnalyser::getScalar)
+	.def("getSegmentLength", &SegmentAnalyser::getSegmentLength)
 	.def("getSummed", getSummed1)
 	.def("getSummed", getSummed2)
+	.def("distribution", distribution_1)
+	.def("distribution", distribution_2)
+	.def("distribution2", distribution2_1)
+	.def("distribution2", distribution2_2)
     .def("getNumberOfRoots", &SegmentAnalyser::getNumberOfRoots)
-	.def("distribution", distribution1)
+	.def("cut", cut1)
 	.def("addUserData", &SegmentAnalyser::addUserData)
 	.def("clearUserData", &SegmentAnalyser::clearUserData)
 	.def("write", &SegmentAnalyser::write)
+	// .def("cut", cut2) // not working, see top definition of cut2
     ;
+    class_<std::vector<SegmentAnalyser>>("std_vector_SegmentAnalyser_")
+        .def(vector_indexing_suite<std::vector<SegmentAnalyser>>() )
+	;
     /*
      * example_exudation.h (rather specific for Cheng)
      */

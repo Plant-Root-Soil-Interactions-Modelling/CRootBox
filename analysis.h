@@ -45,7 +45,7 @@ public:
 
     // User data for export or distributions
     void addUserData(std::vector<double> data, std::string name) { assert(data.size()==segments.size()); userData.push_back(data); userDataNames.push_back(name);}
-    ///< adds user data that are written inot the VTP file, @see SegmentAnalyser::writeVTP
+    ///< adds user data that are written int the VTP file, @see SegmentAnalyser::writeVTP
     void clearUserData() { userData.clear(); userDataNames.clear(); } ///< resets the user data
 
     // some exports
@@ -68,5 +68,8 @@ protected:
     std::vector<std::string> userDataNames; ///< names of the data added, e.g. "Flux", "Pressure", etc.
 
 };
+
+inline bool operator==(const SegmentAnalyser& lhs, const SegmentAnalyser& rhs){ return (&lhs==&rhs); } // only address wise, needed for boost python indexing suite
+inline bool operator!=(const SegmentAnalyser& lhs, const SegmentAnalyser& rhs){ return !(lhs == rhs); }
 
 #endif

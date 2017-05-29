@@ -47,7 +47,7 @@ void example1_wb_dgf()
     /*
      * Export final result (as vtp)
      */
-    rootsystem.write(name+".vtp",RootSystem::ot_segments); // use ot_polylines for nicer visualization, ot_segments for animations
+    rootsystem.write(name+".vtp");
 
     /*
      * Export segments in RSML format

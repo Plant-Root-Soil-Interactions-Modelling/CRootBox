@@ -36,14 +36,14 @@ int main(int argc, char* argv[])
         name= argv[1];
     }
 
-    example1(); // open parameter file, and output VTP
-    //example1_wb_dgf(); // root growth inside a big box to simulate soil surface, open parameter file, and output VTP
-    //example2(); // like example 1, but with put geometry
-    //example3(); // more than 1 plant
+    // example1(); // open parameter file, and output VTP
+    // example1_wb_dgf(); // root growth inside a big box to simulate soil surface, open parameter file, and output VTP
+    // example2(); // like example 1, but with put geometry
+    // example3(); // more than 1 plant
     // example4(); // rhizotubes (an example for a more complex geomety)
-    // example5(); // hydrotropism
+    //example5(); // hydrotropism
 
-    // benchmarks();
+     benchmarks();
 
 //    if (argc>1) {
 //        cout<<"starting simulation: "<< name <<"\n";

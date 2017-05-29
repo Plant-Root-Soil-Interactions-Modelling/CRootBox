@@ -4,7 +4,7 @@
  * (A) Virtual soil core analysis
  *
  * Simulates the growing root systems (6*37) in the field
- * uses the soil coring method to anaylse the root systems.
+ * uses the soil coring method to analyse the root systems.
  *
  */
 using namespace std;
@@ -82,7 +82,7 @@ SegmentAnalyser getResult(vector<RootSystem*>& allRS, double time) {
  * @param r     radius of the soil core
  * @param h     height of the soil core
  */
-SignedDistanceFunction* soilCores(double r,double h)
+vector<SignedDistanceFunction*> soilCores(double r,double h)
 {
 	SDF_PlantContainer* core =  new SDF_PlantContainer(r,r,h,false);
 	vector<double> x = {27, 27, 27, 27, 27, 45, 45, 45, 45, 45, 63, 63, 63, 63, 63};
@@ -91,8 +91,8 @@ SignedDistanceFunction* soilCores(double r,double h)
 	for (size_t i=0; i<x.size(); i++) {
 		cores_.push_back(new SDF_RotateTranslate(core, 0, SDF_RotateTranslate::xaxis, Vector3d(x[i],y[i],0)));
 	}
-	SDF_Union* cores = new SDF_Union(cores_);
-	return cores;
+	// SDF_Union* cores = new SDF_Union(cores_);
+	return cores_;
 }
 
 
@@ -119,33 +119,37 @@ void shehan_SoilCore(string name = "wheat", bool exportVTP = false)
 	double r = 2.1; // radius of the soil core (cm)
 	double h = 160; // depth of the soil core (cm)
 	double dz = 5; // width of layer (cm)
-	SignedDistanceFunction* coregeometry = soilCores(r,h);
+	vector<SignedDistanceFunction*> coregeometry = soilCores(r,h);
 
-	vector<vector<double>> finalmatrix(times.size()-1);
+	vector<vector<double>> finalmatrix(15*(times.size()-1));
 	for (size_t i=1; i<times.size(); i++) {
-		std::cout << "\nANALYSE TIME " << times.at(i) <<"\n\n";
-		SegmentAnalyser coreanalyser = getResult(allRS, times.at(i));
-		std::cout << "crop\n";
-		coreanalyser.crop(coregeometry); // throw segments away
-		std::cout << "pack\n";
-		coreanalyser.pack(); // throw unused nodes away
-		std::cout << "get distribution\n";
-		vector<double> tl = coreanalyser.distribution(RootSystem::st_length,0,h,round(h/dz),true);  // vertical distribution
-		for (double& d :tl) {
-			d = d/(15*r*r*M_PI*dz); // 15 soil cores
-		}
-		finalmatrix.at(i-1) = tl; // store length density in the finalmatrix
-		if (exportVTP) {
-			string vtpname = name + "_core_cropped"+ std::to_string(i)+".vtp"; // export cropped segments for vizualisaten
-			coreanalyser.write(vtpname);
+		for (size_t j=0; j<15; j++) {
+
+			std::cout << "\nANALYSE TIME " << times.at(i) <<"\n\n";
+			SegmentAnalyser coreanalyser = getResult(allRS, times.at(i));
+			std::cout << "crop\n";
+			coreanalyser.crop(coregeometry[j]); // throw segments away
+			std::cout << "pack\n";
+			coreanalyser.pack(); // throw unused nodes away
+			std::cout << "get distribution\n";
+			vector<double> tl = coreanalyser.distribution(RootSystem::st_length,0,h,round(h/dz),true);  // vertical distribution
+			for (double& d :tl) {
+				d = d/(15*r*r*M_PI*dz); // 15 soil cores
+			}
+			finalmatrix.at((i-1)*15+j) = tl; // store length density in the finalmatrix
+			if (exportVTP) {
+				string vtpname = name + "_core_cropped"+ std::to_string(i)+".vtp"; // export cropped segments for vizualisaten
+				coreanalyser.write(vtpname);
+			}
+
 		}
 	}
 
 	/*
 	 * Export the final matrix
 	 */
-	int n = finalmatrix[0].size(); // 32
-	int m = times.size()-1; // 8
+	int n = finalmatrix[0].size(); // h/dz = 32
+	int m = finalmatrix.size();
 	string matname = name+"_core_matrix.txt";
 	std::ofstream fos;
 	fos.open(matname.c_str());
@@ -159,15 +163,15 @@ void shehan_SoilCore(string name = "wheat", bool exportVTP = false)
 	}
 	fos.close();
 
-	/*
-	 * Export rootsystems (around 4.5GB)
-	 */
-	SegmentAnalyser analyser;
-	for (const auto& rs : allRS) {
-	    analyser.addSegments(*rs);
-	}
-	string vtpname = name +".vtp";
-	analyser.write(vtpname);
+//	/*
+//	 * Export rootsystems (around 4.5GB)
+//	 */
+//	SegmentAnalyser analyser;
+//	for (const auto& rs : allRS) {
+//	    analyser.addSegments(*rs);
+//	}
+//	string vtpname = name +".vtp";
+//	analyser.write(vtpname);
 
 
 	/**
@@ -175,7 +179,8 @@ void shehan_SoilCore(string name = "wheat", bool exportVTP = false)
 	 */
 	if (exportVTP) {
 		string gname = name + "_core.py";
-		allRS[0]->setGeometry(coregeometry); // just for writing
+		SDF_Union* cores = new SDF_Union(coregeometry);
+		allRS[0]->setGeometry(cores); // just for writing
 		allRS[0]->write(gname);
 	}
 

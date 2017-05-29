@@ -57,18 +57,17 @@ Root::~Root()
 	}
 }
 
-
 /**
  * Simulates growth of this root for a time span dt
  *
  * @param dt       time step [day]
+ * @param silence  indicates if status messages are written to the console (cout) (default = false)
  */
-void Root::simulate(double dt)
+void Root::simulate(double dt, bool silence)
 {
-	newnodes = 0; // reset new node counter
+	old_non = 0; // is set in Root:createSegments, (the zero indicates the first call to createSegments)
 
 	const RootParameter &p = param; // rename
-	// std::cout << "Root.simulate(dt) \n" << p.toString();
 
 	// increase age
 	if (age+dt>p.rlt) { // root life time
@@ -79,11 +78,11 @@ void Root::simulate(double dt)
 
 	if (alive) { // dead roots wont grow
 
-		// probablistic branching model
+		// probabilistic branching model (todo test)
 		if ((age>0) && (age-dt<=0)) { // the root emerges in this time step
 			double P = rootsystem->getRootTypeParameter(param.type)->sbp->getValue(nodes.back(),this);
 			if (P<1.) { // P==1 means the lateral emerges with probability 1 (default case)
-				double p = 1-std::pow((1-P), dt); //probabiltiy of emergence in this time step
+				double p = 1-std::pow((1-P), dt); //probabilty of emergence in this time step
 				if (rand()>p) { // not rand()<p
 					age -= dt; // the root does not emerge in this time step
 				}
@@ -111,12 +110,12 @@ void Root::simulate(double dt)
 					// basal zone
 					if ((dl>0)&&(length<p.lb)) { // length is the current length of the root
 						if (length+dl<=p.lb) {
-							createSegments(dl);
+							createSegments(dl,silence);
 							length+=dl;
 							dl=0;
 						} else {
 							double ddx = p.lb-length;
-							createSegments(ddx);
+							createSegments(ddx,silence);
 							dl-=ddx; // ddx already has been created
 							length=p.lb;
 						}
@@ -131,12 +130,12 @@ void Root::simulate(double dt)
 									createLateral();
 								}
 								if (length+dl<=s) { // finish within inter-lateral distance i
-									createSegments(dl);
+									createSegments(dl,silence);
 									length+=dl;
 									dl=0;
 								} else { // grow over inter-lateral distance i
 									double ddx = s-length;
-									createSegments(ddx);
+									createSegments(ddx,silence);
 									dl-=ddx;
 									length=s;
 								}
@@ -150,12 +149,12 @@ void Root::simulate(double dt)
 					}
 					// apical zone
 					if (dl>0) {
-						createSegments(dl);
+						createSegments(dl,silence);
 						length+=dl;
 					}
 				} else { // no laterals
 					if (dl>0) {
-						createSegments(dl);
+						createSegments(dl,silence);
 						length+=dl;
 					}
 				} // if laterals
@@ -175,7 +174,7 @@ double Root::getCreationTime(double length)
 	assert(length>=0);
 	double rootage = getAge(length);
 	if (rootage<0) {
-		std::cout << "negative root age "<<rootage<<" at length "<< length;
+		std::cout << "Root::getCreationTime() negative root age "<<rootage<<" at length "<< length;
 		std::cout.flush();
 		throw std::invalid_argument( "bugbugbug" );
 	}
@@ -258,7 +257,7 @@ void Root::createLateral()
  *
  *  @param l       length the root growth [cm]
  */
-void Root::createSegments(double l)
+void Root::createSegments(double l, bool silence)
 {
 	// std::cout << "createSegments("<< l << ")\n";
 	assert(l>0);
@@ -266,43 +265,47 @@ void Root::createSegments(double l)
 
 	// shift first node to axial resolution
 	int nn = nodes.size();
-	if ((newnodes==0) && (nn>1)) {
-		auto n2 = nodes.at(nn-2);
-		auto n1 = nodes.at(nn-1);
-		double olddx = n1.minus(n2).length();
-		if (olddx<dx()*0.99) { // shift node instead of creating a new node
+	if (old_non==0) { // first call of createSegments (in Root::simulate)
+		if (nn>1) {
+			auto n2 = nodes.at(nn-2);
+			auto n1 = nodes.at(nn-1);
+			double olddx = n1.minus(n2).length();
+			if (olddx<dx()*0.99) { // shift node instead of creating a new node
 
-			Vector3d h; // current heading
-			if (nn>2) {
-				h = n2.minus(nodes.at(nn-3));
-				h.normalize();
-			} else {
-				h = iheading;
-			}
-			double sdx = std::min(dx()-olddx,l);
+				Vector3d h; // current heading
+				if (nn>2) {
+					h = n2.minus(nodes.at(nn-3));
+					h.normalize();
+				} else {
+					h = iheading;
+				}
+				double sdx = std::min(dx()-olddx,l);
 
-			Matrix3d ons = Matrix3d::ons(h);
-			Vector2d ab = rootsystem->tf.at(param.type-1)->getHeading(nodes.back(),ons,olddx+sdx,this);
-			ons.times(Matrix3d::rotX(ab.y));
-			ons.times(Matrix3d::rotZ(ab.x));
-			Vector3d newdx = Vector3d(ons.column(0).times(sdx));
+				Matrix3d ons = Matrix3d::ons(h);
+				Vector2d ab = rootsystem->tf.at(param.type-1)->getHeading(nodes.back(),ons,olddx+sdx,this);
+				ons.times(Matrix3d::rotX(ab.y));
+				ons.times(Matrix3d::rotZ(ab.x));
+				Vector3d newdx = Vector3d(ons.column(0).times(sdx));
 
-			Vector3d newnode = Vector3d(nodes.back().plus(newdx));
-			sl = sdx;
-			double et = this->getCreationTime(length+sl);
-			nodes[nodes.size()-1] = newnode;
-			netimes[netimes.size()-1] = et;
-			//std::cout << "shift" << newnode.toString() << "\n";
-
-			l -= sdx;
-			if (l<=0) { // ==0 should be enough
-				return;
+				Vector3d newnode = Vector3d(nodes.back().plus(newdx));
+				sl = sdx;
+				double et = this->getCreationTime(length+sl);
+				nodes[nn-1] = newnode;
+				netimes[nn-1] = std::max(et,rootsystem->getSimTime()); // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
+				old_non = nn-1;
+				l -= sdx;
+				if (l<=0) { // ==0 should be enough
+					return;
+				}
 			}
 		}
+		old_non = nn; // CHECK
 	}
 
 	if (l<smallDx) {
-		std::cout << "skipped small segment (<"<< smallDx << ") \n";
+		if (!silence) {
+			std::cout << "skipped small segment (<"<< smallDx << ") \n";
+		}
 		return;
 	}
 
@@ -324,7 +327,9 @@ void Root::createSegments(double l)
 		} else { // last segment
 			sdx = l-n*dx();
 			if (sdx<smallDx) {
-				std::cout << "skipped small segment (<"<< smallDx << ") \n";
+				if (!silence) {
+					std::cout << "skipped small segment (<"<< smallDx << ") \n";
+				}
 				return;
 			}
 		}
@@ -335,10 +340,11 @@ void Root::createSegments(double l)
 		ons.times(Matrix3d::rotX(ab.y));
 		ons.times(Matrix3d::rotZ(ab.x));
 		Vector3d newdx = Vector3d(ons.column(0).times(sdx));
-
 		Vector3d newnode = Vector3d(nodes.back().plus(newdx));
 		double et = this->getCreationTime(length+sl);
-		addNode(newnode,et); // increases newnode counter
+		et = std::max(et,rootsystem->getSimTime()); // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
+		addNode(newnode,et);
+
 	} // for
 
 }
@@ -386,7 +392,6 @@ void Root::addNode(Vector3d n, double t)
 	nodes.push_back(n); // node
 	nodeIds.push_back(rootsystem->getNodeIndex()); // new unique id
 	netimes.push_back(t); // exact creation time
-	newnodes++; // increase new node counter
 }
 
 /**

@@ -28,7 +28,7 @@ public:
     Root(RootSystem* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of RootSystem, or Root::createLaterals()
     virtual ~Root();
 
-    void simulate(double dt); ///< root growth for a time span of \param dt
+    void simulate(double dt, bool silence = false); ///< root growth for a time span of \param dt
 
     /* exact from analytical equations */
     double getCreationTime(double lenght); ///< analytical creation (=emergence) time of a node at a length
@@ -66,7 +66,7 @@ public:
     bool active = 1; ///< true: active, false: root stopped growing
     double age = 0; ///< current age [days]
     double length = 0; ///< actual length [cm] of the root. might differ from getLength(age) in case of impeded root growth
-    int newnodes = 0; ///< number of new nodes created in the last simulation step, reset by simulate(dt)
+    int old_non = 0; ///< index of the node that was update last time step (==0 if no update was performed)
 
     /* up and down */
     Root* parent; ///< pointer to the parent root (equals nullptr if it is a base root)
@@ -76,7 +76,7 @@ public:
 
 protected:
 
-    void createSegments(double l); ///< creates segments of length l, called by Root::simulate()
+    void createSegments(double l, bool silence); ///< creates segments of length l, called by Root::simulate()
     void createLateral(); ///< creates a new lateral, called by Root::simulate()
 
     /* parameters that are given per node */
