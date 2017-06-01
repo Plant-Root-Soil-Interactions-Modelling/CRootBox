@@ -402,7 +402,6 @@ std::vector<Root*> RootSystem::getSegmentsOrigin() const
 {
 	this->getRoots(); // update roots (if necessary)
 	int nos=getNumberOfSegments();
-	std::cout << "Number of segments: " << nos << "\n";
 	std::vector<Root*> s(nos);
 	int c=0;
 	for (auto const& r:roots) {

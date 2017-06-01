@@ -316,7 +316,7 @@ SDF_HalfPlane::SDF_HalfPlane(const Vector3d& o, const Vector3d& p1, const Vector
 	Vector3d v2 = p2.minus(o);
 	n = v1.cross(v2);
 	n.normalize();
-	std::cout << "SDF_HalfPlane normal:"<< n.toString() << "\n" ;
+//	std::cout << "SDF_HalfPlane normal:"<< n.toString() << "\n" ;
 };
 
 /**

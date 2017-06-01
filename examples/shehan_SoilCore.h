@@ -55,7 +55,7 @@ void simulateRS(vector<double> times, vector<RootSystem*>& allRS)
 		std::cout << "\nTIME " << times.at(i+1) <<"\n\n";
 		double dt = times.at(i+1)-times.at(i);
 		for (int r=0; r<N_; r++) { // simulate all
-			allRS.at(r)->simulate(dt);
+			allRS.at(r)->simulate(dt,true);
 		}
 	}
 }

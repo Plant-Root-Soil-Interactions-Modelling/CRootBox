@@ -26,7 +26,7 @@ void SegmentAnalyser::addSegments(const RootSystem& rs)
 }
 
 /**
- * Adds all segmentes from the analyser @param a to this analysis.
+ * Adds all segments from the analyser @param a to this analysis.
  */
 void SegmentAnalyser::addSegments(const SegmentAnalyser& a)
 {
@@ -130,7 +130,6 @@ double SegmentAnalyser::getSegmentLength(int i) const
 	Vector3d y = nodes.at(s.y);
 	return x.minus(y).length();
 }
-
 
 /**
  * Crops the segments with some geometry
@@ -407,7 +406,7 @@ std::vector<double> SegmentAnalyser::distribution(int st, double top, double bot
 	double dz = (bot-top)/double(n);
 	SDF_PlantBox* layer = new SDF_PlantBox(1e100,1e100,dz);
 	for (int i=0; i<n; i++) {
-		Vector3d t(0,0,-(i+0.5)*dz);
+		Vector3d t(0,0,top-i*dz);
 		SDF_RotateTranslate g(layer,t);
 		if (exact) {
 			SegmentAnalyser a(*this); // copy everything
@@ -435,7 +434,7 @@ std::vector<SegmentAnalyser> SegmentAnalyser::distribution(double top, double bo
 	double dz = (bot-top)/double(n);
 	SDF_PlantBox* layer = new SDF_PlantBox(1e100,1e100,dz);
 	for (int i=0; i<n; i++) {
-		Vector3d t(0,0,-dz/2.-i*dz);
+		Vector3d t(0,0,top-i*dz);
 		SDF_RotateTranslate g(layer,t);
 		SegmentAnalyser a = SegmentAnalyser(*this); // copy everything
 		a.crop(&g); // crop exactly
@@ -463,14 +462,14 @@ std::vector<std::vector<double>> SegmentAnalyser::distribution2(int st, double t
 	std::vector<std::vector<double>> d(n);
 	double dz = (bot-top)/double(n);
 	double dx = (right-left)/double(m);
-	SDF_PlantBox* layer = new SDF_PlantBox(dx,1e100,dz);
+	SDF_PlantBox* layer = new SDF_PlantBox(dx,1e9,dz);
 
 	for (int i=0; i<n; i++) {
 
 		std::vector<double> row(m); // m columns
 		for (int j=0; j<m; j++) {
 
-			Vector3d t(dx/2.+j*dx,0,-dz/2.-i*dz);
+			Vector3d t(left+(j+0.5)*dx,0.,top-i*dz); // box is [-x/2,-y/2,0] - [x/2,y/2,-z]
 			SDF_RotateTranslate g(layer,t);
 
 			if (exact) {
@@ -498,23 +497,34 @@ std::vector<std::vector<double>> SegmentAnalyser::distribution2(int st, double t
  * @param right     right along x-axis (cm)
  * @param n         number of vertical grid elements (each with height of (bot-top)/n )
  * @param m 		number of horizontal grid elements (each with length of (right-left)/m)
- * \return Vector of size @param n containing the summed parameter in this layser
+ * \return Vector of size @param n containing the summed parameter in this layer
  */
 std::vector<std::vector<SegmentAnalyser>> SegmentAnalyser::distribution2(double top, double bot, double left, double right, int n, int m) const
 {
 	std::vector<std::vector<SegmentAnalyser>> d(n);
 	double dz = (bot-top)/double(n);
 	double dx = (right-left)/double(m);
-	SDF_PlantBox* layer = new SDF_PlantBox(dx,1.e9,dz);
+	SDF_PlantBox* layer = new SDF_PlantBox(dx,1e4,dz);
 	// std::cout << "dx " << dx  <<", dz "<< dz << "\n";
 	for (int i=0; i<n; i++) {
 		for (int j=0; j<m; j++) {
-			Vector3d t(left+(j+0.5)*dx,0.,top-(i+0.5)*dz);
-			//std::cout << i<< "," << j << ", " <<t.getString() << "; ";
+			Vector3d t(left+(j+0.5)*dx,0.,top-i*dz); // box is [-x/2,-y/2,0] - [x/2,y/2,-z]
 			SDF_RotateTranslate g(layer,t);
 			SegmentAnalyser a(*this); // copy everything
 			a.crop(&g); // crop exactly
 			d.at(i).push_back(a);
+
+//			std::stringstream ss;
+//			ss << "(" << i << ", " << j << ").py";
+//			std::string name = "test"+ss.str();
+//			std::ofstream fos;
+//			fos.open(name.c_str());
+//			fos << "from paraview.simple import *\n";
+//			fos << "paraview.simple._DisableFirstRenderCameraReset()\n";
+//			fos << "renderView1 = GetActiveViewOrCreate('RenderView')\n\n";
+//			g.writePVPScript(fos);
+//			fos.close();
+
 		}
 	}
 	delete layer;
