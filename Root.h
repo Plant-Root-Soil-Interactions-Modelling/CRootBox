@@ -77,7 +77,7 @@ public:
 protected:
 
     void createSegments(double l, bool silence); ///< creates segments of length l, called by Root::simulate()
-    void createLateral(); ///< creates a new lateral, called by Root::simulate()
+    void createLateral(bool silence); ///< creates a new lateral, called by Root::simulate()
 
     /* parameters that are given per node */
     std::vector<Vector3d> nodes; ///< nodes of the root

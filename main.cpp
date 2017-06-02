@@ -41,9 +41,9 @@ int main(int argc, char* argv[])
     // example2(); // like example 1, but with put geometry
     // example3(); // more than 1 plant
     // example4(); // rhizotubes (an example for a more complex geomety)
-    //example5(); // hydrotropism
+    // example5(); // hydrotropism
 
-     benchmarks();
+     // benchmarks();
 
 //    if (argc>1) {
 //        cout<<"starting simulation: "<< name <<"\n";
@@ -51,12 +51,12 @@ int main(int argc, char* argv[])
 //    } else {
 //        shehan_SoilCore(); // with default values
 //    }
-
-    // shehan_SoilCore("wheat",true);
+//
+//     shehan_SoilCore("wheat",true);
 
     // shehan_RhizoTubes("wheat",true);
 
-    // shehan_Trenches("wheat",true);
+    shehan_Trenches("wheat",true);
 
     // example_dumux(); // tests the suggested dumux coupling
 

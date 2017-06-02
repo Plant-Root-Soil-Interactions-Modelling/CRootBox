@@ -38,8 +38,8 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
 	parent_ni=pni;
 	length = 0;
 	// initial node
-	if (parent!=nullptr) { // the first node of the base roots must be created in initialize
-		// dont use addNode for the first node of the root,
+	if (parent!=nullptr) { // the first node of the base roots must be created in RootSystem::initialize()
+		// otherwise, don't use addNode for the first node of the root,
 		// since this node exists already and does not need a new identifier
 		nodes.push_back(parent->getNode(pni));
 		nodeIds.push_back(parent->getNodeId(pni));
@@ -82,7 +82,7 @@ void Root::simulate(double dt, bool silence)
 		if ((age>0) && (age-dt<=0)) { // the root emerges in this time step
 			double P = rootsystem->getRootTypeParameter(param.type)->sbp->getValue(nodes.back(),this);
 			if (P<1.) { // P==1 means the lateral emerges with probability 1 (default case)
-				double p = 1-std::pow((1-P), dt); //probabilty of emergence in this time step
+				double p = 1-std::pow((1-P), dt); //probability of emergence in this time step
 				if (rand()>p) { // not rand()<p
 					age -= dt; // the root does not emerge in this time step
 				}
@@ -93,7 +93,7 @@ void Root::simulate(double dt, bool silence)
 
 			// children first (lateral roots grow even if base root is inactive)
 			for (auto l:laterals) {
-				l->simulate(dt);
+				l->simulate(dt,silence);
 			}
 
 			if (active) {
@@ -127,7 +127,7 @@ void Root::simulate(double dt, bool silence)
 							s+=p.ln.at(i);
 							if (length<s) {
 								if (i==laterals.size()) { // new lateral
-									createLateral();
+									createLateral(silence);
 								}
 								if (length+dl<=s) { // finish within inter-lateral distance i
 									createSegments(dl,silence);
@@ -143,7 +143,7 @@ void Root::simulate(double dt, bool silence)
 						}
 						if (dl>0) {
 							if (p.ln.size()==laterals.size()) { // new lateral (the last one)
-								createLateral();
+								createLateral(silence);
 							}
 						}
 					}
@@ -220,7 +220,7 @@ RootTypeParameter* Root::getRootTypeParameter() const
  *
  * Overwrite this method to implement more sezialized root classes.
  */
-void Root::createLateral()
+void Root::createLateral(bool silence)
 {
 	// std::cout << "createLateral()\n";
 	const RootParameter &p = param; // rename
@@ -244,7 +244,7 @@ void Root::createLateral()
 
 		Root* lateral = rootsystem->createRoot(lt,  h, delay,  this, length, nodes.size()-1);
 		laterals.push_back(lateral);
-		lateral->simulate(age-ageLN); // pass time overhead (age we want to achieve minus current age)
+		lateral->simulate(age-ageLN,silence); // pass time overhead (age we want to achieve minus current age)
 		//cout << "time overhead " << age-ageLN << "\n";
 	}
 }

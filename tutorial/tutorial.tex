@@ -1,0 +1,177 @@
+\documentclass[a4paper]{article}
+
+\usepackage[latin1]{inputenc} 
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{amsmath}
+
+\usepackage{listings}
+\usepackage{color}
+
+% \usepackage{draftwatermark}
+%\usepackage{fullpage}
+
+%\SetWatermarkText{\includegraphics{sw_logo.png}}
+\newcommand{\bm}[1]{\mbox{\boldmath{$#1$}}}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+ 
+\lstset{style=mystyle}
+
+
+
+
+\begin{document}
+
+
+\begin{center}
+\includegraphics[width=0.2\textwidth]{sw_logo} \\
+\vspace{0.5 cm}
+\huge{\textbf{CRootBox Tutorial}} \\
+\vspace{0.5 cm}
+\normalsize
+Daniel Leitner \\
+www.simwerk.at \\
+\end{center}
+\vspace{0.5 cm}
+
+\noindent 
+The following tutorial offers scripts to outline the usage of the CRootBox Python binding for many different applications. 
+For further documentation please refer to the doxygen class documentation of the CRootBox code.
+
+\section*{Basic usage}
+ 
+The first example shows how to use CRootBox in the most simple situation: open a parameter file (L), do the simulation (L), and save the result (L). 
+
+\begin{lstlisting}[language=Python, caption=Example 1a]
+import py_rootbox as rb
+
+rootsystem = rb.RootSystem()
+
+# Open plant and root parameter from a file
+name = "Anagallis_femina_Leitner_2010" 
+rootsystem.openFile(name) 
+
+# Initialize
+rootsystem.initialize() 
+
+# Simulate
+rootsystem.simulate(30) 
+
+# Export final result (as vtp)
+rootsystem.write("results/"+name+".vtp") 
+\end{lstlisting}
+
+\noindent 
+Lets revise the above code in more detail: 
+\begin{itemize}
+ \item[L1] Imports Python CRootBox library (py\_rootbox), and names it rb
+\end{itemize}
+
+
+
+
+
+
+\begin{lstlisting}[language=Python, caption=Example 1b]
+import py_rootbox as rb
+
+rootsystem = rb.RootSystem()
+
+# Open plant and root parameter from a file
+name = "Anagallis_femina_Leitner_2010" 
+rootsystem.openFile(name)
+
+# Create and set geometry
+
+# 1.creates a cylindrical soil core with top radius 5 cm, bot radius 5 cm, height 40cm
+soilcore = rb.SDF_PlantContainer(5,5,40,False)
+
+# 2. creates a square 27*27 cm containter with height 1.5 cm
+rhizotron = rb.SDF_PlantBox(1.4,27,27);
+
+# 3. creates a square rhizotron r*r, with height h, rotated around the x-axis for angle alpha
+r = 20
+h = 4
+alpha = 45
+rhizotron2 = rb.SDF_PlantContainer(r,r,h,True);
+posA = rb.Vector3d(0,r,-h/2); #  origin before rotation
+A = rb.Matrix3d.rotX(alpha/180.*3.14)
+posA = A.times(posA) # origin after rotation
+rotatedRhizotron = rb.SDF_RotateTranslate(rhizotron2,alpha,0,posA.times(-1));
+
+# pick 1, 2, or 3
+rootsystem.setGeometry(rotatedRhizotron) 
+
+# Initialize
+rootsystem.initialize() 
+
+# Simulate
+rootsystem.simulate(60)
+
+# Export final result (as vtp)
+rootsystem.write("results/"+name+".vtp") 
+
+# Export container geometry as Paraview Python script (run file in Paraview by Tools->Python Shell, Run Script)    
+rootsystem.write("results/"+name+".py") 
+
+\end{lstlisting}
+
+
+
+
+
+
+
+
+
+ 
+\section*{More complex geometries}
+
+
+
+
+\section*{Basic analysis}
+
+
+
+
+\section*{Root-soil interaction}
+
+
+
+
+
+\section*{Extend CRootBox}
+
+
+
+
+
+\bibliographystyle{apalike}
+\bibliography{references}
+
+
+\end{document}

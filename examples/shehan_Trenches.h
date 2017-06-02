@@ -21,7 +21,8 @@ vector<SDF_HalfPlane*> fieldTrenches() {
 	double dist1 = 18; // cm horizontal distance between plants
 	double dist2 = 6; 	// cm vertical distance between the trenches
 	for (int i=0; i<N; i++) {
-		Vector3d o(1.5*dist1, 5.*dist2+i*dist2,  -160);  // actually, only y component is important
+		Vector3d o(1.5*dist1, 5.*dist2+i*dist2,  -160);
+		std::cout << o.toString() << "\n";
 		Vector3d p1(1.5*dist1, 5.*dist2+i*dist2,  0);
 		Vector3d p2(3.5*dist1, 5.*dist2+i*dist2,  -160);
 		trenches.push_back(new SDF_HalfPlane(o,p1,p2));
@@ -36,7 +37,7 @@ vector<SDF_HalfPlane*> fieldTrenches() {
  * @param geom     confining geometry
  */
 vector<RootSystem*> initializeRootSystems2(string name, SignedDistanceFunction* geom = new SignedDistanceFunction())
-{
+						{
 	auto gen = mt19937(chrono::system_clock::now().time_since_epoch().count());
 	auto UD = uniform_real_distribution<double>(0,1); // random stuff, does it work now?
 	int M=6;
@@ -51,7 +52,9 @@ vector<RootSystem*> initializeRootSystems2(string name, SignedDistanceFunction* 
 			rs->openFile(name);
 			rs->setGeometry(geom);
 			rs->getRootTypeParameter(4)->theta = 80./180.*M_PI; // fix insertion angle of the basal roots
-			rs->getRootSystemParameter()->seedPos = Vector3d(dist1*i,dist2*j,-3); // set position of seed [cm]
+			auto pos = Vector3d(dist1*i,dist2*j,-3);
+			std::cout << pos.toString() << "\n";
+			rs->getRootSystemParameter()->seedPos = pos; // set position of seed [cm]
 			double s = UD(gen);
 			rs->setSeed(s); // randomly select a seed
 			rs->initialize(4,5);
@@ -76,7 +79,7 @@ void shehan_Trenches(string name = "wheat", bool exportVTP = false)
 	/*
 	 * Simulate
 	 */
-	vector<double> times = {0, 30, 60, 90, 120, 150, 180, 210, 240};
+	vector<double> times = {0, 1, 30}; //, 60, 90, 120, 150, 180, 210, 240};
 	simulateRS(times, allRS);
 
 	/*
@@ -86,7 +89,7 @@ void shehan_Trenches(string name = "wheat", bool exportVTP = false)
 	int m = 4;
 	int n = 32;
 	SDF_PlantBox box_(36.,1.e9,160.);
-	SDF_RotateTranslate box(&box_, Vector3d(18.+ 27., 0., 0.) );
+	//SDF_RotateTranslate box(&box_, Vector3d(18.+ 27., 0., 0.) );
 	vector<SDF_HalfPlane*> trenches = fieldTrenches();
 	vector<vector<vector<double>>> finalMT;
 
@@ -110,33 +113,24 @@ void shehan_Trenches(string name = "wheat", bool exportVTP = false)
 			std::cout << "cut \n";
 			SegmentAnalyser analyser = getResult(allRS,times.at(t+1));
 			SegmentAnalyser cut = analyser.cut(*tr);
-			cut.crop(&box); // cut with bounding box
+			// cut.crop(&box); // cut with bounding box
 
 			// split into grid
 			std::cout <<"grid \n";
-			vector<vector<SegmentAnalyser>> anamatrix1 = cut.distribution2(0,160, tr->o.x-dist1,tr->o.x,n,m);
-			vector<vector<SegmentAnalyser>> anamatrix2 = cut.distribution2(0,160, tr->o.x,tr->o.x+dist1,n,m);
+			//			vector<vector<SegmentAnalyser>> anamatrix1 = cut.distribution2(0,160, 1.5*dist1, 2.5*dist1,n,m);
+			//			vector<vector<SegmentAnalyser>> anamatrix2 = cut.distribution2(0,160, 2.5*dist1, 3.5*dist1,n,m);
+			vector<vector<SegmentAnalyser>> anamatrix = cut.distribution2(0,160, 1.5*dist1, 3.5*dist1,n,2*m);
 
 			// save root count into matrix
 			std::cout<<"count \n";
 			for (int i=0; i<n; i++) {
 				for (int j=0; j<m; j++) {
-					finalmatrix[i][j] += anamatrix1[i][j].segments.size();
-					finalmatrix[i][j] += anamatrix2[i][j].segments.size();
+					//					finalmatrix[i][j] += anamatrix[i][j].segments.size();
+					//					finalmatrix[i][j] += anamatrix[i][j+m].segments.size();
+					finalmatrix[i][j] += anamatrix[i][j].getSummed(RootSystem::st_length);
+					finalmatrix[i][j] += anamatrix[i][j+m].getSummed(RootSystem::st_length);;
 				}
 			}
-
-//			/*
-//			 * Export trenches for last time step
-//			 */
-//			if (t==times.size()-2) {
-//				string vtpname = name + "_trench_"+std::to_string(ii)+".vtp";
-//				cut.write(vtpname);
-//				if (ii==1) { // only once
-//					//analyser.at(t)->write(name+std::to_string(int(t))+".vtp");
-//				}
-//			}
-
 		}
 
 		finalMT.push_back(finalmatrix); // a lot of finals we have here (one matrix per time step)
@@ -163,13 +157,13 @@ void shehan_Trenches(string name = "wheat", bool exportVTP = false)
 		std::cout << "\n\n";
 	}
 
-	//	/*
-	//	 * Export rootsystems (around 4.5GB)
-	//	 */
-	//	for (size_t i=0; i<times.size()-1; i++) {
-	//		string vtpname = name + std::to_string(i+1)+".vtp";
-	//		analyser.at(i)->write(vtpname);
-	//	}
+	/*
+	 * Export rootsystems (around 4.5GB)
+	 */
+	for (size_t i=0; i<times.size()-1; i++) {
+		string vtpname = name + std::to_string(i+1)+".vtp";
+		getResult(allRS,times.at(i+1)).write(vtpname);
+	}
 
 	if (exportVTP) {
 		vector<SignedDistanceFunction*> tr_;
@@ -180,6 +174,10 @@ void shehan_Trenches(string name = "wheat", bool exportVTP = false)
 		SDF_Union trenchgeometry = SDF_Union(tr_);
 		allRS[0]->setGeometry(&trenchgeometry); // just for writing
 		allRS[0]->write(gname);
+
+//		allRS[0]->setGeometry(&box); // just for writing
+//		allRS[0]->write("boundingbox.py");
+
 	}
 
 }

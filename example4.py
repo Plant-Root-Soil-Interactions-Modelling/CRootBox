@@ -83,7 +83,7 @@ for _ in range(0,N):
 #     
 # Export results (as vtp)
 #    
-rootsystem.write("results/"+name + ".vtp", rb.OutputType.polylines);
+rootsystem.write("results/"+name + ".vtp")
 
 #
 # Export container geometry as Paraview Python script (run file in Paraview by Tools->Python Shell, Run Script)
