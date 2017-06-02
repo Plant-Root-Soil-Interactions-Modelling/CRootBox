@@ -45,25 +45,27 @@
 
 \begin{document}
 
-
 \begin{center}
 \includegraphics[width=0.2\textwidth]{sw_logo} \\
 \vspace{0.5 cm}
-\huge{\textbf{CRootBox Tutorial}} \\
+\huge{\textbf{Python CRootBox Tutorial (py\_rootbox)}} \\
 \vspace{0.5 cm}
 \normalsize
 Daniel Leitner \\
-www.simwerk.at \\
+www.simwerk.at 
 \end{center}
+
 \vspace{0.5 cm}
 
 \noindent 
 The following tutorial offers scripts to outline the usage of the CRootBox Python binding for many different applications. 
 For further documentation please refer to the doxygen class documentation of the CRootBox code.
 
-\section*{Basic usage}
+
+
+\section{Basic usage}
  
-The first example shows how to use CRootBox in the most simple situation: open a parameter file (L), do the simulation (L), and save the result (L). 
+The first example shows how to use CRootBox in the most simple situation: open a parameter file (L7), do the simulation (L13), and save the result (L16). 
 
 \begin{lstlisting}[language=Python, caption=Example 1a]
 import py_rootbox as rb
@@ -87,13 +89,19 @@ rootsystem.write("results/"+name+".vtp")
 \noindent 
 Lets revise the above code in more detail: 
 \begin{itemize}
- \item[L1] Imports Python CRootBox library (py\_rootbox), and names it rb
+ \item[L1] Imports the CRootBox Python library (py\_rootbox), and names it rb
+ \item[L3] Constructs the root system object
+ \item[L7] Opens two text files: the root type parameter file (.rparam) and the root system parameter file (.pparam). Optionally, as a second argument a path can be provided, the default path is (modelparameter/). 
+ Alternatively, all parameter can be set or modified directly in Python (see Section \ref{sec:sa}).
+ \item[L10] Initializes the simulation: Creates the tap root the base roots (i.e. all basal roots, and shootborne roots that might emerge), creates the tropisms and passes the domain geometry to it, and creates the elongation functions. 
+ \item[L13] Performs the simulation. The value 30 is the simulation time in days. If no simultation time is passed the simulation time is taken fromthe .pparam file. Note that simulation results are independent from the time step, 
+ i.e. 30 simulate(1) calls should have same result). 
+ \item[L17] Saves the resulting root system geometry in the VTK Polygonal Data format (VTP) as polylines. 
 \end{itemize}
 
-
-
-
-
+The next example is an extension of the previous one, where the root system grows in one of two containers (Soil core or rectangular rhizotron).
+Such geometries are important if we want mimic experimental settings. In CRootBox domain geometry is represented in a mesh free way using signed distance functions (SDF).
+SDF return the distance to the closest boundary, an add negative sign, if we are inside of the domain.
 
 \begin{lstlisting}[language=Python, caption=Example 1b]
 import py_rootbox as rb
@@ -112,18 +120,8 @@ soilcore = rb.SDF_PlantContainer(5,5,40,False)
 # 2. creates a square 27*27 cm containter with height 1.5 cm
 rhizotron = rb.SDF_PlantBox(1.4,27,27);
 
-# 3. creates a square rhizotron r*r, with height h, rotated around the x-axis for angle alpha
-r = 20
-h = 4
-alpha = 45
-rhizotron2 = rb.SDF_PlantContainer(r,r,h,True);
-posA = rb.Vector3d(0,r,-h/2); #  origin before rotation
-A = rb.Matrix3d.rotX(alpha/180.*3.14)
-posA = A.times(posA) # origin after rotation
-rotatedRhizotron = rb.SDF_RotateTranslate(rhizotron2,alpha,0,posA.times(-1));
-
-# pick 1, 2, or 3
-rootsystem.setGeometry(rotatedRhizotron) 
+# pick 1, 2
+rootsystem.setGeometry(soilcore) 
 
 # Initialize
 rootsystem.initialize() 
@@ -136,35 +134,55 @@ rootsystem.write("results/"+name+".vtp")
 
 # Export container geometry as Paraview Python script (run file in Paraview by Tools->Python Shell, Run Script)    
 rootsystem.write("results/"+name+".py") 
-
 \end{lstlisting}
 
+The geometry is first created by constructing some specialisation of the call SignedDistanceFunction, and the passed to the root system by the method setGeometry: 
+\begin{itemize}
+ \item[L12] Construct a soil core 
+ \item[L15] Construct a rhizotron
+ \item[L18] Pick one the two geoemtries. It is important to call setGeometry before initialize!
+ \item[L30] Its possible to save the geometry as Paraview Pyhton script for visualization. Run this script in Paraview by Tools->Python Shell, Run Script.
+\end{itemize}
 
 
 
 
+\section{More complex geometries}
+
+\subsection{Using SDF with set operations}
+
+\subsection{Multiple root systems}
 
 
 
+\section{Analysis of simualtion results}
 
- 
-\section*{More complex geometries}
+\subsection{Per root}
 
+\subsection{Per segment}
 
-
-
-\section*{Basic analysis}
-
+\subsection{Sensitivity analysis} \label{sec:sa}
 
 
 
-\section*{Root-soil interaction}
+\section{Root-soil interaction}
+
+\subsection{Tropism}
+
+\subsection{Scale elongation rate}
+
+\subsection{Scale insertion angle}
+
+\subsection{Scale lateral emergence probability}
 
 
 
+\section{Extend CRootBox}
 
+\subsection{Add tropisms}
 
-\section*{Extend CRootBox}
+\subsection{Add elongation functions}
+
 
 
 

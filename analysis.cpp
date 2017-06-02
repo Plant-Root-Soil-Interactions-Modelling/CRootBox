@@ -101,14 +101,14 @@ std::vector<double> SegmentAnalyser::getScalar(int st) const
 			v = 1;
 		}
 		break;
-        case RootSystem::st_parenttype: {
-        	if (r->parent!=nullptr) {
-        		v = r->parent->param.type;
-        	} else {
-        		v = 0;
-        	}
-        	break;
-        }
+		case RootSystem::st_parenttype: {
+			if (r->parent!=nullptr) {
+				v = r->parent->param.type;
+			} else {
+				v = 0;
+			}
+			break;
+		}
 		default:
 			throw std::invalid_argument( "AnalysisSDF::getData() type not implemented" );
 		}
@@ -128,7 +128,7 @@ double SegmentAnalyser::getSegmentLength(int i) const
 	Vector2i s = segments.at(i);
 	Vector3d x = nodes.at(s.x);
 	Vector3d y = nodes.at(s.y);
-	return x.minus(y).length();
+	return (x.minus(y)).length();
 }
 
 /**
@@ -261,7 +261,7 @@ void SegmentAnalyser::pack() {
 }
 
 /**
- *  Numerically computes the intersetion point
+ *  Numerically computes the intersection point
  *
  * @param in       the node within the domain
  * @param out      the node outside of the domain
@@ -514,17 +514,18 @@ std::vector<std::vector<SegmentAnalyser>> SegmentAnalyser::distribution2(double 
 			a.crop(&g); // crop exactly
 			d.at(i).push_back(a);
 
-//			std::stringstream ss;
-//			ss << "(" << i << ", " << j << ").py";
-//			std::string name = "test"+ss.str();
-//			std::ofstream fos;
-//			fos.open(name.c_str());
-//			fos << "from paraview.simple import *\n";
-//			fos << "paraview.simple._DisableFirstRenderCameraReset()\n";
-//			fos << "renderView1 = GetActiveViewOrCreate('RenderView')\n\n";
-//			g.writePVPScript(fos);
-//			fos.close();
-
+			if (i==0) {
+				std::stringstream ss;
+				ss << "(" << i << ":" << j << ").py";
+				std::string name = "test"+ss.str();
+				std::ofstream fos;
+				fos.open(name.c_str());
+				fos << "from paraview.simple import *\n";
+				fos << "paraview.simple._DisableFirstRenderCameraReset()\n";
+				fos << "renderView1 = GetActiveViewOrCreate('RenderView')\n\n";
+				g.writePVPScript(fos);
+				fos.close();
+			}
 		}
 	}
 	delete layer;

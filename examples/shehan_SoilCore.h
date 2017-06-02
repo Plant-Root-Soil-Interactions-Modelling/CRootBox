@@ -61,18 +61,18 @@ void simulateRS(vector<double> times, vector<RootSystem*>& allRS)
 }
 
 /**
- * Retrieves a the state of the root systems at a certain time
- * in an analyser object
+ * Retrieves a the state of the root systems at a certain time in a SegmentAnalyser object
  */
 SegmentAnalyser getResult(vector<RootSystem*>& allRS, double time) {
   SegmentAnalyser a = SegmentAnalyser();
   for (const auto& rs : allRS) { // merge all into one analyser object
       //cout << "Analyser " << a.segments.size()<< ", " << a.nodes.size() << "\n";
       //cout << "Root system: " << rs->getNumberOfNodes() <<"\n";
-      a.addSegments(*rs);
+	  auto news = SegmentAnalyser(*rs);
+	  news.filter(RootSystem::st_time,0,time);
+	  news.pack(); // delete unused nodes
+      a.addSegments(news);
   }
-  a.filter(RootSystem::st_time,0,time);
-  a.pack(); // delete unused nodes
   return a;
 }
 
