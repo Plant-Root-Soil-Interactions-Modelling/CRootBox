@@ -53,6 +53,9 @@ def simOnce(name, simtime, lbins, lrange, zbins, zrange, dx, dt):
     rs.openFile(name,"modelparameter/")
     for i in range(0,10):    
         rs.getRootTypeParameter(i+1).dx = dx    
+    
+    rs.getRootTypeParameter(4).theta = 80./180.*math.pi  # fix insertion angle of the basal roots
+    
     rs.initialize() 
     N = round(simtime/dt)
     print("simOnce")
@@ -101,14 +104,14 @@ def simOnce(name, simtime, lbins, lrange, zbins, zrange, dx, dt):
 
 # Params
 dx = 0.5
-dt = 60
+dt = 5
 
 runs = 1000
 # name = "Lupinus_albus_Leitner_2014"
 # name = "Zea_mays_1_Leitner_2010"
 # name = "Anagallis_femina_Leitner_2010"
 name = "wheat"
-simtime = 60
+simtime = 5
 
 # Histogram params
 lbins = 40
