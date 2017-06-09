@@ -18,19 +18,23 @@ for i in range(0,N):
 # Simulate parallel
 simtime = 120
 def simulate(i):
-    print("simualte ",i)
-    allRS[i]. simulate(simtime)
+    allRS[i].simulate(simtime)
      
 pool = Pool()
-param_space = range(0,len(allRS))    
-for res in pool.imap(simulate,param_space):
-    # do nothing
-    c = 0
-            
-# Export results as single vtp files
+param_space = range(0,len(allRS))   
+d = [1 for res in pool.imap(simulate,param_space)] 
+
+# Export results as single vtp files (as polylines)
 c = 0
+ana = rb.SegmentAnalyser() # see example 3b
 for rs in allRS:
       c += 1 # root system number
-      vtpname = "results/"+name+"_"+str(c)+".vtp"
+      vtpname = "results/example_2b_"+str(c)+".vtp"
       rs.write(vtpname)
+      ana.addSegments(rs) # collect all
+       
+# Write all into single file (segments)
+ana.write("results/example_2b_all.vtp") 
+      
+      
       

@@ -119,7 +119,7 @@ void RootSystem::writeParameters(std::ostream& os) const
 
 /**
  * Sets up the base roots according to the plant parameters,
- * a confining geometry, the tropsim functions, and the growth functions.
+ * a confining geometry, the tropism functions, and the growth functions.
  *
  * Call this method before simulation and after setting geometry, plant and root parameters
  */
@@ -154,7 +154,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		double delay = rs.firstB;
 		for (int i=0; i<maxB; i++) {
 			Root* basalroot = new Root(this, basaltype, iheading ,delay, nullptr, 0, 0);
-			Vector3d node = rs.seedPos.minus(Vector3d(0.,0.,dzB));
+			Vector3d node = rs.seedPos.plus(Vector3d(0.,0.,dzB));
 			basalroot->addNode(node,delay);
 			baseRoots.push_back(basalroot);
 			delay += rs.delayB;
@@ -239,14 +239,14 @@ void RootSystem::simulate()
  */
 void RootSystem::setSeed(double seed) {
 	std::cout << "Setting random seed "<< seed <<"\n";
-	gen.seed(seed);
+	gen.seed(1./seed);
 	for (auto t : tf) {
 		double s  = rand();
-		t->setSeed(s);
+		t->setSeed(1./s);
 	}
 	for (auto rp : rtparam) {
 		double s  = rand();
-		rp.setSeed(s);
+		rp.setSeed(1./s);
 	}
 }
 
@@ -360,7 +360,7 @@ std::vector<Vector3d> RootSystem::getNodes() const
 }
 
 /**
- * TODO test and comment
+ * Returns the root system as polylines, i.e. each root is represented by its nodes
  */
 std::vector<std::vector<Vector3d>> RootSystem::getPolylines() const
 {
@@ -433,7 +433,7 @@ std::vector<double> RootSystem::getNETimes() const
 }
 
 /**
- * todo test and comment
+ *  Returns the node emergence times to the corresponding polylines, see also RootSystem::getPolylines
  */
 std::vector<std::vector<double>> RootSystem::getPolylinesNET() const
 {

@@ -64,7 +64,7 @@ depth=100.;
 c=0
 for rs in allRS:
       analysis = rb.SegmentAnalyser(rs)
-      RLD = analysis.distribution(rb.ScalarType.length,0,depth,nl,1)
+      RLD = analysis.distribution(rb.ScalarType.length,0,depth,nl,True)
       vRLD[c,:]=RLD
       vRLD[c,:] /= (depth/nl)
       c += 1 # root system number

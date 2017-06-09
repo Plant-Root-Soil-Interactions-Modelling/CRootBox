@@ -62,6 +62,10 @@ The following tutorial offers scripts to outline the usage of the CRootBox Pytho
 For further documentation please refer to the doxygen class documentation of the CRootBox code.
 
 
+\vspace{0.5 cm}
+
+\tableofcontents
+
 
 \section{Basic usage}
  
@@ -141,13 +145,16 @@ The geometry is first created by constructing some specialisation of the call Si
  \item[L12] Construct a soil core 
  \item[L15] Construct a rhizotron
  \item[L18] Pick one the two geoemtries. It is important to call setGeometry before initialize!
- \item[L30] Its possible to save the geometry as Paraview Pyhton script for visualization. Run this script in Paraview by Tools->Python Shell, Run Script.
+ \item[L30] Its possible to save the geometry as Paraview Pyhton script for visualization. Run this script in Paraview by Tools$\rightarrow$Python Shell, Run Script.
 \end{itemize}
 
 
 
 
 \section{More complex geometries}
+
+The section shows how to build more complex geometries with SDF. 
+Furthermore, we show an example with multiple root systems that is computed in parallel
 
 \subsection{Using SDF with set operations}
 
@@ -157,6 +164,10 @@ The geometry is first created by constructing some specialisation of the call Si
 
 \section{Analysis of simualtion results}
 
+There are various post processing options, on a per root level by the class RootSystem, or per segment, by the class SegmentAnalyser.
+We show some examples of the most frequently used methods. Additionally we show how model parameters can be modified, 
+and how a sensitivity ananlysis can be performed. 
+
 \subsection{Per root}
 
 \subsection{Per segment}
@@ -165,9 +176,14 @@ The geometry is first created by constructing some specialisation of the call Si
 
 
 
-\section{Root-soil interaction}
+\section{Root functional modelling}
 
-\subsection{Tropism}
+Root growth is strongly influenced by pedo-climate conditions, and plant internal state. 
+CRootBox offers build in ways to develop such models. 
+In this section we assume static soil conditions, and describe predefined ways how the soil can affect root growth.
+Dynamic soil conditions are described in the following section 'Coupling with a soil model'
+
+\subsection{Hydro- and Chemoropism}
 
 \subsection{Scale elongation rate}
 
@@ -177,7 +193,20 @@ The geometry is first created by constructing some specialisation of the call Si
 
 
 
+\section{Coupling with a soil model}
+
+In this section we present an example similar to one published in . 
+Furhtermore, we present features that can be used to analyse the dynamic behaviour of the root system development.
+
+\subsection{Coupling to 1D water content}
+
+\subsection{Other dynamic aspects}
+
+
+
 \section{Extend CRootBox}
+
+CRootBox can be easily extended by additional tropism types, or elongation functions. 
 
 \subsection{Add tropisms}
 

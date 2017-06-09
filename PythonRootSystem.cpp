@@ -277,7 +277,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def_readwrite("r", &RootTypeParameter::r)
 			.def_readwrite("rs", &RootTypeParameter::rs)
 			.def_readwrite("a", &RootTypeParameter::a)
-			.def_readwrite("as", &RootTypeParameter::as)
+			.def_readwrite("a_s", &RootTypeParameter::as) // as is a keyword in python
 			.def_readwrite("colorR", &RootTypeParameter::colorR)
 			.def_readwrite("colorG", &RootTypeParameter::colorG)
 			.def_readwrite("colorB", &RootTypeParameter::colorB)
@@ -335,6 +335,12 @@ BOOST_PYTHON_MODULE(py_rootbox)
     class_<std::vector<Root*>>("std_vector_Root_")
         .def(vector_indexing_suite<std::vector<Root*>>() )
 	;
+    class_<std::vector<std::vector<Vector3d>>>("std_vector_vector_Vector3d_")
+		.def(vector_indexing_suite<std::vector<std::vector<Vector3d>>>() )
+	;
+    class_<std::vector<std::vector<double>>>("std_vector_vector_double_")
+		.def(vector_indexing_suite<std::vector<std::vector<double>>>() )
+	;
 	/*
 	 * RootSystem.h
 	 */
@@ -342,16 +348,17 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("setRootTypeParameter", &RootSystem::setRootTypeParameter)
 		.def("getRootTypeParameter", &RootSystem::getRootTypeParameter, return_value_policy<reference_existing_object>())
 		.def("setRootSystemParameter", &RootSystem::setRootSystemParameter)
-		.def("getRootSystemParameter", &RootSystem::getRootSystemParameter, return_value_policy<reference_existing_object>()) // tutorial "naive (dangerous) approach"
+		.def("getRootSystemParameter", &RootSystem::getRootSystemParameter, return_value_policy<reference_existing_object>()) // tutorial: "naive (dangerous) approach"
 		.def("openFile", &RootSystem::openFile, openFile_overloads())
 		.def("setGeometry", &RootSystem::setGeometry)
-		.def("setSoil", &RootSystem::setPySoil) // cheated here, might work...
+		.def("setSoil", &RootSystem::setSoil)
 		.def("reset", &RootSystem::reset)
 		.def("initialize", &RootSystem::initialize, initialize_overloads())
 		.def("simulate",simulate1, simulate1_overloads())
 		.def("simulate",simulate2)
 		.def("getSimTime", &RootSystem::getSimTime)
 		.def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
+		.def("getNumberOfSegments", &RootSystem::getNumberOfSegments)
 		.def("getRoots", &RootSystem::getRoots)
 		.def("getBaseRoots", &RootSystem::getBaseRoots)
 		.def("getNodes", &RootSystem::getNodes)

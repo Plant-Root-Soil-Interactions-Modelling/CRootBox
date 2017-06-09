@@ -106,7 +106,7 @@ def simOnce(name, simtime, lbins, lrange, zbins, zrange, dx, dt):
 dx = 0.5
 dt = 5
 
-runs = 1000
+runs = 100
 # name = "Lupinus_albus_Leitner_2014"
 # name = "Zea_mays_1_Leitner_2010"
 # name = "Anagallis_femina_Leitner_2010"
