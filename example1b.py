@@ -12,7 +12,7 @@ rootsystem.openFile(name)
 soilcore = rb.SDF_PlantContainer(5,5,40,False)
 
 # 2. creates a square 27*27 cm containter with height 1.5 cm (used in parametrisation experiment
-rhizotron = rb.SDF_PlantBox(1.4,27,27);
+rhizotron = rb.SDF_PlantBox(1.4,27,27)
 
 # pick 1, 2
 rootsystem.setGeometry(soilcore)  # soilcore, rhizotron
@@ -24,7 +24,7 @@ rootsystem.initialize() # make sure to call rootsystem.setGeometry before initia
 rootsystem.simulate(60) # days
 
 # Export final result (as vtp)
-rootsystem.write("results/"+name+".vtp")  # roots are exported as polyline
+rootsystem.write("results/example_1b.vtp")  # roots are exported as polyline
 
 # Export container geometry as Paraview Python script (run file in Paraview by Tools->Python Shell, Run Script)    
-rootsystem.write("results/"+name+".py") 
+rootsystem.write("results/example_1b.py") 

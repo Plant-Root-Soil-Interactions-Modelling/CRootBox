@@ -3,8 +3,6 @@ import os
 import numpy as np
 import py_rootbox as rb   
 
-
-
 #
 # Auxiliary functions that could be moved to py_rootbox
 #
@@ -42,9 +40,7 @@ def nodes2seg(nodes,seg,data): # node data to segment data
         n2 = seg[i,1]
         data_[i] = 0.5*(data[n1]+data[n2])
     return data_
-    
-        
-    
+                
 def z2i(z,n): # maps z to equidistant mesh
     i = int(round((abs(z)/100)*n))  
     return min(max(i,0),n-1) 
@@ -72,9 +68,7 @@ def plotRSscatter(ax,nodes): # plots the root system nodes (rather slow)
     n = vv2a(nodes)
     ax.scatter(n[:,0]*scale,n[:,1]*scale,n[:,2]*scale)
     ax.set_title("Root tips")
-    
-    
-    
+        
 def parameterPath(): # works only if everything is located in folder CRootBox
     cwd = os.getcwd()
     i = cwd.index("CRootBox"+os.sep)

@@ -48,7 +48,7 @@ def a2v(a): #  numpy array to rb.std_vector_double
         l.append(d)
     return l
 
-def a2i(a): #  numpy array to rb.std_int_double
+def a2i(a): #  numpy array to rb.std_vector_int
     l = rb.std_vector_int_()
     for i in a:
         l.append(i)

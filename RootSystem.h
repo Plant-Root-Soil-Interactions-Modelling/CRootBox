@@ -51,7 +51,6 @@ public:
 	// Simulation
 	void setGeometry(SignedDistanceFunction* geom) { geometry = geom; } ///< optionally, sets a confining geometry (call before RootSystem::initialize())
 	void setSoil(SoilProperty* soil_) { soil = soil_; } ///< optionally sets a soil for hydro tropism (call before RootSystem::initialize())
-	void setPySoil(SoilProperty soil_) { soil = &soil_; } ///< experimental setter for the Python binding (todo)
 	void reset(); ///< resets the root class, keeps the root type parameters
 	void initialize(int basal=4, int shootborne=5); ///< creates the base roots, call before simulation and after setting the plant and root parameters
 	void simulate(double dt, bool silence = false); ///< simulates root system growth for time span dt
@@ -88,6 +87,7 @@ public:
 	std::vector<Vector3d> getUpdatedNodes(); // to replace to the old node vector
 	std::vector<Vector3d> getNewNodes(); // to dynamically add to the old node vector
 	std::vector<Vector2i> getNewSegments(); // to dynamically add to the list of segments
+	// restore(); ///< restore old time step
 
 	// Output Simulation results
 	void write(std::string name) const; /// writes simulation results (type is determined from file extension in name)

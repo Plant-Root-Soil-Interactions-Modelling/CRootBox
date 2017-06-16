@@ -1,7 +1,8 @@
 import py_rootbox as rb
+import math
 
 rootsystem = rb.RootSystem()
-name = "Maize_Pheno1_Leitner_et_al_2014" 
+name = "Zea_mays_4_Leitner_2014"
 
 # Open plant and root parameter from a file
 rootsystem.openFile(name)
@@ -10,9 +11,9 @@ rootsystem.openFile(name)
 r = 20
 h = 4
 alpha = 45
-rhizotron2 = rb.SDF_PlantContainer(r,r,h,True);
-posA = rb.Vector3d(0,r,-h/2); # origin before rotation
-A = rb.Matrix3d.rotX(alpha/180.*3.1415)
+rhizotron2 = rb.SDF_PlantContainer(r,r,h,True)
+posA = rb.Vector3d(0,r,-h/2) # origin before rotation
+A = rb.Matrix3d.rotX(alpha/180.*math.pi)
 posA = A.times(posA) # origin after rotation
 rotatedRhizotron = rb.SDF_RotateTranslate(rhizotron2,alpha,0,posA.times(-1))
 
@@ -29,11 +30,11 @@ splitBox = rb.SDF_Union(box_)
 
 # 3. Rhizotubes as obstacles 
 # Box
-box = rb.SDF_PlantBox(96,126,130);
+box = rb.SDF_PlantBox(96,126,130)
 # A single Rhizotube
-r = 2*3.2; # cm
+r = 2*3.2 # cm
 rhizotube = rb.SDF_PlantContainer(r,r,96,False)
-rhizoX = rb.SDF_RotateTranslate(rhizotube, 90, rb.SDF_Axis.yaxis, rb.Vector3d(boxX/2,0,0))
+rhizoX = rb.SDF_RotateTranslate(rhizotube, 90, rb.SDF_Axis.yaxis, rb.Vector3d(96/2,0,0))
 # The experimental setting
 rhizotubes_ = rb.std_vector_SDF_()
 y_ = ( -30, -18, -6, 6, 18, 30 )
@@ -57,8 +58,8 @@ rootsystem.initialize()
 rootsystem.simulate(60) # days   
 
 # Export results (as vtp)    
-rootsystem.write("results/"+name + ".vtp")
+rootsystem.write("results/example_2a.vtp")
 
 # Export container geometry as Paraview Python script 
-rootsystem.write("results/"+name + ".py",0)
+rootsystem.write("results/example_2a.py")
 

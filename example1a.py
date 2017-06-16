@@ -13,4 +13,4 @@ rootsystem.initialize()
 rootsystem.simulate(30)  # or 20, 40, 60 days
 
 # Export final result (as vtp)
-rootsystem.write("results/"+name+".vtp") # roots are exported as polylines
+rootsystem.write("results/example_1a.vtp") # roots are exported as polylines
