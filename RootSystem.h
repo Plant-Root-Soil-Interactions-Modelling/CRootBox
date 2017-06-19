@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <chrono>
 #include <random>
+#include <numeric>
 
 #include "ModelParameter.h"
 #include "Root.h"
@@ -30,9 +31,12 @@ class RootSystem
 
 public:
 
-	enum TropismTypes { tt_plagio=0, tt_gravi=1, tt_exo=2, tt_hydro=3 };  ///< root tropism
-	enum GrowthFunctionTypes { gft_negexp=1, gft_linear=2 }; // root growth function
-	enum ScalarTypes { st_type=0, st_radius=1, st_order=2, st_time=3, st_length=4, st_surface=5, st_one=6, st_userdata1=7, st_userdata2=8, st_userdata3=9, st_parenttype = 10}; ///< @see RootSystem::getScalar
+	enum TropismTypes { tt_plagio = 0, tt_gravi = 1, tt_exo = 2, tt_hydro = 3 };  ///< root tropism
+	enum GrowthFunctionTypes { gft_negexp = 1, gft_linear = 2 }; // root growth function
+	enum ScalarTypes { st_type = 0, st_radius = 1, st_order = 2, st_time = 3, st_length = 4, st_surface = 5, st_one = 6,
+		st_userdata1 = 7, st_userdata2 = 8, st_userdata3 = 9, st_parenttype = 10,
+		st_lb = 11, st_la = 12, st_nob = 13, st_r = 14, st_theta = 15, st_rlt = 16,
+		st_meanln = 17, st_stdln = 18}; ///< @see RootSystem::getScalar
 	static const std::vector<std::string> scalarTypeNames; ///< the corresponding names
 
 	RootSystem() { initRTP(); };

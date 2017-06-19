@@ -38,7 +38,7 @@ public:
     RootTypeParameter* getRootTypeParameter() const;  ///< returns the root type parameter of the root
     double dx() const { return getRootTypeParameter()->dx; } ///< returns the axial resolution
 
-    std::vector<Root*> getRoots(); ///< return the root inlcuding laterals as sequential vector
+    std::vector<Root*> getRoots(); ///< return the root including laterals as sequential vector
     void getRoots(std::vector<Root*>& v); ///< return the root system as sequential vector
 
     /* Nodes of the root */

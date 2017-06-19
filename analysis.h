@@ -39,6 +39,7 @@ public:
     // todo distribution3
 
     // rather specialized things we want to know
+    std::vector<Root*> getRoots() const; ///< segment origins
     int getNumberOfRoots() const; ///< number of different roots
     SegmentAnalyser foto(const Vector3d& pos, const Matrix3d& ons, double height) const; ///< takes a picture TODO unfinished, untested
     SegmentAnalyser cut(const SDF_HalfPlane& plane) const; ///< returns the segments intersecting with a plane (e.g. for trenches)

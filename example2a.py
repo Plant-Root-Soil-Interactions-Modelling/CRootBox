@@ -49,7 +49,7 @@ rhizotubes = rb.SDF_Union(rhizotubes_)
 rhizoTube = rb.SDF_Difference(box, rhizotubes)
 
 # set geometry
-rootsystem.setGeometry(rhizoTube) # rotatedRhizotron, splitBox, or rhizoTube
+rootsystem.setGeometry(rotatedRhizotron) # rotatedRhizotron, splitBox, or rhizoTube
 
 # Initialize
 rootsystem.initialize() 

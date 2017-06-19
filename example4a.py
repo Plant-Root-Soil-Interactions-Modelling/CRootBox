@@ -7,10 +7,11 @@ rootsystem.openFile(name)
 # Manually set tropism to hydrotropism for the first ten root types
 sigma = [0.4, 1., 1., 1., 1. ] * 2
 for i in range(0,10):  
-    rootsystem.getRootTypeParameter(i+1).dx = 0.25 # adjust resolution
-    rootsystem.getRootTypeParameter(i+1).tropismT = rb.TropismType.hydro
-    rootsystem.getRootTypeParameter(i+1).tropismN = 2 # strength of tropism
-    rootsystem.getRootTypeParameter(i+1).tropismS = sigma[i] # sigma
+    p = rootsystem.getRootTypeParameter(i+1)
+    p.dx = 0.25 # adjust resolution
+    p.tropismT = rb.TropismType.hydro
+    p.tropismN = 2 # strength of tropism
+    p.tropismS = sigma[i] 
      
 # Static soil property
 maxS = 0.7 # maximal 

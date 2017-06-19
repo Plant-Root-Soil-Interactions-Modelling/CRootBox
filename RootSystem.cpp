@@ -1,6 +1,7 @@
 #include "RootSystem.h"
 
-const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","1","userdata 1", "userdata 2", "userdata 3", "parent type"  };
+const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","1","userdata 1", "userdata 2", "userdata 3", "parent type",
+	"basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance"};
 
 /**
  * Destructor
@@ -477,19 +478,19 @@ std::vector<double> RootSystem::getScalar(int stype) const
 			}
 			break;
 		}
-		case RootSystem::st_time: // emergence time of the root
+		case st_time: // emergence time of the root
 			value = roots[i]->getNodeETime(0);
 			break;
-		case RootSystem::st_length:
+		case st_length:
 			value = roots[i]->length;
 			break;
-		case RootSystem::st_surface:
+		case st_surface:
 			value =  roots[i]->length*2.*M_PI*roots[i]->param.a;
 			break;
-		case RootSystem::st_one:
+		case st_one:
 			value =  1;
 			break;
-		case RootSystem::st_parenttype: {
+		case st_parenttype: {
 			Root* r_ = roots[i];
 			if (r_->parent!=nullptr) {
 				value = r_->parent->param.type;
@@ -498,8 +499,38 @@ std::vector<double> RootSystem::getScalar(int stype) const
 			}
 			break;
 		}
+		case st_lb:
+			value = roots[i]->param.lb;
+			break;
+		case st_la:
+			value = roots[i]->param.la;
+			break;
+		case st_nob:
+			value = roots[i]->param.nob;
+			break;
+		case st_r:
+			value = roots[i]->param.r;
+			break;
+		case st_theta:
+			value = roots[i]->param.theta;
+			break;
+		case st_rlt:
+			value = roots[i]->param.rlt;
+			break;
+		case st_meanln: {
+			const std::vector<double>& v_ = roots[i]->param.ln;
+			value = std::accumulate(v_.begin(), v_.end(), 0.0) / v_.size();
+			break;
+		}
+		case st_stdln: {
+			const std::vector<double>& v_ = roots[i]->param.ln;
+			double mean = std::accumulate(v_.begin(), v_.end(), 0.0) / v_.size();
+			double sq_sum = std::inner_product(v_.begin(), v_.end(), v_.begin(), 0.0);
+			value = std::sqrt(sq_sum / v_.size() - mean * mean);
+			break;
+		}
 		default:
-			throw std::invalid_argument( "RootSystem::copyRootParam() type not implemented" );
+			throw std::invalid_argument( "RootSystem::getScalar type not implemented" );
 		}
 		scalars[i]=value;
 	}
