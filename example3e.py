@@ -4,10 +4,14 @@ import math
 rs = rb.RootSystem()
 
 # Open plant and root parameter from a file
-name = "Zea_mays_4_Leitner_2014"
+name = "Anagallis_femina_Leitner_2010"
 rs.openFile(name)
 
-# 1. Creates a square rhizotron r*r, with height h, rotated around the x-axis 
+for i in range(0,10):  
+    p = rs.getRootTypeParameter(i+1)
+    p.dx = 0.1 # adjust resolution
+
+# 1. creates a square rhizotron r*r, with height h, rotated around the x-axis for angle alpha
 r, h, alpha = 20, 4, 45
 rhizotron2 = rb.SDF_PlantContainer(r,r,h,True)
 posA = rb.Vector3d(0,r,-h/2) # origin before rotation
@@ -28,7 +32,7 @@ splitBox = rb.SDF_Union(box_)
 
 # 3. Rhizotubes as obstacles 
 box = rb.SDF_PlantBox(96,126,130) # box
-rhizotube = rb.SDF_PlantContainer(6.4,6.4,96,False) # a single rhizotube
+rhizotube = rb.SDF_PlantContainer(6.4,6.4,96,False) # a single Rhizotube
 rhizoX = rb.SDF_RotateTranslate(rhizotube, 90, rb.SDF_Axis.yaxis, rb.Vector3d(96/2,0,0))
 
 rhizotubes_ = rb.std_vector_SDF_()
@@ -43,15 +47,16 @@ for i in range(0,len(y_)):
 rhizotubes = rb.SDF_Union(rhizotubes_)
 rhizoTube = rb.SDF_Difference(box, rhizotubes)
 
-# Set geometry: rotatedRhizotron, splitBox, or rhizoTube
-rs.setGeometry(rotatedRhizotron)  
-
 # Simulate
+rs.setGeometry(rotatedRhizotron) # rotatedRhizotron, splitBox, or rhizoTube
 rs.initialize() 
 rs.simulate(60) # days   
 
-# Export results (as vtp)    
-rs.write("results/example_2a.vtp")
+# Export results as segments     
+rb.SegmentAnalyser(rs).write("results/example_3e.vtp")
 
 # Export container geometry as Paraview Python script 
-rs.write("results/example_2a.py")
+rs.write("results/example_3e.py")
+
+
+

@@ -11,14 +11,14 @@ for i in range(0,N):
     for j in range(0,N):
          rs = rb.RootSystem()
          rs.openFile(name) 
-         rs.getRootSystemParameter().seedPos = rb.Vector3d(dist*i,dist*j,-3) # set position of seed [cm]
+         rs.getRootSystemParameter().seedPos = rb.Vector3d(dist*i,dist*j,-3) 
          allRS.append(rs)
          rs.initialize()
 
 # Simulate parallel
 simtime = 120
 def simulate(i):
-    allRS[i].simulate(simtime)
+    allRS[i].simulate(simtime, True)
      
 pool = Pool()
 param_space = range(0,len(allRS))   
@@ -35,6 +35,4 @@ for rs in allRS:
        
 # Write all into single file (segments)
 ana.write("results/example_2b_all.vtp") 
-      
-      
-      
+       
