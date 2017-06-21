@@ -35,9 +35,6 @@ p1.tropismS = 0.3
 rs.setRootTypeParameter(p0)
 rs.setRootTypeParameter(p1)
 
-print(p0)
-print(p1)
-
 # Root system parameter (neglecting shoot borne)
 maxB = 100
 firstB = 10.
@@ -51,4 +48,3 @@ rs.initialize()
 rs.simulate(40, True)
 
 rs.write("results/example_3c.vtp")
-

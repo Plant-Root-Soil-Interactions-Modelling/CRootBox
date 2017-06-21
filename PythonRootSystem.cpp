@@ -105,9 +105,12 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate1_overloads,simulate,1,2);
 //	    .def("getDist", &SignedDistanceFunction_Wrap::getDist, &SignedDistanceFunction_Wrap::default_getDist)
 //	; // TODO how does polymorphism work... (everything works fine, dont ask why)
 // tricky booom boom (?)
-struct SoilPropertyCallback : SoilProperty, wrapper<SoilProperty> {
+
+
+struct SoilProperty_Wrap : SoilProperty, wrapper<SoilProperty> {
 
     double getValue(const Vector3d& pos, const Root* root = nullptr) const {
+
     	return this->get_override("getValue")(pos, root);
     }
 
@@ -116,7 +119,6 @@ struct SoilPropertyCallback : SoilProperty, wrapper<SoilProperty> {
     }
 
 };
-
 
 /**
  * Expose classes to Python module
@@ -245,7 +247,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	/*
 	 * soil.h
 	 */
-	class_<SoilPropertyCallback,boost::noncopyable>("SoilProperty",init<>())
+	class_<SoilProperty_Wrap,boost::noncopyable>("SoilProperty",init<>())
 			.def("getValue",pure_virtual(&SoilProperty::getValue))
 			.def("__str__",pure_virtual(&SoilProperty::toString))
 	;
@@ -294,8 +296,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def_readwrite("successor", &RootTypeParameter::successor)
 			.def_readwrite("successorP", &RootTypeParameter::successorP)
 			.def_readwrite("se", &RootTypeParameter::se)
-			.def_readwrite("sbp", &RootTypeParameter::sbp)
 			.def_readwrite("sa", &RootTypeParameter::sa)
+			.def_readwrite("sbp", &RootTypeParameter::sbp)
 			.def("__str__",&RootTypeParameter::toString)
 	;
 	class_<RootParameter>("RootParameter", init<>())
@@ -327,10 +329,21 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("__str__",&RootSystemParameter::toString)
 	;
 	/**
-	 * Root.h (only pointers, no members)
+	 * Root.h (no members, just data)
 	 */
-    class_<Root>("Root", init<RootSystem*, int, Vector3d, double, Root*, double, int>())
+    class_<Root, Root*>("Root", init<RootSystem*, int, Vector3d, double, Root*, double, int>())
 		.def("__str__",&Root::toString)
+	    .def_readwrite("rootsystem", &Root::rootsystem)
+	    .def_readwrite("param", &Root::param)
+	    .def_readwrite("id", &Root::id)
+	    .def_readwrite("parent_base_length", &Root::parent_base_length)
+	    .def_readwrite("parent_ni", &Root::parent_ni)
+	    .def_readwrite("alive", &Root::alive)
+	    .def_readwrite("active", &Root::active)
+	    .def_readwrite("age", &Root::age)
+	    .def_readwrite("length", &Root::length)
+	    .def_readwrite("parent", &Root::parent)
+	    .def_readwrite("laterals", &Root::laterals)
     ;
     class_<std::vector<Root*>>("std_vector_Root_")
         .def(vector_indexing_suite<std::vector<Root*>>() )
@@ -415,7 +428,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	.def("distribution", distribution_2)
 	.def("distribution2", distribution2_1)
 	.def("distribution2", distribution2_2)
-    .def("getNumberOfRoots", &SegmentAnalyser::getNumberOfRoots)
+    .def("getRoots", &SegmentAnalyser::getRoots)
+	.def("getNumberOfRoots", &SegmentAnalyser::getNumberOfRoots)
 	.def("cut", cut1)
 	.def("addUserData", &SegmentAnalyser::addUserData)
 	.def("clearUserData", &SegmentAnalyser::clearUserData)

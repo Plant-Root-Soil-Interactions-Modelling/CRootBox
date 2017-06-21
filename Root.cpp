@@ -82,8 +82,9 @@ void Root::simulate(double dt, bool silence)
 		if ((age>0) && (age-dt<=0)) { // the root emerges in this time step
 			double P = rootsystem->getRootTypeParameter(param.type)->sbp->getValue(nodes.back(),this);
 			if (P<1.) { // P==1 means the lateral emerges with probability 1 (default case)
-				double p = 1-std::pow((1-P), dt); //probability of emergence in this time step
-				if (rand()>p) { // not rand()<p
+				double p = 1.-std::pow((1.-P), dt); //probability of emergence in this time step
+				std::cout <<P<<", "<<p<< "\n";
+				if (rootsystem->rand()>p) { // not rand()<p
 					age -= dt; // the root does not emerge in this time step
 				}
 			}

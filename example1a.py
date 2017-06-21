@@ -4,13 +4,13 @@ rootsystem = rb.RootSystem()
 
 # Open plant and root parameter from a file
 name = "Anagallis_femina_Leitner_2010" 
-rootsystem.openFile(name) # as a second argument you could add the path (default = "modelparameter/"
+rootsystem.openFile(name) 
 
 # Initialize
 rootsystem.initialize() 
 
 # Simulate
-rootsystem.simulate(30)  # or 20, 40, 60 days
+rootsystem.simulate(30) 
 
 # Export final result (as vtp)
-rootsystem.write("results/example_1a.vtp") # roots are exported as polylines
+rootsystem.write("results/example_1a.vtp") 

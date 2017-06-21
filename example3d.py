@@ -18,7 +18,7 @@ def set_all_sd(rs,s):
 # Parameters
 name = "Triticum_aestivum_a_Bingham_2011" 
 simtime = 20
-N = 10 # resolution of paramter
+N = 100 # resolution of paramter
 runs = 10 # iterations
 theta0_ = np.linspace(0,math.pi/2,N)
 dx_ = np.linspace(0.1,1.,N) # geometric 0.01 1?

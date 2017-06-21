@@ -110,7 +110,7 @@ std::vector<double> SegmentAnalyser::getScalar(int st) const
 			break;
 		}
 		default:
-			throw std::invalid_argument( "AnalysisSDF::getData() type not implemented" );
+			throw std::invalid_argument( "SegmentAnalyser::getScalar: Type not implemented" );
 		}
 		data.at(i) = v;
 	}
@@ -288,12 +288,8 @@ Vector3d SegmentAnalyser::cut(Vector3d in, Vector3d out, SignedDistanceFunction*
  * \return The summed parameter of type @param st (@see RootSystem::ScalarType)
  */
 double SegmentAnalyser::getSummed(int st) const {
-	std::vector<double> data = getScalar(st);
-	double v = 0;
-	for (auto const& d : data) {
-		v += d;
-	}
-	return v;
+	std::vector<double> v_ = getScalar(st);
+	return std::accumulate(v_.begin(), v_.end(), 0.0);
 }
 
 /**
@@ -317,17 +313,30 @@ double SegmentAnalyser::getSummed(int st, SignedDistanceFunction* g) const {
 	return v;
 }
 
+
+
 /**
- * \return The number of roots
+ * Return the unique origins of the segments
  */
-int SegmentAnalyser::getNumberOfRoots() const
+std::vector<Root*> SegmentAnalyser::getRoots() const
 {
 	std::set<Root*> rootset;  // praise the stl
 	for (Root* r : segO) {
 		rootset.insert(r);
 	}
+	return std::vector<Root*>(rootset.begin(), rootset.end());
+}
+
+/**
+ * \return The number of roots
+ */
+int SegmentAnalyser::getNumberOfRoots() const
+{
+	const auto& rootset = getRoots();
 	return rootset.size();
 }
+
+
 
 /**
  * Projects the segments to an image plane (todo verify this code)
@@ -554,7 +563,7 @@ void SegmentAnalyser::write(std::string name)
 		std::cout << "writing dgf file: "<< name << "\n";
 		writeDGF(fos);
 	} else {
-		throw std::invalid_argument("RootSystem::write(): Unkwown file type");
+		throw std::invalid_argument("SegmentAnalyser::write: Unknown file type");
 	}
 	fos.close();
 }

@@ -59,7 +59,7 @@ www.simwerk.at
 
 \noindent 
 The following tutorial offers scripts to outline the usage of the CRootBox Python binding for many different applications. 
-For further documentation please refer to the doxygen class documentation of the CRootBox code.
+For further documentation please refer to the Doxygen class documentation of the CRootBox code.
 
 
 \vspace{0.5 cm}
@@ -67,87 +67,39 @@ For further documentation please refer to the doxygen class documentation of the
 \tableofcontents
 
 
+
 \section{Basic usage}
  
 The first example shows how to use CRootBox in the most simple situation: open a parameter file (L7), do the simulation (L13), and save the result (L16). 
 
-\begin{lstlisting}[language=Python, caption=Example 1a]
-import py_rootbox as rb
-
-rootsystem = rb.RootSystem()
-
-# Open plant and root parameter from a file
-name = "Anagallis_femina_Leitner_2010" 
-rootsystem.openFile(name) 
-
-# Initialize
-rootsystem.initialize() 
-
-# Simulate
-rootsystem.simulate(30) 
-
-# Export final result (as vtp)
-rootsystem.write("results/"+name+".vtp") 
-\end{lstlisting}
+\lstinputlisting[language=Python, caption=Example 1a]{../example1a.py} % basicstyle=\footnotesize, 
 
 \noindent 
 Lets revise the above code in more detail: 
 \begin{itemize}
- \item[L1] Imports the CRootBox Python library (py\_rootbox), and names it rb
- \item[L3] Constructs the root system object
- \item[L7] Opens two text files: the root type parameter file (.rparam) and the root system parameter file (.pparam). Optionally, as a second argument a path can be provided, the default path is (modelparameter/). 
+ \item[1] Imports the CRootBox Python library (py\_rootbox), and names it rb
+ \item[3] Constructs the root system object
+ \item[7] Opens two text files: the root type parameter file (.rparam) and the root system parameter file (.pparam). Optionally, as a second argument a path can be provided, the default path is (modelparameter/). 
  Alternatively, all parameter can be set or modified directly in Python (see Section \ref{sec:sa}).
- \item[L10] Initializes the simulation: Creates the tap root the base roots (i.e. all basal roots, and shootborne roots that might emerge), creates the tropisms and passes the domain geometry to it, and creates the elongation functions. 
- \item[L13] Performs the simulation. The value 30 is the simulation time in days. If no simultation time is passed the simulation time is taken fromthe .pparam file. Note that simulation results are independent from the time step, 
+ \item[10] Initializes the simulation: Creates the tap root the base roots (i.e. all basal roots, and shoot borne roots that might emerge), creates the tropisms and passes the domain geometry to it, and creates the elongation functions. 
+ \item[13] Performs the simulation. The value 30 is the simulation time in days. If no simultation time is passed the simulation time is taken from the .pparam file. Note that simulation results are independent from the time step, 
  i.e. 30 simulate(1) calls should have same result). 
- \item[L17] Saves the resulting root system geometry in the VTK Polygonal Data format (VTP) as polylines. 
+ \item[17] Saves the resulting root system geometry in the VTK Polygonal Data format (VTP) as polylines. 
 \end{itemize}
 
-The next example is an extension of the previous one, where the root system grows in one of two containers (Soil core or rectangular rhizotron).
+The next example is an extension of the previous one, where the root system grows in one of two containers (a soil core or rectangular rhizotron).
 Such geometries are important if we want mimic experimental settings. In CRootBox domain geometry is represented in a mesh free way using signed distance functions (SDF).
 SDF return the distance to the closest boundary, an add negative sign, if we are inside of the domain.
 
-\begin{lstlisting}[language=Python, caption=Example 1b]
-import py_rootbox as rb
-
-rootsystem = rb.RootSystem()
-
-# Open plant and root parameter from a file
-name = "Anagallis_femina_Leitner_2010" 
-rootsystem.openFile(name)
-
-# Create and set geometry
-
-# 1.creates a cylindrical soil core with top radius 5 cm, bot radius 5 cm, height 40cm
-soilcore = rb.SDF_PlantContainer(5,5,40,False)
-
-# 2. creates a square 27*27 cm containter with height 1.5 cm
-rhizotron = rb.SDF_PlantBox(1.4,27,27);
-
-# pick 1, 2
-rootsystem.setGeometry(soilcore) 
-
-# Initialize
-rootsystem.initialize() 
-
-# Simulate
-rootsystem.simulate(60)
-
-# Export final result (as vtp)
-rootsystem.write("results/"+name+".vtp") 
-
-# Export container geometry as Paraview Python script (run file in Paraview by Tools->Python Shell, Run Script)    
-rootsystem.write("results/"+name+".py") 
-\end{lstlisting}
+\lstinputlisting[language=Python, caption=Example 1b]{../example1b.py}
 
 The geometry is first created by constructing some specialisation of the call SignedDistanceFunction, and the passed to the root system by the method setGeometry: 
 \begin{itemize}
- \item[L12] Construct a soil core 
- \item[L15] Construct a rhizotron
- \item[L18] Pick one the two geoemtries. It is important to call setGeometry before initialize!
- \item[L30] Its possible to save the geometry as Paraview Pyhton script for visualization. Run this script in Paraview by Tools$\rightarrow$Python Shell, Run Script.
+ \item[12] Construct a soil core 
+ \item[15] Construct a rhizotron
+ \item[18] Pick one the two geometries. It is important to call setGeometry before initialize!
+ \item[30] Its possible to save the geometry as Paraview Python script for visualization. Run this script in Paraview by Tools$\rightarrow$Python Shell, Run Script.
 \end{itemize}
-
 
 
 
@@ -158,21 +110,190 @@ Furthermore, we show an example with multiple root systems that is computed in p
 
 \subsection{Using SDF with set operations}
 
+In the following example we create more complex geometries that we might encounter in experiments. 
+First, we sow how to rotate a rhizotron (e.g. to see more roots at the wall due to gravitropism). 
+Second, we create a split box experiment, and finally we show how we can create obstacles in the domain like rhizotubes. 
+
+The examples show how to build more complex geometries with rotation, translation and using set operations on the SDF.
+
+\lstinputlisting[language=Python, caption=Example 2a]{../example2a.py}
+
+\begin{itemize}
+
+\item[10-16] Definition of a rotated rhizotron: L12 creates the flat container with a small height, this container is then rotated and translated into the desired position. L13 is the position where the origin should lie, and L14 the rotational matrix around the x-axis. 
+In L15 the origin position is rotated. Finally, in L16 the new rotated and translated geometry is created. 
+ 
+\item[18-27] Definition of of a split box: The split box is composed of a left box, a right box, and a top box connecting left and right. In L27 the geometry is defined by the set operation union of the three compartments. 
+ 
+\item[29-44] Definition of rhizotubes as obstacles: L30 is the surrounding box, L31 a single rhizotube, that is rotated around the y-axis in L32. L34-L41 create a list of rhizotubes at different locations that mimics the experimental setup. 
+L43 and L44 compose the final geometry by to set operation, first a union of all tubes, and then cut them out the surrounding box by taking the difference. 
+ 
+\item[47] Pick one of the three geometries for you simulation.
+ 
+\item[57] Also more complex geometries can be visualized by the Paraview script, however set operations are not really performed, only the involved geometries are visualized.
+
+\end{itemize}
+
+
+
 \subsection{Multiple root systems}
 
+Its possible to simulate multiple root systems. To speed up things we can do that in parallel.
+The following example shows how simple this can be achieved in Python, by a plot scale simulation
+
+\lstinputlisting[language=Python, caption=Example 2b]{../example2b.py}
+
+\begin{itemize}
+
+\item[5,6] Set the number of columns and rows of the plot, and the distance between the root systems.
+
+\item[9-16] Creates the root systems, and puts them into a list allRS. L14 sets the position of the seed. 
+
+\item[19-21] Defines a function to simulate the root system of index i of allRS. 
+
+\item[23-25] Simulates in parallel: L23 creates the multiprocessing pool object. L24 defines which parameters we pass to the function, in our case the indices of the root system. 
+L25 does the performs the parallel computation. Nothing is returned by the simulate function, but the root systems are updated.
+
+\item[27-37] Save the root systems as single file and additionally saves all root systems into one file. 
+Therefore, we create an SegmentAnalyser object in L29 and put all segments into it L34, and finally export the single file L37.
+
+\end{itemize}
 
 
-\section{Analysis of simualtion results}
 
-There are various post processing options, on a per root level by the class RootSystem, or per segment, by the class SegmentAnalyser.
-We show some examples of the most frequently used methods. Additionally we show how model parameters can be modified, 
-and how a sensitivity ananlysis can be performed. 
+\section{Analysis of simulation results}
 
-\subsection{Per root}
+There are various post processing options, on a per root level by the class RootSystem, or a per segment level by the class SegmentAnalyser.
+We show some examples of the most frequently used methods. Additionally, we show how model parameters can be modified, 
+and how a sensitivity analysis can be performed. 
 
-\subsection{Per segment}
+\subsection{Analysis per root}
+
+The class RootSystem offers some post-processing options. All of them are on a per root level. 
+The following script shows how to analyse length versus time, and how we could obtain root tip or root base positions. 
+
+First lets analyse the root length over times, and consider total root length, and root length per type. 
+
+\lstinputlisting[firstline=1,lastline=41, language=Python, caption=Example 3a (1)]{../example3a.py}
+
+\begin{itemize}
+
+\item[2] Rb\_tools is a small utility package that contains functions to convert the exposed C++ data types to NumPy arrays. 
+\item[3] NumPy is Pythons scientific computing package
+\item[4] Matplotlib is Pythons easy way to create figures like in Matlab.
+
+\item[6-9] Sets up the simulation
+
+\item[11-13] Defines the simulation time, the time step, and the resulting number of simulate(dt) calls. 
+
+\item[16,17] First we state which scalar type we want to analyse (others are type, radius, order, time, length, surface, one, parenttype) and in L17 we give it a name for labeling the figure. 
+
+\item[18-21] Pre-definition of the NumPy arrays storing the lengths over time. 
+
+\item[22-21] The simulation loops executes the simulation for a single time step L23. L24 calculates the type of each root, L25 the length (or other scalar type) of the root. 
+The functions v2a is defined in the package rb\_tools and converts the C++ vector of doubles to a NumPy array. L26-L29 calculates the total root length in the time step for all roots, and for specific root types.
+
+\item[31-40] Creates the figure showing the results
+
+\end{itemize}
+
+Furthermore, we want to show two options how to retrieve root tip postions and root base positions from a simulation:
+
+\lstinputlisting[firstline=42, language=Python, caption=Example 3a (2)]{../example3a.py}
+
+\begin{itemize}
+
+\item[43-44] Reset the simulation and simulate for only 4 days (otherwise there are so many root tips)
+
+\item[46-47] To get an idea how big the result is. Note that number of segments equals the number of nodes minus number of base roots.
+
+\item[50-53] Retrieves the nodes of each roots, and prints the first node (root base), and the last node (root tip)
+
+\item[56-61] L56 returns all nodes of the root system, vv2a converts the vector of Vector3d to a NumPy array. The methods L57, L58 return the indices of the tips and bases. Finally, tips and bases are printed as before. 
+
+\end{itemize}
+
+
+
+\subsection{Analysis per segment}
+
+The class SegmentAnalyser offers post-processing options per segment. 
+The advantage is we can do distributions or crop with any geometry. 
+The following script demonstrates some of the possibilities by creating a virtual soil core experiment. 
+
+\lstinputlisting[language=Python, caption=Example 3b]{../example3b.py}
+
+\begin{itemize}
+
+\item[5-L10] Performs the simulation and exports the results.
+
+\item[13-16] We define two soil cores, one in the center of the root and one 10 cm translated. In L16 we pick which one we use for the further analysis. 
+
+\item[18-22] Prepares the plot. We use four sub-figures. 
+
+\item[24-28] Creates a root length distribution versus depth. L25 creates the SegmentAnalyser object, and L26 creates the distribution.
+
+\item[30-36] Performs the same distribution in the soil core. In L32 we crop the segments with the geometry. L33 is used to delete unused nodes. 
+
+\item[38-45] Same as before, but we are only interested in segments that are younger than 30 days. In L40 we use the filer method to keep only the segments we want to analyse. 
+
+\item[47-54] The filter method can be used for many different applications. In the following we use it to analyse lateral roots only. 
+
+\item[56-58] Show and save resulting figure.
+
+\end{itemize}
+
+
 
 \subsection{Sensitivity analysis} \label{sec:sa}
+
+In the previous examples we always opened the root system parameters from a file. 
+In the following example we show to do everything in a Python script without the need of any parameter files. 
+This is especially important if we want to modify the parameters in our scripts. 
+
+First we start with a script that defines all the parameter, and secondly, we show how we can use this to perform a sensitivity analysis.
+
+\lstinputlisting[language=Python, caption=Example 3c]{../example3c.py}
+
+\begin{itemize}
+
+\item[8,9] Create the root type parameters of type 1 and type 2.
+\item[11-33] We set up a simple root system by hand. First we define the tap root L11-L24, then the laterals L26-L33. In L20 and L21 we have to convert the Python types to the exposed C++ types.
+\item[35,36] Set the root type parameters
+
+\item[38-43] Create the root system parameter stating when basal and shoot borne roots emerge.
+
+\item[45] Sets the root system parameters.
+
+\item[47-50] Initialize, simulate, export. 
+
+\end{itemize}
+
+Next we vary given parameters in order to make a sensitivity analysis. This takes a lot of simulation runs. Again, we use parallel computing to speed up execution.
+
+\lstinputlisting[language=Python, caption=Example 3d]{../example3d.py}
+
+\begin{itemize}
+
+\item[7-16] Defines a function to set all standard deviations proportional to the parameter values. We use this function in the following to set the standard deviation to zero everywhere. 
+
+\item[18-24] todo
+
+\end{itemize}
+
+
+
+\subsection{How to make an animation}
+
+In order to create an animation in Paraview we have to consider some details. 
+
+
+We modify example2a.py to improve the animation.
+
+The script animate in the folder animate will help you to render the file .
+When exporting vtp files in order to make high definition animations in Paraview we should keep some things in mind. 
+The most important thing
+
 
 
 
@@ -183,9 +304,13 @@ CRootBox offers build in ways to develop such models.
 In this section we assume static soil conditions, and describe predefined ways how the soil can affect root growth.
 Dynamic soil conditions are described in the following section 'Coupling with a soil model'
 
-\subsection{Hydro- and Chemoropism}
+\subsection{Hydro- and chemotropism}
+
+\lstinputlisting[language=Python, caption=Example 4a]{../example4a.py}
 
 \subsection{Scale elongation rate}
+
+\lstinputlisting[language=Python, caption=Example 4b]{../example4b.py}
 
 \subsection{Scale insertion angle}
 
@@ -193,10 +318,12 @@ Dynamic soil conditions are described in the following section 'Coupling with a 
 
 
 
-\section{Coupling with a soil model}
+\section{Model coupling}
 
-In this section we present an example similar to one published in . 
-Furhtermore, we present features that can be used to analyse the dynamic behaviour of the root system development.
+In this section we first discuss how to obtain a graph reprentaion of the root system, and then present an example similar to one published in \cite{}. 
+Furthermore, we present features that can be used to analyse the dynamic behaviour of the root system development.
+
+\subsection{Graph representation}
 
 \subsection{Coupling to 1D water content}
 
