@@ -71,7 +71,6 @@ for t in range(0,simtime):
 	#https://docs.scipy.org/doc/numpy/reference/generated/numpy.savez.html
 	#np.savez(nameOutputFile, z=z, RLD=RLD)
 
-
 # Export root systems (for visualisation) as single vtp files (as polylines)
 c = 0
 ana = rb.SegmentAnalyser() # see example 3b
