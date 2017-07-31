@@ -66,7 +66,7 @@ public:
     bool active = 1; ///< true: active, false: root stopped growing
     double age = 0; ///< current age [days]
     double length = 0; ///< actual length [cm] of the root. might differ from getLength(age) in case of impeded root growth
-    int old_non = 0; ///< index of the node that was update last time step (==0 if no update was performed)
+    int old_non = 0; ///< number of old nodes, the sign is positive if the last node was updated, otherwise its negative
 
     /* up and down */
     Root* parent; ///< pointer to the parent root (equals nullptr if it is a base root)

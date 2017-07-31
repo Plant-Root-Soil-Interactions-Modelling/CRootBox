@@ -1,26 +1,42 @@
-import py_rootbox as rb
+import scipy.sparse.linalg as LA
+from scipy import sparse
 
+import py_rootbox as rb    
+from rb_tools import *
+
+import xylem_flux 
+
+# Simulate a root system
+name = "Sorghum_bicolor_NA_NA"
+simtime = 60 # days
+dt = 0.1 
+N = round(simtime/dt)
 rs = rb.RootSystem()
-
-# Open plant and root parameter from a file
-name = "Cauliflower_Vansteenkiste_et_al_2014" 
-rs.openFile(name) # as a second argument you could add the path (default = "modelparameter/"
-
-# Initialize
+rs.openFile(name)
 rs.initialize() 
 
-# simulation
-simtime = 120.
-dt = 1.
-N = 120/dt
-
-rs.initialize()
-for i in range(0,round(N)):
-    rs.simulate(dt,True)
+# Incrementally build an adjacency matrix 
+nodes = np.array([])
+seg= np.array([])
 
 
+print()
+for i in range(0,N):    
+     
+     rs.simulate(dt) 
+     
+     print("Number of nodes", rs.getNumberOfNodes()) # equals the number of new segments
+     print("Number of roots", len(rs.getRootTips()))
+     
+     print("Number of new nodes", rs.getNumberOfNewNodes()) # equals the number of new segments
+     print("Number of new roots", rs.getNumberOfNewRoots())
 
+     uni = v2a(rs.getUpdatedNodeIndices())    
+     unodes =  vv2a(rs.getUpdatedNodes())
+     print("Number of node updates", len(unodes), len(uni))
+             
+     newnodes = vv2a(rs.getNewNodes())
+     newsegs = seg2a(rs.getNewSegments())
+     
+     print()
 
-
-# Export final result (as vtp)
-rs.write("results/example_5b.vtp") # roots are exported as polylines

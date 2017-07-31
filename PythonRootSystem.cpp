@@ -12,7 +12,7 @@
  *  build a shared library from this file
  *  put comment to line 16 to ignore this file
  */
-// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -384,6 +384,12 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getRootBases", &RootSystem::getRootBases)
 		.def("write", &RootSystem::write)
 		.def("setSeed",&RootSystem::setSeed)
+		.def("getNumberOfNewNodes",&RootSystem::getNumberOfNewNodes)
+		.def("getNumberOfNewRoots",&RootSystem::getNumberOfNewRoots)
+		.def("getUpdatedNodeIndices",&RootSystem::getUpdatedNodeIndices)
+		.def("getUpdatedNodes",&RootSystem::getUpdatedNodes)
+		.def("getNewNodes",&RootSystem::getNewNodes)
+		.def("getNewSegments",&RootSystem::getNewSegments)
 	;
     enum_<RootSystem::TropismTypes>("TropismType")
     	.value("plagio", RootSystem::TropismTypes::tt_plagio)

@@ -87,11 +87,11 @@ public:
 	// Dynamic information what happened last time step
 	int getNumberOfNewNodes() { return getNumberOfNodes()-old_non; } ///< returns the number of new nodes, which is exactly the same number as new segments
 	int getNumberOfNewRoots() { return getRoots().size() -old_nor; }  ///< returns the number of new roots
-	std::vector<int> getNodeUpdateIndices(); // todo test and comment
-	std::vector<Vector3d> getUpdatedNodes(); // to replace to the old node vector
+	std::vector<int> getUpdatedNodeIndices(); // todo test and comment
+	std::vector<Vector3d> getUpdatedNodes(); // to replace in the old node vector
 	std::vector<Vector3d> getNewNodes(); // to dynamically add to the old node vector
 	std::vector<Vector2i> getNewSegments(); // to dynamically add to the list of segments
-	// restore(); ///< restore old time step
+	// restore(); ///< TODO restore old time step
 
 	// Output Simulation results
 	void write(std::string name) const; /// writes simulation results (type is determined from file extension in name)

@@ -1,7 +1,7 @@
 #include "RootSystem.h"
 
 const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","1","userdata 1", "userdata 2", "userdata 3", "parent type",
-	"basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance"};
+		"basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance"};
 
 /**
  * Destructor
@@ -538,32 +538,33 @@ std::vector<double> RootSystem::getScalar(int stype) const
 }
 
 /**
- * todo test comment
+ * The indices of the nodes that were updated in the last time step
  */
-std::vector<int> RootSystem::getNodeUpdateIndices()
+std::vector<int> RootSystem::getUpdatedNodeIndices()
 {
 	this->getRoots(); // update roots (if necessary)
-	std::vector<int> ni = std::vector<int> (old_nor);
-	int c =0;
+	std::vector<int> ni = std::vector<int>(0);
 	for (auto const& r: roots) {
 		if (r->old_non>0){
-			ni.at(r->getNodeId(r->old_non));
-			c++;
+			ni.push_back(r->getNodeId(r->old_non));
 		}
 	}
 	return ni;
 }
 
 /**
- *
+ * The values of the nodes that were updated in the last time step
  */
 std::vector<Vector3d> RootSystem::getUpdatedNodes()
 {
 	this->getRoots(); // update roots (if necessary)
-	int non = getNumberOfNodes();
-	std::vector<Vector3d> un(non-old_non); // reserve big enough vector
-
-	return un;
+	std::vector<Vector3d> nv = std::vector<Vector3d>(0);
+	for (auto const& r: roots) {
+		if (r->old_non>0){
+			nv.push_back(r->getNode(r->old_non));
+		}
+	}
+	return nv;
 }
 
 /**
@@ -576,7 +577,8 @@ std::vector<Vector3d> RootSystem::getNewNodes()
 	int non = getNumberOfNodes();
 	std::vector<Vector3d> nv(non-old_non); // reserve big enough vector
 	for (auto const& r: roots) {
-		for (size_t i=r->old_non+1; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
+		int onon = std::abs(r->old_non);
+		for (size_t i=onon+1; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
 			nv.at(r->getNodeId(i)-old_non) = r->getNode(i); // pray that ids are correct
 		}
 	}
@@ -590,11 +592,12 @@ std::vector<Vector3d> RootSystem::getNewNodes()
 std::vector<Vector2i> RootSystem::getNewSegments()
 {
 	this->getRoots(); // update roots (if necessary)
-	int non=getNumberOfNodes()-1;
-	std::vector<Vector2i> si(non);
+	int non=getNumberOfNodes();
+	std::vector<Vector2i> si(non-old_non);
 	int c=0;
 	for (auto const& r:roots) {
-		for (size_t i=r->old_non; i<r->getNumberOfNodes()-1; i++) {
+		int onon = std::abs(r->old_non);
+		for (size_t i=onon; i<r->getNumberOfNodes()-1; i++) {
 			Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
 			si.at(c) = v;
 			c++;

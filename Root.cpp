@@ -163,6 +163,7 @@ void Root::simulate(double dt, bool silence)
 			active = getLength(std::max(age,0.))<(p.getK()-dx()/10); // become inactive, if final length is nearly reached
 		}
 	} // if alive
+
 }
 
 /**
@@ -299,8 +300,9 @@ void Root::createSegments(double l, bool silence)
 					return;
 				}
 			}
+		} else {
+			old_non = -(nn-1);
 		}
-		old_non = nn; // CHECK
 	}
 
 	if (l<smallDx) {
