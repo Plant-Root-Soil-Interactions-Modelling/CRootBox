@@ -26,12 +26,13 @@ for i in range(0,N):
 
 simtime = 120 # simulation time [day]
 dt=1 # time step [day]
+ntimestep= round(simtime/dt)
 depth=140; # soil depth [cm]
 nl = 15; # number of layers
 
 RLD_lastTime=vRLD=np.zeros((nl)) # Root length density at last time step [cm/cm3]
 #simulation for each time step 
-for t in range(0,simtime):
+for t in range(0,ntimestep):
 	for rs in allRS:
 	    rs.simulate(dt)
 	# Compute vertical RLD distribution in layers
@@ -45,7 +46,7 @@ for t in range(0,simtime):
 	      vRLD[c,:] /= (depth/nl)# rootLength per soil depth
 	      c += 1 # root system number
 	RLD=np.sum(vRLD,axis=0)/(Area*(depth/nl))
-	growingRate = RLD-RLD_lastTime
+	growingRate = (RLD-RLD_lastTime)/dt
 	RLD_lastTime = RLD
 	#Plot Root length density per layer
 	z=np.linspace(0,depth*(-1),nl)   # depth*-1 is the (negativ) z coordinate
@@ -54,7 +55,7 @@ for t in range(0,simtime):
 	plt.axis((0,x2,y1,y2)) # set min of x axis to 0, because of some negative values of (mean-std)
 	plt.xlabel('RLD (cm/cm3)')
 	plt.ylabel('Depth (cm)')
-	nameOutputFile="results/Soil3_wheat_RLD_time_"+str(t)
+	nameOutputFile="results/Soil3_wheat_RLD_time_"+str(t*dt)
 	plt.savefig(nameOutputFile+".png")
 	plt.close()
 	#Plot Growing rate per layer
@@ -63,7 +64,7 @@ for t in range(0,simtime):
 	plt.axis((0,x2,y1,y2)) # set min of x axis to 0, because of some negative values of (mean-std)
 	plt.xlabel('Growing rate (cm/cm3/day)')
 	plt.ylabel('Depth (cm)')
-	nameOutputFile="results/Soil3_wheat_GrowingRate_time_"+str(t)
+	nameOutputFile="results/Soil3_wheat_GrowingRate_time_"+str(t*dt)
 	plt.savefig(nameOutputFile+".png")
 	plt.close()
 
