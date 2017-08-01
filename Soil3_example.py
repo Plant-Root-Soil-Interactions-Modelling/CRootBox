@@ -24,10 +24,10 @@ for i in range(0,N):
          allRS.append(rs)
          rs.initialize()
 
-simtime = 120 # simulation time [day]
-dt=1 # time step [day]
-ntimestep= round(simtime/dt)
-depth=140; # soil depth [cm]
+simtime = 120. # simulation time [day]
+dt=1. # time step [day]
+ntimestep= int(round(simtime/dt))
+depth=150.; # soil depth [cm]
 nl = 15; # number of layers
 
 RLD_lastTime=vRLD=np.zeros((nl)) # Root length density at last time step [cm/cm3]
@@ -37,7 +37,6 @@ for t in range(0,ntimestep):
 	    rs.simulate(dt)
 	# Compute vertical RLD distribution in layers
 	vRLD=np.zeros((N*N,nl)); # N*N rows, nl columns
-	depth=150.;
 	c=0
 	for rs in allRS:
 	      analysis = rb.SegmentAnalyser(rs)
