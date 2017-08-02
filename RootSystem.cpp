@@ -201,6 +201,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		gf.push_back(gf_);
 	}
 
+	old_non = baseRoots.size();
 }
 
 /**
@@ -352,6 +353,11 @@ std::vector<Vector3d> RootSystem::getNodes() const
 	this->getRoots(); // update roots (if necessary)
 	int non = getNumberOfNodes();
 	std::vector<Vector3d> nv = std::vector<Vector3d>(non); // reserve big enough vector
+	// copy initial nodes (roots might not have developed)
+	for (auto const& r: baseRoots) {
+		nv.at(r->getNodeId(0)) = r->getNode(0);
+	}
+	// copy root nodes
 	for (auto const& r: roots) {
 		for (size_t i=0; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
 			nv.at(r->getNodeId(i)) = r->getNode(i); // pray that ids are correct
@@ -540,13 +546,13 @@ std::vector<double> RootSystem::getScalar(int stype) const
 /**
  * The indices of the nodes that were updated in the last time step
  */
-std::vector<int> RootSystem::getUpdatedNodeIndices()
+std::vector<int> RootSystem::getUpdatedNodeIndices() const
 {
 	this->getRoots(); // update roots (if necessary)
 	std::vector<int> ni = std::vector<int>(0);
 	for (auto const& r: roots) {
 		if (r->old_non>0){
-			ni.push_back(r->getNodeId(r->old_non));
+			ni.push_back(r->getNodeId(r->old_non-1));
 		}
 	}
 	return ni;
@@ -555,13 +561,13 @@ std::vector<int> RootSystem::getUpdatedNodeIndices()
 /**
  * The values of the nodes that were updated in the last time step
  */
-std::vector<Vector3d> RootSystem::getUpdatedNodes()
+std::vector<Vector3d> RootSystem::getUpdatedNodes() const
 {
 	this->getRoots(); // update roots (if necessary)
 	std::vector<Vector3d> nv = std::vector<Vector3d>(0);
 	for (auto const& r: roots) {
 		if (r->old_non>0){
-			nv.push_back(r->getNode(r->old_non));
+			nv.push_back(r->getNode(r->old_non-1));
 		}
 	}
 	return nv;
@@ -571,15 +577,14 @@ std::vector<Vector3d> RootSystem::getUpdatedNodes()
  * Returns a vector of newly created nodes since the last call of RootSystem::simulate(dt),
  * to dynamically add to the old node vector, see also RootSystem::getNodes
  */
-std::vector<Vector3d> RootSystem::getNewNodes()
+std::vector<Vector3d> RootSystem::getNewNodes() const
 {
 	this->getRoots(); // update roots (if necessary)
-	int non = getNumberOfNodes();
-	std::vector<Vector3d> nv(non-old_non); // reserve big enough vector
+	std::vector<Vector3d> nv(this->getNumberOfNewNodes());
 	for (auto const& r: roots) {
 		int onon = std::abs(r->old_non);
-		for (size_t i=onon+1; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
-			nv.at(r->getNodeId(i)-old_non) = r->getNode(i); // pray that ids are correct
+		for (size_t i=onon; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
+			nv.at(r->getNodeId(i)-this->old_non) = r->getNode(i); // pray that ids are correct
 		}
 	}
 	return nv;
@@ -589,15 +594,14 @@ std::vector<Vector3d> RootSystem::getNewNodes()
  * Returns a vector of newly created segments since the last call of RootSystem::simulate(dt),
  * to dynamically add to the old segment index vector, see also RootSystem::getSegments
  */
-std::vector<Vector2i> RootSystem::getNewSegments()
+std::vector<Vector2i> RootSystem::getNewSegments() const
 {
 	this->getRoots(); // update roots (if necessary)
-	int non=getNumberOfNodes();
-	std::vector<Vector2i> si(non-old_non);
+	std::vector<Vector2i> si(this->getNumberOfNewNodes());
 	int c=0;
 	for (auto const& r:roots) {
 		int onon = std::abs(r->old_non);
-		for (size_t i=onon; i<r->getNumberOfNodes()-1; i++) {
+		for (size_t i=onon-1; i<r->getNumberOfNodes()-1; i++) {
 			Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
 			si.at(c) = v;
 			c++;

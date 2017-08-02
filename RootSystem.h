@@ -85,12 +85,12 @@ public:
     std::vector<int> getRootBases() const; ///< Node indices of the root bases
 
 	// Dynamic information what happened last time step
-	int getNumberOfNewNodes() { return getNumberOfNodes()-old_non; } ///< returns the number of new nodes, which is exactly the same number as new segments
-	int getNumberOfNewRoots() { return getRoots().size() -old_nor; }  ///< returns the number of new roots
-	std::vector<int> getUpdatedNodeIndices(); // todo test and comment
-	std::vector<Vector3d> getUpdatedNodes(); // to replace in the old node vector
-	std::vector<Vector3d> getNewNodes(); // to dynamically add to the old node vector
-	std::vector<Vector2i> getNewSegments(); // to dynamically add to the list of segments
+	int getNumberOfNewNodes() const { return getNumberOfNodes()-old_non; } ///< returns the number of new nodes, which is exactly the same number as new segments
+	int getNumberOfNewRoots() const { return getRoots().size() -old_nor; }  ///< returns the number of new roots
+	std::vector<int> getUpdatedNodeIndices() const; // todo test and comment
+	std::vector<Vector3d> getUpdatedNodes() const; // to replace in the old node vector
+	std::vector<Vector3d> getNewNodes() const; // to dynamically add to the old node vector
+	std::vector<Vector2i> getNewSegments() const; // to dynamically add to the list of segments
 	// restore(); ///< TODO restore old time step
 
 	// Output Simulation results

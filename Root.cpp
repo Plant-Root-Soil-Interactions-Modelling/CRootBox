@@ -47,6 +47,12 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
 	}
 }
 
+
+Root::Root(const Root& r)
+{
+
+}
+
 /**
  * Destructor, spread the word
  */
@@ -163,6 +169,10 @@ void Root::simulate(double dt, bool silence)
 			active = getLength(std::max(age,0.))<(p.getK()-dx()/10); // become inactive, if final length is nearly reached
 		}
 	} // if alive
+
+	if (old_non==0) { // if createSegments was not called
+		old_non = -nodes.size();
+	}
 
 }
 
@@ -294,14 +304,14 @@ void Root::createSegments(double l, bool silence)
 				double et = this->getCreationTime(length+sl);
 				nodes[nn-1] = newnode;
 				netimes[nn-1] = std::max(et,rootsystem->getSimTime()); // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
-				old_non = nn-1;
+				old_non = nn;
 				l -= sdx;
 				if (l<=0) { // ==0 should be enough
 					return;
 				}
 			}
 		} else {
-			old_non = -(nn-1);
+			old_non = -nn;
 		}
 	}
 
