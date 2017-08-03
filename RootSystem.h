@@ -40,6 +40,7 @@ public:
 	static const std::vector<std::string> scalarTypeNames; ///< the corresponding names
 
 	RootSystem() { initRTP(); };
+	RootSystem(const RootSystem& rs); //< copy constructor
 	virtual ~RootSystem();
 
 	// Parameter input output

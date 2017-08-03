@@ -17,7 +17,6 @@ simtime = 60 # days
 dt = 0.1
 N = round(simtime/dt)
 
-
 # Incrementally build nodes and segments
 nodes = vv2a(rs.getNodes()) # contains the initial nodes of tap, basal and shootborne roots
 seg = np.array([], dtype=np.int64).reshape(0,2)
@@ -48,7 +47,7 @@ for i in range(0,N):
          seg = np.vstack((seg,newsegs))
      
      print()
-#      if rs.getNumberOfNewNodes()!=newnodes.shape[0]:
+#      if rs.getNumberOfNewNodes()!=newnodes.shape[0]: # stuff for debugging...
 #          print("oh noooooooo")      
 #      for i in range(0,newnodes.shape[0]):
 #          if np.sum(newnodes[i,:]) == 0:
@@ -83,8 +82,8 @@ nodes_ = vv2a(rs.getNodes());
 seg_ = seg2a(rs.getSegments());
     
 uneq = np.sum(nodes_!=nodes)/3
+print("unequal nodes: ", uneq) 
 if uneq>0:    
-    print("unequal nodes: ", uneq) 
     i = np.nonzero(nodes_[:,0]!=nodes[:,0])
     print(i)
     print()
@@ -98,7 +97,6 @@ if uneq>0:
 seg = np.sort(seg,axis=0) # per default along the last axis 
 seg_ = np.sort(seg_,axis=0) 
 print("unequal segs: ", np.sum(seg_!=seg)/2) 
-
 
 # rs.write("results/example_5b.vtp")
 

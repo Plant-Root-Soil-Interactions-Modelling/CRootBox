@@ -31,7 +31,6 @@ class RootTypeParameter
 public:
 
 	RootTypeParameter(); ///< default constructor
-	RootTypeParameter(const RootTypeParameter& rp); ///< copy constructor
 	virtual ~RootTypeParameter() { };
 
 	void set(int type, double lb, double lbs, double la, double las, double ln, double lns, double nob, double nobs,

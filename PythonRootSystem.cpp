@@ -12,7 +12,7 @@
  *  build a shared library from this file
  *  put comment to line 16 to ignore this file
  */
-// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -263,7 +263,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	 * ModelParameter.h
 	 */
 	class_<RootTypeParameter>("RootTypeParameter", init<>())
-			.def(init<RootTypeParameter&>())
 			.def("realize",&RootTypeParameter::realize)
 			.def("getLateralType",&RootTypeParameter::getLateralType)
 			.def("getK",&RootTypeParameter::getK)
@@ -332,6 +331,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	 * Root.h (no members, just data)
 	 */
     class_<Root, Root*>("Root", init<RootSystem*, int, Vector3d, double, Root*, double, int>())
+		.def(init<Root&>())
 		.def("__str__",&Root::toString)
 	    .def_readwrite("rootsystem", &Root::rootsystem)
 	    .def_readwrite("param", &Root::param)
@@ -357,7 +357,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	/*
 	 * RootSystem.h
 	 */
-    class_<RootSystem>("RootSystem")
+    class_<RootSystem, RootSystem*>("RootSystem", init<>())
+		.def(init<RootSystem&>())
 		.def("setRootTypeParameter", &RootSystem::setRootTypeParameter)
 		.def("getRootTypeParameter", &RootSystem::getRootTypeParameter, return_value_policy<reference_existing_object>())
 		.def("setRootSystemParameter", &RootSystem::setRootSystemParameter)

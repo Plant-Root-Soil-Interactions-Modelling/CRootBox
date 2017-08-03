@@ -13,15 +13,6 @@ RootTypeParameter::RootTypeParameter() {
 			successor, successorP, 1.22, 0., 1.e9, 0., 1, "undefined");
 }
 
-/**
- * Copy constructor
- */
-RootTypeParameter::RootTypeParameter(const RootTypeParameter& rp) :type(rp.type), lb(rp.lb), lbs(rp.lbs), la(rp.la), las(rp.las),
-		ln(rp.ln), lns(rp.lns), nob(rp.nob), nobs(rp.nobs), r(rp.r), rs(rp.rs), a(rp.a), as(rp.as), colorR(rp.colorR), colorG(rp.colorG),
-		colorB(rp.colorB), tropismT(rp.tropismT), tropismN(rp.tropismN), tropismS(rp.tropismS), dx(rp.dx), theta(rp.theta), thetas(rp.thetas),
-		rlt(rp.rlt), rlts(rp.rlts), gf(rp.gf), name(rp.name), successor(rp.successor),
-		successorP(rp.successorP) { }
-
 void RootTypeParameter::set(int type, double lb, double lbs, double la, double las, double ln, double lns, double nob, double nobs,
 		double r, double rs, double a, double as,  double colorR, double colorG, double colorB, double tropismT, double tropismN, double tropismS,
 		double dx, const std::vector<int>& successor, const std::vector<double>& successorP, double theta, double thetas, double rlt, double rlts,

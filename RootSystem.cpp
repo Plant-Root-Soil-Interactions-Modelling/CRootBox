@@ -4,6 +4,39 @@ const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","o
 		"basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance"};
 
 /**
+ * Copy Constructor
+ *
+ * deep copies the root system
+ * does not copy growth functions, tropism functions, geometry, and soil
+ * empties buffer
+ */
+RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), rsparam(rs.rsparam), rtparam(rs.rtparam), gf(rs.gf), tf(rs.tf), geometry(rs.geometry), soil(rs.soil),
+		simtime(rs.simtime), rid(rs.rid), nid(rs.nid), old_non(rs.old_non), old_nor(rs.old_nor), maxtypes(rs.maxtypes), gen(rs.gen), UD(rs.UD), ND(rs.ND)
+{
+	std::cout << "Copying root system";
+
+	RootSystem* rs_ = nullptr;
+	// cheat
+	for (auto& br : rs.baseRoots) {
+		rs_ = br->rootsystem; // always the same root system
+		br->rootsystem = this;
+	}
+
+	// copy base Roots
+	std::vector<Root*> baseRoots = std::vector<Root*>(rs.baseRoots.size());
+	for (size_t i=0; i<rs.baseRoots.size(); i++) {
+		baseRoots.at(i) = new Root(*rs.baseRoots.at(i)); // deep copy root tree
+	}
+
+	// uncheat
+	for (auto& br : rs.baseRoots) {
+		br->rootsystem = rs_;
+	}
+
+	std::vector<Root*> roots = std::vector<Root*>();
+}
+
+/**
  * Destructor
  */
 RootSystem::~RootSystem()
