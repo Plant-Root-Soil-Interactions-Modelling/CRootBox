@@ -309,6 +309,8 @@ void Root::createSegments(double l, bool silence)
 				if (l<=0) { // ==0 should be enough
 					return;
 				}
+			} else {
+				old_non = -nn;
 			}
 		} else {
 			old_non = -nn;

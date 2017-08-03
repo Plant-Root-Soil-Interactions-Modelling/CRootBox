@@ -60,12 +60,12 @@ void RootTypeParameter::set(int type, double lb, double lbs, double la, double l
  */
 RootParameter RootTypeParameter::realize() {
 	// type does not change
-	double lb_ = std::max(lb + randn()*lbs,double(0)); // length of basal zone
-	double la_ = std::max(la + randn()*las,double(0)); // length of apical zone
+	double lb_ = std::max(lb + randn()*lbs,double(1.e-5)); // length of basal zone
+	double la_ = std::max(la + randn()*las,double(1.e-5)); // length of apical zone
 	std::vector<double> ln_; // stores the inter-distances
 	int nob_ = std::max(round(nob + randn()*nobs),double(0)); // maximal number of branches
 	for (int i = 0; i<nob_-1; i++) { // create inter-root distances
-		double d = std::max(ln + randn()*lns,1e-9);
+		double d = std::max(ln + randn()*lns,1.e-5);
 		ln_.push_back(d);
 	}
 	double r_ = std::max(r + randn()*rs,double(0)); // initial elongation

@@ -579,6 +579,7 @@ std::vector<Vector3d> RootSystem::getUpdatedNodes() const
  */
 std::vector<Vector3d> RootSystem::getNewNodes() const
 {
+	roots.clear();
 	this->getRoots(); // update roots (if necessary)
 	std::vector<Vector3d> nv(this->getNumberOfNewNodes());
 	for (auto const& r: roots) {

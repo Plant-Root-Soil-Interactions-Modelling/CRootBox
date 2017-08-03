@@ -7,14 +7,14 @@ from rb_tools import *
 import xylem_flux 
 
 # Simulate a root system
-name = "Anagallis_femina_Leitner_2010" #"Sorghum_bicolor_NA_NA" "Zea_mays_4_Leitner_2014" # 
+name = "Zea_mays_4_Leitner_2014"  # "Zea_mays_4_Leitner_2014"  # "Anagallis_femina_Leitner_2010" #"Sorghum_bicolor_NA_NA" "Zea_mays_4_Leitner_2014" # 
 rs = rb.RootSystem()
 rs.openFile(name)
 rs.initialize() 
 
 # example
 simtime = 60 # days
-dt = 1
+dt = 0.1
 N = round(simtime/dt)
 
 
@@ -27,7 +27,7 @@ print(nodes)
 print()
 for i in range(0,N):        
   
-     rs.simulate(dt)           
+     rs.simulate(dt, False)           
      print("Number of nodes", rs.getNumberOfNodes()) # equals the number of new segments
      print("Number of roots", len(rs.getRootTips()))
             
@@ -37,59 +37,68 @@ for i in range(0,N):
      uni = v2ai(rs.getUpdatedNodeIndices())    
      unodes =  vv2a(rs.getUpdatedNodes())
      print("Number of node updates", len(unodes), len(uni))
-     # do the update
-          
-     nodes[uni] = unodes     
-             
+               
+     nodes[uni] = unodes # do the update    
+                   
      newnodes = vv2a(rs.getNewNodes())
      newsegs = seg2a(rs.getNewSegments())
-     
-     if rs.getNumberOfNewNodes()!=newnodes.shape[0]:
-         print("oh noooooooo") 
-     
-#      print("New nodes: ")
-#      print(newnodes,"\n")
-#      print("New segments: ")
-#      print(newsegs)
      if len(newnodes)!=0:
          nodes = np.vstack((nodes,newnodes))
      if len(newsegs)!=0:
          seg = np.vstack((seg,newsegs))
      
-    # test is everything right?
-     nodes_ = vv2a(rs.getNodes());
-     seg_ = seg2a(rs.getSegments());
-    
-     uneq = np.sum(nodes_!=nodes)/3
-    
-     if uneq>0:    
-#         print("Incremental nodes", len(nodes), " real", len(nodes_))
-#         print("Incremental segments", len(seg), " real", len(seg_))   
-        print("unequal nodes: ", uneq) 
-
-        i = np.nonzero(nodes_[:,0]!=nodes[:,0])
-        print(i)
-        print()
-
-        print(nodes[i,:])
-        print(nodes_[i,:])     
-         
-     
-     
      print()
+#      if rs.getNumberOfNewNodes()!=newnodes.shape[0]:
+#          print("oh noooooooo")      
+#      for i in range(0,newnodes.shape[0]):
+#          if np.sum(newnodes[i,:]) == 0:
+#              i_=i+nodes.shape[0]
+#              print("New node ", i, "is empty =",i_)
+#              
+#              nodes_ = vv2a(rs.getNodes())
+#              seg_ = seg2a(rs.getSegments())    
+#              origins = rs.getSegmentsOrigin()
+#              # print(type(origins))
+#              
+#              print("should be ", nodes_[i_])
+#              
+#              arg = np.argmax(seg_[:,1] == i_)
+#              print("missing segment ", arg, seg_[arg,:])
+#              r = origins[int(arg)]
+#              print(r)
+#              print(r.param)
+#              arg = np.argmax(seg_[:,1] == seg_[arg,0])
+#              print("predecessor ", arg, seg_[arg,:])
+#                                        
+#              arg = np.argmax(newsegs[:,1] == i_)
+#              print(arg)
+#              print("segment ", newsegs[arg,:])
+#                           
+#              print("New segments")
+#              print(newsegs)
 
-
+     
+# test is everything right?
+nodes_ = vv2a(rs.getNodes());
+seg_ = seg2a(rs.getSegments());
+    
+uneq = np.sum(nodes_!=nodes)/3
+if uneq>0:    
+    print("unequal nodes: ", uneq) 
+    i = np.nonzero(nodes_[:,0]!=nodes[:,0])
+    print(i)
+    print()
+    print(nodes[i,:])
+    print(nodes_[i,:])     
+    print()
 
 # node indices have meaning, the ordering should be the same
 
+# segment indices have no special meaning, and the ordering is different
+seg = np.sort(seg,axis=0) # per default along the last axis 
+seg_ = np.sort(seg_,axis=0) 
+print("unequal segs: ", np.sum(seg_!=seg)/2) 
 
 
-
-# # segment indices have no special meaning, and the ordering is different
-# seg = np.sort(seg,axis=0) # per default along the last axis 
-# seg_ = np.sort(seg_,axis=0) 
-# print("unequal segs: ", np.sum(seg_!=seg)/2) 
-# 
-# 
 # rs.write("results/example_5b.vtp")
 
