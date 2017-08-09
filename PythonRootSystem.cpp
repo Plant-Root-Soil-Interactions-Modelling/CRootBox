@@ -263,7 +263,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	 * ModelParameter.h
 	 */
 	class_<RootTypeParameter>("RootTypeParameter", init<>())
-			.def(init<RootTypeParameter&>())
 			.def("realize",&RootTypeParameter::realize)
 			.def("getLateralType",&RootTypeParameter::getLateralType)
 			.def("getK",&RootTypeParameter::getK)
@@ -332,6 +331,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	 * Root.h (no members, just data)
 	 */
     class_<Root, Root*>("Root", init<RootSystem*, int, Vector3d, double, Root*, double, int>())
+		.def(init<Root&>())
 		.def("__str__",&Root::toString)
 	    .def_readwrite("rootsystem", &Root::rootsystem)
 	    .def_readwrite("param", &Root::param)
@@ -357,7 +357,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	/*
 	 * RootSystem.h
 	 */
-    class_<RootSystem>("RootSystem")
+    class_<RootSystem, RootSystem*>("RootSystem", init<>())
+		.def(init<RootSystem&>())
 		.def("setRootTypeParameter", &RootSystem::setRootTypeParameter)
 		.def("getRootTypeParameter", &RootSystem::getRootTypeParameter, return_value_policy<reference_existing_object>())
 		.def("setRootSystemParameter", &RootSystem::setRootSystemParameter)
@@ -384,6 +385,12 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getRootBases", &RootSystem::getRootBases)
 		.def("write", &RootSystem::write)
 		.def("setSeed",&RootSystem::setSeed)
+		.def("getNumberOfNewNodes",&RootSystem::getNumberOfNewNodes)
+		.def("getNumberOfNewRoots",&RootSystem::getNumberOfNewRoots)
+		.def("getUpdatedNodeIndices",&RootSystem::getUpdatedNodeIndices)
+		.def("getUpdatedNodes",&RootSystem::getUpdatedNodes)
+		.def("getNewNodes",&RootSystem::getNewNodes)
+		.def("getNewSegments",&RootSystem::getNewSegments)
 	;
     enum_<RootSystem::TropismTypes>("TropismType")
     	.value("plagio", RootSystem::TropismTypes::tt_plagio)

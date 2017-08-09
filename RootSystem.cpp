@@ -1,7 +1,40 @@
 #include "RootSystem.h"
 
 const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","1","userdata 1", "userdata 2", "userdata 3", "parent type",
-	"basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance"};
+		"basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance"};
+
+/**
+ * Copy Constructor
+ *
+ * deep copies the root system
+ * does not copy growth functions, tropism functions, geometry, and soil
+ * empties buffer
+ */
+RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), rsparam(rs.rsparam), rtparam(rs.rtparam), gf(rs.gf), tf(rs.tf), geometry(rs.geometry), soil(rs.soil),
+		simtime(rs.simtime), rid(rs.rid), nid(rs.nid), old_non(rs.old_non), old_nor(rs.old_nor), maxtypes(rs.maxtypes), gen(rs.gen), UD(rs.UD), ND(rs.ND)
+{
+	std::cout << "Copying root system";
+
+	RootSystem* rs_ = nullptr;
+	// cheat
+	for (auto& br : rs.baseRoots) {
+		rs_ = br->rootsystem; // always the same root system
+		br->rootsystem = this;
+	}
+
+	// copy base Roots
+	std::vector<Root*> baseRoots = std::vector<Root*>(rs.baseRoots.size());
+	for (size_t i=0; i<rs.baseRoots.size(); i++) {
+		baseRoots.at(i) = new Root(*rs.baseRoots.at(i)); // deep copy root tree
+	}
+
+	// uncheat
+	for (auto& br : rs.baseRoots) {
+		br->rootsystem = rs_;
+	}
+
+	std::vector<Root*> roots = std::vector<Root*>();
+}
 
 /**
  * Destructor
@@ -201,6 +234,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		gf.push_back(gf_);
 	}
 
+	old_non = baseRoots.size();
 }
 
 /**
@@ -352,6 +386,11 @@ std::vector<Vector3d> RootSystem::getNodes() const
 	this->getRoots(); // update roots (if necessary)
 	int non = getNumberOfNodes();
 	std::vector<Vector3d> nv = std::vector<Vector3d>(non); // reserve big enough vector
+	// copy initial nodes (roots might not have developed)
+	for (auto const& r: baseRoots) {
+		nv.at(r->getNodeId(0)) = r->getNode(0);
+	}
+	// copy root nodes
 	for (auto const& r: roots) {
 		for (size_t i=0; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
 			nv.at(r->getNodeId(i)) = r->getNode(i); // pray that ids are correct
@@ -538,46 +577,48 @@ std::vector<double> RootSystem::getScalar(int stype) const
 }
 
 /**
- * todo test comment
+ * The indices of the nodes that were updated in the last time step
  */
-std::vector<int> RootSystem::getNodeUpdateIndices()
+std::vector<int> RootSystem::getUpdatedNodeIndices() const
 {
 	this->getRoots(); // update roots (if necessary)
-	std::vector<int> ni = std::vector<int> (old_nor);
-	int c =0;
+	std::vector<int> ni = std::vector<int>(0);
 	for (auto const& r: roots) {
 		if (r->old_non>0){
-			ni.at(r->getNodeId(r->old_non));
-			c++;
+			ni.push_back(r->getNodeId(r->old_non-1));
 		}
 	}
 	return ni;
 }
 
 /**
- *
+ * The values of the nodes that were updated in the last time step
  */
-std::vector<Vector3d> RootSystem::getUpdatedNodes()
+std::vector<Vector3d> RootSystem::getUpdatedNodes() const
 {
 	this->getRoots(); // update roots (if necessary)
-	int non = getNumberOfNodes();
-	std::vector<Vector3d> un(non-old_non); // reserve big enough vector
-
-	return un;
+	std::vector<Vector3d> nv = std::vector<Vector3d>(0);
+	for (auto const& r: roots) {
+		if (r->old_non>0){
+			nv.push_back(r->getNode(r->old_non-1));
+		}
+	}
+	return nv;
 }
 
 /**
  * Returns a vector of newly created nodes since the last call of RootSystem::simulate(dt),
  * to dynamically add to the old node vector, see also RootSystem::getNodes
  */
-std::vector<Vector3d> RootSystem::getNewNodes()
+std::vector<Vector3d> RootSystem::getNewNodes() const
 {
+	roots.clear();
 	this->getRoots(); // update roots (if necessary)
-	int non = getNumberOfNodes();
-	std::vector<Vector3d> nv(non-old_non); // reserve big enough vector
+	std::vector<Vector3d> nv(this->getNumberOfNewNodes());
 	for (auto const& r: roots) {
-		for (size_t i=r->old_non+1; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
-			nv.at(r->getNodeId(i)-old_non) = r->getNode(i); // pray that ids are correct
+		int onon = std::abs(r->old_non);
+		for (size_t i=onon; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
+			nv.at(r->getNodeId(i)-this->old_non) = r->getNode(i); // pray that ids are correct
 		}
 	}
 	return nv;
@@ -587,14 +628,14 @@ std::vector<Vector3d> RootSystem::getNewNodes()
  * Returns a vector of newly created segments since the last call of RootSystem::simulate(dt),
  * to dynamically add to the old segment index vector, see also RootSystem::getSegments
  */
-std::vector<Vector2i> RootSystem::getNewSegments()
+std::vector<Vector2i> RootSystem::getNewSegments() const
 {
 	this->getRoots(); // update roots (if necessary)
-	int non=getNumberOfNodes()-1;
-	std::vector<Vector2i> si(non);
+	std::vector<Vector2i> si(this->getNumberOfNewNodes());
 	int c=0;
 	for (auto const& r:roots) {
-		for (size_t i=r->old_non; i<r->getNumberOfNodes()-1; i++) {
+		int onon = std::abs(r->old_non);
+		for (size_t i=onon-1; i<r->getNumberOfNodes()-1; i++) {
 			Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
 			si.at(c) = v;
 			c++;

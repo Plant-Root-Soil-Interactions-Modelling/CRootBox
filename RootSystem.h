@@ -40,6 +40,7 @@ public:
 	static const std::vector<std::string> scalarTypeNames; ///< the corresponding names
 
 	RootSystem() { initRTP(); };
+	RootSystem(const RootSystem& rs); //< copy constructor
 	virtual ~RootSystem();
 
 	// Parameter input output
@@ -85,13 +86,13 @@ public:
     std::vector<int> getRootBases() const; ///< Node indices of the root bases
 
 	// Dynamic information what happened last time step
-	int getNumberOfNewNodes() { return getNumberOfNodes()-old_non; } ///< returns the number of new nodes, which is exactly the same number as new segments
-	int getNumberOfNewRoots() { return getRoots().size() -old_nor; }  ///< returns the number of new roots
-	std::vector<int> getNodeUpdateIndices(); // todo test and comment
-	std::vector<Vector3d> getUpdatedNodes(); // to replace to the old node vector
-	std::vector<Vector3d> getNewNodes(); // to dynamically add to the old node vector
-	std::vector<Vector2i> getNewSegments(); // to dynamically add to the list of segments
-	// restore(); ///< restore old time step
+	int getNumberOfNewNodes() const { return getNumberOfNodes()-old_non; } ///< returns the number of new nodes created in the previous time step (ame number as new segments)
+	int getNumberOfNewRoots() const { return getRoots().size() -old_nor; }  ///< returns the number of new roots created in the previous time step
+	std::vector<int> getUpdatedNodeIndices() const; ///< indices of nodes that were updated in the previous time step
+	std::vector<Vector3d> getUpdatedNodes() const; ///< values of the updated nodes
+	std::vector<Vector3d> getNewNodes() const; ///< nodes created in the previous time step
+	std::vector<Vector2i> getNewSegments() const; ///< segments created in the previous time step
+	// restore(); ///< TODO restore old time step
 
 	// Output Simulation results
 	void write(std::string name) const; /// writes simulation results (type is determined from file extension in name)

@@ -26,6 +26,7 @@ class Root
 public:
 
     Root(RootSystem* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of RootSystem, or Root::createLaterals()
+    Root(const Root& r); ///< deep copy of the tree
     virtual ~Root();
 
     void simulate(double dt, bool silence = false); ///< root growth for a time span of \param dt
@@ -66,7 +67,7 @@ public:
     bool active = 1; ///< true: active, false: root stopped growing
     double age = 0; ///< current age [days]
     double length = 0; ///< actual length [cm] of the root. might differ from getLength(age) in case of impeded root growth
-    int old_non = 0; ///< index of the node that was update last time step (==0 if no update was performed)
+    int old_non = 1; ///< number of old nodes, the sign is positive if the last node was updated, otherwise its negative
 
     /* up and down */
     Root* parent; ///< pointer to the parent root (equals nullptr if it is a base root)
@@ -80,9 +81,9 @@ protected:
     void createLateral(bool silence); ///< creates a new lateral, called by Root::simulate()
 
     /* parameters that are given per node */
-    std::vector<Vector3d> nodes; ///< nodes of the root
-    std::vector<int> nodeIds; ///< unique node identifier
-    std::vector<double> netimes; ///< node emergence times [days]
+    std::vector<Vector3d> nodes = std::vector<Vector3d>(0); ///< nodes of the root
+    std::vector<int> nodeIds = std::vector<int>(0); ///< unique node identifier
+    std::vector<double> netimes = std::vector<double>(0); ///< node emergence times [days]
 
 };
 

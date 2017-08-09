@@ -13,15 +13,6 @@ RootTypeParameter::RootTypeParameter() {
 			successor, successorP, 1.22, 0., 1.e9, 0., 1, "undefined");
 }
 
-/**
- * Copy constructor
- */
-RootTypeParameter::RootTypeParameter(const RootTypeParameter& rp) :type(rp.type), lb(rp.lb), lbs(rp.lbs), la(rp.la), las(rp.las),
-		ln(rp.ln), lns(rp.lns), nob(rp.nob), nobs(rp.nobs), r(rp.r), rs(rp.rs), a(rp.a), as(rp.as), colorR(rp.colorR), colorG(rp.colorG),
-		colorB(rp.colorB), tropismT(rp.tropismT), tropismN(rp.tropismN), tropismS(rp.tropismS), dx(rp.dx), theta(rp.theta), thetas(rp.thetas),
-		rlt(rp.rlt), rlts(rp.rlts), gf(rp.gf), name(rp.name), successor(rp.successor),
-		successorP(rp.successorP) { }
-
 void RootTypeParameter::set(int type, double lb, double lbs, double la, double las, double ln, double lns, double nob, double nobs,
 		double r, double rs, double a, double as,  double colorR, double colorG, double colorB, double tropismT, double tropismN, double tropismS,
 		double dx, const std::vector<int>& successor, const std::vector<double>& successorP, double theta, double thetas, double rlt, double rlts,
@@ -60,12 +51,12 @@ void RootTypeParameter::set(int type, double lb, double lbs, double la, double l
  */
 RootParameter RootTypeParameter::realize() {
 	// type does not change
-	double lb_ = std::max(lb + randn()*lbs,double(0)); // length of basal zone
-	double la_ = std::max(la + randn()*las,double(0)); // length of apical zone
+	double lb_ = std::max(lb + randn()*lbs,double(1.e-5)); // length of basal zone
+	double la_ = std::max(la + randn()*las,double(1.e-5)); // length of apical zone
 	std::vector<double> ln_; // stores the inter-distances
 	int nob_ = std::max(round(nob + randn()*nobs),double(0)); // maximal number of branches
 	for (int i = 0; i<nob_-1; i++) { // create inter-root distances
-		double d = std::max(ln + randn()*lns,1e-9);
+		double d = std::max(ln + randn()*lns,1.e-5);
 		ln_.push_back(d);
 	}
 	double r_ = std::max(r + randn()*rs,double(0)); // initial elongation
