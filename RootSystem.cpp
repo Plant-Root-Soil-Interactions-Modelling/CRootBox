@@ -230,7 +230,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		tf.push_back(new ConfinedTropism(tropism, geometry)); // wrap confinedTropism around baseTropism
 		int gft = rtparam.at(i).gf;
 		GrowthFunction* gf_ = this->createGrowthFunction(gft);
-		gf_->getAge(1,1,1,nullptr);  // check if getAge is implemented (ohterwise an exception is thrown)
+		gf_->getAge(1,1,1,nullptr);  // check if getAge is implemented (otherwise an exception is thrown)
 		gf.push_back(gf_);
 	}
 

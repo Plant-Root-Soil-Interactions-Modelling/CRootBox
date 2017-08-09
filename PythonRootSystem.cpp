@@ -358,7 +358,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	 * RootSystem.h
 	 */
     class_<RootSystem, RootSystem*>("RootSystem", init<>())
-		.def(init<RootSystem&>())
+ 		.def(init<RootSystem&>())
 		.def("setRootTypeParameter", &RootSystem::setRootTypeParameter)
 		.def("getRootTypeParameter", &RootSystem::getRootTypeParameter, return_value_policy<reference_existing_object>())
 		.def("setRootSystemParameter", &RootSystem::setRootSystemParameter)

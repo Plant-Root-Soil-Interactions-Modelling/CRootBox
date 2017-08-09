@@ -42,7 +42,7 @@ public:
      * @param old      rotation matrix, old(:,1) is the root tip heading
      * @param a        rotation angle alpha (angular change)
      * @param b        rotation angle beta (radial change)
-     * @param dx       small ditance to look ahead
+     * @param dx       small distance to look ahead
      * @param root     points to the root that called getHeading, just in case something else is needed (i.e. iheading for exotropism)
      *
      * \return         the value minimized by getHeading(), it should be in [0,1], in this way combination of various tropisms will be easier

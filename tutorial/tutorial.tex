@@ -4,6 +4,7 @@
 \usepackage{graphicx}
 \usepackage{natbib}
 \usepackage{amsmath}
+\usepackage{subcaption}
 
 \usepackage{listings}
 \usepackage{color}
@@ -66,6 +67,8 @@ For further documentation please refer to the Doxygen class documentation of the
 
 \tableofcontents
 
+\newpage
+
 
 
 \section{Basic usage}
@@ -84,7 +87,7 @@ Lets revise the above code in more detail:
  \item[10] Initializes the simulation: Creates the tap root the base roots (i.e. all basal roots, and shoot borne roots that might emerge), creates the tropisms and passes the domain geometry to it, and creates the elongation functions. 
  \item[13] Performs the simulation. The value 30 is the simulation time in days. If no simulation time is passed the simulation time is taken from the .pparam file. Note that simulation results are independent from the time step, 
  i.e. 30 simulate(1) calls should yield the same result as simulate(30). 
- \item[17] Saves the resulting root system geometry in the VTK Polygonal Data format (VTP) as polylines. 
+ \item[17] Saves the resulting root system geometry in the VTK Polygonal Data format (VTP) as polylines, see Figure \ref{fig:basicA}. 
 \end{itemize}
 
 The next example is an extension of the previous one, where the root system grows in one of two containers (a soil core or rectangular rhizotron).
@@ -98,8 +101,20 @@ The geometry is first created by constructing some specialization of the class S
  \item[12] Construct a soil core 
  \item[15] Construct a rhizotron
  \item[18] Pick one of the two geometries. It is important to call setGeometry before initialize.
- \item[30] Its possible to save the geometry as Paraview Python script for visualization. Run this script in Paraview by Tools$\rightarrow$Python Shell, Run Script.
+ \item[30] Its possible to save the geometry as Paraview Python script for visualization, see Figure \ref{fig:basicB}. Run this script in Paraview by Tools$\rightarrow$Python Shell, Run Script.
 \end{itemize}
+
+\begin{figure}
+\begin{subfigure}[c]{0.5\textwidth}
+\includegraphics[width=0.99\textwidth]{example_1a.png}
+\subcaption{Unconfined growth (Example 1a)} \label{fig:basicA}
+\end{subfigure}
+\begin{subfigure}[c]{0.5\textwidth}
+\includegraphics[width=0.99\textwidth]{example_1b.png}
+\subcaption{Confined growth (Example 1b)} \label{fig:basicB}
+\end{subfigure}
+\caption{Resulting figures from Section 1} 
+\end{figure}
 
 
 
@@ -120,13 +135,13 @@ The examples show how to build more complex geometries with rotation, translatio
 
 \begin{itemize}
 
-\item[10-16] Definition of a rotated rhizotron: L12 creates the flat container with a small height, this container is then rotated and translated into the desired position. 
+\item[10-16] Definition of a rotated rhizotron, see Figure \ref{fig:rhizo}: L12 creates the flat container with a small height, this container is then rotated and translated into the desired position. 
 L13 is the position where the origin will lie, and L14 the rotational matrix around the x-axis. 
 In L15 the origin position is rotated. Finally, in L16 the new rotated and translated geometry is created. 
  
-\item[18-27] Definition of of a split box: The split box is composed of a left box, a right box, and a top box connecting left and right. In L27 the geometry is defined by the set operation union of the three compartments. 
+\item[18-27] Definition of of a split box, see Figure \ref{fig:split}: The split box is composed of a left box, a right box, and a top box connecting left and right. In L27 the geometry is defined by the set operation union of the three compartments. 
  
-\item[29-44] Definition of rhizotubes as obstacles: L30 is the surrounding box, L31 a single rhizotube, that is rotated around the y-axis in L32. L34-L41 create a list of rhizotubes at different locations that mimics the experimental setup. 
+\item[29-44] Definition of rhizotubes as obstacles, see Figure \ref{fig:rhizotubes}: L30 is the surrounding box, L31 a single rhizotube, that is rotated around the y-axis in L32. L34-L41 create a list of rhizotubes at different locations that mimics the experimental setup. 
 L43 and L44 compose the final geometry by to set operation, first a union of all tubes, and then cut them out the surrounding box by taking the difference. 
  
 \item[47] Pick one of the three geometries for your simulation.
@@ -135,30 +150,48 @@ L43 and L44 compose the final geometry by to set operation, first a union of all
 
 \end{itemize}
 
+\begin{figure}
+\begin{subfigure}[c]{0.3\textwidth}
+\includegraphics[width=0.99\textwidth]{example_2a1.png}
+\subcaption{Rotated rhizotron} \label{fig:rhizo}
+\end{subfigure}
+\begin{subfigure}[c]{0.3\textwidth}
+\includegraphics[width=0.99\textwidth]{example_2a2.png}
+\subcaption{Split box} \label{fig:split}
+\end{subfigure}
+\begin{subfigure}[c]{0.3\textwidth}
+\includegraphics[width=0.99\textwidth]{example_2a3.png}
+\subcaption{Rhizotubes} \label{fig:rhizotubes}
+\end{subfigure}
+\caption{Manipulating SDF (Example 2a)}
+\end{figure}
+
 
 
 \subsection{Multiple root systems}
 
-Its possible to simulate multiple root systems. To speed up computation the simulation is performed in parallel.
-The following example shows how simple this can be achieved in Python, by a small plot scale simulation.
+Its possible to simulate multiple root systems. In the following we show a small plot scale simulation.
 
 \lstinputlisting[language=Python, caption=Example 2b]{../example2b.py}
 
 \begin{itemize}
 
-\item[5,6] Set the number of columns and rows of the plot, and the distance between the root systems.
+\item[6,7] Set the number of columns and rows of the plot, and the distance between the root systems.
 
-\item[9-16] Creates the root systems, and puts them into a list allRS. L14 sets the position of the seed. 
+\item[10-16] Creates the root systems, and puts them into a list allRS. L15 sets the position of the seed. 
 
-\item[19-21] Defines a function to simulate the root system of index i of allRS. 
+\item[20,21] Simulates all root systems 
 
-\item[23-25] Simulates in parallel: L23 creates the multiprocessing pool object. L24 defines which parameters we pass to the function, in our case the indices of the root system. 
-L25 performs the parallel computation. Nothing is returned by the simulate function, but the root system instances are updated.
-
-\item[27-37] Saves each root systems, and additionally, saves all root systems into a single file. 
-Therefore, we create an SegmentAnalyser object in L29 and put all segments into it L34, and finally export the single file L37.
+\item[24-31] Saves each root systems, and additionally, saves all root systems into a single file. 
+Therefore, we create an SegmentAnalyser object in L24 and merge all segments into it L28, and finally export the single file L31. The resulting geometry is shown in Figure \ref{fig:multiple}.
 
 \end{itemize}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth]{example_2b.png}
+\caption{Multiple root systems (Example 2b), colors denote the creation time of the roots} \label{fig:multiple}
+\end{figure}
 
 
 
@@ -185,16 +218,16 @@ First lets analyse the root length versus time, and consider the total root leng
 
 \item[6-9] Sets up the simulation
 
-\item[11-13] Defines the simulation time, the time step, and the resulting number of simulate(dt) calls. 
+\item[11-13] Defines the simulation time, time step, and the resulting number of simulate(dt) calls. 
 
 \item[16,17] First we state which scalar type we want to analyse (others are type, radius, order, time, length, surface, one, parenttype) and in L17 we give it a name for labeling the figure. 
 
 \item[18-21] Pre-definition of the NumPy arrays storing the lengths over time. 
 
-\item[22-21] The simulation loops executes the simulation for a single time step L23. L24 calculates the type of each root, L25 the length (or other scalar type) of the root. 
+\item[22-29] The simulation loops executes the simulation for a single time step L23. L24 calculates the type of each root, L25 the length (or other scalar type) of the root. 
 The functions v2a is defined in the package rb\_tools and converts the C++ vector of doubles to a NumPy array. L26-L29 calculates the total root length in the time step for all roots, and for specific root types.
 
-\item[31-40] Creates the figure showing the results
+\item[31-40] Creates Figure \ref{fig:length}.
 
 \end{itemize}
 
@@ -204,15 +237,35 @@ Furthermore, we want to show two options how to retrieve root tip postions and r
 
 \begin{itemize}
 
-\item[43-44] Reset the simulation and simulate for only 4 days (otherwise there are so many root tips)
+\item[43-44] Reset the simulation and simulate for only 7 days (otherwise there are so many root tips)
 
-\item[46-47] To get an idea how big the result is. Note that number of segments equals the number of nodes minus number of base roots.
+\item[46-47] Outputs the number of nodes and segments to get an idea how big the resulting root system is. 
+Note that number of segments equals the number of nodes minus the number of base roots that will emerge. Base roots are tap roots, basal roots and shootborne roots.
 
-\item[50-53] Retrieves the nodes of each roots, and prints the first node (root base), and the last node (root tip)
+\item[50-55] The first approach retrieves all roots as polylines L50. Root tips are the last nodes of the polylines L55, root bases the first nodes L54. 
+Roots that have not started to grow have only 1 node, and are not retrieved by getPolylines().
 
-\item[56-61] L56 returns all nodes of the root system, vv2a converts the vector of Vector3d to a NumPy array. The methods L57, L58 return the indices of the tips and bases. Finally, tips and bases are printed as before. 
+\item[58-60] Second approach: L56 returns all nodes of the root system, vv2a converts the vector of the CRootBox C++ type Vector3d to a NumPy array. 
+The methods L57, L58 return the indices of the tips and bases. 
+
+\item[63-69] Creates Figure \ref{fig:scatter} using the second approach.
+
+\item[71-73] Verifies that both approaches yield the same result.
 
 \end{itemize}
+
+\begin{figure}
+\begin{subfigure}[c]{0.5\textwidth}
+\includegraphics[width=0.99\textwidth]{example_3a.png}
+\subcaption{Total root length versus time} \label{fig:length}
+\end{subfigure}
+\begin{subfigure}[c]{0.5\textwidth}
+\includegraphics[width=0.99\textwidth]{example_3a2.png}
+\subcaption{Top view of the root tip and root bases} \label{fig:scatter}
+\end{subfigure}
+\caption{Root system analysis (Example 3a)} 
+\end{figure}
+
 
 
 
