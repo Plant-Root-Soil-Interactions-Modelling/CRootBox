@@ -54,7 +54,7 @@ public:
     //< Auxiliary function: Applies angles a and b and goes dx [cm] into the new direction
 
     // random numbers
-    void setSeed(double seed) { gen.seed(seed); } ///< Sets the seed of the random number generator
+    void setSeed(double seed) { gen = std::mt19937(seed); } ///< Sets the seed of the random number generator
     double rand() { return UD(gen); } ///< Uniformly distributed random number (0,1)
     double randn() { return ND(gen); } ///< Normally distributed random number (0,1)
 

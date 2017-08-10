@@ -21,7 +21,7 @@ void example1()
      * Open plant and root parameter from a file
      */
     rootsystem.openFile(name);
-    rootsystem.writeParameters(std::cout);
+    // rootsystem.writeParameters(std::cout);
 
     /*
      * Initialize

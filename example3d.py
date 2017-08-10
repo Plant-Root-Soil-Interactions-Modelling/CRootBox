@@ -18,10 +18,9 @@ def set_all_sd(rs,s):
 # Parameters
 name = "Triticum_aestivum_a_Bingham_2011" 
 simtime = 20
-N = 100 # resolution of paramter
-runs = 10 # iterations
+N = 50 # resolution of paramter
+runs = 10 # iterations 
 theta0_ = np.linspace(0,math.pi/2,N)
-dx_ = np.linspace(0.1,1.,N) # geometric 0.01 1?
 
 # One simulation
 def simulate(i):
@@ -30,8 +29,8 @@ def simulate(i):
     set_all_sd(rs,0.) # set all sd to zero                
 
     # vary parameter
-    p1 = rs.getRootTypeParameter(1)
-    p4 = rs.getRootTypeParameter(4)
+    p1 = rs.getRootTypeParameter(1) # tap root
+    p4 = rs.getRootTypeParameter(4) # basal roots
     p1.theta = theta0_[i]
     p4.theta = theta0_[i]   
 
@@ -45,29 +44,34 @@ def simulate(i):
     rad_dist = 0.
     for r in roots:
         depth += r[-1].z
-        rad_dist += math.hypot(r[-1].x,r[-1].y)
-        
+        rad_dist += math.hypot(r[-1].x,r[-1].y)        
     depth /= len(roots)
     rad_dist /= len(roots)
 
     return depth, rad_dist
 
-# Parallel execution
-param = [] # param is a list of tuples
-for i in range(0,N):
-    param.append((i,))
-pool = Pool()
-output =  pool.starmap(simulate,param)
-
 depth_ = np.zeros(N)
 rad_dist_ = np.zeros(N)
-for i,o in enumerate(output):
-    depth_[i] = o[0]
-    rad_dist_[i] = o[1]
+
+for r in range(0,runs):    
     
+    # Parallel execution
+    param = [] # param is a list of tuples
+    for i in range(0,N):
+        param.append((i,))    
+    pool = Pool()
+    output =  pool.starmap(simulate,param)
+    pool.close()
+
+    # Copy results
+    for i,o in enumerate(output):
+        depth_[i] += (o[0]/runs)
+        rad_dist_[i] += (o[1]/runs)
+    
+# Figure 
 fig, axes = plt.subplots(nrows=1, ncols=2, figsize=(10,8))
-axes[0].set_xlabel('Theta (-)')
-axes[1].set_xlabel('Theta (-)')
+axes[0].set_xlabel('Insertion angle theta (-)')
+axes[1].set_xlabel('Insertion angle theta (-)')
 axes[0].set_ylabel('Mean tip depth (cm)')
 axes[1].set_ylabel('Mean tip radial distance (cm)')
 axes[0].plot(theta0_, depth_)

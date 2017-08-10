@@ -1,6 +1,6 @@
 #include "RootSystem.h"
 
-const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","1","userdata 1", "userdata 2", "userdata 3", "parent type",
+const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","volume","1","userdata 1", "userdata 2", "userdata 3", "parent type",
 		"basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance"};
 
 /**
@@ -13,9 +13,10 @@ const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","o
 RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), rsparam(rs.rsparam), rtparam(rs.rtparam), gf(rs.gf), tf(rs.tf), geometry(rs.geometry), soil(rs.soil),
 		simtime(rs.simtime), rid(rs.rid), nid(rs.nid), old_non(rs.old_non), old_nor(rs.old_nor), maxtypes(rs.maxtypes), gen(rs.gen), UD(rs.UD), ND(rs.ND)
 {
-	std::cout << "Copying root system";
+	std::cout << "Copying root system ("<<rs.baseRoots.size()<< " base roots) \n";
 
 	RootSystem* rs_ = nullptr;
+
 	// cheat
 	for (auto& br : rs.baseRoots) {
 		rs_ = br->rootsystem; // always the same root system
@@ -23,7 +24,7 @@ RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), 
 	}
 
 	// copy base Roots
-	std::vector<Root*> baseRoots = std::vector<Root*>(rs.baseRoots.size());
+	baseRoots = std::vector<Root*>(rs.baseRoots.size());
 	for (size_t i=0; i<rs.baseRoots.size(); i++) {
 		baseRoots.at(i) = new Root(*rs.baseRoots.at(i)); // deep copy root tree
 	}
@@ -274,15 +275,23 @@ void RootSystem::simulate()
  */
 void RootSystem::setSeed(double seed) {
 	std::cout << "Setting random seed "<< seed <<"\n";
-	gen.seed(1./seed);
+	gen = std::mt19937(seed);
 	for (auto t : tf) {
 		double s  = rand();
-		t->setSeed(1./s);
+		t->setSeed(s);
 	}
 	for (auto rp : rtparam) {
 		double s  = rand();
-		rp.setSeed(1./s);
+		rp.setSeed(s);
 	}
+}
+
+
+void RootSystem::debugSeed()
+{
+	std::stringstream s;
+	s << "Rootsystem seed "<< gen << "\n";
+	std::cout << s.str();
 }
 
 /**
@@ -526,6 +535,9 @@ std::vector<double> RootSystem::getScalar(int stype) const
 		case st_surface:
 			value =  roots[i]->length*2.*M_PI*roots[i]->param.a;
 			break;
+		case st_volume:
+			value =  roots[i]->length*M_PI*(roots[i]->param.a)*(roots[i]->param.a);
+			break;
 		case st_one:
 			value =  1;
 			break;
@@ -561,7 +573,7 @@ std::vector<double> RootSystem::getScalar(int stype) const
 			value = std::accumulate(v_.begin(), v_.end(), 0.0) / v_.size();
 			break;
 		}
-		case st_stdln: {
+		case st_sdln: {
 			const std::vector<double>& v_ = roots[i]->param.ln;
 			double mean = std::accumulate(v_.begin(), v_.end(), 0.0) / v_.size();
 			double sq_sum = std::inner_product(v_.begin(), v_.end(), v_.begin(), 0.0);

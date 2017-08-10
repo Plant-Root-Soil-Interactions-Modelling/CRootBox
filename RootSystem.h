@@ -33,10 +33,10 @@ public:
 
 	enum TropismTypes { tt_plagio = 0, tt_gravi = 1, tt_exo = 2, tt_hydro = 3 };  ///< root tropism
 	enum GrowthFunctionTypes { gft_negexp = 1, gft_linear = 2 }; // root growth function
-	enum ScalarTypes { st_type = 0, st_radius = 1, st_order = 2, st_time = 3, st_length = 4, st_surface = 5, st_one = 6,
-		st_userdata1 = 7, st_userdata2 = 8, st_userdata3 = 9, st_parenttype = 10,
-		st_lb = 11, st_la = 12, st_nob = 13, st_r = 14, st_theta = 15, st_rlt = 16,
-		st_meanln = 17, st_stdln = 18}; ///< @see RootSystem::getScalar
+	enum ScalarTypes { st_type = 0, st_radius = 1, st_order = 2, st_time = 3, st_length = 4, st_surface = 5, st_volume = 6, st_one = 7,
+		st_userdata1 = 8, st_userdata2 = 9, st_userdata3 = 10, st_parenttype = 11,
+		st_lb = 12, st_la = 13, st_nob = 14, st_r = 15, st_theta = 16, st_rlt = 17,
+		st_meanln = 18, st_sdln = 19}; ///< @see RootSystem::getScalar
 	static const std::vector<std::string> scalarTypeNames; ///< the corresponding names
 
 	RootSystem() { initRTP(); };
@@ -104,6 +104,9 @@ public:
 
 	// random stuff
 	void setSeed(double seed); ///< help fate (sets the seed of all random generators)
+
+	void debugSeed();
+
 	double rand() { return UD(gen); } ///< Uniformly distributed random number (0,1)
 	double randn() { return ND(gen); } ///< Normally distributed random number (0,1)
 

@@ -101,8 +101,10 @@ public:
 		return scale;
 	}
 
+    virtual std::string toString() const { return "ProportionalElongation"; } ///< Quick info about the object for debugging
+
 protected:
-	double scale = 0.;
+	double scale = 1.;
 
 };
 

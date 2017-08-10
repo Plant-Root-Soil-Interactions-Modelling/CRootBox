@@ -268,7 +268,6 @@ The methods L57, L58 return the indices of the tips and bases.
 
 
 
-
 \subsection{Analysis per segment}
 
 The class SegmentAnalyser offers post-processing options per segment. 
@@ -281,7 +280,7 @@ The following script demonstrates some of the possibilities by creating a virtua
 
 \item[5-L10] Performs the simulation and exports the results.
 
-\item[13-16] We define two soil cores, one in the center of the root and one 10 cm translated. In L16 we pick which one we use for the further analysis. 
+\item[13-16] We define two soil cores, one in the center of the root and one 10 cm translated. In L16 we pick which one we use for the further analysis.  Figure \ref{fig:soilcoreGeom} shows the resulting geometry.
 
 \item[18-22] Prepares the plot. We use four sub-figures. 
 
@@ -291,11 +290,33 @@ The following script demonstrates some of the possibilities by creating a virtua
 
 \item[38-45] Same as before, but we are only interested in segments that are younger than 30 days. In L40 we use the filer method to keep only the segments we want to analyse. 
 
-\item[47-54] The filter method can be used for many different applications. In the following we use it to analyse lateral roots only. 
-
-\item[56-58] Show and save resulting figure.
+\item[47-54] The filter method can be used for many different applications. In the following we use it to analyse lateral roots only. Possible rb.ScalarType are: 
+'type', 'radius', 'order', segment creation time 'time', 'length', 'surface', 'volume', 'one', 'userdata1', 'userdata2', 'userdata3', and 'parenttype'.
+\item[56-58] Show and save resulting Figure \ref{fig:central} or \ref{fig:shifted}.
 
 \end{itemize}
+
+In this example the central core captures only a little amount of laterals (Figure \ref{fig:central}) because the root system is wide spread. 
+The shifted root core represents the overall root system slightly better, see Figure \ref{fig:shifted}.  
+The basic idea is that such simulations help to increase the understanding of experimental observations.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.6\textwidth]{example_3b.png}
+\caption{Virtual soil cores experiment (Example 3b): Central core (blue), shifted core (red)} \label{fig:soilcoreGeom}
+\end{figure} 
+
+\begin{figure}
+\centering
+\includegraphics[width=1\textwidth]{example_3b1.png} 
+\caption{Central core} \label{fig:soilcore1} \label{fig:central}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=1\textwidth]{example_3b2.png} 
+\caption{Shifted core} \label{fig:soilcore2} \label{fig:shifted}
+\end{figure}
 
 
 
@@ -305,7 +326,7 @@ In the previous examples we always opened the root system parameters from a file
 In the following example we show to do everything in a Python script without the need of any parameter files. 
 This is especially important if we want to modify the parameters in our scripts. 
 
-First we start with a script that defines all the parameter, and secondly, we show how we can use this to perform a sensitivity analysis.
+First we start with a script that defines the parameter within the script, and secondly, we show how we can use this to perform a sensitivity analysis.
 
 \lstinputlisting[language=Python, caption=Example 3c]{../example3c.py}
 
@@ -323,30 +344,68 @@ First we start with a script that defines all the parameter, and secondly, we sh
 
 \end{itemize}
 
-Next we vary given parameters in order to make a sensitivity analysis. This takes a lot of simulation runs. Again, we use parallel computing to speed up execution.
+Note that all parameters can be set and modified within the script. Especially, standard deviations can set to zero in order to be able to precisely predict the result. 
+For example we can calculate the total root system length analytically, and check if the numerical simulation yield the (exact) same result. 
+This is performed in the script benchmark.py, which is used to test and validate CRootBox.
+
+In the next part we vary given parameters in order to make a sensitivity analysis. This takes a lot of simulation runs and we demonstrate the of use parallel computing to speed up execution.
+We vary the insertion angle of the tap root and basal root, and look at the change in mean root tip depth and radial distance. 
 
 \lstinputlisting[language=Python, caption=Example 3d]{../example3d.py}
 
 \begin{itemize}
 
-\item[7-16] Defines a function to set all standard deviations proportional to the parameter values. We use this function in the following to set the standard deviation to zero everywhere. 
+\item[8-16] Defines a function to set all standard deviations proportional to the parameter values. We use this function in the following to set the standard deviation to zero everywhere. 
 
-\item[18-24] todo
+\item[19-23] Parameters of the analysis. $N$ denotes the resolution of the parameter we vary, and $runs$ the number of iterations, i.e. $N\cdot runs$ simulations are performed. 
+In L24 we define the insertion angle to be varied linearly between 0 and $\pi/2$.
+
+\item[26-51] Definition of a function that performs the simulation and returns mean root tip depth and radial distance. First we create a root system and set the standard deviation to zero L27-L29. 
+L32-L35 sets the insertion angle, tap root is always of type 1, and in the parameter file 'Triticum\_aestivum\_a\_Bingham\_2011' basal roots are of type 4. L38-39 performs the simulation. 
+L42-L49 calculates the mean root tip depth and radial distance. 
+
+\item[53-69] This section performs the computation. L53-54 preallocates the resulting arrays. L58-L64 performs the parallel computations, index $i$ is the index of the insertion angle. L67-L69 calculates the mean values.
+
+\item[72-82] Creates the resulting Figure \ref{fig:sa}
 
 \end{itemize}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth]{example_3d.png}
+\caption{Sensitivity of mean root tip depth (left) and radial distance (right) to the insertion angle theta (Example 3d). } \label{fig:sa}
+\end{figure}
 
 
 
 \subsection{How to make an animation}
 
 In order to create an animation in Paraview we have to consider some details. 
+The main idea is to export the result file as segments using the class SegmentAnalyser. 
+A specific frame is then obtained by thresholding using the segments creation times. 
 
+We modify example1b.py and show how to create an animation.
 
-We modify example2a.py to improve the animation.
+\lstinputlisting[language=Python, caption=Example 3e (modified 1b)]{../example3e.py}
 
-The script animate in the folder animate will help you to render the file .
-When exporting vtp files in order to make high definition animations in Paraview we should keep some things in mind. 
-The most important thing
+\begin{itemize}
+
+\item[14-16] Its important to use a small resolution in order to obtain a smooth animation. L16 set the axial resolution to 0.1 cm
+
+\item[23] Instead of saving the root system as polylines, we use the SegmentAnalyser to save the root system as segments.
+
+\item[26] We save the geometry as Python script for the visualization in ParaView.
+
+\end{itemize}
+
+After running the script we perform the following operations to create an animation:
+\begin{enumerate}
+ \item Open the .vtp file in ParaView (File$\rightarrow$Open...).
+ \item Optionally, create a tube plot with the help of the script scripts/tubePlot.py (Tools$\rightarrow$Python Shell, press 'Run script')
+ \item Optionally, visualize the domain boundaries by running the script results/example\_3e.py (Tools$\rightarrow$Python Shell, press 'Run script') 
+ \item Run the script scripts/animate.py (Tools$\rightarrow$Python Shell, press 'Run script'). The script creates the threshold filter and the animation. 
+ \item Use File$\rightarrow$Save Animation... to render and save the animation.
+\end{enumerate}
 
 
 

@@ -53,7 +53,7 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
 Root::Root(const Root& r) :rootsystem(r.rootsystem), param(r.param), iheading(r.iheading), id(r.id), parent_base_length(r.parent_base_length), parent_ni(r.parent_ni), alive(r.alive),
 		active(r.active), age(r.age), length(r.length), old_non(r.old_non), parent(r.parent), smallDx(r.smallDx), nodes(r.nodes), nodeIds(r.nodeIds), netimes(r.netimes)
 {
-	std::vector<Root*> laterals = std::vector<Root*>(r.laterals.size());
+	laterals = std::vector<Root*>(r.laterals.size());
 	for (size_t i=0; i< r.laterals.size(); i++) {
 		laterals.at(i) = new Root(*r.laterals.at(i)); // copy lateral
 		laterals.at(i)->parent = this; // set parent
@@ -113,7 +113,9 @@ void Root::simulate(double dt, bool silence)
 			if (active) {
 
 				// length increment
-				double length_ = getLength(std::max(age-dt,0.)); // length of the root for unimpeded growth (i.e. length_==length for unimpeded growth)
+				double lengthMax = getLength(std::max(age-dt,0.)); // length of the root for unimpeded growth (i.e. length_==length for unimpeded growth)
+				double lengthMin = length; // realized length
+				double length_ = (lengthMax+lengthMin)/2.; // best i could think of
 				double targetlength = getLength(age);
 				double e = targetlength-length_; //elongation in time step dt
 				double scale = rootsystem->getRootTypeParameter(param.type)->se->getValue(nodes.back(),this); // hope some of this is optimized out if not set
@@ -173,7 +175,7 @@ void Root::simulate(double dt, bool silence)
 					}
 				} // if laterals
 			} // if active
-			active = getLength(std::max(age,0.))<(p.getK()-dx()/10); // become inactive, if final length is nearly reached
+			active = length<(p.getK()-dx()/10); // become inactive, if final length is nearly reached
 		}
 	} // if alive
 
