@@ -39,7 +39,7 @@ public:
 		st_meanln = 18, st_sdln = 19}; ///< @see RootSystem::getScalar
 	static const std::vector<std::string> scalarTypeNames; ///< the corresponding names
 
-	RootSystem() { initRTP(); };
+	RootSystem();
 	RootSystem(const RootSystem& rs); //< copy constructor
 	virtual ~RootSystem();
 
@@ -103,12 +103,10 @@ public:
 	std::string toString() const; ///< infos about current root system state (for debugging)
 
 	// random stuff
-	void setSeed(double seed); ///< help fate (sets the seed of all random generators)
-
-	void debugSeed();
-
-	double rand() { return UD(gen); } ///< Uniformly distributed random number (0,1)
-	double randn() { return ND(gen); } ///< Normally distributed random number (0,1)
+	void setSeed(double seed) const; ///< help fate (sets the seed of all random generators)
+	void debugSeed() const;
+	double rand() const { return UD(gen); } ///< Uniformly distributed random number (0,1)
+	double randn() const { return ND(gen); } ///< Normally distributed random number (0,1)
 
 	int rsmlReduction = 5; ///< only each n-th node is written to the rsml file (to coarsely adjust axial resolution for output)
 
@@ -139,9 +137,9 @@ private:
 	int getRootIndex() { rid++; return rid; } ///< returns next unique root id, called by the constructor of Root
 	int getNodeIndex() { nid++; return nid; } ///< returns next unique node id, called by Root::addNode()
 
-	std::mt19937 gen = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());
-	std::uniform_real_distribution<double> UD = std::uniform_real_distribution<double>(0,1);
-	std::normal_distribution<double> ND = std::normal_distribution<double>(0,1);
+	mutable std::mt19937 gen;
+	mutable std::uniform_real_distribution<double> UD;
+	mutable std::normal_distribution<double> ND;
 
 };
 

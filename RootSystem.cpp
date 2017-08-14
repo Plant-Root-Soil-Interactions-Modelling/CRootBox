@@ -4,6 +4,15 @@ const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","o
 		"basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance"};
 
 /**
+ * Constructor
+ */
+RootSystem::RootSystem() :gen(std::mt19937(std::chrono::system_clock::now().time_since_epoch().count())), UD(std::uniform_real_distribution<double>(0,1)),
+		ND(std::normal_distribution<double>(0,1))
+{
+	initRTP();
+};
+
+/**
  * Copy Constructor
  *
  * deep copies the root system
@@ -163,6 +172,11 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 	//cout << "Root system initialize\n";
 	reset(); // just in case
 
+	// fix randomness of root type parameters
+	for (auto& rtp : rtparam) {
+		rtp.setSeed(this->rand());
+	}
+
 	// Create root system
 	const double maxT = 365.; // maximal simulation time
 	const double dzB = 0.1; // distance of basal roots up the mesocotyl [cm] (hardcoded in the orginal version, hardcoded here)
@@ -227,6 +241,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		double N = rtparam.at(i).tropismN;
 		double sigma = rtparam.at(i).tropismS;
 		TropismFunction* tropism = this->createTropismFunction(type,N,sigma);
+		tropism->setSeed(this->rand());
 		// std::cout << "#" << i << ": type " << type << ", N " << N << ", sigma " << sigma << "\n";
 		tf.push_back(new ConfinedTropism(tropism, geometry)); // wrap confinedTropism around baseTropism
 		int gft = rtparam.at(i).gf;
@@ -270,10 +285,11 @@ void RootSystem::simulate()
  * Sets the seed of the root systems random number generator,
  * and all subclasses using random number generators:
  * @see TropismFunction, @see RootParameter
+ * To obtain two exact same root system call before initialize().
  *
  * @param seed      random number generator seed
  */
-void RootSystem::setSeed(double seed) {
+void RootSystem::setSeed(double seed) const {
 	std::cout << "Setting random seed "<< seed <<"\n";
 	gen = std::mt19937(seed);
 	for (auto t : tf) {
@@ -287,7 +303,7 @@ void RootSystem::setSeed(double seed) {
 }
 
 
-void RootSystem::debugSeed()
+void RootSystem::debugSeed() const
 {
 	std::stringstream s;
 	s << "Rootsystem seed "<< gen << "\n";

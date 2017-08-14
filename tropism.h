@@ -54,18 +54,18 @@ public:
     //< Auxiliary function: Applies angles a and b and goes dx [cm] into the new direction
 
     // random numbers
-    void setSeed(double seed) { gen = std::mt19937(seed); } ///< Sets the seed of the random number generator
-    double rand() { return UD(gen); } ///< Uniformly distributed random number (0,1)
-    double randn() { return ND(gen); } ///< Normally distributed random number (0,1)
+    void setSeed(double seed) const { gen = std::mt19937(seed); } ///< Sets the seed of the random number generator
+    double rand() const { return UD(gen); } ///< Uniformly distributed random number (0,1)
+    double randn() const { return ND(gen); } ///< Normally distributed random number (0,1)
 
 protected:
     double n; ///< Number of trials
     double sigma; ///< Standard deviation
 
 private:
-    std::mt19937 gen = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());  // random stuff
-    std::normal_distribution<double> ND = std::normal_distribution<double>(0,1);
-    std::uniform_real_distribution<double> UD = std::uniform_real_distribution<double>(0,1);;
+    mutable std::mt19937 gen = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());  // random stuff
+    mutable std::normal_distribution<double> ND = std::normal_distribution<double>(0,1);
+    mutable std::uniform_real_distribution<double> UD = std::uniform_real_distribution<double>(0,1);;
 };
 
 

@@ -308,13 +308,13 @@ The basic idea is that such simulations help to increase the understanding of ex
 
 \begin{figure}
 \centering
-\includegraphics[width=1\textwidth]{example_3b1.png} 
+\includegraphics[width=0.9\textwidth]{example_3b1.png} 
 \caption{Central core} \label{fig:soilcore1} \label{fig:central}
 \end{figure}
 
 \begin{figure}
 \centering
-\includegraphics[width=1\textwidth]{example_3b2.png} 
+\includegraphics[width=0.9\textwidth]{example_3b2.png} 
 \caption{Shifted core} \label{fig:soilcore2} \label{fig:shifted}
 \end{figure}
 
@@ -410,18 +410,32 @@ After running the script we perform the following operations to create an animat
 
 
 
+
 \section{Root functional modelling}
 
-Root growth is strongly influenced by pedo-climate conditions, and plant internal state. 
-CRootBox offers build in ways to develop such models. 
+Root growth is strongly influenced by pedo-climate conditions, and plant internal state. CRootBox offers build in ways to develop such models. 
 In this section we assume static soil conditions, and describe predefined ways how the soil can affect root growth.
 Dynamic soil conditions are described in the following section 'Coupling with a soil model'
 
 \subsection{Hydro- and chemotropism}
 
-
+Root growth direction is influenced by soil conditions such as water content, soil strength, or nutrient concentration. 
+In the following we show how this is achieved in CRootBox.
 
 \lstinputlisting[language=Python, caption=Example 4a]{../example4a.py}
+
+\begin{itemize}
+
+\item[1] todo
+
+\end{itemize}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth]{example_4a.png}
+\caption{Chemotropism in a nutrient rich layer} \label{fig:sa}
+\end{figure}
+
 
 \subsection{Scale elongation rate}
 
@@ -430,6 +444,7 @@ Dynamic soil conditions are described in the following section 'Coupling with a 
 \subsection{Scale insertion angle}
 
 \subsection{Scale lateral emergence probability}
+
 
 
 
@@ -460,9 +475,6 @@ CRootBox can be easily extended by additional tropism types, or elongation funct
 \subsection{Add tropisms}
 
 \subsection{Add elongation functions}
-
-
-
 
 
 

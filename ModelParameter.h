@@ -48,9 +48,9 @@ public:
 	std::string toString() const { std::stringstream ss; write(ss); return ss.str(); } ///< writes parameter to a string
 
 	// random numbers
-	void setSeed(double seed) { gen = std::mt19937(seed); } ///< Sets the seed of the random number generator
-	double rand() { return UD(gen); } ///< Uniformly distributed random number (0,1)
-	double randn() { return ND(gen); } ///< Normally distributed random number (0,1)
+	void setSeed(double seed) const { gen = std::mt19937(seed); } ///< Sets the seed of the random number generator
+	double rand() const { return UD(gen); } ///< Uniformly distributed random number (0,1)
+	double randn() const { return ND(gen); } ///< Normally distributed random number (0,1)
 
 	/*
 	 * Rootbox parameters per root type
@@ -89,9 +89,9 @@ public:
 	SoilProperty* sbp = new SoilProperty(); ///< scale branching probability function
 
 private:
-	std::mt19937 gen = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());  // random stuff
-	std::uniform_real_distribution<double> UD = std::uniform_real_distribution<double>(0,1);
-	std::normal_distribution<double> ND = std::normal_distribution<double>(0,1);
+	mutable std::mt19937 gen = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());  // random stuff
+	mutable std::uniform_real_distribution<double> UD = std::uniform_real_distribution<double>(0,1);
+	mutable std::normal_distribution<double> ND = std::normal_distribution<double>(0,1);
 
 };
 
