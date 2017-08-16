@@ -3,17 +3,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 rs = rb.RootSystem()
-name = "Brassica_oleracea_Vansteenkiste_2014" 
-rs.openFile(name)
+rs.openFile("Brassica_oleracea_Vansteenkiste_2014")
 rs.initialize() 
 rs.simulate(120, True) 
-rs.write(name+".vtp")
 
 # Soil core analysis
 r, depth, layers = 10, 100., 100
 soilcolumn = rb.SDF_PlantContainer(r,r,depth,False) # in the center of the root
 soilcolumn2 = rb.SDF_RotateTranslate(soilcolumn,0,0,rb.Vector3d(10,0,0)) # shift 10 cm
-geom = soilcolumn2
+
+# pick one geometry for further analysis
+geom = soilcolumn
 
 z_=np.linspace(0,-1*depth,layers)
 fig, axes = plt.subplots(nrows=1, ncols=4, figsize=(16,8))

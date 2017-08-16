@@ -251,7 +251,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("getValue",pure_virtual(&SoilProperty::getValue))
 			.def("__str__",pure_virtual(&SoilProperty::toString))
 	;
-	class_<SoilPropertySDF, bases<SoilProperty>>("SoilPropertySDF",init<>())
+	class_<SoilPropertySDF, SoilPropertySDF*, bases<SoilProperty>>("SoilPropertySDF",init<>())
 			.def(init<SignedDistanceFunction*, double, double, double>())
 			.def_readwrite("sdf", &SoilPropertySDF::sdf)
 			.def_readwrite("fmax", &SoilPropertySDF::fmax)
@@ -259,6 +259,12 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def_readwrite("slope", &SoilPropertySDF::slope)
 			.def("__str__",&SoilPropertySDF::toString)
 	;
+	class_<ProportionalElongation, ProportionalElongation*, bases<SoilProperty>>("ProportionalElongation",init<>())
+			.def("getValue", &ProportionalElongation::getValue)
+			.def("setScale", &ProportionalElongation::setScale)
+			.def("__str__",&ProportionalElongation::toString)
+	;
+
 	/*
 	 * ModelParameter.h
 	 */
@@ -358,7 +364,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	 * RootSystem.h
 	 */
     class_<RootSystem, RootSystem*>("RootSystem", init<>())
-		.def(init<RootSystem&>())
+ 		.def(init<RootSystem&>())
 		.def("setRootTypeParameter", &RootSystem::setRootTypeParameter)
 		.def("getRootTypeParameter", &RootSystem::getRootTypeParameter, return_value_policy<reference_existing_object>())
 		.def("setRootSystemParameter", &RootSystem::setRootSystemParameter)
@@ -391,6 +397,9 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getUpdatedNodes",&RootSystem::getUpdatedNodes)
 		.def("getNewNodes",&RootSystem::getNewNodes)
 		.def("getNewSegments",&RootSystem::getNewSegments)
+		.def("debugSeed",&RootSystem::debugSeed)
+		.def("rand",&RootSystem::rand)
+		.def("randn",&RootSystem::randn)
 	;
     enum_<RootSystem::TropismTypes>("TropismType")
     	.value("plagio", RootSystem::TropismTypes::tt_plagio)
@@ -408,17 +417,26 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	    .value("order", RootSystem::ScalarTypes::st_order)
 	    .value("time", RootSystem::ScalarTypes::st_time)
 	    .value("length", RootSystem::ScalarTypes::st_length)
+		.value("volume", RootSystem::ScalarTypes::st_volume)
 	    .value("surface", RootSystem::ScalarTypes::st_surface)
 		.value("one", RootSystem::ScalarTypes::st_one)
 		.value("userdata1", RootSystem::ScalarTypes::st_userdata1)
 		.value("userdata2", RootSystem::ScalarTypes::st_userdata2)
 		.value("userdata3", RootSystem::ScalarTypes::st_userdata3)
 		.value("parenttype", RootSystem::ScalarTypes::st_parenttype)
+		.value("lb", RootSystem::ScalarTypes::st_lb)
+		.value("la", RootSystem::ScalarTypes::st_la)
+		.value("nob", RootSystem::ScalarTypes::st_nob)
+		.value("r", RootSystem::ScalarTypes::st_r)
+		.value("theta", RootSystem::ScalarTypes::st_theta)
+		.value("rlt", RootSystem::ScalarTypes::st_rlt)
+		.value("meanln", RootSystem::ScalarTypes::st_meanln)
+		.value("sdln", RootSystem::ScalarTypes::st_sdln)
 	;
     /*
      * analysis.h
      */
-    class_<SegmentAnalyser>("SegmentAnalyser")
+    class_<SegmentAnalyser, SegmentAnalyser*>("SegmentAnalyser")
     .def(init<RootSystem&>())
     .def(init<SegmentAnalyser&>())
 	.def("addSegments",addSegments1)

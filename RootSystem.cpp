@@ -1,7 +1,16 @@
 #include "RootSystem.h"
 
-const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","1","userdata 1", "userdata 2", "userdata 3", "parent type",
+const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","volume","1","userdata 1", "userdata 2", "userdata 3", "parent type",
 		"basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance"};
+
+/**
+ * Constructor
+ */
+RootSystem::RootSystem() :gen(std::mt19937(std::chrono::system_clock::now().time_since_epoch().count())), UD(std::uniform_real_distribution<double>(0,1)),
+		ND(std::normal_distribution<double>(0,1))
+{
+	initRTP();
+};
 
 /**
  * Copy Constructor
@@ -13,9 +22,10 @@ const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","o
 RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), rsparam(rs.rsparam), rtparam(rs.rtparam), gf(rs.gf), tf(rs.tf), geometry(rs.geometry), soil(rs.soil),
 		simtime(rs.simtime), rid(rs.rid), nid(rs.nid), old_non(rs.old_non), old_nor(rs.old_nor), maxtypes(rs.maxtypes), gen(rs.gen), UD(rs.UD), ND(rs.ND)
 {
-	std::cout << "Copying root system";
+	std::cout << "Copying root system ("<<rs.baseRoots.size()<< " base roots) \n";
 
 	RootSystem* rs_ = nullptr;
+
 	// cheat
 	for (auto& br : rs.baseRoots) {
 		rs_ = br->rootsystem; // always the same root system
@@ -23,7 +33,7 @@ RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), 
 	}
 
 	// copy base Roots
-	std::vector<Root*> baseRoots = std::vector<Root*>(rs.baseRoots.size());
+	baseRoots = std::vector<Root*>(rs.baseRoots.size());
 	for (size_t i=0; i<rs.baseRoots.size(); i++) {
 		baseRoots.at(i) = new Root(*rs.baseRoots.at(i)); // deep copy root tree
 	}
@@ -162,6 +172,11 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 	//cout << "Root system initialize\n";
 	reset(); // just in case
 
+	// fix randomness of root type parameters
+	for (auto& rtp : rtparam) {
+		rtp.setSeed(this->rand());
+	}
+
 	// Create root system
 	const double maxT = 365.; // maximal simulation time
 	const double dzB = 0.1; // distance of basal roots up the mesocotyl [cm] (hardcoded in the orginal version, hardcoded here)
@@ -226,11 +241,12 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		double N = rtparam.at(i).tropismN;
 		double sigma = rtparam.at(i).tropismS;
 		TropismFunction* tropism = this->createTropismFunction(type,N,sigma);
+		tropism->setSeed(this->rand());
 		// std::cout << "#" << i << ": type " << type << ", N " << N << ", sigma " << sigma << "\n";
 		tf.push_back(new ConfinedTropism(tropism, geometry)); // wrap confinedTropism around baseTropism
 		int gft = rtparam.at(i).gf;
 		GrowthFunction* gf_ = this->createGrowthFunction(gft);
-		gf_->getAge(1,1,1,nullptr);  // check if getAge is implemented (ohterwise an exception is thrown)
+		gf_->getAge(1,1,1,nullptr);  // check if getAge is implemented (otherwise an exception is thrown)
 		gf.push_back(gf_);
 	}
 
@@ -269,20 +285,29 @@ void RootSystem::simulate()
  * Sets the seed of the root systems random number generator,
  * and all subclasses using random number generators:
  * @see TropismFunction, @see RootParameter
+ * To obtain two exact same root system call before initialize().
  *
  * @param seed      random number generator seed
  */
-void RootSystem::setSeed(double seed) {
+void RootSystem::setSeed(double seed) const {
 	std::cout << "Setting random seed "<< seed <<"\n";
-	gen.seed(1./seed);
+	gen = std::mt19937(seed);
 	for (auto t : tf) {
 		double s  = rand();
-		t->setSeed(1./s);
+		t->setSeed(s);
 	}
 	for (auto rp : rtparam) {
 		double s  = rand();
-		rp.setSeed(1./s);
+		rp.setSeed(s);
 	}
+}
+
+
+void RootSystem::debugSeed() const
+{
+	std::stringstream s;
+	s << "Rootsystem seed "<< gen << "\n";
+	std::cout << s.str();
 }
 
 /**
@@ -526,6 +551,9 @@ std::vector<double> RootSystem::getScalar(int stype) const
 		case st_surface:
 			value =  roots[i]->length*2.*M_PI*roots[i]->param.a;
 			break;
+		case st_volume:
+			value =  roots[i]->length*M_PI*(roots[i]->param.a)*(roots[i]->param.a);
+			break;
 		case st_one:
 			value =  1;
 			break;
@@ -561,7 +589,7 @@ std::vector<double> RootSystem::getScalar(int stype) const
 			value = std::accumulate(v_.begin(), v_.end(), 0.0) / v_.size();
 			break;
 		}
-		case st_stdln: {
+		case st_sdln: {
 			const std::vector<double>& v_ = roots[i]->param.ln;
 			double mean = std::accumulate(v_.begin(), v_.end(), 0.0) / v_.size();
 			double sq_sum = std::inner_product(v_.begin(), v_.end(), v_.begin(), 0.0);

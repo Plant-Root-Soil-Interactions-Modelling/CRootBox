@@ -14,7 +14,7 @@ N = round(simtime/dt) # steps
  
 # Plot some scalar value over time
 stype = rb.ScalarType.length 
-stype_str = "length cm"
+stype_str = "length (cm)"
 v_ = np.zeros(N)
 v1_ = np.zeros(N)
 v2_ = np.zeros(N)
@@ -41,22 +41,33 @@ plt.show()
 
 # Find root tips and bases (two approaches)
 rs.initialize() 
-rs.simulate(4) # 4 days young....
+rs.simulate(7, True) # 7 days young....
 
 print(rs.getNumberOfNodes(), "nodes")
 print(rs.getNumberOfSegments(), "segments")
 
 # Use polyline representation of the roots
 polylines = rs.getPolylines()    
-for r in polylines:
-    print("base: \t", r[0])
-    print("tip: \t", r[-1])  
+bases = np.zeros((len(polylines),3))
+tips = np.zeros((len(polylines),3))
+for i,r in enumerate(polylines):
+    bases[i,:] = [r[0].x,r[0].y,r[0].z]
+    tips[i,:] = [r[-1].x,r[-1].y,r[-1].z]
 
 # Or, use node indices to find tip or base nodes
 nodes = vv2a(rs.getNodes())
 tipI = rs.getRootTips()
 baseI = rs.getRootBases()
-for i in range(0,len(tipI)):
-    print("base: \t", nodes[baseI[i]])
-    print("tip: \t", nodes[tipI[i]])
 
+# Plot results (1st approach)
+plt.title("Top view")
+plt.xlabel("cm")
+plt.ylabel("cm")
+plt.scatter(nodes[baseI,0], nodes[baseI,1], c="g", label = "root bases")
+plt.scatter(nodes[tipI,0], nodes[tipI,1], c="r", label = "root tips")
+plt.savefig("results/example_3a2.png")
+plt.show()
+
+ # check if the two approaches yield the same result
+uneq = np.sum(nodes[baseI,:]!=bases) + np.sum(nodes[tipI,:]!=tips)
+print("Unequal tips and basals:", uneq)

@@ -89,6 +89,24 @@ public:
 
 };
 
+/**
+ * Scales the root elongation with fixed value same for each root
+ */
+class ProportionalElongation : public SoilProperty
+{
+public:
+	void setScale(double s) { scale = s; }
+
+	virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
+		return scale;
+	}
+
+    virtual std::string toString() const { return "ProportionalElongation"; } ///< Quick info about the object for debugging
+
+protected:
+	double scale = 1.;
+
+};
 
 /**
  *  1D linear look up

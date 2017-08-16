@@ -97,6 +97,10 @@ std::vector<double> SegmentAnalyser::getScalar(int st) const
 			v = getSegmentLength(i)*2*M_PI*r->param.a;
 		}
 		break;
+		case RootSystem::st_volume: {
+			v =  getSegmentLength(i)*M_PI*(r->param.a)*(r->param.a);
+		}
+		break;
 		case RootSystem::st_one: { // e.g. for counting segments
 			v = 1;
 		}
