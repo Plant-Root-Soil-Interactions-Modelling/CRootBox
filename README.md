@@ -4,8 +4,8 @@ The fastest way to try CRootBox is to read the examples. Just uncomment the exam
 
 The code should compile with any c++11 compiler, e.g. for g++:
 
-  $ g++ *.cpp -std=c++11
-  $ ./a.out
+    $ g++ *.cpp -std=c++11
+    $ ./a.out
 
 
 # Folder sructure
