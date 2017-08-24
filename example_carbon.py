@@ -61,3 +61,6 @@ for i in range(0,N):
     print()
     
 rs.write("results/example_carbon.vtp")
+
+
+

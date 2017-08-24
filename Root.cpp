@@ -157,10 +157,8 @@ void Root::simulate(double dt, bool silence)
 								}
 							}
 						}
-						if (dl>0) {
-							if (p.ln.size()==laterals.size()) { // new lateral (the last one)
-								createLateral(silence);
-							}
+						if (p.ln.size()==laterals.size()) { // new lateral (the last one)
+							createLateral(silence);
 						}
 					}
 					// apical zone

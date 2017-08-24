@@ -384,13 +384,13 @@ In order to create an animation in Paraview we have to consider some details.
 The main idea is to export the result file as segments using the class SegmentAnalyser. 
 A specific frame is then obtained by thresholding using the segments creation times. 
 
-We modify example1b.py and show how to create an animation.
+We modify example1b.py to demonstrate how to create an animation.
 
 \lstinputlisting[language=Python, caption=Example 3e (modified 1b)]{../example3e.py}
 
 \begin{itemize}
 
-\item[14-16] Its important to use a small resolution in order to obtain a smooth animation. L16 set the axial resolution to 0.1 cm
+\item[14-16] Its important to use a small resolution in order to obtain a smooth animation. L16 set the axial resolution to 0.1 cm. 
 
 \item[23] Instead of saving the root system as polylines, we use the SegmentAnalyser to save the root system as segments.
 
@@ -401,8 +401,8 @@ We modify example1b.py and show how to create an animation.
 After running the script we perform the following operations to create an animation:
 \begin{enumerate}
  \item Open the .vtp file in ParaView (File$\rightarrow$Open...).
- \item Optionally, create a tube plot with the help of the script scripts/tubePlot.py (Tools$\rightarrow$Python Shell, press 'Run script')
- \item Optionally, visualize the domain boundaries by running the script results/example\_3e.py (Tools$\rightarrow$Python Shell, press 'Run script') 
+ \item Optionally, create a tube plot with the help of the script scripts/tubePlot.py (Tools$\rightarrow$Python Shell, press 'Run script').
+ \item Optionally, visualize the domain boundaries by running the script results/example\_3e.py (Tools$\rightarrow$Python Shell, press 'Run script').
  \item Run the script scripts/animate.py (Tools$\rightarrow$Python Shell, press 'Run script'). The script creates the threshold filter and the animation. 
  \item Use File$\rightarrow$Save Animation... to render and save the animation.
 \end{enumerate}
@@ -435,6 +435,11 @@ In the following we show how this is achieved in CRootBox.
 \includegraphics[width=0.7\textwidth]{example_4a.png}
 \caption{Chemotropism in a nutrient rich layer} \label{fig:sa}
 \end{figure}
+
+\subsection{User defined tropisms}
+
+Normally, the simulation is created from a set of parameters. For tropisms these are the type of tropism, number of trials $N$ , and tortuosity $\sigma$
+
 
 
 \subsection{Scale elongation rate}

@@ -16,7 +16,7 @@ RootSystem::RootSystem() :gen(std::mt19937(std::chrono::system_clock::now().time
  * Copy Constructor
  *
  * deep copies the root system
- * does not copy growth functions, tropism functions, geometry, and soil
+ * does not copy geometry, and soil
  * empties buffer
  */
 RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), rsparam(rs.rsparam), rtparam(rs.rtparam), gf(rs.gf), tf(rs.tf), geometry(rs.geometry), soil(rs.soil),
@@ -43,7 +43,20 @@ RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), 
 		br->rootsystem = rs_;
 	}
 
-	std::vector<Root*> roots = std::vector<Root*>();
+	roots = std::vector<Root*>(); // new empy buffer
+
+	// deep copy tropisms
+	tf = std::vector<TropismFunction*>(rs.tf.size());
+	for (size_t i=0; i<rs.tf.size(); i++) {
+		tf.at(i) = new TropismFunction(*rs.tf.at(i));
+	}
+
+	// deep copy growth
+	gf = std::vector<GrowthFunction*>(rs.gf.size());
+	for (size_t i=0; i<rs.gf.size(); i++) {
+		gf.at(i) = new GrowthFunction(*rs.gf.at(i));
+	}
+
 }
 
 /**
@@ -241,7 +254,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		double N = rtparam.at(i).tropismN;
 		double sigma = rtparam.at(i).tropismS;
 		TropismFunction* tropism = this->createTropismFunction(type,N,sigma);
-		tropism->setSeed(this->rand());
+		tropism->setSeed(this->rand()); // fix randomness
 		// std::cout << "#" << i << ": type " << type << ", N " << N << ", sigma " << sigma << "\n";
 		tf.push_back(new ConfinedTropism(tropism, geometry)); // wrap confinedTropism around baseTropism
 		int gft = rtparam.at(i).gf;
@@ -251,6 +264,21 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 	}
 
 	old_non = baseRoots.size();
+}
+
+/**
+ * Manually sets a tropism function for a specific or for all root types.
+ * Must be called after RootSystem::initialize()
+ */
+void RootSystem::setTropism(TropismFunction* tf_, int rt)
+{
+	if (rt>-1) { // set for a specific root type
+		tf.at(rt) = tf_;
+	} else { // set for all root types (default)
+		for (size_t i=0; i<tf.size(); i++) {
+			tf.at(i) = tf_;
+		}
+	}
 }
 
 /**

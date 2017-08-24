@@ -13,4 +13,3 @@ rootsystem.initialize()
 rootsystem.simulate(30) 
 
 # Export final result (as vtp)
-rootsystem.write("results/example_1a.vtp") 

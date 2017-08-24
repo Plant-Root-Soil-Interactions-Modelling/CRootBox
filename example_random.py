@@ -29,8 +29,3 @@ rs3.setSeed(1.)
 rs3.initialize()
 rs3.simulate(simtime)
 print("total length", np.sum(v2a(rs3.getScalar(rb.ScalarType.length))))
-
-    
-    
-    
-       
