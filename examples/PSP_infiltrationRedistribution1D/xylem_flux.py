@@ -189,7 +189,7 @@ def axial_flux0(p, seg, nodes, kz, rho, g):
 # soil_p  lambda funciton returning the soil matric potential at a given location, p=soil_p(x,y,z) [M L−1 T−2]
 #
 # out:
-# the radial flux
+# the radial flux [L3 T-1] its radial flow
 def radial_flux(p, seg, nodes, radius, kr, soil_p):
     rf = np.zeros(seg.shape[0])
     c = 0

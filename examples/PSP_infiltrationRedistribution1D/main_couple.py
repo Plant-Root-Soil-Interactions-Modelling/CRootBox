@@ -40,7 +40,7 @@ if not isSuccess:
     print("warning: wrong soil file.")
     quit()             
 funcType = inf.CAMPBELL         
-Se = 0.3 # initial degree of saturation ]0-1]
+Se = 0.6 # initial degree of saturation ]0-1]
 inf.initializeWater(funcType, soil, Se, inf.CELL_CENT_FIN_VOL) # for simplicity we use a linear grid
 for i in range(inf.n+2):
     inf.oldTheta[i] = inf.theta[i]              
@@ -72,7 +72,7 @@ dirichlet = False
 #
 # Simulation parameters
 #                   
-simTime = 28*24*3600   
+simTime = 28*24*3600  #28*24*3600   
 maxTimeStep = 3600           
 dt = 36.              
 time = 0              
@@ -86,7 +86,7 @@ rs_out_next = 7*24*3600 # root system output times (vtp)
 rho = 1e3 # kg / m^3      
 g = 1.e-3*9.8065 # m / s^2   
 
-pot_trans = np.array([-1.15741e-10]) # # m^3 s^-1 potential transpiration
+pot_trans = np.array([2*-2e-9]) # # m^3 s^-1 potential transpiration [-5.e-8]
 top_pot = -1500 # J kg^-1 top potential (wilting point)
 
 ctflux = 0 # cumulative transpiration
@@ -108,6 +108,7 @@ while (time < simTime):
     # 1. Richards Code (from Soil Physics with Python)
     #     
     t1 = timer.time()    
+    ubPotential = inf.psi[2] # should be order 2 over time (centered around 1)
     success, nrIterations, flux = inf.cellCentFiniteVolWater(funcType, soil, dt, ubPotential, isFreeDrainage, inf.LOGARITHMIC)  
     while (not success):
         print ("dt =", dt, "no convergence")
@@ -115,6 +116,7 @@ while (time < simTime):
         for i in range(inf.n+2): # reset to old time step
             inf.theta[i] = inf.oldTheta[i]
             inf.psi[i] = inf.waterPotential(funcType, soil[inf.hor[i]], inf.theta[i])
+        ubPotential = inf.psi[2]
         success, nrIterations, flux = inf.cellCentFiniteVolWater(funcType, soil, dt, ubPotential, isFreeDrainage,inf.LOGARITHMIC)
 
     for i in range(inf.n+2):
@@ -152,7 +154,7 @@ while (time < simTime):
         eff_trans = xylem_flux.axial_flux0(x, seg, nodes, kz, rho, g) # verify that eff_trans == pot_trans        
         print("using neumann ( Effective Transpiration = " +str(eff_trans)+" m^3 s^-1)", "top potential", x[0] )        
          
-    if dirichlet: # or (x[0]<top_pot):        
+    if dirichlet or (x[0]<top_pot):        
         Q, b = xylem_flux.linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p2) 
         dirichlet = True
         Q, b = xylem_flux.bc_dirichlet(Q, b, np.array([0]), np.array([top_pot])) 
@@ -175,7 +177,7 @@ while (time < simTime):
         z = 0.5*(z1+z2)
         if z>-soil[-1].lowerDepth: # -1 meter
             ind = math.floor(-z/soil[-1].lowerDepth*inf.n)
-            sink[ind] += radial_flux[i] * dt       
+            sink[ind] += ( 40 * radial_flux[i] * dt / 0.01 ) # per volume, i.e. per layer (40 plants per m^2)
     
     for i in range(0,inf.n): # apply sink
         inf.theta[i+1] += sink[i] 
@@ -201,7 +203,8 @@ while (time < simTime):
     s2 = str(format((t3-t2)/t0, '.3f'))
     s3 = str(format((t4-t3)/t0, '.3f'))
     s4 = str(format((t -t4)/t0, '.3f'))
-    print("simtime =", format(time/3600./24., '.3f'), "days, spent ="+ s0 +"s ("+s1+", "+s2+", "+s3+", "+s4+")", rs.getNumberOfNodes(), "nodes,", "dt =", dt, " iterations =", int(nrIterations), "cum trans",ctflux,  "summed infiltration:", format(sumInfiltration, '.3f'))
+    print("simtime =", format(time/3600./24., '.3f'), "days, spent ="+ s0 +"s ("+s1+", "+s2+", "+s3+", "+s4+")", rs.getNumberOfNodes(), "nodes,", "dt =", dt, 
+          " iterations =", int(nrIterations), "cum trans", ctflux, "trans", -float(np.sum(0.01*sink/40))/dt, "summed infiltration:", format(sumInfiltration, '.3f'))
     
     if time>=rs_out_next: 
         rs_out_next += (7*24*3600)  
@@ -220,23 +223,20 @@ while (time < simTime):
         ax1 = fig1a.gca()
         ax2 = ax1.twiny()          
         rsl = v2a(rs_ana.distribution(rb.ScalarType.length,0.,100.,inf.n,False))
-#         print(rsl[0:10])
-#         print(sink[0:10])
-#         print("press key")
-#         input()
-
         ax2.set_ylim(-0.25, 0)
-        ax2.set_xlim(0, 1.2*100)
-        #ax2.set_xlabel("Root system length (m)",color='green',fontsize=32)
-        #ax2.set_ylabel("Depth (m)",fontsize=32)         
+        ax2.set_xlim(0, 1.5*100)
+        ax2.set_xlabel("Root system length (m)",color='green',fontsize=32)
+        ax2.set_ylabel("Depth (m)",fontsize=32)                 
         l2 = ax2.plot(rsl,-inf.z[1:len(inf.z)-1],color='green') # for greyscale...     
         plt.setp(l2, linewidth=2)     
-        
+#         xt_ = [0.,0.3,0.6,0.9,1.2,1.5]        
+#         ax2.set_xticks([100*x for x in xt_] , [str(s) for s in xt_] )        
+                
         ax1.set_ylim(-0.25, 0) # plot sink
-        ax1.set_xlim(0.,6.e-8)
-        #ax1.set_xlabel("Sink (1)",color='blue',fontsize=32)
-        #ax1.set_ylabel("Depth (m)",fontsize=32)         
-        l1 = ax1.plot(-sink,-inf.z[1:len(inf.z)-1],'-',color='blue')   
+        ax1.set_xlim(0.,2.5e-10)
+        ax1.set_xlabel("Sink (1)",color='blue',fontsize=32)
+        ax1.set_ylabel("Depth (m)",fontsize=32)         
+        l1 = ax1.plot(-0.01*sink/40./dt,-inf.z[1:len(inf.z)-1],'-',color='blue')   
         plt.setp(l1, linewidth=2)
                                
         fig1a.show()                        
@@ -250,9 +250,11 @@ while (time < simTime):
         ax = fig1.gca()
         ax.set_xlabel("Time",fontsize=16)             
         ax.set_ylabel("Depth",fontsize=16)
-        ax.set_title("Water content",fontsize=16)     
+        ax.set_title("Effective saturation",fontsize=16)     
+        # ax2.set_xticks( )
         cax = ax.imshow(out_img[0:50,:], interpolation="nearest", cmap="hot")             
         fig1.colorbar(cax,ticks=np.linspace(0,Se,7))       
+        # fig1.colorbar(cax)       
         plt.pause(0.0001) 
             
     if (float(nrIterations/inf.maxNrIterations) < 0.1): 
@@ -269,76 +271,3 @@ plt.show()
 
 
 
-
-
-
-
-#         imin = np.min(np.min(inf.theta))
-#         imax = np.max(np.max(inf.theta))           
-#         print(imin)+
-#         print(imax)    
-
-
-# print("Minimal xylem potential", min(x), " Maximal xylem potential ", max(x))
-
-
-# for i in range(0,4):
-#     print(rs.getRootTypeParameter(i+1))
-# quit();
-# soil_wc = soil_watercontent(soil[-1].lowerDepth)
-# soil_wc = rb.SoilProperty()
-# rs.setSoil(soil_wc)
-
-
-# ubPotential = inf.airEntryPotential(funcType, soil[0]) # [J kg^-1] upper boundary condition INFILTRATION
-
-
-
-
-        # Subplot2 - ROOT SYSTEM
-        # plotRSscatter(ax2, rs.getRootTips()) # set projection3d in initialization
-
-#         # Subplot2 - root length distribution
-#         rsl = v2a(rs_ana.distribution(rb.ScalarType.length,0.,100.,inf.n,False))
-#         ax2.set_ylim(-1, 0)
-#         ax2.set_xlabel("Root system length [m]");
-#         ax2.set_ylabel("Depth [m]")         
-#         ax2.plot(rsl/100,-inf.z[1:len(inf.z)-1])  
-        
-#         # Subplot 2 - PSI
-#         ax2.set_ylim(-1, 0)
-#         ax2.set_xlabel("Water matric potential");
-#         ax2.set_ylabel("Depth [m]")         
-#         ax2.plot(inf.psi,-inf.z)           
-#         
-#         # Subplot3  -SINK
-#         ax3.set_ylim(-1, 0)
-#         ax3.set_xlabel("Sink");
-#         ax3.set_ylabel("Depth [m]")         
-#         ax3.plot(sink,-inf.z[1:len(inf.z)-1])         
-        
-#         # Subplot 3 - CUMULATIVE ROOT WATER UPTAKE        
-#         ax3.set_xlabel("Time [days]")
-#         ax3.set_ylabel("Root water uptake [1]") 
-#         ax3.plot([time/3600/24,out_next/3600/24], [cflux,cflux], 'k-')
-    
-#         # Subplot 4 - THETA
-#         ax4.set_ylim(-1, 0)
-#         ax4.set_xlabel("Water content");
-#         ax4.set_ylabel("Depth [m]")         
-#         ax4.plot(inf.theta,-inf.z)   
-      
-#         # Subplot 4 - PSI
-#         ax4.set_ylim(-1, 0)
-#         ax4.set_xlabel("Water matric potential");
-#         ax4.set_ylabel("Depth [m]")         
-#         ax4.plot(inf.psi,-inf.z)   
-
-
-# # pre study with large time steps
-# t_ = np.array([0.,14.,21.,28.])
-# for i in range(0,len(t_)-1):
-#      rs.simulate(t_[i+1]-t_[i])
-#      rs.write(rsname+"_"+str(t_[i+1])+".vtp")
-# quit()
-             
