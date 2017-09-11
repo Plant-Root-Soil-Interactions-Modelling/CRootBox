@@ -9,7 +9,7 @@
 #
 
 import py_rootbox as rb
-from evtk.hl import gridToVTK
+# from evtk.hl import gridToVTK
 import numpy as np
 
 
@@ -45,7 +45,7 @@ for i in range(0,int(N)):
 #
 # Export final result (as vtp)
 #
-rootsystem.write("results/"+name+".vtp",rb.OutputType.segments) # use ot_polylines for nicer visualization, ot_segments for animations
+rootsystem.write("results/"+name+".vtp") # use ot_polylines for nicer visualization, ot_segments for animations
 
 
 params = rb.ExudationParameters()  
@@ -75,3 +75,6 @@ X_,Y_,Z_=np.meshgrid(X,Y,Z,indexing="ij") # stupid matlab default
 
 gridToVTK("./Exudates",X,Y,Z,pointData={"Exudates":C})
 print((C>0).sum())
+
+
+

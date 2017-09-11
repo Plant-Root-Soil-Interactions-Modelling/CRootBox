@@ -45,17 +45,17 @@ RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), 
 
 	roots = std::vector<Root*>(); // new empy buffer
 
-	// deep copy tropisms
-	tf = std::vector<TropismFunction*>(rs.tf.size());
-	for (size_t i=0; i<rs.tf.size(); i++) {
-		tf.at(i) = new TropismFunction(*rs.tf.at(i));
-	}
-
-	// deep copy growth
-	gf = std::vector<GrowthFunction*>(rs.gf.size());
-	for (size_t i=0; i<rs.gf.size(); i++) {
-		gf.at(i) = new GrowthFunction(*rs.gf.at(i));
-	}
+//	// deep copy tropisms
+//	tf = std::vector<TropismFunction*>(rs.tf.size());
+//	for (size_t i=0; i<rs.tf.size(); i++) {
+//		tf.at(i) = new TropismFunction(*rs.tf.at(i));
+//	}
+//
+//	// deep copy growth
+//	gf = std::vector<GrowthFunction*>(rs.gf.size());
+//	for (size_t i=0; i<rs.gf.size(); i++) {
+//		gf.at(i) = new GrowthFunction(*rs.gf.at(i));
+//	}
 
 }
 

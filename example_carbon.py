@@ -16,8 +16,8 @@ rs.openFile(name)
 # Set growth to linear (default is negative exponential)
 for i in range(0,10):
     p = rs.getRootTypeParameter(i+1)
-    p.gf = 2; 
-    
+    p.gf = 2
+     
 rs.initialize() 
 
 # Create proportional elongation callback 
@@ -28,7 +28,7 @@ se.setScale(1.)
 for i in range(0,10):
     p = rs.getRootTypeParameter(i+1)
     p.se = se # se = scale elongation 
-
+ 
 ol = 0
 se.setScale(1.) 
 
@@ -61,6 +61,4 @@ for i in range(0,N):
     print()
     
 rs.write("results/example_carbon.vtp")
-
-
 
