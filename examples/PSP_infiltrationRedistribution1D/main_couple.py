@@ -224,19 +224,19 @@ while (time < simTime):
         ax2 = ax1.twiny()          
         rsl = v2a(rs_ana.distribution(rb.ScalarType.length,0.,100.,inf.n,False))
         ax2.set_ylim(-0.25, 0)
-        ax2.set_xlim(0, 1.5*100)
-        ax2.set_xlabel("Root system length (m)",color='green',fontsize=32)
-        ax2.set_ylabel("Depth (m)",fontsize=32)                 
-        l2 = ax2.plot(rsl,-inf.z[1:len(inf.z)-1],color='green') # for greyscale...     
+        ax2.set_xlim(0, 1.2)
+        # ax2.set_xlabel("Root system length (m)",color='green',fontsize=32)
+        # ax2.set_ylabel("Depth (m)",fontsize=32)                 
+        l2 = ax2.plot(rsl/100.,-inf.z[1:len(inf.z)-1],color='green') # for greyscale...     
         plt.setp(l2, linewidth=2)     
 #         xt_ = [0.,0.3,0.6,0.9,1.2,1.5]        
 #         ax2.set_xticks([100*x for x in xt_] , [str(s) for s in xt_] )        
                 
         ax1.set_ylim(-0.25, 0) # plot sink
-        ax1.set_xlim(0.,2.5e-10)
-        ax1.set_xlabel("Sink (1)",color='blue',fontsize=32)
-        ax1.set_ylabel("Depth (m)",fontsize=32)         
-        l1 = ax1.plot(-0.01*sink/40./dt,-inf.z[1:len(inf.z)-1],'-',color='blue')   
+        ax1.set_xlim(0.,2.75e-10)
+        # ax1.set_xlabel("Sink (1)",color='blue',fontsize=32)
+        # ax1.set_ylabel("Depth (m)",fontsize=32)         
+        l1 = ax1.plot(-0.01*sink/40./dt,-inf.z[1:len(inf.z)-1],'-',color='blue')   # 0.01 m is the layer width, 40 plants
         plt.setp(l1, linewidth=2)
                                
         fig1a.show()                        
