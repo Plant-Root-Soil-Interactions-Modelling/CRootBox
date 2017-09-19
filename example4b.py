@@ -12,19 +12,13 @@ right = rb.SDF_RotateTranslate(sideBox, rb.Vector3d(4.99,0,0))
 leftright = rb.SDF_Union(left,right)
 rs.setGeometry(leftright)  
 
-# left compartment has a minimum of 0, 1 elsewhere
+# left compartment has a minimum of 0.01, 1 elsewhere
 maxS = 1. # maximal 
 minS = 0.01 # minimal 
-slope = 1. # [cm] linear gradient between min and ma
+slope = 1. # [cm] linear gradient between min and max
 leftC = rb.SDF_Complement(left)
 soilprop = rb.SoilPropertySDF(leftC, maxS, minS, slope) # for root elongation 
 soilprop2 = rb.SoilPropertySDF(left, 1., 0.002, slope) # for branching
-
-# class MySoil(rb.SoilPropertySDF):    # todo 
-#     def getValue(p, r):
-#         print("haha")
-#         return 1.         
-# mysoil = MySoil(leftC, maxS, minS, slope)
 
 # Manually set scaling function and tropism parameters
 sigma = [0.4, 1., 1., 1., 1. ] * 2
@@ -47,11 +41,10 @@ for i in range(0,10):
 # p.sbp = soilprop2
 
 # simulation
+rs.initialize()
 simtime = 120.
 dt = 1.
 N = 120/dt
-
-rs.initialize()
 for i in range(0,round(N)):
     rs.simulate(dt,True)
 
@@ -90,3 +83,12 @@ print()
 # write results
 rs.write("results/example_4b1.py") # compartment geometry 
 rs.write("results/example_4b1.vtp") # root system
+
+
+
+# class MySoil(rb.SoilPropertySDF):    # todo 
+#     def getValue(p, r):
+#         print("haha")
+#         return 1.         
+# mysoil = MySoil(leftC, maxS, minS, slope)
+

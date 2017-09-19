@@ -1,10 +1,5 @@
-import scipy.sparse.linalg as LA
-from scipy import sparse
-
 import py_rootbox as rb    
 from rb_tools import *
-
-import xylem_flux 
 
 # Simulate a root system
 name = "Zea_mays_4_Leitner_2014"  # "Zea_mays_4_Leitner_2014"  # "Anagallis_femina_Leitner_2010" #"Sorghum_bicolor_NA_NA" "Zea_mays_4_Leitner_2014" # 
@@ -47,6 +42,32 @@ for i in range(0,N):
          seg = np.vstack((seg,newsegs))
      
      print()
+     
+# test is everything right?
+nodes_ = vv2a(rs.getNodes());
+seg_ = seg2a(rs.getSegments());
+    
+uneq = np.sum(nodes_!=nodes)/3
+print("unequal nodes: ", uneq) 
+if uneq>0:    
+    i = np.nonzero(nodes_[:,0]!=nodes[:,0])
+    print(i)
+    print()
+    print(nodes[i,:])
+    print(nodes_[i,:])     
+    print()
+
+# node indices have meaning, the ordering should be the same
+
+# segment indices have no special meaning, and the ordering is different
+seg = np.sort(seg,axis=0) # per default along the last axis 
+seg_ = np.sort(seg_,axis=0) 
+print("unequal segs: ", np.sum(seg_!=seg)/2) 
+
+# rs.write("results/example_5b.vtp")
+
+
+
 #      if rs.getNumberOfNewNodes()!=newnodes.shape[0]: # stuff for debugging...
 #          print("oh noooooooo")      
 #      for i in range(0,newnodes.shape[0]):
@@ -75,28 +96,4 @@ for i in range(0,N):
 #                           
 #              print("New segments")
 #              print(newsegs)
-
-     
-# test is everything right?
-nodes_ = vv2a(rs.getNodes());
-seg_ = seg2a(rs.getSegments());
-    
-uneq = np.sum(nodes_!=nodes)/3
-print("unequal nodes: ", uneq) 
-if uneq>0:    
-    i = np.nonzero(nodes_[:,0]!=nodes[:,0])
-    print(i)
-    print()
-    print(nodes[i,:])
-    print(nodes_[i,:])     
-    print()
-
-# node indices have meaning, the ordering should be the same
-
-# segment indices have no special meaning, and the ordering is different
-seg = np.sort(seg,axis=0) # per default along the last axis 
-seg_ = np.sort(seg_,axis=0) 
-print("unequal segs: ", np.sum(seg_!=seg)/2) 
-
-# rs.write("results/example_5b.vtp")
 

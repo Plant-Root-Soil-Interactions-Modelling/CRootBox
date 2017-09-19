@@ -12,10 +12,22 @@ def v2a(vd): # rb.std_vector_double_ to numpy array
         l[i] = vd[i]
     return l
 
+def v2ai(vd): # rb.std_vector_int_ to numpy int array    
+    l = np.zeros(len(vd),dtype=np.int) 
+    for i in range(0,len(vd)):
+        l[i] = vd[i]
+    return l
+
 def a2v(a): #  numpy array to rb.std_vector_double
     l = rb.std_vector_double_()
     for d in a:
         l.append(d)
+    return l
+
+def a2i(a): #  numpy array to rb.std_vector_int
+    l = rb.std_vector_int_()
+    for i in a:
+        l.append(i)
     return l
     
 def vv2a(vd): # rb.std_vector_Vector3_ to numpy array
