@@ -110,7 +110,7 @@ runs = 100
 # name = "Lupinus_albus_Leitner_2014"
 # name = "Zea_mays_1_Leitner_2010"
 # name = "Anagallis_femina_Leitner_2010"
-name = "wheat"
+name = "Triticum_aestivum_a_Bingham_2011"
 simtime = 5
 
 # Histogram params

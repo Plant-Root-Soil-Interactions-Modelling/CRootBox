@@ -309,13 +309,13 @@ The basic idea is that such simulations help to increase the understanding of ex
 \begin{figure}
 \centering
 \includegraphics[width=0.9\textwidth]{example_3b1.png} 
-\caption{Central core} \label{fig:soilcore1} \label{fig:central}
+\caption{Central core} \label{fig:central}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.9\textwidth]{example_3b2.png} 
-\caption{Shifted core} \label{fig:soilcore2} \label{fig:shifted}
+\caption{Shifted core} \label{fig:shifted}
 \end{figure}
 
 
@@ -415,9 +415,11 @@ After running the script we perform the following operations to create an animat
 
 Root growth is strongly influenced by pedo-climate conditions, and plant internal state. CRootBox offers build in ways to develop such models. 
 In this section we assume static soil conditions, and describe predefined ways how the soil can affect root growth.
-Dynamic soil conditions are described in the following section 'Coupling with a soil model'
+Dynamic soil conditions are described in the following section 'Coupling with a soil model'. 
+Implemented root responses are (1) the change in direction of the growing root tip, Section \ref{sec:hydro} and \ref{sec:usertropism} 
+(2) the scaling of the elongation rate, Section \ref{sec:elongation} (3) the change of insertion angle, Section \ref{sec:insertion} (4) the change of branching density, Section \ref{sec:probabilistic}.
 
-\subsection{Hydro- and chemotropism}
+\subsection{Hydro- and chemotropism} \label{sec:hydro}
 
 Root growth direction is influenced by soil conditions such as water content, soil strength, or nutrient concentration. 
 In the following we show how this is achieved in CRootBox.
@@ -432,23 +434,50 @@ In the following we show how this is achieved in CRootBox.
 
 \begin{figure}
 \centering
-\includegraphics[width=0.7\textwidth]{example_4a.png}
-\caption{Chemotropism in a nutrient rich layer} \label{fig:sa}
+\includegraphics[width=0.7\textwidth]{example4a.png}
+\caption{Chemotropism in a nutrient rich layer} \label{fig:chemo}
 \end{figure}
 
-\subsection{User defined tropisms}
+\subsection{User defined tropisms} \label{sec:usertropism}
 
-Normally, the simulation is created from a set of parameters. For tropisms these are the type of tropism, number of trials $N$ , and tortuosity $\sigma$
+Normally, the simulation is created from a set of parameters. For tropisms these are the type of tropism $tt$, number of trials $N$ , and tortuosity $\sigma$.
+There are two ways to add user defined tropisms: 
+
+\begin{enumerate}
+ \item The first is C++ only: It is to extend the CRootBox class and overwrite the method RootSystem:createTropismFunction. 
+This is the function that is called, when the tropisms are created from the parameters. 
+\item The second is to manually set the tropisms using method RootSystem::setTropism. The user has to extend the new tropism class from the class TropismFunction. 
+Currently, this is working only in C++, but in future it will be possible directly from Python. Make sure to call setTropism($\dots$) after initialize().
+\end{enumerate}
 
 
-
-\subsection{Scale elongation rate}
+\subsection{Scale elongation rate} \label{sec:elongation}
 
 \lstinputlisting[language=Python, caption=Example 4b]{../example4b.py}
 
-\subsection{Scale insertion angle}
+\subsection{Scale insertion angle} \label{sec:insertion}
 
-\subsection{Scale lateral emergence probability}
+\subsection{Scale lateral emergence probability} \label{sec:probabilistic}
+
+\begin{figure}
+\begin{subfigure}[c]{0.3\textwidth}
+\includegraphics[width=0.99\textwidth]{example4b1.png}
+\subcaption{Root elongation rate} \label{fig:elongation}
+\end{subfigure}
+\begin{subfigure}[c]{0.3\textwidth}
+\includegraphics[width=0.99\textwidth]{example4b2.png}
+\subcaption{Insertion angle of laterals} \label{fig:insertion}
+\end{subfigure}
+\begin{subfigure}[c]{0.3\textwidth}
+\includegraphics[width=0.99\textwidth]{example4b3.png}
+\subcaption{Branching density (probabilistic model)} \label{fig:probability}
+\end{subfigure}
+\caption{Predefined root responses}
+\end{figure}
+
+
+
+
 
 
 
@@ -462,6 +491,8 @@ Furthermore, we present features that can be used to analyse the dynamic behavio
 
 how to build an adjacency matrix, and how to calculate fluxes within the root system
 
+\lstinputlisting[language=Python, caption=Example 5a]{../example5a.py}
+
 \subsection{Coupling to 1D water content}
 
 explain and link to paper example
@@ -470,16 +501,11 @@ explain and link to paper example
 
 how to receive information anbout the last time step and 
 how to incrementally build an adjacency matrix
+especially important if we couple to dumux (example 5b)
+
+\lstinputlisting[language=Python, caption=Example 5b]{../example5b.py}
 
 
-
-\section{Extend CRootBox}
-
-CRootBox can be easily extended by additional tropism types, or elongation functions. 
-
-\subsection{Add tropisms}
-
-\subsection{Add elongation functions}
 
 
 

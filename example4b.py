@@ -14,7 +14,7 @@ rs.setGeometry(leftright)
 
 # left compartment has a minimum of 0, 1 elsewhere
 maxS = 1. # maximal 
-minS = 0. # minimal 
+minS = 0.01 # minimal 
 slope = 1. # [cm] linear gradient between min and ma
 leftC = rb.SDF_Complement(left)
 soilprop = rb.SoilPropertySDF(leftC, maxS, minS, slope) # for root elongation 
@@ -33,18 +33,18 @@ for i in range(0,10):
     p.dx = 0.25 # adjust resolution
     p.tropismS = sigma[i] 
     
-#     # 1. Scale elongation
-#     p.se = soilprop
-    
+    # 1. Scale elongation
+    p.se = soilprop
+     
 #     # 2. Scale insertion angle
 #     p.sa = soilprop
     
-# 3. Scale branching probability
-p = rs.getRootTypeParameter(2)
-p.ln = p.ln/5
-p.nob = p.nob*5
-p = rs.getRootTypeParameter(3)
-p.sbp = soilprop2
+# # 3. Scale branching probability
+# p = rs.getRootTypeParameter(2)
+# p.ln = p.ln/5
+# p.nob = p.nob*5
+# p = rs.getRootTypeParameter(3)
+# p.sbp = soilprop2
 
 # simulation
 simtime = 120.
@@ -88,5 +88,5 @@ print('Mean insertion angle is ', rm_theta/math.pi*180, 'degrees')
 print()
 
 # write results
-rs.write("results/example_4b.py") # compartment geometry 
-rs.write("results/example_4b.vtp") # root system
+rs.write("results/example_4b1.py") # compartment geometry 
+rs.write("results/example_4b1.vtp") # root system

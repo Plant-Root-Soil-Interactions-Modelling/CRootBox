@@ -23,7 +23,7 @@ A = sparse.coo_matrix((np.ones(seg.shape[0]),(seg[:,0],seg[:,1])))
 
 # Parameters for flux model
 rs_Kr = np.array([ 2.e-10, 2.e-10, 2.e-10, 2.e-10, 2.e-10, 2.e-11, 2.e-11 ]) # s/m; root hydraulic radial conductivity per root type 
-rs_Kz = np.array([ 5.e-14, 5.e-14, 5.e-14, 5.e-14, 5e-14, 5e-14, 5e-14 ]) # m²*s; root hydraulic axial conductivity per root type 
+rs_Kz = np.array([ 5.e-14, 5.e-14, 5.e-14, 5.e-14, 5e-14, 5e-14, 5e-14 ]) # m2*s; root hydraulic axial conductivity per root type 
 
 soil_psi = -700 # static soil pressure J kg^-1
 
