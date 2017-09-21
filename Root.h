@@ -25,6 +25,8 @@ class Root
 
 public:
 
+    friend RootSystem;
+
     Root(RootSystem* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of RootSystem, or Root::createLaterals()
     Root(const Root& r); ///< deep copy of the tree
     virtual ~Root();

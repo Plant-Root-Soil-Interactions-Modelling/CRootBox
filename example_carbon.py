@@ -4,7 +4,7 @@ import math
 
 # Parameter
 simtime = 30. # days
-dt = 1.
+dt = 1
 N = round(simtime/dt) # steps
 maxinc = 20; # maximal length increment (cm/day), TODO base this value on some fancy model 
 
@@ -49,7 +49,7 @@ for i in range(0,N):
 
     if inc>(maxinc*dt): # cm
         print("***")
-        s = math.pow((maxinc*dt)/inc,0.6) # empirical, since root growth is not linear due to branching. smaller time steps could partially fix this
+        s = (maxinc*dt)/inc # empirical, since root growth is not linear due to branching. smaller time steps could partially fix this
         se.setScale(s)    
              
     rs.simulate(dt, True) 

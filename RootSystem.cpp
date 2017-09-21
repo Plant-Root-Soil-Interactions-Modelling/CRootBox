@@ -210,14 +210,19 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 			setRootTypeParameter(brtp);
 		}
 		int maxB = rs.maxB;
-		if (rs.delayB>0) {
+		if (rs.delayB>0) { // limit if possible
 			maxB = std::min(maxB,int(ceil((maxT-rs.firstB)/rs.delayB))); // maximal for simtime maxT
 		}
 		double delay = rs.firstB;
-		for (int i=0; i<maxB; i++) {
-			Root* basalroot = new Root(this, basaltype, iheading ,delay, nullptr, 0, 0);
-			Vector3d node = rs.seedPos.plus(Vector3d(0.,0.,dzB));
-			basalroot->addNode(node,delay);
+                Root* basalroot0 = new Root(this, basaltype, iheading ,delay, nullptr, 0, 0);
+                Vector3d node = rs.seedPos.plus(Vector3d(0.,0.,dzB));
+                basalroot0->addNode(node,delay);
+                baseRoots.push_back(basalroot0);
+		for (int i=1; i<maxB; i++) {
+	                Root* basalroot = new Root(this, basaltype, iheading ,delay, nullptr, 0, 0);
+                        basalroot->nodes.push_back(basalroot0->getNode(0));
+                        basalroot->nodeIds.push_back(basalroot0->getNodeId(0));
+                        basalroot->netimes.push_back(delay);
 			baseRoots.push_back(basalroot);
 			delay += rs.delayB;
 		}
@@ -487,6 +492,30 @@ std::vector<Vector2i> RootSystem::getSegments() const
 	}
 	return s;
 }
+
+/**
+ * Return the segments connecting tap root, basal roots, and shoot borne roots.
+ *
+ * The upper node represents the oldest emerged shoot-borne root, or if none, the node where
+ * all basal roots emerge.
+ */
+std::vector<Vector2i> RootSystem::getShootSegments() const
+{
+        this->getRoots(); // update roots (if necessary)
+        int nos=getNumberOfSegments();
+        std::vector<Vector2i> s(nos);
+        int c=0;
+        for (auto const& r:roots) {
+                for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
+                        Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
+                        s.at(c) = v;
+                        c++;
+                }
+        }
+        return s;
+}
+
+
 
 /**
  * Returns pointers of the roots corresponding to each segment
