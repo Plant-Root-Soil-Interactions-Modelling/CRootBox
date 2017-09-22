@@ -71,7 +71,7 @@ public:
 
   // Analysis of simulation results
   int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system
-  int getNumberOfSegments() const { return nid+1-baseRoots.size(); } ///< Number of segments of the root system (the number of nodes-1 for tap root systems)
+  int getNumberOfSegments() const { return nid-numberOfCrowns; } ///< Number of segments of the root system (the number of nodes-1 for tap root systems)
   std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots and buffers the result
   std::vector<Root*> getBaseRoots() const { return baseRoots; } ///< Base roots are tap root, basal roots, and shoot borne roots
   std::vector<Vector3d> getNodes() const; ///< Copies all root system nodes into a vector
@@ -108,9 +108,9 @@ public:
   double rand() const { return UD(gen); } ///< Uniformly distributed random number (0,1)
   double randn() const { return ND(gen); } ///< Normally distributed random number (0,1)
 
-  int rsmlReduction = 5; ///< only each n-th node is written to the rsml file (to coarsely adjust axial resolution for output)
-
 private:
+
+  const int rsmlReduction = 5; ///< only each n-th node is written to the rsml file (to coarsely adjust axial resolution for output)
 
   RootSystemParameter rsparam; ///< Plant parameter
   std::vector<RootTypeParameter> rtparam; ///< Parameter set for each root type
@@ -131,8 +131,11 @@ private:
   const int maxtypes = 100;
   void initRTP(); // default values for rtparam vector
 
+  int numberOfCrowns = 0;
+
   void writeRSMLMeta(std::ostream & os) const;
   void writeRSMLPlant(std::ostream & os) const;
+
 
   int getRootIndex() { rid++; return rid; } ///< returns next unique root id, called by the constructor of Root
   int getNodeIndex() { nid++; return nid; } ///< returns next unique node id, called by Root::addNode()

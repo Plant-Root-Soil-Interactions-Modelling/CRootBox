@@ -1,16 +1,24 @@
 import py_rootbox as rb
+from rb_tools import *
 
 rootsystem = rb.RootSystem()
 
 # Open plant and root parameter from a file
-name = "Anagallis_femina_Leitner_2010" 
+name = "Zea_mays_1_Leitner_2010" # "Anagallis_femina_Leitner_2010" 
 rootsystem.openFile(name) 
 
 # Initialize
 rootsystem.initialize() 
 
 # Simulate
-rootsystem.simulate(30) 
+rootsystem.simulate(60, True) 
 
 # Export final result (as vtp)
 rootsystem.write("results/example_1a.vtp")  
+
+# shoots_seg  = seg2a(rootsystem.getShootSegments())
+# print(shoots_seg)
+
+# ana = rb.SegmentAnalyser(rootsystem)
+# ana.write("results/example_1a.dgf")
+

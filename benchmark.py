@@ -254,6 +254,9 @@ for t in dt:
     nl[c] = sum(d)
     non[c] = rs.getNumberOfNodes()
     
+    seg = rs.getSegments()
+    nodes = rs.getNodes()
+    
     ana = rb.SegmentAnalyser(rs)    
     ana.filter(rb.ScalarType.type,1.) # 1 is the type number of the tap root
     nl_tap[c] = ana.getSummed(rb.ScalarType.length)

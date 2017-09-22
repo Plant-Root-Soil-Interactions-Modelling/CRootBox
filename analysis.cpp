@@ -15,6 +15,7 @@ SegmentAnalyser::SegmentAnalyser(const RootSystem& rs)
 	segO = rs.getSegmentsOrigin();
 	assert(segments.size()==ctimes.size());
 	assert(segments.size()==segO.size());
+	this->rs = &rs; // needed for dgf writer, only
 }
 
 /**
@@ -685,6 +686,20 @@ void SegmentAnalyser::writeDGF(std::ostream & os) const
 		double time = ctimes.at(i);
 		double type = r->param.type;
 		os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
+	}
+	if (rs!=nullptr) {
+	    auto shoot_segs = rs->getShootSegments();
+	    for (auto& s : shoot_segs) {
+                Vector3d n1 = nodes.at(s.x);
+                Vector3d n2 = nodes.at(s.y);
+                int branchnumber = -1;
+                double radius = 1;
+                double length = sqrt((n1.x-n2.x)*(n1.x-n2.x)+(n1.y-n2.y)*(n1.y-n2.y)+(n1.z-n2.z)*(n1.z-n2.z));
+                double surface = 2*radius*M_PI*length;
+                double time = 0;
+                double type = -1;
+                os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
+	    }
 	}
 
 	os << "# \n";

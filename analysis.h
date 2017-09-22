@@ -68,6 +68,8 @@ protected:
     std::vector<std::vector<double>> userData; ///< user data attached to the segments (for vtp file), e.g. flux, pressure, etc.
     std::vector<std::string> userDataNames; ///< names of the data added, e.g. "Flux", "Pressure", etc.
 
+    const RootSystem* rs = nullptr;
+
 };
 
 inline bool operator==(const SegmentAnalyser& lhs, const SegmentAnalyser& rhs){ return (&lhs==&rhs); } // only address wise, needed for boost python indexing suite

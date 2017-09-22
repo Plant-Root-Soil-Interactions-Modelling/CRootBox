@@ -13,7 +13,7 @@
  *  build a shared library from this file
  *  put comment to line 16 to ignore this file
  */
-// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -385,6 +385,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getNodes", &RootSystem::getNodes)
 		.def("getPolylines", &RootSystem::getPolylines)
 		.def("getSegments", &RootSystem::getSegments)
+                .def("getShootSegments", &RootSystem::getShootSegments)
 		.def("getSegmentsOrigin", &RootSystem::getSegmentsOrigin)
 		.def("getNETimes", &RootSystem::getNETimes)
 		.def("getScalar", &RootSystem::getScalar)
