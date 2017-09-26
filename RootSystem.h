@@ -122,7 +122,7 @@ private:
 
   double simtime = 0;
   int rid = -1; // unique root id counter
-  int nid = -1; // unique root id counter
+  int nid = -1; // unique node id counter
 
   int old_non=0;
   int old_nor=0;

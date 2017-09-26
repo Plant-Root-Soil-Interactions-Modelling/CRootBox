@@ -28,7 +28,7 @@ public:
     friend RootSystem;
 
     Root(RootSystem* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of RootSystem, or Root::createLaterals()
-    Root(const Root& r); ///< deep copy of the tree
+    Root(const Root& r, RootSystem& rs); ///< deep copy of the tree
     virtual ~Root();
 
     void simulate(double dt, bool silence = false); ///< root growth for a time span of \param dt

@@ -62,3 +62,32 @@ for i in range(0,N):
     
 rs.write("results/example_carbon.vtp")
 
+
+
+print("copy test")
+
+rs = rb.RootSystem()
+name = "Anagallis_femina_Leitner_2010" 
+rs.openFile(name)     
+rs.initialize() 
+rs.simulate(20) # for a bit
+
+rs2 = rb.RootSystem(rs) # copy the root system
+
+nodes = vv2a(rs.getNodes())
+nodes2 = vv2a(rs2.getNodes())
+print(nodes.shape, nodes2.shape)
+
+nodes2 = vv2a(rs2.getNodes())
+
+rs.simulate(10)
+rs2.simulate(10)
+
+nodes = vv2a(rs.getNodes())
+nodes2 = vv2a(rs2.getNodes())
+print(nodes.shape, nodes2.shape)
+
+uneq = np.sum(nodes!=nodes2)
+print("Unequal nodes", uneq)
+
+

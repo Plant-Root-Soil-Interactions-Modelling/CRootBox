@@ -12,10 +12,10 @@ using namespace std;
 
 void example1()
 {
+
     RootSystem rootsystem;
 
     string name = "Anagallis_femina_Leitner_2010";
-
 
     /*
      * Open plant and root parameter from a file
@@ -69,5 +69,39 @@ void example1()
     std::cout << "Root system length " << l << " cm \n";
 
     cout << "Finished with a total of " << rootsystem.getNumberOfNodes()<< " nodes\n";
+
+//	// Root System copy example
+//	RootSystem rs = RootSystem();
+//	string name = "Anagallis_femina_Leitner_2010";
+//	rs.openFile(name);
+//	rs.initialize();
+//
+//	cout << "Simulate... \n";
+//
+//	rs.simulate(20); // for a bit
+//
+//	auto rs2 = RootSystem(rs);
+//
+//	cout << "Nodes... \n";
+//
+//	auto nodes1 = rs.getNodes();
+//	auto nodes2 = rs2.getNodes();
+//
+//	cout << "nodes 1: " << nodes1.size() << "\n";
+//	cout << "nodes 2: " << nodes2.size() << "\n";
+//
+//	cout << "Simulate both \n";
+//
+//	rs.simulate(10);
+//	rs2.simulate(10);
+//
+//	nodes1 = rs.getNodes();
+//	nodes2 = rs2.getNodes();
+//
+//	cout << "New nodes... \n";
+//	cout << "nodes 1: " << nodes1.size() << "\n";
+//	cout << "nodes 2: " << nodes2.size() << "\n";
+//
+
 
 }
