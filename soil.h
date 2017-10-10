@@ -118,13 +118,15 @@ public:
 	SoilProperty1Dlinear(double a, double b, size_t n): a(a), b(b), n(n), data(n) { };
 	void setData(std::vector<double>& data_) { assert(data.size()==n); data=data_; }
 
-	double mapIZ(size_t i) const { return a + (i+0.5)*(b-a)/(n-1); }
-	size_t mapZI(double z) const { return std::round((z-a)*(n-1)/(b-a)-0.5); }
+    // double mapIZ(size_t i) const { return a + (i+0.5)*(b-a)/(n-1); }
+	size_t mapZI(double z) const { return std::round((z-a)/(b-a)*(n-1)); }
 
 	virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
 		size_t i =mapZI(pos.z);
-		assert(i>=0);
-		assert(i<n);
+		//assert(i>=0);
+		//assert(i<n);
+		i = std::max(int(i),0);
+		i = std::min(int(i),int(n-1));
 		return data[i];
 	}
 
