@@ -74,6 +74,7 @@ SegmentAnalyser (SegmentAnalyser::*cut1)(const SDF_HalfPlane& plane) const = &Se
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(initialize_overloads,initialize,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openFile_overloads,openFile,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate1_overloads,simulate,1,2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getValue_overloads,getValue,1,2);
 
 /**
  * Virtual functions (not sure if needed, or only if we derive classes from it in python?), not working...
@@ -261,12 +262,12 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("__str__",&SoilPropertySDF::toString)
 	;
 	class_<ProportionalElongation, ProportionalElongation*, bases<SoilProperty>>("ProportionalElongation",init<>())
-			.def("getValue", &ProportionalElongation::getValue)
+			.def("getValue", &ProportionalElongation::getValue, getValue_overloads())
 			.def("setScale", &ProportionalElongation::setScale)
 			.def("__str__",&ProportionalElongation::toString)
 	;
 	class_<SoilProperty1Dlinear, SoilProperty1Dlinear*, bases<SoilProperty>>("SoilProperty1Dlinear",init<double, double, size_t>())
-			.def("getValue", &SoilProperty1Dlinear::getValue)
+			.def("getValue", &SoilProperty1Dlinear::getValue, getValue_overloads())
 			.def("setData", &SoilProperty1Dlinear::setData)
 			.def("__str__",&SoilProperty1Dlinear::toString)
 	;
