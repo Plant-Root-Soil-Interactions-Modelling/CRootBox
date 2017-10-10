@@ -265,6 +265,12 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("setScale", &ProportionalElongation::setScale)
 			.def("__str__",&ProportionalElongation::toString)
 	;
+	class_<SoilProperty1Dlinear, SoilProperty1Dlinear*, bases<SoilProperty>>("SoilProperty1Dlinear",init<double, double, size_t>())
+			.def("getValue", &SoilProperty1Dlinear::getValue)
+			.def("setData", &SoilProperty1Dlinear::setData)
+			.def("__str__",&SoilProperty1Dlinear::toString)
+	;
+
 
 	/*
 	 * ModelParameter.h
