@@ -7,31 +7,30 @@ rs = rb.RootSystem()
 name = "Anagallis_femina_Leitner_2010" 
 rs.openFile(name)
 
-elongation_scaling = rb.SoilProperty1Dlinear(0,-50,100) # for root elongation 
+scale_elongation = rb.SoilProperty1Dlinear(0,-50, 100) # for root elongation from 0 cm to -50 cm, 100 layers
 
-scales = np.ones((100,))
+soil_strength = np.ones((100,))*0.5 # some data           
+                  
+scales = np.exp(-0.4*soil_strength) # scales from some equation (TODO) 
 
-elongation_scaling.setData(a2v(scales))
+scale_elongation.setData(a2v(scales)) # set proportionality factors
   
-# print("Value at -2 ", soilprop.getValue(rb.Vector3d(0,0,-2), r))
-  
-# Manually set scaling function and tropism parameters
-sigma = [0.4, 1., 1., 1., 1. ] * 2
+# Manually set scale elongation function 
 for i in range(0,10):  
     p = rs.getRootTypeParameter(i+1)
-    p.dx = 0.25 # adjust resolution
-    p.tropismS = sigma[i]      
-    # 1. Scale elongation
-    p.se = elongation_scaling
+    p.se = scale_elongation
        
-# simulation
+# Simulation
 rs.initialize()
 simtime = 120.
 dt = 1.
 N = 120/dt
 for i in range(0,round(N)):
     
-    # update scales (e.g. from theta)
+    # update soil model (e.g. soil_strength)
+    
+    # update scales (e.g. from water content, soil_strength)
+    scales = np.exp(-0.4*soil_strength) # scales from some equation (TODO)
     
     # copy scales into scaling funciton
     elongation_scaling.setData(a2v(scales))
