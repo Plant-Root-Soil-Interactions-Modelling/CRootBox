@@ -172,9 +172,11 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 	//cout << "Root system initialize\n";
 	reset(); // just in case
 
-	// fix randomness of root type parameters
-	for (auto& rtp : rtparam) {
-		rtp.setSeed(this->rand());
+	// fix randomness of root type parameters if the seed was set manually
+	if (manualSeed) {
+		for (auto& rtp : rtparam) {
+			rtp.setSeed(this->rand());
+		}
 	}
 
 	// Create root system
@@ -313,8 +315,9 @@ void RootSystem::simulate()
  *
  * @param seed      random number generator seed
  */
-void RootSystem::setSeed(double seed) const {
+void RootSystem::setSeed(double seed) {
 	std::cout << "Setting random seed "<< seed <<"\n";
+	manualSeed = true;
 	gen = std::mt19937(seed);
 	for (auto t : tf) {
 		double s  = rand();

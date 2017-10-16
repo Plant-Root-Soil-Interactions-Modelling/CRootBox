@@ -103,7 +103,7 @@ public:
   std::string toString() const; ///< infos about current root system state (for debugging)
 
   // random stuff
-  void setSeed(double seed) const; ///< help fate (sets the seed of all random generators)
+  void setSeed(double seed); ///< help fate (sets the seed of all random generators)
   void debugSeed() const;
   double rand() const { return UD(gen); } ///< Uniformly distributed random number (0,1)
   double randn() const { return ND(gen); } ///< Normally distributed random number (0,1)
@@ -136,6 +136,7 @@ private:
   void writeRSMLMeta(std::ostream & os) const;
   void writeRSMLPlant(std::ostream & os) const;
 
+  bool manualSeed = false;
 
   int getRootIndex() { rid++; return rid; } ///< returns next unique root id, called by the constructor of Root
   int getNodeIndex() { nid++; return nid; } ///< returns next unique node id, called by Root::addNode()
