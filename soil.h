@@ -15,6 +15,7 @@ class Root;
 class SoilProperty
 {
 public:
+	SoilProperty() {};,,,
     virtual ~SoilProperty() {};
 
 
@@ -24,7 +25,7 @@ public:
      * @param pos       position [cm], (normally, root->getNode(root->getNumberOfNodes()-1))
      * @param root      the root that wants to know the scalar property
      *                  in some situation this might be usefull (e.g. could increase look up speed from a unstructured mesh)
-     * \return          scalar soil property
+     * \return          scalar soil property,,,,,,,
      */
     virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const { return 1.; } ///< Returns a scalar property of the soil, 1. per default
 

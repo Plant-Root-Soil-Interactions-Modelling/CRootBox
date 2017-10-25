@@ -2,10 +2,12 @@
 #define PY_ROOTBOX_H_
 
 // copy paste for daniel
-// 1. export LD_LIBRARY_PATH=~/boost_1_62_0/stage/lib
-// 2.  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.5 -L/home/daniel/boost_1_62_0/stage/lib -lboost_python Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o Debug/examples/Exudation/gauss_legendre.o
-// 2b  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.4 -lboost_python-py34 Debug/examples/Exudation/gauss_legendre.o
-// 2c  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.5 -lboost_python-py35 Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o Debug/examples/Exudation/gauss_legendre.o
+// 1.  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.5 -L/home/daniel/boost_1_62_0/stage/lib -lboost_python Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o Debug/examples/Exudation/gauss_legendre.o
+// 2.  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.5 -lboost_python-py35 Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o Debug/examples/Exudation/gauss_legendre.o
+// 3.  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.6 -lboost_python-py36 Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o Debug/examples/Exudation/gauss_legendre.o
+
+
+
 
 /**
  *  A Python module for CRootbox based on boost.python
@@ -65,16 +67,16 @@ std::vector<SegmentAnalyser> (SegmentAnalyser::*distribution_2)(double top, doub
 std::vector<std::vector<double>> (SegmentAnalyser::*distribution2_1)(int st, double top, double bot, double left, double right, int n, int m, bool exact) const = &SegmentAnalyser::distribution2;
 std::vector<std::vector<SegmentAnalyser>> (SegmentAnalyser::*distribution2_2)(double top, double bot, double left, double right, int n, int m) const = &SegmentAnalyser::distribution2;
 SegmentAnalyser (SegmentAnalyser::*cut1)(const SDF_HalfPlane& plane) const = &SegmentAnalyser::cut;
-// static Vector3d (SegmentAnalyser::*cut2)(Vector3d in, Vector3d out, SignedDistanceFunction* geometry) = &SegmentAnalyser::cut; // not working, dont know why, problem with static?
 
 
 /**
- * Default arguments: no idea how to do it by hand,  magic everywhere...
+ * Default arguments: no idea how to do it by hand, magic everywhere...
  */
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(initialize_overloads,initialize,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openFile_overloads,openFile,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate1_overloads,simulate,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getValue_overloads,getValue,1,2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(tropismObjective_overloads,tropismObjective,5,6);
 
 /**
  * Virtual functions (not sure if needed, or only if we derive classes from it in python?), not working...
@@ -249,7 +251,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	/*
 	 * soil.h
 	 */
-	class_<SoilProperty_Wrap,boost::noncopyable>("SoilProperty",init<>())
+	class_<SoilProperty_Wrap, SoilProperty_Wrap*, SoilProperty*, boost::noncopyable>("SoilProperty",init<>())
 			.def("getValue",pure_virtual(&SoilProperty::getValue))
 			.def("__str__",pure_virtual(&SoilProperty::toString))
 	;
@@ -270,6 +272,18 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("getValue", &SoilProperty1Dlinear::getValue, getValue_overloads())
 			.def("setData", &SoilProperty1Dlinear::setData)
 			.def("__str__",&SoilProperty1Dlinear::toString)
+	;
+	/*
+	 * tropism.h
+	 */
+	class_<TropismFunction, TropismFunction*>("TropismFunction",init<>())
+			.def(init<double, double>())
+			.def("getHeading",&TropismFunction::getHeading)
+			.def("tropismObjective",&TropismFunction::tropismObjective, tropismObjective_overloads())
+			.def("copy",&TropismFunction::copy, return_value_policy<reference_existing_object>())
+			.def("setSeed",&TropismFunction::setSeed)
+			.def("rand",&TropismFunction::rand)
+			.def("randn",&TropismFunction::randn)
 	;
 
 

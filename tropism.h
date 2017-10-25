@@ -47,7 +47,7 @@ public:
      *
      * \return         the value minimized by getHeading(), it should be in [0,1], in this way combination of various tropisms will be easier
      */
-    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root) { std::cout << "default\n"; return 0; }
+    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) { std::cout << "default\n"; return 0; }
     ///< The objective function of the random optimization of getHeading().
 
     virtual TropismFunction* copy() { return new TropismFunction(*this); }
@@ -91,7 +91,7 @@ public:
     ConfinedTropism(ConfinedTropism& t): TropismFunction(t), geometry(t.geometry), alphaN(t.alphaN), betaN(t.betaN) { tropism = t.tropism->copy(); }
     ///< copy constructor
 
-    virtual Vector2d getHeading(const Vector3d& pos, Matrix3d old,  double dx, const Root* root) override;
+    virtual Vector2d getHeading(const Vector3d& pos, Matrix3d old,  double dx, const Root* root = nullptr) override;
     ///< changes baseTropism->getHeading() in case geometric boundaries are hit
 
     virtual TropismFunction* copy() override { return new ConfinedTropism(*this); } //< deep copies the tropism (excluding geometry)
@@ -121,7 +121,7 @@ public:
 
     virtual TropismFunction* copy() override { return new Gravitropism(*this); } ///< copy constructor
 
-    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root) override {
+    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override {
         old.times(Matrix3d::rotX(b));
         old.times(Matrix3d::rotZ(a));
         return 0.5*(old.column(0).z+1.); // negative values point downwards, tranformed to 0..1
@@ -144,7 +144,7 @@ public:
 
     virtual TropismFunction* copy() override { return new Plagiotropism(*this); } ///< copy constructor
 
-    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root) override {
+    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override {
         old.times(Matrix3d::rotX(b));
         old.times(Matrix3d::rotZ(a));
         return std::abs(old.column(0).z); // 0..1
@@ -167,7 +167,7 @@ public:
 
     virtual TropismFunction* copy() override { return new Exotropism(*this); } ///< copy constructor
 
-    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root) override;
+    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override;
     ///< getHeading() minimizes this function, @see TropismFunction
 
 };
@@ -186,7 +186,7 @@ public:
 
     virtual TropismFunction* copy() override { return new Hydrotropism(*this); } ///< copy constructor
 
-    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root) override;
+    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override;
     ///< getHeading() minimizes this function, @see TropismFunction
 
 private:
@@ -221,7 +221,7 @@ public:
 
     virtual TropismFunction* copy() override { return new CombinedTropism(*this); } ///< copy constructor
 
-    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root) override;
+    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override;
     ///< getHeading() minimizes this function, @see TropismFunction
 
 private:

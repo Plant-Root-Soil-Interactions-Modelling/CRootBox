@@ -11,14 +11,7 @@ rootsystem.openFile(name)
 rootsystem.initialize() 
 
 # Simulate
-rootsystem.simulate(60, True) 
+rootsystem.simulate(30, True) 
 
 # Export final result (as vtp)
 rootsystem.write("results/example_1a.vtp")  
-
-# shoots_seg  = seg2a(rootsystem.getShootSegments())
-# print(shoots_seg)
-
-# ana = rb.SegmentAnalyser(rootsystem)
-# ana.write("results/example_1a.dgf")
-

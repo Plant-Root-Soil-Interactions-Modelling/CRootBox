@@ -92,7 +92,7 @@ Lets revise the above code in more detail:
 
 The next example is an extension of the previous one, where the root system grows in one of two containers (a soil core or rectangular rhizotron).
 Such geometries are important if we want to mimic experimental settings. In CRootBox the domain geometry is represented in a mesh free way using signed distance functions (SDF).
-A SDF returns the distance to the closest boundary, with negative sign if we are inside of the domain, and a positive if we are outside.
+A SDF returns the distance to the closest boundary, with negative sign if it lies inside of the domain, and a positive if it the point is outside.
 
 \lstinputlisting[language=Python, caption=Example 1b]{../example1b.py}
 
@@ -100,7 +100,7 @@ The geometry is first created by constructing some specialization of the class S
 \begin{itemize}
  \item[12] Construct a soil core 
  \item[15] Construct a rhizotron
- \item[18] Pick one of the two geometries. It is important to call setGeometry before initialize.
+ \item[18] Pick one of the two geometries. Note that it is important to call setGeometry before initialize.
  \item[30] Its possible to save the geometry as Paraview Python script for visualization, see Figure \ref{fig:basicB}. Run this script in Paraview by Tools$\rightarrow$Python Shell, Run Script.
 \end{itemize}
 
@@ -414,8 +414,8 @@ After running the script we perform the following operations to create an animat
 Root growth is strongly influenced by pedo-climate conditions, and plant internal state. CRootBox offers build in ways to develop such models. 
 In this section we assume static soil conditions, and describe predefined ways how the soil can affect root growth.
 Dynamic soil conditions are described in the following section 'Coupling with a soil model'. 
-Implemented root responses are (1) the change in direction of the growing root tip, Section \ref{sec:hydro} and \ref{sec:usertropism} 
-(2) the scaling of the elongation rate (3) the change of insertion angle (4) the change of lateral emergence probability, Section \ref{sec:elongation}.
+Implemented root responses are (1) the change in direction of the growing root tip, described in Sections \ref{sec:hydro} and \ref{sec:usertropism} 
+(2) the scaling of the elongation rate (3) the change of insertion angle (4) the change of lateral emergence probability, (2)-(4) are described in Section \ref{sec:elongation}.
 
 \subsection{Hydro- and chemotropism} \label{sec:hydro}
 
@@ -441,7 +441,7 @@ $minS$ outside the geometry, and linear slope with length $slope$. At the bounda
 
 \item[39] Exports the root system geometry
 
-\item[42-43] We actually do not wish to set this geometry, but we just abuse the writer of the class RootSytem to export a Python script showing the soil geometry. The resulting ParaView visualization is presented in Figure \ref{fig:chemo}.
+\item[42-43] We actually do not wish to set this geometry, but we just abuse the writer of the class RootSytem to export a Python script showing the layer geometry. The resulting ParaView visualization is presented in Figure \ref{fig:chemo}.
 
 \end{itemize}
 
@@ -451,6 +451,8 @@ $minS$ outside the geometry, and linear slope with length $slope$. At the bounda
 \caption{Chemotropism in a nutrient rich layer} \label{fig:chemo}
 \end{figure}
 
+
+
 \subsection{User defined tropisms} \label{sec:usertropism}
 
 Normally, the simulation is created from a set of parameters. For tropisms these are the type of tropism $tt$, number of trials $N$ , and tortuosity $\sigma$.
@@ -458,7 +460,7 @@ There are two ways to add user defined tropisms:
 
 \begin{enumerate}
 \item The first is C++ only: It is to extend the CRootBox class and overwrite the method RootSystem:createTropismFunction. 
-This is the function that is called, when the tropisms are created from the parameters. 
+This is the function that is called, when the tropisms are created from the parameters ($tt$, $N$, $sigma$). This is necessary when user defined tropism should be created from a parameter file, where $tt$ is the number of the new tropism type. 
 \item The second is to manually set the tropisms using method RootSystem::setTropism. The user has to extend the new tropism class from the class TropismFunction. 
 Currently, this is working only in C++, but in future it will be possible directly from Python. Make sure to call setTropism($\dots$) after initialize().
 \end{enumerate}
