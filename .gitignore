@@ -6,3 +6,13 @@ Debug/
 py_rootbox.so
 examples/Coupling_PSP/__pycache__/
 
+# CMake clutter
+build-*
+Testing
+CMakeCache.txt
+CMakeFiles/
+*.cmake
+*.a
+
+# auto-saved files
+*~
