@@ -16,7 +16,7 @@ RootSystem::RootSystem() :gen(std::mt19937(std::chrono::system_clock::now().time
  * Copy Constructor
  *
  * deep copies the root system
- * does not deept copy geometry, elongation functions, and soil
+ * does not deep copy geometry, elongation functions, and soil (all not owned by rootsystem)
  * empties buffer
  */
 RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), rsparam(rs.rsparam), rtparam(rs.rtparam), gf(rs.gf), tf(rs.tf), geometry(rs.geometry), soil(rs.soil),
@@ -38,11 +38,11 @@ RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), 
 		tf[i]= rs.tf[i]->copy();
 	}
 
-	//	// deep copy growth
-	//	gf = std::vector<GrowthFunction*>(rs.gf.size());
-	//	for (size_t i=0; i<rs.gf.size(); i++) {
-	//		gf.at(i) = new GrowthFunction(*rs.gf.at(i));
-	//	}
+	// deep copy growth
+	gf = std::vector<GrowthFunction*>(rs.gf.size());
+	for (size_t i=0; i<rs.gf.size(); i++) {
+		gf[i]= rs.gf[i]->copy();
+	}
 
 }
 
@@ -323,9 +323,10 @@ void RootSystem::simulate(double dt, double maxinc, ProportionalElongation* se)
 	RootSystem* rs_ = new RootSystem(*this);
 	se->setScale(1.);
 	rs_->simulate(dt, true);
-	v_ = this->getScalar(RootSystem::st_length);
+	v_ = rs_->getScalar(RootSystem::st_length);
 	double l = std::accumulate(v_.begin(), v_.end(), 0.0);
 	double inc_ = l - ol;
+	std::cout << "expected increase is " << inc_ << "\n";
 	delete rs_;
 
 	if ((inc_>maxinc) && (std::abs(inc_-maxinc)>accuracy)) { // check if we have to perform a binary search
@@ -339,11 +340,11 @@ void RootSystem::simulate(double dt, double maxinc, ProportionalElongation* se)
 			RootSystem* rs_ = new RootSystem(*this);
 			se->setScale(m);
 			rs_->simulate(dt, true);
-			v_ = this->getScalar(RootSystem::st_length);
+			v_ = rs_->getScalar(RootSystem::st_length);
 			double l = std::accumulate(v_.begin(), v_.end(), 0.0);
 			double inc_ = l - ol;
 			delete rs_;
-            std::cout << "\tsl, mid, sr " << sl << ", " <<  m << ", " <<  sr << ", " <<  inc_;
+            std::cout << "\tsl, mid, sr " << sl << ", " <<  m << ", " <<  sr << ", " <<  inc_ << "\n";
 
 			if (inc_>maxinc) { // concatenate
 				sr = m;

@@ -2,45 +2,45 @@ import py_rootbox as rb
 from rb_tools import *
 import math
 
-accuracy = 0.1 # cm
-maxiter = 10
-
-
-def elongate(rs, inc, dt, se):
-
-    ol = np.sum(v2a(rs.getScalar(rb.ScalarType.length)))
-    i = 0
-        
-    rs_ = rb.RootSystem(rs) # copy
-    se.setScale(1.)
-    rs_.simulate(dt, True)
-    inc_ = np.sum(v2a(rs_.getScalar(rb.ScalarType.length))) - ol
-    
-    if inc_>inc and abs(inc_-inc)>accuracy: # check if we have to perform a binary search  
-        
-        sl = 0. # left           
-        sr = 1. # right
-                        
-        while abs(inc_-inc)>accuracy and i<maxiter: # binary search 
-                                    
-            m = (sl+sr)/2. # mid
-            rs_ = rb.RootSystem(rs) # copy        
-            se.setScale(m)  
-            rs_.simulate(dt, True) 
-            inc_ = np.sum(v2a(rs_.getScalar(rb.ScalarType.length))) - ol
-            print("\tsl, mid, sr ", sl, m, sr, inc_)
-            
-            if inc_>inc: # concatenate
-                sr = m
-            else:
-                sl = m                  
-            
-            i += 1            
-            
-        return rs_                        
-        
-    else:
-        return rs_
+# accuracy = 0.1 # cm
+# maxiter = 10
+#
+# # was added to the c++ code
+# def elongate(rs, inc, dt, se):
+# 
+#     ol = np.sum(v2a(rs.getScalar(rb.ScalarType.length)))
+#     i = 0
+#         
+#     rs_ = rb.RootSystem(rs) # copy
+#     se.setScale(1.)
+#     rs_.simulate(dt, True)
+#     inc_ = np.sum(v2a(rs_.getScalar(rb.ScalarType.length))) - ol
+#     
+#     if inc_>inc and abs(inc_-inc)>accuracy: # check if we have to perform a binary search  
+#         
+#         sl = 0. # left           
+#         sr = 1. # right
+#                         
+#         while abs(inc_-inc)>accuracy and i<maxiter: # binary search 
+#                                     
+#             m = (sl+sr)/2. # mid
+#             rs_ = rb.RootSystem(rs) # copy        
+#             se.setScale(m)  
+#             rs_.simulate(dt, True) 
+#             inc_ = np.sum(v2a(rs_.getScalar(rb.ScalarType.length))) - ol
+#             print("\tsl, mid, sr ", sl, m, sr, inc_)
+#             
+#             if inc_>inc: # concatenate
+#                 sr = m
+#             else:
+#                 sl = m                  
+#             
+#             i += 1            
+#             
+#         return rs_                        
+#         
+#     else:
+#         return rs_
     
 # Parameter
 simtime = 30. # days
@@ -68,7 +68,7 @@ for i in range(0,N):
     
     print("\nSimulation ", i)
     
-    rs = elongate(rs, maxinc*dt, dt, se)
+    rs.simulate(dt, dt*maxinc, se)  # todo: multiplication better inside mehtod
     
     l = np.sum(v2a(rs.getScalar(rb.ScalarType.length)))
     inc =  l - ol

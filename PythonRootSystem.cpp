@@ -55,6 +55,7 @@ std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceF
 
 void (RootSystem::*simulate1)(double dt, bool silence) = &RootSystem::simulate;
 void (RootSystem::*simulate2)() = &RootSystem::simulate;
+void (RootSystem::*simulate3)(double dt, double maxinc, ProportionalElongation* se) = &RootSystem::simulate;
 
 void (SegmentAnalyser::*addSegments1)(const RootSystem& rs) = &SegmentAnalyser::addSegments;
 void (SegmentAnalyser::*addSegments2)(const SegmentAnalyser& a) = &SegmentAnalyser::addSegments;
@@ -285,8 +286,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("rand",&TropismFunction::rand)
 			.def("randn",&TropismFunction::randn)
 	;
-
-
 	/*
 	 * ModelParameter.h
 	 */
@@ -398,6 +397,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("initialize", &RootSystem::initialize, initialize_overloads())
 		.def("simulate",simulate1, simulate1_overloads())
 		.def("simulate",simulate2)
+		.def("simulate",simulate3)
 		.def("getSimTime", &RootSystem::getSimTime)
 		.def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
 		.def("getNumberOfSegments", &RootSystem::getNumberOfSegments)

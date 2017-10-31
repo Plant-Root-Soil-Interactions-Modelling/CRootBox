@@ -50,10 +50,10 @@ public:
     virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) { std::cout << "default\n"; return 0; }
     ///< The objective function of the random optimization of getHeading().
 
-    virtual TropismFunction* copy() { return new TropismFunction(*this); }
+    virtual TropismFunction* copy() { return new TropismFunction(*this); } ///< factory method
 
     static Vector3d getPosition(const Vector3d& pos, Matrix3d old, double a, double b, double dx);
-    //< Auxiliary function: Applies angles a and b and goes dx [cm] into the new direction
+    ///< Auxiliary function: Applies angles a and b and goes dx [cm] into the new direction
 
     // random numbers
     void setSeed(double seed) const { gen = std::mt19937(seed); } ///< Sets the seed of the random number generator
