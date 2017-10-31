@@ -59,6 +59,7 @@ public:
   void setTropism(TropismFunction* tf, int rt = -1);
   void simulate(double dt, bool silence = false); ///< simulates root system growth for time span dt
   void simulate(); ///< simulates root system growth for the time defined in the root system parameters
+  void simulate(double dt, double maxinc, ProportionalElongation* se);
   double getSimTime() const { return simtime; } ///< returns the current simulation time
 
   // call back functions (todo simplify)

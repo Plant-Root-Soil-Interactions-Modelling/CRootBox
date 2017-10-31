@@ -20,10 +20,7 @@
 #include "examples/shehan_RhizoTubes.h"
 #include "examples/shehan_Trenches.h"
 
-//#include "examples/Exudation/example_exudation.h"
-
-//#include "DumuxRootSystem.h" // suggested coupling
-//#include "examples/example_dumux.h"
+#include "examples/Exudation/example_exudation.h"
 
 /**
  * Starts an examples (from the examples folder)

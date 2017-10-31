@@ -308,6 +308,58 @@ void RootSystem::simulate()
 }
 
 /**
+ * Simulates root system growth for the time span dt, elongates a maximum of maxinc total length using the proportional elongation pe
+ */
+void RootSystem::simulate(double dt, double maxinc, ProportionalElongation* se)
+{
+	const double accuracy = 1e-3;
+	const int maxiter = 20;
+
+	auto v_ = this->getScalar(RootSystem::st_length);
+	double ol = std::accumulate(v_.begin(), v_.end(), 0.0);
+
+	int i = 0;
+
+	RootSystem* rs_ = new RootSystem(*this);
+	se->setScale(1.);
+	rs_->simulate(dt, true);
+	v_ = this->getScalar(RootSystem::st_length);
+	double l = std::accumulate(v_.begin(), v_.end(), 0.0);
+	double inc_ = l - ol;
+	delete rs_;
+
+	if ((inc_>maxinc) && (std::abs(inc_-maxinc)>accuracy)) { // check if we have to perform a binary search
+
+		double sl = 0.; // left
+		double sr = 1.; // right
+
+		while ((std::abs(inc_-maxinc)>accuracy) && (i<maxiter))  { // binary search
+
+			double m = (sl+sr)/2.; // mid
+			RootSystem* rs_ = new RootSystem(*this);
+			se->setScale(m);
+			rs_->simulate(dt, true);
+			v_ = this->getScalar(RootSystem::st_length);
+			double l = std::accumulate(v_.begin(), v_.end(), 0.0);
+			double inc_ = l - ol;
+			delete rs_;
+            std::cout << "\tsl, mid, sr " << sl << ", " <<  m << ", " <<  sr << ", " <<  inc_;
+
+			if (inc_>maxinc) { // concatenate
+				sr = m;
+			} else {
+				sl = m;
+			}
+
+			i ++;
+		}
+
+	}
+
+	this->simulate(dt, true);
+}
+
+/**
  * Sets the seed of the root systems random number generator,
  * and all subclasses using random number generators:
  * @see TropismFunction, @see RootParameter
