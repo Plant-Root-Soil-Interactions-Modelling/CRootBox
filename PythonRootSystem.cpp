@@ -55,7 +55,7 @@ std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceF
 
 void (RootSystem::*simulate1)(double dt, bool silence) = &RootSystem::simulate;
 void (RootSystem::*simulate2)() = &RootSystem::simulate;
-void (RootSystem::*simulate3)(double dt, double maxinc, ProportionalElongation* se) = &RootSystem::simulate;
+void (RootSystem::*simulate3)(double dt, double maxinc, ProportionalElongation* se, bool silence) = &RootSystem::simulate;
 
 void (SegmentAnalyser::*addSegments1)(const RootSystem& rs) = &SegmentAnalyser::addSegments;
 void (SegmentAnalyser::*addSegments2)(const SegmentAnalyser& a) = &SegmentAnalyser::addSegments;
@@ -69,13 +69,13 @@ std::vector<std::vector<double>> (SegmentAnalyser::*distribution2_1)(int st, dou
 std::vector<std::vector<SegmentAnalyser>> (SegmentAnalyser::*distribution2_2)(double top, double bot, double left, double right, int n, int m) const = &SegmentAnalyser::distribution2;
 SegmentAnalyser (SegmentAnalyser::*cut1)(const SDF_HalfPlane& plane) const = &SegmentAnalyser::cut;
 
-
 /**
  * Default arguments: no idea how to do it by hand, magic everywhere...
  */
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(initialize_overloads,initialize,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openFile_overloads,openFile,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate1_overloads,simulate,1,2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate3_overloads,simulate,3,4);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getValue_overloads,getValue,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(tropismObjective_overloads,tropismObjective,5,6);
 
@@ -397,7 +397,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("initialize", &RootSystem::initialize, initialize_overloads())
 		.def("simulate",simulate1, simulate1_overloads())
 		.def("simulate",simulate2)
-		.def("simulate",simulate3)
+		.def("simulate",simulate3, simulate3_overloads())
 		.def("getSimTime", &RootSystem::getSimTime)
 		.def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
 		.def("getNumberOfSegments", &RootSystem::getNumberOfSegments)

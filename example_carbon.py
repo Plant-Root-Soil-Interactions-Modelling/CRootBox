@@ -66,16 +66,15 @@ ol = 0
 # Simulation loop
 for i in range(0,N):    
     
-    print("\nSimulation ", i)
+    print("\nSimulation", i)
     
-    rs.simulate(dt, dt*maxinc, se)  # todo: multiplication better inside mehtod
-    
+    rs.simulate(dt, maxinc, se, False) # True = disable debug messages, False = enable debug messages
+        
     l = np.sum(v2a(rs.getScalar(rb.ScalarType.length)))
     inc =  l - ol
     ol = l
-    
-    print("elongated ", inc, " cm")
-    
+        
+    print("elongated ", inc, " cm")    
         
 rs.write("results/example_carbon.vtp")
 

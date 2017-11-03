@@ -22,7 +22,7 @@ RootSystem::RootSystem() :gen(std::mt19937(std::chrono::system_clock::now().time
 RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), rsparam(rs.rsparam), rtparam(rs.rtparam), gf(rs.gf), tf(rs.tf), geometry(rs.geometry), soil(rs.soil),
 		simtime(rs.simtime), rid(rs.rid), nid(rs.nid), old_non(rs.old_non), old_nor(rs.old_nor), maxtypes(rs.maxtypes), gen(rs.gen), UD(rs.UD), ND(rs.ND)
 {
-	std::cout << "Copying root system ("<<rs.baseRoots.size()<< " base roots) \n";
+	// std::cout << "Copying root system ("<<rs.baseRoots.size()<< " base roots) \n";
 
 	// copy base Roots
 	baseRoots = std::vector<Root*>(rs.baseRoots.size());
@@ -308,13 +308,16 @@ void RootSystem::simulate()
 }
 
 /**
- * Simulates root system growth for the time span dt, elongates a maximum of maxinc total length using the proportional elongation pe
+ * Simulates root system growth for the time span dt [days],
+ * elongates a maximum of maxinc total length [cm/day]
+ * using the proportional elongation se
  */
-void RootSystem::simulate(double dt, double maxinc, ProportionalElongation* se)
+void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se, bool silence)
 {
-	const double accuracy = 1e-3;
+	const double accuracy = 1.e-3;
 	const int maxiter = 20;
 
+	double maxinc = dt*maxinc_;
 	auto v_ = this->getScalar(RootSystem::st_length);
 	double ol = std::accumulate(v_.begin(), v_.end(), 0.0);
 
@@ -322,11 +325,13 @@ void RootSystem::simulate(double dt, double maxinc, ProportionalElongation* se)
 
 	RootSystem* rs_ = new RootSystem(*this);
 	se->setScale(1.);
-	rs_->simulate(dt, true);
+	rs_->simulate(dt, silence);
 	v_ = rs_->getScalar(RootSystem::st_length);
 	double l = std::accumulate(v_.begin(), v_.end(), 0.0);
 	double inc_ = l - ol;
-	std::cout << "expected increase is " << inc_ << "\n";
+	if (!silence) {
+		std::cout << "expected increase is " << inc_ << "\n";
+	}
 	delete rs_;
 
 	if ((inc_>maxinc) && (std::abs(inc_-maxinc)>accuracy)) { // check if we have to perform a binary search
@@ -334,30 +339,30 @@ void RootSystem::simulate(double dt, double maxinc, ProportionalElongation* se)
 		double sl = 0.; // left
 		double sr = 1.; // right
 
-		while ((std::abs(inc_-maxinc)>accuracy) && (i<maxiter))  { // binary search
+		while ( ((std::abs(inc_-maxinc)) > accuracy) && (i<maxiter) )  { // binary search
 
 			double m = (sl+sr)/2.; // mid
 			RootSystem* rs_ = new RootSystem(*this);
 			se->setScale(m);
-			rs_->simulate(dt, true);
+			rs_->simulate(dt, silence);
 			v_ = rs_->getScalar(RootSystem::st_length);
-			double l = std::accumulate(v_.begin(), v_.end(), 0.0);
-			double inc_ = l - ol;
+			l = std::accumulate(v_.begin(), v_.end(), 0.0);
+			inc_ = l - ol;
 			delete rs_;
-            std::cout << "\tsl, mid, sr " << sl << ", " <<  m << ", " <<  sr << ", " <<  inc_ << "\n";
+			if (!silence) {
+				std::cout << "\t(sl, mid, sr) = (" << sl << ", " <<  m << ", " <<  sr << "), inc " <<  inc_ << ", err: " << std::abs(inc_-maxinc) << " > " << accuracy << "\n";
+			}
 
 			if (inc_>maxinc) { // concatenate
 				sr = m;
 			} else {
 				sl = m;
 			}
+			i++;
 
-			i ++;
 		}
-
 	}
-
-	this->simulate(dt, true);
+	this->simulate(dt, silence);
 }
 
 /**
