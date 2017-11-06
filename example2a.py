@@ -44,14 +44,15 @@ rhizotubes = rb.SDF_Union(rhizotubes_)
 rhizoTube = rb.SDF_Difference(box, rhizotubes)
 
 # Set geometry: rotatedRhizotron, splitBox, or rhizoTube
-rs.setGeometry(rotatedRhizotron)  
+rs.setGeometry(rhizoTube)  
 
 # Simulate
 rs.initialize() 
-rs.simulate(60) # days   
+rs.simulate(90) # days   
 
 # Export results (as vtp)    
 rs.write("results/example_2a.vtp")
 
 # Export container geometry as Paraview Python script 
 rs.write("results/example_2a.py")
+

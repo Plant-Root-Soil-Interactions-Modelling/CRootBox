@@ -88,13 +88,14 @@ public:
   std::vector<int> getRootBases() const; ///< Node indices of the root bases
 
   // Dynamic information what happened last time step
-  int getNumberOfNewNodes() const { return getNumberOfNodes()-old_non; } ///< returns the number of new nodes created in the previous time step (ame number as new segments)
-  int getNumberOfNewRoots() const { return getRoots().size() -old_nor; }  ///< returns the number of new roots created in the previous time step
-  std::vector<int> getUpdatedNodeIndices() const; ///< indices of nodes that were updated in the previous time step
-  std::vector<Vector3d> getUpdatedNodes() const; ///< values of the updated nodes
-  std::vector<Vector3d> getNewNodes() const; ///< nodes created in the previous time step
-  std::vector<Vector2i> getNewSegments() const; ///< segments created in the previous time step
-  // restore(); ///< TODO restore old time step
+  int getNumberOfNewNodes() const { return getNumberOfNodes()-old_non; } ///< The number of new nodes created in the previous time step (ame number as new segments)
+  int getNumberOfNewRoots() const { return getRoots().size() -old_nor; }  ///< The number of new roots created in the previous time step
+  std::vector<int> getUpdatedNodeIndices() const; ///< Indices of nodes that were updated in the previous time step
+  std::vector<Vector3d> getUpdatedNodes() const; ///< Values of the updated nodes
+  std::vector<Vector3d> getNewNodes() const; ///< Nodes created in the previous time step
+  std::vector<Vector2i> getNewSegments() const; ///< Segments created in the previous time step
+  std::vector<Root*> getNewSegmentsOrigin() const; ///< Copies a pointer to the root containing the new segments
+
 
   // Output Simulation results
   void write(std::string name) const; /// writes simulation results (type is determined from file extension in name)

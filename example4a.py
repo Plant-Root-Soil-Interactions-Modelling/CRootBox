@@ -41,4 +41,3 @@ rs.write("results/example_4a.vtp")
 # Export geometry of static soil  
 rs.setGeometry(layer)  # just for vizualisation
 rs.write("results/example_4a.py")
-

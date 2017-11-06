@@ -784,6 +784,25 @@ std::vector<Vector2i> RootSystem::getNewSegments() const
 }
 
 /**
+ *
+ */
+std::vector<Root*> RootSystem::getNewSegmentsOrigin() const
+{
+	this->getRoots(); // update roots (if necessary)
+	std::vector<Root*> si(this->getNumberOfNewNodes());
+	int c=0;
+	for (auto& r:roots) {
+		int onon = std::abs(r->old_non);
+		for (size_t i=onon-1; i<r->getNumberOfNodes()-1; i++) {
+			si.at(c) = r;
+			c++;
+		}
+	}
+	return si;
+}
+
+
+/**
  * todo
  */
 std::string RootSystem::toString() const
