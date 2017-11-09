@@ -7,8 +7,6 @@
 // 3.  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.6 -lboost_python-py36 Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o Debug/examples/Exudation/gauss_legendre.o
 
 
-
-
 /**
  *  A Python module for CRootbox based on boost.python
  *
@@ -34,6 +32,8 @@
 #include "examples/Exudation/example_exudation.h"
 
 using namespace boost::python;
+
+
 
 /*
  * Functions overloading (by hand, there are also macros available)
@@ -69,6 +69,8 @@ std::vector<std::vector<double>> (SegmentAnalyser::*distribution2_1)(int st, dou
 std::vector<std::vector<SegmentAnalyser>> (SegmentAnalyser::*distribution2_2)(double top, double bot, double left, double right, int n, int m) const = &SegmentAnalyser::distribution2;
 SegmentAnalyser (SegmentAnalyser::*cut1)(const SDF_HalfPlane& plane) const = &SegmentAnalyser::cut;
 
+
+
 /**
  * Default arguments: no idea how to do it by hand, magic everywhere...
  */
@@ -79,51 +81,25 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate3_overloads,simulate,3,4);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getValue_overloads,getValue,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(tropismObjective_overloads,tropismObjective,5,6);
 
+
+
 /**
- * Virtual functions (not sure if needed, or only if we derive classes from it in python?), not working...
- *
- * it seems a bit tricky to make polymorphism work, we have to wrap the classes
- *
- * Tutorial example:
- * struct BaseWrap : Base, wrapper<Base>
- * {
- *    int f()
- *    {
- *        if (override f = this->get_override("f"))
- *            return f(); // *note*
- *        return Base::f();
- *    }
- *
- *    int default_f() { return this->Base::f(); }
- * };
+ * Virtual functions
  */
-//struct SignedDistanceFunction_Wrap : SignedDistanceFunction, wrapper<SignedDistanceFunction>
-//{
-//	double getDist(const Vector3d& v) const {
-//		if (override getDist = this->get_override("getDist"))
-//			return getDist(v);
-//		return SignedDistanceFunction::getDist(v);
-//	}
-//	double default_getDist(const Vector3d& v) { return this->SignedDistanceFunction::getDist(v); }
-//};
-//	class_<SignedDistanceFunction_Wrap, boost::noncopyable>("SignedDistanceFunction")
-//	    .def("getDist", &SignedDistanceFunction_Wrap::getDist, &SignedDistanceFunction_Wrap::default_getDist)
-//	; // TODO how does polymorphism work... (everything works fine, dont ask why)
-// tricky booom boom (?)
+class SoilProperty_Wrap : public SoilProperty, public wrapper<SoilProperty> {
+public:
 
-
-struct SoilProperty_Wrap : SoilProperty, wrapper<SoilProperty> {
-
-    double getValue(const Vector3d& pos, const Root* root = nullptr) const {
-
+    virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
     	return this->get_override("getValue")(pos, root);
     }
 
-    std::string toString() const {
+    virtual std::string toString() const override {
     	return this->get_override("toString")();
     }
 
 };
+
+
 
 /**
  * Expose classes to Python module
@@ -252,9 +228,9 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	/*
 	 * soil.h
 	 */
-	class_<SoilProperty_Wrap, SoilProperty_Wrap*, SoilProperty*, boost::noncopyable>("SoilProperty",init<>())
-			.def("getValue",pure_virtual(&SoilProperty::getValue))
-			.def("__str__",pure_virtual(&SoilProperty::toString))
+	class_<SoilProperty_Wrap, SoilProperty_Wrap*, boost::noncopyable>("SoilProperty",init<>())
+			.def("getValue",&SoilProperty_Wrap::getValue)
+			.def("__str__",&SoilProperty_Wrap::toString)
 	;
 	class_<SoilPropertySDF, SoilPropertySDF*, bases<SoilProperty>>("SoilPropertySDF",init<>())
 			.def(init<SignedDistanceFunction*, double, double, double>())
