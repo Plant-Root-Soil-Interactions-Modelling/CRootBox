@@ -433,16 +433,16 @@ void Root::writeRSML(std::ostream & cout, std::string indent) const
 		// polyline nodes
 		cout << indent << "\t\t\t" << "<point ";
 		Vector3d v = nodes.at(0);
-		cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
+		cout << "x=\"" << v.x << "\" y=\"" << v.z << "\" z=\"" << v.y << "\"/>\n";
 		int n = this->rootsystem->rsmlReduction;
 		for (size_t i = 1; i<nodes.size()-1; i+=n) {
 			cout << indent << "\t\t\t" << "<point ";
 			Vector3d v = nodes.at(i);
-			cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
+			cout << "x=\"" << v.x << "\" y=\"" << v.z << "\" z=\"" << v.y << "\"/>\n";
 		}
 		cout << indent << "\t\t\t" << "<point ";
 		v = nodes.at(nodes.size()-1);
-		cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
+		cout << "x=\"" << v.x << "\" y=\"" << v.z << "\" z=\"" << v.y << "\"/>\n";
 		cout << indent << "\t\t</polyline>\n"; // close polyline
 		cout << indent << "\t</geometry>\n"; // close geometry
 
