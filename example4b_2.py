@@ -7,13 +7,13 @@ rs = rb.RootSystem()
 name = "Anagallis_femina_Leitner_2010" 
 rs.openFile(name)
 
-scale_elongation = rb.SoilProperty1Dlinear(0,-50, 100) # for root elongation from 0 cm to -50 cm, 100 layers
+scale_elongation = rb.EquidistantGrid1D(0,-50, 100) # for root elongation from 0 cm to -50 cm, 100 layers
 
-soil_strength = np.ones((100,))*0.5 # some data           
+soil_strength = np.ones((99,))*0.5 # some data           
                   
 scales = np.exp(-0.4*soil_strength) # scales from some equation (TODO) 
 
-scale_elongation.setData(a2v(scales)) # set proportionality factors
+scale_elongation.data = a2v(scales) # set proportionality factors
   
 print("value at -3 cm", scale_elongation.getValue(rb.Vector3d(0,0,-3)))
   
@@ -35,7 +35,7 @@ for i in range(0,round(N)):
     scales = np.exp(-0.4*soil_strength) # scales from some equation (TODO)
     
     # copy scales into scaling funciton
-    scale_elongation.setData(a2v(scales))
+    scale_elongation.data = a2v(scales)
     
     rs.simulate(dt,True)
 

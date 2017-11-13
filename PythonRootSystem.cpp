@@ -13,7 +13,7 @@
  *  build a shared library from this file
  *  put comment to line 16 to ignore this file
  */
-// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -86,7 +86,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(tropismObjective_overloads,tropismObjecti
 /**
  * Virtual functions
  */
-class SoilProperty_Wrap : public SoilProperty, public wrapper<SoilProperty> {
+class SoilLookUp_Wrap : public SoilLookUp, public wrapper<SoilLookUp> {
 public:
 
     virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
@@ -228,29 +228,43 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	/*
 	 * soil.h
 	 */
-	class_<SoilProperty_Wrap, SoilProperty_Wrap*, boost::noncopyable>("SoilProperty",init<>())
-			.def("getValue",&SoilProperty_Wrap::getValue)
-			.def("__str__",&SoilProperty_Wrap::toString)
+	class_<SoilLookUp_Wrap, SoilLookUp_Wrap*, boost::noncopyable>("SoilLookUp",init<>())
+			.def("getValue",&SoilLookUp_Wrap::getValue)
+			.def("__str__",&SoilLookUp_Wrap::toString)
 	;
-	class_<SoilPropertySDF, SoilPropertySDF*, bases<SoilProperty>>("SoilPropertySDF",init<>())
+	class_<SoilLookUpSDF, SoilLookUpSDF*, bases<SoilLookUp>>("SoilLookUpSDF",init<>())
 			.def(init<SignedDistanceFunction*, double, double, double>())
-			.def_readwrite("sdf", &SoilPropertySDF::sdf)
-			.def_readwrite("fmax", &SoilPropertySDF::fmax)
-			.def_readwrite("fmin", &SoilPropertySDF::fmin)
-			.def_readwrite("slope", &SoilPropertySDF::slope)
-			.def("__str__",&SoilPropertySDF::toString)
+			.def_readwrite("sdf", &SoilLookUpSDF::sdf)
+			.def_readwrite("fmax", &SoilLookUpSDF::fmax)
+			.def_readwrite("fmin", &SoilLookUpSDF::fmin)
+			.def_readwrite("slope", &SoilLookUpSDF::slope)
+			.def("__str__",&SoilLookUpSDF::toString)
 	;
-	class_<ProportionalElongation, ProportionalElongation*, bases<SoilProperty>>("ProportionalElongation",init<>())
+	class_<ProportionalElongation, ProportionalElongation*, bases<SoilLookUp>>("ProportionalElongation",init<>())
 			.def("getValue", &ProportionalElongation::getValue, getValue_overloads())
 			.def("setScale", &ProportionalElongation::setScale)
 			.def("__str__",&ProportionalElongation::toString)
 	;
-	class_<SoilProperty1Dlinear, SoilProperty1Dlinear*, bases<SoilProperty>>("SoilProperty1Dlinear",init<double, double, size_t>())
-			.def("getValue", &SoilProperty1Dlinear::getValue, getValue_overloads())
-			.def("setData", &SoilProperty1Dlinear::setData)
-			.def("__str__",&SoilProperty1Dlinear::toString)
+	class_<RectilinearGrid1D, RectilinearGrid1D*, bases<SoilLookUp>>("RectilinearGrid1D",init<>())
+			.def(init<size_t, std::vector<double>, std::vector<double>>())
+			.def("getValue", &RectilinearGrid1D::getValue, getValue_overloads())
+			.def("__str__",&RectilinearGrid1D::toString)
+			.def("map",&RectilinearGrid1D::map)
+			.def_readwrite("n", &RectilinearGrid1D::n)
+			.def_readwrite("grid", &RectilinearGrid1D::grid)
+			.def_readwrite("data", &RectilinearGrid1D::data)
 	;
-	/*
+	class_<EquidistantGrid1D, EquidistantGrid1D*, bases<RectilinearGrid1D>>("EquidistantGrid1D",init<double, double, size_t>())
+			.def(init<double, double, std::vector<double>>())
+			.def("getValue", &EquidistantGrid1D::getValue, getValue_overloads())
+			.def("__str__",&EquidistantGrid1D::toString)
+			.def("map",&EquidistantGrid1D::map)
+			.def_readwrite("n", &EquidistantGrid1D::n)
+			.def_readwrite("grid", &EquidistantGrid1D::grid)
+			.def_readwrite("data", &EquidistantGrid1D::data)
+	;
+	/**
+	 *
 	 * tropism.h
 	 */
 	class_<TropismFunction, TropismFunction*>("TropismFunction",init<>())

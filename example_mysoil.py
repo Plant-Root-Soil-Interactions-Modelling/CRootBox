@@ -3,7 +3,7 @@ import py_rootbox as rb
 #
 # try to create my own soil in pyhton
 #
-class My_Soil(rb.SoilProperty):
+class My_Soil(rb.SoilLookUp):
 
     def getValue(self, pos, root):
         print(pos)
@@ -32,10 +32,9 @@ minS = 0.1 # minimal
 slope = 5 # linear gradient between min and max (cm)
 box = rb.SDF_PlantBox(30,30,2) # cm
 layer = rb.SDF_RotateTranslate(box, rb.Vector3d(0,0,-16))
-soil_prop = rb.SoilPropertySDF(layer, maxS, minS, slope)
+soil_prop = rb.SoilLookUpSDF(layer, maxS, minS, slope)
 
 mysoil1 = My_Soil() 
-mysoil2 = rb.SoilProperty()
 
 # Set the soil properties before calling initialize
 rs.setSoil(mysoil1)

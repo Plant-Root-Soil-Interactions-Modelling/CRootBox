@@ -37,7 +37,7 @@ void example5()
     double maxS = 0.7; // maximal saturation
     double minS = 0.1; // minimal saturation
     double slope = 20; // [cm] linear gradient between min and max
-    SoilPropertySDF soilprop(&left, maxS, minS, slope);
+    SoilLookUpSDF soilprop(&left, maxS, minS, slope);
 
     // set the soil properties before calling initialize
     rootsystem.setSoil(&soilprop);

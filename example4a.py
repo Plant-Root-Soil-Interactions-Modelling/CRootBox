@@ -19,7 +19,7 @@ minS = 0.1 # minimal
 slope = 5 # linear gradient between min and max (cm)
 box = rb.SDF_PlantBox(30,30,2) # cm
 layer = rb.SDF_RotateTranslate(box, rb.Vector3d(0,0,-16))
-soil_prop = rb.SoilPropertySDF(layer, maxS, minS, slope)
+soil_prop = rb.SoilLookUpSDF(layer, maxS, minS, slope)
 
 # Set the soil properties before calling initialize
 rs.setSoil(soil_prop)

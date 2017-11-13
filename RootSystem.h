@@ -54,7 +54,7 @@ public:
 
   // Simulation
   void setGeometry(SignedDistanceFunction* geom) { geometry = geom; } ///< optionally, sets a confining geometry (call before RootSystem::initialize())
-  void setSoil(SoilProperty* soil_) { soil = soil_; } ///< optionally sets a soil for hydro tropism (call before RootSystem::initialize())
+  void setSoil(SoilLookUp* soil_) { soil = soil_; } ///< optionally sets a soil for hydro tropism (call before RootSystem::initialize())
   void reset(); ///< resets the root class, keeps the root type parameters
   void initialize(int basal=4, int shootborne=5); ///< creates the base roots, call before simulation and after setting the plant and root parameters
   void setTropism(TropismFunction* tf, int rt = -1);
@@ -96,7 +96,6 @@ public:
   std::vector<Vector2i> getNewSegments() const; ///< Segments created in the previous time step
   std::vector<Root*> getNewSegmentsOrigin() const; ///< Copies a pointer to the root containing the new segments
 
-
   // Output Simulation results
   void write(std::string name) const; /// writes simulation results (type is determined from file extension in name)
   void writeRSML(std::ostream & os) const; ///< writes current simulation results as RSML
@@ -121,7 +120,7 @@ private:
   std::vector<GrowthFunction*> gf; ///< Growth function per root type
   std::vector<TropismFunction*> tf;  ///< Tropism per root type
   SignedDistanceFunction* geometry = new SignedDistanceFunction(); ///< Confining geometry (unconfined by default)
-  SoilProperty* soil = nullptr; ///< callback for hydro, or chemo tropism (needs to set before initialize()) TODO should be a part of tf, or rtparam
+  SoilLookUp* soil = nullptr; ///< callback for hydro, or chemo tropism (needs to set before initialize()) TODO should be a part of tf, or rtparam
 
   double simtime = 0;
   int rid = -1; // unique root id counter

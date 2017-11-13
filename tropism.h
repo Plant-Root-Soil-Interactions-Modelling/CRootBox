@@ -8,7 +8,7 @@
 #include "soil.h"
 
 class Root;
-class SoilProperty;
+class SoilLookUp;
 
 
 
@@ -182,7 +182,7 @@ class Hydrotropism : public TropismFunction
 
 public:
 
-    Hydrotropism(double n, double sigma, SoilProperty* soil) : TropismFunction(n,sigma), soil(soil) { } ///< @see TropismFunction
+    Hydrotropism(double n, double sigma, SoilLookUp* soil) : TropismFunction(n,sigma), soil(soil) { } ///< @see TropismFunction
 
     virtual TropismFunction* copy() override { return new Hydrotropism(*this); } ///< copy constructor
 
@@ -190,7 +190,7 @@ public:
     ///< getHeading() minimizes this function, @see TropismFunction
 
 private:
-    SoilProperty* soil;
+    SoilLookUp* soil;
 };
 
 

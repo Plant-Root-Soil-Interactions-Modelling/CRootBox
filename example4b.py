@@ -17,8 +17,8 @@ maxS = 1. # maximal
 minS = 0.01 # minimal 
 slope = 1. # [cm] linear gradient between min and max
 leftC = rb.SDF_Complement(left)
-soilprop = rb.SoilPropertySDF(leftC, maxS, minS, slope) # for root elongation 
-soilprop2 = rb.SoilPropertySDF(left, 1., 0.002, slope) # for branching
+soilprop = rb.SoilLookUpSDF(leftC, maxS, minS, slope) # for root elongation 
+soilprop2 = rb.SoilLookUpSDF(left, 1., 0.002, slope) # for branching
 
 # Manually set scaling function and tropism parameters
 sigma = [0.4, 1., 1., 1., 1. ] * 2
