@@ -14,7 +14,7 @@
 #include "soil.h"
 
 class Root;
-class TropismFunction;
+class Tropism;
 
 /**
  * RootSystem
@@ -57,7 +57,7 @@ public:
   void setSoil(SoilLookUp* soil_) { soil = soil_; } ///< optionally sets a soil for hydro tropism (call before RootSystem::initialize())
   void reset(); ///< resets the root class, keeps the root type parameters
   void initialize(int basal=4, int shootborne=5); ///< creates the base roots, call before simulation and after setting the plant and root parameters
-  void setTropism(TropismFunction* tf, int rt = -1);
+  void setTropism(Tropism* tf, int rt = -1);
   void simulate(double dt, bool silence = false); ///< simulates root system growth for time span dt
   void simulate(); ///< simulates root system growth for the time defined in the root system parameters
   void simulate(double dt, double maxinc, ProportionalElongation* se, bool silence = false);
@@ -66,14 +66,14 @@ public:
   // call back functions (todo simplify)
   virtual Root* createRoot(int lt, Vector3d  h, double delay, Root* parent, double pbl, int pni);
   ///< Creates a new lateral root, overwrite or change this method to use more specialized root classes
-  virtual TropismFunction* createTropismFunction(int tt, double N, double sigma);
+  virtual Tropism* createTropismFunction(int tt, double N, double sigma);
   ///< Creates the tropisms, overwrite or change this method to add more tropisms TODO a vector<tropism*> might be easier to use
   virtual GrowthFunction* createGrowthFunction(int gft);
   ///< Creates the growth function per root type, overwrite or change this method to add more tropisms
 
   // Analysis of simulation results
-  int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system
-  int getNumberOfSegments() const { return nid-numberOfCrowns; } ///< Number of segments of the root system (the number of nodes-1 for tap root systems)
+  int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system (including nodes for seed, root crowns, and artificial shoot)
+  int getNumberOfSegments() const { return nid-numberOfCrowns-1; } ///< Number of segments of the root system ((nid+1)-1) - numberOfCrowns - 1 (artificial shoot)
   int getNumberOfRoots(bool all = false) const { if (all) return rid+1; else return getRoots().size(); }
   std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots and buffers the result
   std::vector<Root*> getBaseRoots() const { return baseRoots; } ///< Base roots are tap root, basal roots, and shoot borne roots
@@ -119,7 +119,7 @@ private:
   std::vector<RootTypeParameter> rtparam; ///< Parameter set for each root type
   std::vector<Root*> baseRoots;  ///< Base roots of the root system
   std::vector<GrowthFunction*> gf; ///< Growth function per root type
-  std::vector<TropismFunction*> tf;  ///< Tropism per root type
+  std::vector<Tropism*> tf;  ///< Tropism per root type
   SignedDistanceFunction* geometry = new SignedDistanceFunction(); ///< Confining geometry (unconfined by default)
   SoilLookUp* soil = nullptr; ///< callback for hydro, or chemo tropism (needs to set before initialize()) TODO should be a part of tf, or rtparam
 

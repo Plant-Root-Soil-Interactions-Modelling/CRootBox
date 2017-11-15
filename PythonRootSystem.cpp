@@ -99,6 +99,22 @@ public:
 
 };
 
+class Tropism_Wrap : public Tropism, public wrapper<Tropism> {
+public:
+
+//	Tropism_Wrap(): Tropism() { }
+//	Tropism_Wrap(double n,double sigma): Tropism(n,sigma) { }
+
+    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override {
+    	return this->get_override("tropismObjective")(pos, old, a, b, dx, root);
+    }
+
+    virtual Tropism* copy() override {
+    	return this->get_override("copy")();
+    }
+
+};
+
 
 
 /**
@@ -267,14 +283,15 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	 *
 	 * tropism.h
 	 */
-	class_<TropismFunction, TropismFunction*>("TropismFunction",init<>())
-			.def(init<double, double>())
-			.def("getHeading",&TropismFunction::getHeading)
-			.def("tropismObjective",&TropismFunction::tropismObjective, tropismObjective_overloads())
-			.def("copy",&TropismFunction::copy, return_value_policy<reference_existing_object>())
-			.def("setSeed",&TropismFunction::setSeed)
-			.def("rand",&TropismFunction::rand)
-			.def("randn",&TropismFunction::randn)
+	class_<Tropism_Wrap, Tropism_Wrap*, boost::noncopyable>("Tropism",init<>())
+			.def("getHeading",&Tropism_Wrap::getHeading)
+			.def("tropismObjective",&Tropism_Wrap::tropismObjective, tropismObjective_overloads())
+			.def("copy",&Tropism_Wrap::copy, return_value_policy<reference_existing_object>())
+			.def("setTropismParameter",&Tropism_Wrap::setTropismParameter)
+			.def("setSeed",&Tropism_Wrap::setSeed)
+			.def("setGeometry",&Tropism_Wrap::setGeometry)
+			.def("rand",&Tropism_Wrap::rand)
+			.def("randn",&Tropism_Wrap::randn)
 	;
 	/*
 	 * ModelParameter.h
@@ -396,7 +413,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getNodes", &RootSystem::getNodes)
 		.def("getPolylines", &RootSystem::getPolylines)
 		.def("getSegments", &RootSystem::getSegments)
-         .def("getShootSegments", &RootSystem::getShootSegments)
+        .def("getShootSegments", &RootSystem::getShootSegments)
 		.def("getSegmentsOrigin", &RootSystem::getSegmentsOrigin)
 		.def("getNETimes", &RootSystem::getNETimes)
 		.def("getScalar", &RootSystem::getScalar)

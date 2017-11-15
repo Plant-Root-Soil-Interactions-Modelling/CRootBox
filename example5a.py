@@ -16,7 +16,13 @@ rs.simulate(dt)
 
 # Create graph
 nodes = vv2a(rs.getNodes())/100 # convert from cm to m 
-seg = seg2a(rs.getSegments())
+rseg = seg2a(rs.getSegments()) # root system segments
+sseg = seg2a(rs.getShootSegments()) # additional shoot segments
+seg = np.vstack((sseg,rseg))
+
+print(sseg)
+print(nodes[0,:])
+print(rseg)
 
 # Adjacency matrix
 A = sparse.coo_matrix((np.ones(seg.shape[0]),(seg[:,0],seg[:,1]))) 
@@ -37,10 +43,20 @@ rs_ana = rb.SegmentAnalyser(rs)
 radius = v2a(rs_ana.getScalar(rb.ScalarType.radius))/100. # convert from cm to m 
 type = v2a(rs_ana.getScalar(rb.ScalarType.type))
 kr = np.array(list(map(lambda t: rs_Kr[int(t)-1], type))) # convert from 'per type' to 'per segment'
+kr.resize((kr.shape[0],1))
 kz = np.array(list(map(lambda t: rs_Kz[int(t)-1], type)))     
+kz.resize((kz.shape[0],1))          
+
+shoot1 = np.ones((sseg.shape[0],1))                    
+shoot0 = np.ones((sseg.shape[0],1))
           
 # Call back function for soil potential
 soil = lambda x,y,z : soil_psi
+
+# glue together shoot and root segments
+radius = np.vstack((shoot1,radius))
+kr =  np.vstack((shoot0,kr))
+kz =  np.vstack((shoot1,kz))
 
 # Calculate fluxes within the root system
 Q, b = xylem_flux.linear_system(seg, nodes, radius, kr, kz, rho, g, soil) 
@@ -52,8 +68,12 @@ segP = nodes2seg(nodes,seg,x)# save vtp
 axial_flux = xylem_flux.axial_flux(x, seg, nodes, kz, rho, g)
 radial_flux = xylem_flux.radial_flux(x, seg, nodes, radius, kr, soil)
 net_flux = axial_flux+radial_flux
-rs_ana.addUserData(a2v(segP),"pressure")
-rs_ana.addUserData(a2v(axial_flux),"axial_flux")
-rs_ana.addUserData(a2v(radial_flux),"radial_flux")
-rs_ana.addUserData(a2v(net_flux),"net_flux")
+
+print(segP)
+
+
+# rs_ana.addUserData(a2v(segP[sseg.shape[0]:-1]),"pressure")
+rs_ana.addUserData(a2v(axial_flux[sseg.shape[0]:-1]),"axial_flux")
+rs_ana.addUserData(a2v(radial_flux[sseg.shape[0]:-1]),"radial_flux")
+rs_ana.addUserData(a2v(net_flux[sseg.shape[0]:-1]),"net_flux")
 rs_ana.write("results/example_5a.vtp")         

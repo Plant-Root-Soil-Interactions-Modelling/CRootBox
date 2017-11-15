@@ -13,7 +13,7 @@
  *
  * \return             position
  */
-Vector3d TropismFunction::getPosition(const Vector3d& pos, Matrix3d old, double a, double b, double dx)
+Vector3d Tropism::getPosition(const Vector3d& pos, Matrix3d old, double a, double b, double dx)
 {
     old.times(Matrix3d::rotX(b)); // TODO not nice, there should be a better way, but no easy
     old.times(Matrix3d::rotZ(a));
@@ -30,9 +30,8 @@ Vector3d TropismFunction::getPosition(const Vector3d& pos, Matrix3d old, double 
  *
  * \return             angle alpha and beta
  */
-Vector2d TropismFunction::getHeading(const Vector3d& pos, Matrix3d old, double dx,const Root* root)
+Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,const Root* root)
 {
-    //std::cout<<"TropismFunction::getHeading()\n";
     double a = sigma*randn()*sqrt(dx);
     double b = rand()*2*M_PI;
     double v;
@@ -65,8 +64,6 @@ Vector2d TropismFunction::getHeading(const Vector3d& pos, Matrix3d old, double d
     return Vector2d(a,b);
 }
 
-
-
 /**
  * Inside the geometric domaint baseTropism::getHeading() is returned.
  * In case geometric boundaries are hit, the rotations are modified, so that growth stays inside the domain.
@@ -78,11 +75,9 @@ Vector2d TropismFunction::getHeading(const Vector3d& pos, Matrix3d old, double d
  *
  * \return           the rotations alpha and beta
  */
-Vector2d ConfinedTropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const Root* root)
+Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const Root* root)
 {
-    //std::cout<<"ConfinedTropism::getHeading()\n";
-
-    Vector2d h = tropism->getHeading(pos, old, dx, root);
+    Vector2d h = getUCHeading(pos, old, dx, root);
 
     double a = h.x;
     double b = h.y;
@@ -168,7 +163,7 @@ double Hydrotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double 
  * @param t2            first tropism
  * @param w2            first weight
  */
-CombinedTropism::CombinedTropism(double n, double sigma,TropismFunction* t1, double w1, TropismFunction* t2, double w2): TropismFunction(n,sigma)
+CombinedTropism::CombinedTropism(double n, double sigma,Tropism* t1, double w1, Tropism* t2, double w2): Tropism(n,sigma)
 {
     tropisms.push_back(t1);
     tropisms.push_back(t2);

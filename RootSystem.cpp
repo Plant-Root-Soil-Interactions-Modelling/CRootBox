@@ -33,7 +33,7 @@ RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), 
 	roots = std::vector<Root*>(0); // new empty buffer
 
 	// deep copy tropisms
-	tf = std::vector<TropismFunction*>(rs.tf.size());
+	tf = std::vector<Tropism*>(rs.tf.size());
 	for (size_t i=0; i<rs.tf.size(); i++) {
 		tf[i]= rs.tf[i]->copy();
 	}
@@ -179,6 +179,9 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		}
 	}
 
+	// introduce an extra node at nodes[0]
+	getNodeIndex();
+
 	// Create root system
 	const double maxT = 365.; // maximal simulation time
 	RootSystemParameter const &rs = rsparam; // rename
@@ -251,10 +254,11 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		int type = rtparam.at(i).tropismT;
 		double N = rtparam.at(i).tropismN;
 		double sigma = rtparam.at(i).tropismS;
-		TropismFunction* tropism = this->createTropismFunction(type,N,sigma);
+		Tropism* tropism = this->createTropismFunction(type,N,sigma);
 		tropism->setSeed(this->rand()); // fix randomness
+		tropism->setGeometry(geometry);
 		// std::cout << "#" << i << ": type " << type << ", N " << N << ", sigma " << sigma << "\n";
-		tf.push_back(new ConfinedTropism(tropism, geometry)); // wrap confinedTropism around baseTropism
+		tf.push_back(tropism); // wrap confinedTropism around baseTropism
 		int gft = rtparam.at(i).gf;
 		GrowthFunction* gf_ = this->createGrowthFunction(gft);
 		gf_->getAge(1,1,1,nullptr);  // check if getAge is implemented (otherwise an exception is thrown)
@@ -268,7 +272,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
  * Manually sets a tropism function for a specific or for all root types.
  * Must be called after RootSystem::initialize()
  */
-void RootSystem::setTropism(TropismFunction* tf_, int rt)
+void RootSystem::setTropism(Tropism* tf_, int rt)
 {
 	if (rt>-1) { // set for a specific root type
 		tf.at(rt) = tf_;
@@ -415,15 +419,15 @@ Root* RootSystem::createRoot(int lt, Vector3d  h, double delay, Root* parent, do
  * Creates a specific tropsim,
  * the function must be extended or overwritten to add more tropisms
  */
-TropismFunction* RootSystem::createTropismFunction(int tt, double N, double sigma) {
+Tropism* RootSystem::createTropismFunction(int tt, double N, double sigma) {
 	switch (tt) {
 	case tt_plagio: return new Plagiotropism(N,sigma);
 	case tt_gravi: return new Gravitropism(N,sigma);
 	case tt_exo: return new Exotropism(N,sigma);
 	case tt_hydro: {
-		TropismFunction* gt =  new Gravitropism(N,sigma);
-		TropismFunction* ht= new Hydrotropism(N,sigma,soil);
-		TropismFunction* cht = new CombinedTropism(N,sigma,ht,10.,gt,1.); // does only use the objective functions from gravitropism and hydrotropism
+		Tropism* gt =  new Gravitropism(N,sigma);
+		Tropism* ht= new Hydrotropism(N,sigma,soil);
+		Tropism* cht = new CombinedTropism(N,sigma,ht,10.,gt,1.); // does only use the objective functions from gravitropism and hydrotropism
 		return cht;
 	}
 	default: throw std::invalid_argument( "RootSystem::createTropismFunction() tropism type not implemented" );
@@ -506,6 +510,7 @@ std::vector<Vector3d> RootSystem::getNodes() const
 			nv.at(r->getNodeId(i)) = r->getNode(i); // pray that ids are correct
 		}
 	}
+	nv.at(0) = Vector3d(0.,0.,3.); // add artificial shoot
 	return nv;
 }
 
@@ -554,6 +559,10 @@ std::vector<Vector2i> RootSystem::getSegments() const
 std::vector<Vector2i> RootSystem::getShootSegments() const
 {
 	std::vector<Vector2i> seg = std::vector<Vector2i>(0);
+
+	// connect  basal roots node (seed) to artificial shoot
+	seg.push_back(Vector2i(0,baseRoots.at(0)->getNodeId(0)));
+
 	int n1=0, n2=0;
 	for (int i=0; i<numberOfCrowns-1; i++) { // connecting root crowns
 		int brn = baseRoots.size()-1;
@@ -561,7 +570,7 @@ std::vector<Vector2i> RootSystem::getShootSegments() const
 		n2 = baseRoots.at(brn-(i+1)*rsparam.nC)->getNodeId(0);
 		seg.push_back(Vector2i(n1,n2));
 	}
-	if (numberOfCrowns>0) { // taproot
+	if (numberOfCrowns>0) { // connect to basal roots node (seed)
 		int ti = baseRoots.at(0)->getNodeId(0);
 		seg.push_back(Vector2i(n2,ti));
 	}

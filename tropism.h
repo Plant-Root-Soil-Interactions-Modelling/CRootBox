@@ -15,25 +15,30 @@ class SoilLookUp;
 /**
  * Base class for all tropism functions, e.g. Gravitropism, Plagiotropism, Exotropism...
  */
-class TropismFunction
+class Tropism
 {
 public:
-    virtual ~TropismFunction() {};
+
+    Tropism():Tropism(0,0) { } ///< Default constructor is TropismFunction(0,0)
 
     /**
-     * Constructor,
+     * Tropism with n_ number of trials and standard deviation of sigma_
+     *
      * Always call the constructor, when overwriting the class!
      * Otherwise it will not work, and the mistake is hard to find.
      *
      * @param n_            number of tries
      * @param sigma_        standard deviation of angular change [1/cm]
      */
-    TropismFunction(double n_,double sigma_): n(n_), sigma(sigma_) { }; ///< Tropism with n_ number of trials and standard deviation of sigma_
+    Tropism(double n_,double sigma_): n(n_), sigma(sigma_), geometry(nullptr) { }
 
-    TropismFunction():TropismFunction(0,0) { } ///< Default constructor is TropismFunction(0,0)
+    virtual ~Tropism() {};
 
-    virtual Vector2d getHeading(const Vector3d& pos, Matrix3d old, double dx, const Root* root);
-    ///<  Dices n times and takes the best shot (according to the objective function)
+    void setGeometry(SignedDistanceFunction* geom) { geometry = geom; }
+    void setTropismParameter(double n_,double sigma_) { n=n_; sigma=sigma_; }
+
+    Vector2d getHeading(const Vector3d& pos, Matrix3d old,  double dx, const Root* root = nullptr);
+    ///< changes baseTropism->getHeading() in case geometric boundaries are hit
 
     /**
      * The objective function of the random optimization of getHeading(). Overwrite this function to implement a tropism.
@@ -50,7 +55,7 @@ public:
     virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) { std::cout << "TropismFunction::tropismObjective() not overwritten\n"; return 0; }
     ///< The objective function of the random optimization of getHeading().
 
-    virtual TropismFunction* copy() { return new TropismFunction(*this); } ///< factory method
+    virtual Tropism* copy() { return new Tropism(*this); } ///< factory method
 
     static Vector3d getPosition(const Vector3d& pos, Matrix3d old, double a, double b, double dx);
     ///< Auxiliary function: Applies angles a and b and goes dx [cm] into the new direction
@@ -61,10 +66,19 @@ public:
     double randn() const { return ND(gen); } ///< Normally distributed random number (0,1)
 
 protected:
+
+    Vector2d getUCHeading(const Vector3d& pos, Matrix3d old, double dx, const Root* root);
+    ///< Get unconfined heading (called by getHeading), dices n times and takes the best shot (according to the objective function)
+
     double n; ///< Number of trials
     double sigma; ///< Standard deviation
 
+    SignedDistanceFunction* geometry;
+    const int alphaN = 20;
+    const int betaN = 5;
+
 private:
+
     mutable std::mt19937 gen = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());  // random stuff
     mutable std::normal_distribution<double> ND = std::normal_distribution<double>(0,1);
     mutable std::uniform_real_distribution<double> UD = std::uniform_real_distribution<double>(0,1);
@@ -73,53 +87,16 @@ private:
 
 
 /**
- * Confines root growth to a geometry
- */
-class ConfinedTropism : public TropismFunction
-{
-public:
-
-    /**
-     * ConfinedTropism confines a tropism to a geometry given by a signed distance function
-     *
-     * @param baseTropism   the underlying tropism
-     * @param geometry      geometry, e.g. of a plant container or an obstacle
-     */
-    ConfinedTropism(TropismFunction* baseTropism, SignedDistanceFunction* geometry) : TropismFunction(0,0), tropism(baseTropism), geometry(geometry) { }
-    //< ConfinedTropism confines the baseTropism to geometry
-
-    ConfinedTropism(ConfinedTropism& t): TropismFunction(t), geometry(t.geometry), alphaN(t.alphaN), betaN(t.betaN) { tropism = t.tropism->copy(); }
-    ///< copy constructor
-
-    virtual Vector2d getHeading(const Vector3d& pos, Matrix3d old,  double dx, const Root* root = nullptr) override;
-    ///< changes baseTropism->getHeading() in case geometric boundaries are hit
-
-    virtual TropismFunction* copy() override { return new ConfinedTropism(*this); } //< deep copies the tropism (excluding geometry)
-
-    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root) override {
-        throw std::invalid_argument( "ConfinedTropism::tropismObjective() should not be called directly" );
-    } ///< this mehtod is not called, instead baseTropism->tropismObjective() is used by getHeading
-
-private:
-    TropismFunction* tropism;
-    SignedDistanceFunction* geometry;
-    const int alphaN = 20;
-    const int betaN = 5;
-};
-
-
-
-/**
  * Gravitropism: the tendency to grow downwards
  */
-class Gravitropism : public TropismFunction
+class Gravitropism : public Tropism
 {
 
 public:
 
-    Gravitropism(double n, double sigma) : TropismFunction(n,sigma) { } ///< @see TropismFunction
+    Gravitropism(double n, double sigma) : Tropism(n,sigma) { } ///< @see TropismFunction
 
-    virtual TropismFunction* copy() override { return new Gravitropism(*this); } ///< copy constructor
+    virtual Tropism* copy() override { return new Gravitropism(*this); } ///< copy constructor
 
     virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override {
         old.times(Matrix3d::rotX(b));
@@ -135,14 +112,14 @@ public:
 /**
  * Plagiotropism: the tendency to stay in a horicontal layer
  */
-class Plagiotropism : public TropismFunction
+class Plagiotropism : public Tropism
 {
 
 public:
 
-    Plagiotropism(double n, double sigma) : TropismFunction(n,sigma) { } ///< @see TropismFunction
+    Plagiotropism(double n, double sigma) : Tropism(n,sigma) { } ///< @see TropismFunction
 
-    virtual TropismFunction* copy() override { return new Plagiotropism(*this); } ///< copy constructor
+    virtual Tropism* copy() override { return new Plagiotropism(*this); } ///< copy constructor
 
     virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override {
         old.times(Matrix3d::rotX(b));
@@ -158,14 +135,14 @@ public:
 /**
  * Exotropism: the tendency to keep the initial heading
  */
-class Exotropism : public TropismFunction
+class Exotropism : public Tropism
 {
 
 public:
 
-    Exotropism(double n, double sigma) : TropismFunction(n,sigma) { } ///< @see TropismFunction
+    Exotropism(double n, double sigma) : Tropism(n,sigma) { } ///< @see TropismFunction
 
-    virtual TropismFunction* copy() override { return new Exotropism(*this); } ///< copy constructor
+    virtual Tropism* copy() override { return new Exotropism(*this); } ///< copy constructor
 
     virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override;
     ///< getHeading() minimizes this function, @see TropismFunction
@@ -177,14 +154,14 @@ public:
 /**
  * Hydrotropism (or Chemotropism, ...): the tendency to grow towards a higher saturation (or concentration, ...)
  */
-class Hydrotropism : public TropismFunction
+class Hydrotropism : public Tropism
 {
 
 public:
 
-    Hydrotropism(double n, double sigma, SoilLookUp* soil) : TropismFunction(n,sigma), soil(soil) { } ///< @see TropismFunction
+    Hydrotropism(double n, double sigma, SoilLookUp* soil) : Tropism(n,sigma), soil(soil) { } ///< @see TropismFunction
 
-    virtual TropismFunction* copy() override { return new Hydrotropism(*this); } ///< copy constructor
+    virtual Tropism* copy() override { return new Hydrotropism(*this); } ///< copy constructor
 
     virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override;
     ///< getHeading() minimizes this function, @see TropismFunction
@@ -198,34 +175,34 @@ private:
 /**
  * Combined tropisms, creates a linear combination of the respective objective functions
  */
-class CombinedTropism : public TropismFunction
+class CombinedTropism : public Tropism
 {
 
 public:
 
-    CombinedTropism(double n, double sigma, std::vector<TropismFunction*> tropisms_, std::vector<double> weights_): TropismFunction(n,sigma), tropisms(tropisms_), weights(weights_) {
+    CombinedTropism(double n, double sigma, std::vector<Tropism*> tropisms_, std::vector<double> weights_): Tropism(n,sigma), tropisms(tropisms_), weights(weights_) {
         assert(tropisms.size()>0);
         assert(weights.size()>0);
         assert(tropisms.size()==weights.size());
     } ///< linearly comibines the objective functions of multiple tropisms
 
-    CombinedTropism(double n, double sigma, TropismFunction* t1, double w1, TropismFunction* t2, double w2);
+    CombinedTropism(double n, double sigma, Tropism* t1, double w1, Tropism* t2, double w2);
     ///< linearly comibines the objective functions of two tropism funcitons
 
-    CombinedTropism(CombinedTropism& t): TropismFunction(t), weights(t.weights) {
-    	tropisms = std::vector<TropismFunction*>(t.tropisms.size());
+    CombinedTropism(CombinedTropism& t): Tropism(t), weights(t.weights) {
+    	tropisms = std::vector<Tropism*>(t.tropisms.size());
     	for (size_t i=0; i<tropisms.size(); i++) {
     		tropisms[i] = t.tropisms[i]->copy();
     	}
     }
 
-    virtual TropismFunction* copy() override { return new CombinedTropism(*this); } ///< copy constructor
+    virtual Tropism* copy() override { return new CombinedTropism(*this); } ///< copy constructor
 
     virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override;
     ///< getHeading() minimizes this function, @see TropismFunction
 
 private:
-    std::vector<TropismFunction*> tropisms;
+    std::vector<Tropism*> tropisms;
     std::vector<double> weights;
 };
 
