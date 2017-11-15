@@ -47,7 +47,7 @@ public:
      *
      * \return         the value minimized by getHeading(), it should be in [0,1], in this way combination of various tropisms will be easier
      */
-    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) { std::cout << "default\n"; return 0; }
+    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) { std::cout << "TropismFunction::tropismObjective() not overwritten\n"; return 0; }
     ///< The objective function of the random optimization of getHeading().
 
     virtual TropismFunction* copy() { return new TropismFunction(*this); } ///< factory method

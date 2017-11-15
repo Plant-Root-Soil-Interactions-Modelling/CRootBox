@@ -190,7 +190,7 @@ Therefore, we create an SegmentAnalyser object in L24 and merge all segments int
 \begin{figure}
 \centering
 \includegraphics[width=0.7\textwidth]{example_2b.png}
-\caption{Multiple root systems (Example 2b), colors denote the creation time of the roots} \label{fig:multiple}
+\caption{Multiple root systems (Example 2b), colors denote the creation time of the root segments} \label{fig:multiple}
 \end{figure}
 
 
@@ -203,8 +203,8 @@ and how a sensitivity analysis can be performed.
 
 \subsection{Analysis per root}
 
-The class RootSystem offers some post-processing options. All of them are on a per root level. 
-The following script shows how to analyse length versus time, and how we could obtain root tip or root base positions. 
+The class RootSystem offers some post-processing options. Most of them are on a per root level. 
+The following script shows how to analyse length versus time, and how we can obtain root tip or root base positions. 
 
 First lets analyse the root length versus time, and consider the total root length, and root length per type. 
 
@@ -270,9 +270,9 @@ The methods L57, L58 return the indices of the tips and bases.
 
 \subsection{Analysis per segment}
 
-The class SegmentAnalyser offers post-processing options per segment. 
-The advantage is that we can do distributions or crop the segments with any geometry. 
-The following script demonstrates some of the possibilities by creating a virtual soil core experiment. 
+The class SegmentAnalyser offers post-processing methods per root segment. 
+The advantage is that we can do distributions or densities, and that we can crop the segments with any geometry for analysis. 
+The following script demonstrates some of the possibilities by setting up a virtual soil core experiment. 
 
 \lstinputlisting[language=Python, caption=Example 3b]{../example3b.py}
 
@@ -309,13 +309,13 @@ The basic idea is that such simulations help to increase the understanding of ex
 \begin{figure}
 \centering
 \includegraphics[width=0.9\textwidth]{example_3b1.png} 
-\caption{Central core} \label{fig:central}
+\caption{Central core (Example 3b)} \label{fig:central}
 \end{figure}
 
 \begin{figure}
 \centering
 \includegraphics[width=0.9\textwidth]{example_3b2.png} 
-\caption{Shifted core} \label{fig:shifted}
+\caption{Shifted core (Example 3b)} \label{fig:shifted}
 \end{figure}
 
 
@@ -324,7 +324,7 @@ The basic idea is that such simulations help to increase the understanding of ex
 
 In the previous examples we always opened the root system parameters from a file. 
 In the following example we show to do everything in a Python script without the need of any parameter files. 
-This is especially important if we want to modify the parameters in our scripts. 
+This is especially important if we want to modify the parameters in our scripts like it is needed for sensitivity analysis. 
 
 First we start with a script that defines the parameter within the script, and secondly, we show how we can use this to perform a sensitivity analysis.
 
@@ -344,7 +344,7 @@ First we start with a script that defines the parameter within the script, and s
 
 \end{itemize}
 
-Note that all parameters can be set and modified within the script. Especially, standard deviations can set to zero in order to be able to precisely predict the result. 
+Note that all parameters can be set and modified within the script. Especially, standard deviations can be set to zero in order to be able to precisely predict the result. 
 For example we can calculate the total root system length analytically, and check if the numerical simulation yield the (exact) same result. 
 This is performed in the script benchmark.py, which is used to test and validate CRootBox.
 
@@ -361,7 +361,7 @@ We vary the insertion angle of the tap root and basal root, and look at the chan
 In L24 we define the insertion angle to be varied linearly between 0 and $\pi/2$.
 
 \item[26-51] Definition of a function that performs the simulation and returns mean root tip depth and radial distance. First we create a root system and set the standard deviation to zero L27-L29. 
-L32-L35 sets the insertion angle, tap root is always of type 1, and in the parameter file 'Triticum\_aestivum\_a\_Bingham\_2011' basal roots are of type 4. L38-39 performs the simulation. 
+L32-L35 sets the insertion angle, tap root is always of type 1, and in the parameter file basal roots are of type 4. L38-39 performs the simulation. 
 L42-L49 calculates the mean root tip depth and radial distance. 
 
 \item[53-69] This section performs the computation. L53-54 preallocates the resulting arrays. L58-L64 performs the parallel computations, index $i$ is the index of the insertion angle. L67-L69 calculates the mean values.
@@ -373,7 +373,7 @@ L42-L49 calculates the mean root tip depth and radial distance.
 \begin{figure}
 \centering
 \includegraphics[width=0.7\textwidth]{example_3d.png}
-\caption{Sensitivity of mean root tip depth (left) and radial distance (right) to the insertion angle theta (Example 3d). } \label{fig:sa}
+\caption{Sensitivity of mean root tip depth (left) and radial distance (right) to the insertion angle theta (Example 3d) } \label{fig:sa}
 \end{figure}
 
 
@@ -382,11 +382,11 @@ L42-L49 calculates the mean root tip depth and radial distance.
 
 In order to create an animation in Paraview we have to consider some details. 
 The main idea is to export the result file as segments using the class SegmentAnalyser. 
-A specific frame is then obtained by thresholding using the segments creation times. 
+A specific frame is then obtained by thresholding within Paraview using the segments creation times. 
 
 We modify example1b.py to demonstrate how to create an animation.
 
-\lstinputlisting[language=Python, caption=Example 3e (modified 1b)]{../example3e.py}
+\lstinputlisting[language=Python, caption=Example 3e (modified from Example 1b)]{../example3e.py}
 
 \begin{itemize}
 
@@ -414,6 +414,7 @@ After running the script we perform the following operations to create an animat
 Root growth is strongly influenced by pedo-climate conditions, and plant internal state. CRootBox offers build in ways to develop such models. 
 In this section we assume static soil conditions, and describe predefined ways how the soil can affect root growth.
 Dynamic soil conditions are described in the following section 'Coupling with a soil model'. 
+
 Implemented root responses are (1) the change in direction of the growing root tip, described in Sections \ref{sec:hydro} and \ref{sec:usertropism} 
 (2) the scaling of the elongation rate (3) the change of insertion angle (4) the change of lateral emergence probability, (2)-(4) are described in Section \ref{sec:elongation}.
 
@@ -461,7 +462,8 @@ There are two ways to add user defined tropisms:
 \begin{enumerate}
 \item The first is C++ only: It is to extend the CRootBox class and overwrite the method RootSystem:createTropismFunction. 
 This is the function that is called, when the tropisms are created from the parameters ($tt$, $N$, $sigma$). This is necessary when user defined tropism should be created from a parameter file, where $tt$ is the number of the new tropism type. 
-\item The second is to manually set the tropisms using method RootSystem::setTropism. The user has to extend the new tropism class from the class TropismFunction. 
+\item The second is to manually set the tropisms using the method RootSystem: :setTropism. 
+The user has to extend the new tropism class from the class TropismFunction. 
 Currently, this is working only in C++, but in future it will be possible directly from Python. Make sure to call setTropism($\dots$) after initialize().
 \end{enumerate}
 
@@ -523,8 +525,9 @@ The following script helps to quantify the effects of above simulation:
 
 
 
-
 \section{Model coupling}
+
+% TODO basic concept
 
 In this section we first discuss how to obtain a graph representation of the root system, and then present an example similar to one published in \cite{}. 
 Furthermore, we present features that can be used to analyse the dynamic behaviour of the root system development.

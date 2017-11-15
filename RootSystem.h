@@ -74,6 +74,7 @@ public:
   // Analysis of simulation results
   int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system
   int getNumberOfSegments() const { return nid-numberOfCrowns; } ///< Number of segments of the root system (the number of nodes-1 for tap root systems)
+  int getNumberOfRoots(bool all = false) const { if (all) return rid+1; else return getRoots().size(); }
   std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots and buffers the result
   std::vector<Root*> getBaseRoots() const { return baseRoots; } ///< Base roots are tap root, basal roots, and shoot borne roots
   std::vector<Vector3d> getNodes() const; ///< Copies all root system nodes into a vector
