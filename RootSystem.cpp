@@ -275,7 +275,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 void RootSystem::setTropism(Tropism* tf_, int rt)
 {
 	if (rt>-1) { // set for a specific root type
-		tf.at(rt) = tf_;
+		tf.at(rt-1) = tf_;
 	} else { // set for all root types (default)
 		for (size_t i=0; i<tf.size(); i++) {
 			tf.at(i) = tf_;
