@@ -8,13 +8,16 @@
 #include <random>
 #include <numeric>
 #include <cmath>
+#include <stack>
 
 #include "ModelParameter.h"
 #include "Root.h"
 #include "soil.h"
 
 class Root;
+class RootState;
 class Tropism;
+class RootSystemState;
 
 /**
  * RootSystem
@@ -27,6 +30,7 @@ class RootSystem
 {
 
   friend Root;  // obviously :-)
+  friend RootSystemState;
 
 public:
 
@@ -96,6 +100,9 @@ public:
   std::vector<Vector3d> getNewNodes() const; ///< Nodes created in the previous time step
   std::vector<Vector2i> getNewSegments() const; ///< Segments created in the previous time step
   std::vector<Root*> getNewSegmentsOrigin() const; ///< Copies a pointer to the root containing the new segments
+  void push();
+  void pop();
+
 
   // Output Simulation results
   void write(std::string name) const; /// writes simulation results (type is determined from file extension in name)
@@ -132,14 +139,15 @@ private:
   mutable std::vector<Root*> roots = std::vector<Root*>(); // buffer for getRoots()
 
   const int maxtypes = 100;
-  void initRTP(); // default values for rtparam vector
 
   int numberOfCrowns = 0;
 
+  bool manualSeed = false;
+
+  void initRTP(); // default values for rtparam vector
+
   void writeRSMLMeta(std::ostream & os) const;
   void writeRSMLPlant(std::ostream & os) const;
-
-  bool manualSeed = false;
 
   int getRootIndex() { rid++; return rid; } ///< returns next unique root id, called by the constructor of Root
   int getNodeIndex() { nid++; return nid; } ///< returns next unique node id, called by Root::addNode()
@@ -148,6 +156,56 @@ private:
   mutable std::uniform_real_distribution<double> UD;
   mutable std::normal_distribution<double> ND;
 
+  std::stack<RootSystemState> stateStack = std::stack<RootSystemState>();
+
 };
+
+
+
+
+
+
+
+/**
+ * Sores a state of the RootSystem,
+ * i.e. all data that changes over time (*), i.e. excluding node data that cannot change
+ *
+ * (*) excluding changes regarding RootSystemParameter, any RootTypeParameter, confining geometry, and soil
+ */
+class RootSystemState
+{
+
+	friend RootSystem;
+
+public:
+
+	RootSystemState(const RootSystem& rs);
+
+	void restore(RootSystem& rs);
+
+private:
+
+	  std::vector<RootState> baseRoots;  ///< Base roots of the root system
+
+	  // copy because of random generator seeds
+	  std::vector<Tropism*> tf;
+	  std::vector<GrowthFunction*> gf;
+	  std::vector<RootTypeParameter> rtparam;
+
+	  double simtime = 0;
+	  int rid = -1; // unique root id counter
+	  int nid = -1; // unique node id counter
+	  int old_non=0;
+	  int old_nor=0;
+	  int numberOfCrowns = 0;
+	  bool manualSeed = false;
+
+	  mutable std::mt19937 gen;
+	  mutable std::uniform_real_distribution<double> UD;
+	  mutable std::normal_distribution<double> ND;
+
+};
+
+
 
 #endif /* ROOTSYSTEM_H_ */

@@ -328,6 +328,8 @@ void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se,
 	int i = 0;
 
 	RootSystem* rs_ = new RootSystem(*this);
+	// push();
+
 	se->setScale(1.);
 	rs_->simulate(dt, silence);
 	v_ = rs_->getScalar(RootSystem::st_length);
@@ -336,7 +338,9 @@ void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se,
 	if (!silence) {
 		std::cout << "expected increase is " << inc_ << "\n";
 	}
+
 	delete rs_;
+	// pop()
 
 	if ((inc_>maxinc) && (std::abs(inc_-maxinc)>accuracy)) { // check if we have to perform a binary search
 
@@ -347,12 +351,14 @@ void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se,
 
 			double m = (sl+sr)/2.; // mid
 			RootSystem* rs_ = new RootSystem(*this);
+			// push();
 			se->setScale(m);
 			rs_->simulate(dt, silence);
 			v_ = rs_->getScalar(RootSystem::st_length);
 			l = std::accumulate(v_.begin(), v_.end(), 0.0);
 			inc_ = l - ol;
 			delete rs_;
+			//pop();
 			if (!silence) {
 				std::cout << "\t(sl, mid, sr) = (" << sl << ", " <<  m << ", " <<  sr << "), inc " <<  inc_ << ", err: " << std::abs(inc_-maxinc) << " > " << accuracy << "\n";
 			}
@@ -811,6 +817,19 @@ std::vector<Root*> RootSystem::getNewSegmentsOrigin() const
 }
 
 
+void RootSystem::push()
+{
+	stateStack.push(RootSystemState(*this));
+}
+
+void RootSystem::pop()
+{
+	RootSystemState& rss = stateStack.top();
+	rss.restore(*this);
+	stateStack.pop();
+}
+
+
 /**
  * todo
  */
@@ -990,3 +1009,55 @@ void RootSystem::writeGeometry(std::ostream & os) const
 	geometry->writePVPScript(os);
 }
 
+
+
+
+
+RootSystemState::RootSystemState(const RootSystem& rs) :rtparam(rs.rtparam), simtime(rs.simtime), rid(rs.rid),nid(rs.nid), old_non(rs.old_non), old_nor(rs.old_nor),
+		numberOfCrowns(rs.numberOfCrowns), manualSeed(rs.manualSeed), gen(rs.gen), UD(rs.UD), ND(rs.ND)
+{
+	tf = std::vector<Tropism*>(rs.tf.size()); // deep copy tropisms
+	for (size_t i=0; i<rs.tf.size(); i++) {
+		tf[i]= rs.tf[i]->copy();
+	}
+	gf = std::vector<GrowthFunction*>(rs.gf.size()); // deep copy growth
+	for (size_t i=0; i<rs.gf.size(); i++) {
+		gf[i]= rs.gf[i]->copy();
+	}
+	baseRoots = std::vector<RootState>(rs.baseRoots.size()); // store base roots
+	for (size_t i=0; i<baseRoots.size(); i++) {
+		baseRoots[i] = RootState(*(rs.baseRoots[i]));
+	}
+}
+
+
+void RootSystemState::restore(RootSystem& rs)
+{
+	rs.roots.clear(); // clear buffer
+	rs.rtparam  = rtparam;
+	rs.simtime = simtime; // copy back everything
+	rs.rid = rid;
+	rs.nid = nid;
+	rs.old_non = old_non;
+	rs.old_nor = old_nor;
+	rs.numberOfCrowns = numberOfCrowns;
+	rs.manualSeed = manualSeed;
+	rs.gen = gen;
+	rs.UD = UD;
+	rs.ND = ND;
+	for (size_t i=0; i<rs.tf.size(); i++) { // restore tropism functions
+		delete rs.tf[i];
+	}
+	for (size_t i=0; i<rs.tf.size(); i++) {
+		rs.tf[i] = tf[i];
+	}
+	for (size_t i=0; i<rs.gf.size(); i++) { // restore growth functions
+		delete rs.gf[i];
+	}
+	for (size_t i=0; i<rs.gf.size(); i++) {
+		rs.gf[i]= gf[i];
+	}
+	for (size_t i=0; i<baseRoots.size(); i++) { // restore base roots
+		baseRoots[i].restore(*(rs.baseRoots[i]));
+	}
+}

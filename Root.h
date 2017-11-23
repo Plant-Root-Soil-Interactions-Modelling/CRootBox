@@ -12,6 +12,7 @@
 #include "RootSystem.h"
 
 class RootSystem;
+class RootState;
 
 /**
  * Root
@@ -23,9 +24,10 @@ class RootSystem;
 class Root
 {
 
-public:
-
     friend RootSystem;
+    friend RootState;
+
+public:
 
     Root(RootSystem* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of RootSystem, or Root::createLaterals()
     Root(const Root& r, RootSystem& rs); ///< deep copy of the tree
@@ -88,5 +90,42 @@ protected:
     std::vector<double> netimes = std::vector<double>(0); ///< node emergence times [days]
 
 };
+
+
+
+/**
+ * Stores a state of the root that can later be restored
+ */
+class RootState {
+
+public:
+
+	RootState() { };
+
+	RootState(const Root& r);
+
+	void restore(Root& r);
+
+private:
+
+    /* parameters that are given per root that maybaseRoots change with time */
+    bool alive = 1; ///< true: alive, false: dead
+    bool active = 1; ///< true: active, false: root stopped growing
+    double age = 0; ///< current age [days]
+    double length = 0; ///< actual length [cm] of the root. might differ from getLength(age) in case of impeded root growth
+    int old_non = 1; ///< number of old nodes, the sign is positive if the last node was updated, otherwise its negative
+
+    /* down the root branch*/
+    std::vector<RootState> laterals = std::vector<RootState>(0); ///< the lateral roots of this root
+
+    /* last node */
+    Vector3d lNode = Vector3d(0.,0.,0.);
+    int lNodeId = 0;
+    double lneTime = 0.;
+    size_t non = 0;
+
+};
+
+
 
 #endif /* ROOT_H_ */
