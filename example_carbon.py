@@ -43,14 +43,14 @@ import math
 #         return rs_
     
 # Parameter
-simtime = 30. # days
-dt = 0.1
+simtime = 300. # days
+dt = 1
 N = round(simtime/dt) # steps
 maxinc = 20; # maximal length increment (cm/day), TODO base this value on some fancy model 
 
 # Initialize root system
 rs = rb.RootSystem()
-name = "Anagallis_femina_Leitner_2010" 
+name = "Zea_mays_4_Leitner_2014" 
 rs.openFile(name) 
 rs.initialize() 
 
@@ -68,7 +68,7 @@ for i in range(0,N):
     
     print("\nSimulation", i)
     
-    rs.simulate(dt, maxinc, se, False) # True = disable debug messages, False = enable debug messages
+    rs.simulate(dt, maxinc, se, True) # True = disable debug messages, False = enable debug messages
         
     l = np.sum(v2a(rs.getScalar(rb.ScalarType.length)))
     inc =  l - ol

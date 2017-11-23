@@ -102,17 +102,17 @@ protected:
  *
  *
  */
-class RectilinearGrid1D  : public SoilLookUp
+class Grid1D  : public SoilLookUp
 {
 public:
 
-	RectilinearGrid1D() {
+	Grid1D() {
 		n=0;
 		data = std::vector<double>(0);
 		grid = std::vector<double>(1);
 	}
 
-	RectilinearGrid1D(size_t n, std::vector<double>grid, std::vector<double> data): n(n), grid(grid), data(data) {
+	Grid1D(size_t n, std::vector<double>grid, std::vector<double> data): n(n), grid(grid), data(data) {
 		assert(grid.size()==n);
 		assert(data.size()==n-1);
 	};
@@ -150,7 +150,7 @@ public:
 /**
  *  1D look up table with equidistant spacing
  */
-class EquidistantGrid1D : public RectilinearGrid1D
+class EquidistantGrid1D : public Grid1D
 {
 public:
 
@@ -192,7 +192,7 @@ class RectilinearGrid3D  : public SoilLookUp
 {
 public:
 
-	RectilinearGrid3D(RectilinearGrid1D* xgrid, RectilinearGrid1D* ygrid, RectilinearGrid1D* zgrid) :xgrid(xgrid), ygrid(ygrid), zgrid(zgrid) {
+	RectilinearGrid3D(Grid1D* xgrid, Grid1D* ygrid, Grid1D* zgrid) :xgrid(xgrid), ygrid(ygrid), zgrid(zgrid) {
 		nx = xgrid->n;
 		ny = ygrid->n;
 		nz = zgrid->n;
@@ -216,9 +216,9 @@ public:
 		data.at(map(i,j,k)) = d;
 	}
 
-	RectilinearGrid1D* xgrid;
-	RectilinearGrid1D* ygrid;
-	RectilinearGrid1D* zgrid;
+	Grid1D* xgrid;
+	Grid1D* ygrid;
+	Grid1D* zgrid;
 
 	size_t nx,ny,nz;
 	std::vector<double> data;

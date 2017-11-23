@@ -7,7 +7,7 @@ import py_rootbox as rb
 # Auxiliary functions that could be moved to py_rootbox
 #
 def v2a(vd): # rb.std_vector_double_ to numpy array    
-    l = np.zeros(len(vd)) 
+    l = np.zeros((len(vd),1)) 
     for i in range(0,len(vd)):
         l[i] = vd[i]
     return l

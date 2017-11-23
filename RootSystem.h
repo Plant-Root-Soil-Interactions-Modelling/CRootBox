@@ -8,13 +8,16 @@
 #include <random>
 #include <numeric>
 #include <cmath>
+#include <stack>
 
 #include "ModelParameter.h"
 #include "Root.h"
 #include "soil.h"
 
 class Root;
-class TropismFunction;
+class RootState;
+class Tropism;
+class RootSystemState;
 
 /**
  * RootSystem
@@ -27,6 +30,7 @@ class RootSystem
 {
 
   friend Root;  // obviously :-)
+  friend RootSystemState;
 
 public:
 
@@ -57,7 +61,7 @@ public:
   void setSoil(SoilLookUp* soil_) { soil = soil_; } ///< optionally sets a soil for hydro tropism (call before RootSystem::initialize())
   void reset(); ///< resets the root class, keeps the root type parameters
   void initialize(int basal=4, int shootborne=5); ///< creates the base roots, call before simulation and after setting the plant and root parameters
-  void setTropism(TropismFunction* tf, int rt = -1);
+  void setTropism(Tropism* tf, int rt = -1);
   void simulate(double dt, bool silence = false); ///< simulates root system growth for time span dt
   void simulate(); ///< simulates root system growth for the time defined in the root system parameters
   void simulate(double dt, double maxinc, ProportionalElongation* se, bool silence = false);
@@ -66,14 +70,14 @@ public:
   // call back functions (todo simplify)
   virtual Root* createRoot(int lt, Vector3d  h, double delay, Root* parent, double pbl, int pni);
   ///< Creates a new lateral root, overwrite or change this method to use more specialized root classes
-  virtual TropismFunction* createTropismFunction(int tt, double N, double sigma);
+  virtual Tropism* createTropismFunction(int tt, double N, double sigma);
   ///< Creates the tropisms, overwrite or change this method to add more tropisms TODO a vector<tropism*> might be easier to use
   virtual GrowthFunction* createGrowthFunction(int gft);
   ///< Creates the growth function per root type, overwrite or change this method to add more tropisms
 
   // Analysis of simulation results
-  int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system
-  int getNumberOfSegments() const { return nid-numberOfCrowns; } ///< Number of segments of the root system (the number of nodes-1 for tap root systems)
+  int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system (including nodes for seed, root crowns, and artificial shoot)
+  int getNumberOfSegments() const { return nid-numberOfCrowns-1; } ///< Number of segments of the root system ((nid+1)-1) - numberOfCrowns - 1 (artificial shoot)
   int getNumberOfRoots(bool all = false) const { if (all) return rid+1; else return getRoots().size(); }
   std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots and buffers the result
   std::vector<Root*> getBaseRoots() const { return baseRoots; } ///< Base roots are tap root, basal roots, and shoot borne roots
@@ -97,6 +101,9 @@ public:
   std::vector<int> getNewNodeIndices() const; ///< node indices created in the previous time step
   std::vector<Vector2i> getNewSegments() const; ///< Segments created in the previous time step
   std::vector<Root*> getNewSegmentsOrigin() const; ///< Copies a pointer to the root containing the new segments
+  void push();
+  void pop();
+
 
   // Output Simulation results
   void write(std::string name) const; /// writes simulation results (type is determined from file extension in name)
@@ -120,7 +127,7 @@ private:
   std::vector<RootTypeParameter> rtparam; ///< Parameter set for each root type
   std::vector<Root*> baseRoots;  ///< Base roots of the root system
   std::vector<GrowthFunction*> gf; ///< Growth function per root type
-  std::vector<TropismFunction*> tf;  ///< Tropism per root type
+  std::vector<Tropism*> tf;  ///< Tropism per root type
   SignedDistanceFunction* geometry = new SignedDistanceFunction(); ///< Confining geometry (unconfined by default)
   SoilLookUp* soil = nullptr; ///< callback for hydro, or chemo tropism (needs to set before initialize()) TODO should be a part of tf, or rtparam
 
@@ -133,14 +140,15 @@ private:
   mutable std::vector<Root*> roots = std::vector<Root*>(); // buffer for getRoots()
 
   const int maxtypes = 100;
-  void initRTP(); // default values for rtparam vector
 
   int numberOfCrowns = 0;
 
+  bool manualSeed = false;
+
+  void initRTP(); // default values for rtparam vector
+
   void writeRSMLMeta(std::ostream & os) const;
   void writeRSMLPlant(std::ostream & os) const;
-
-  bool manualSeed = false;
 
   int getRootIndex() { rid++; return rid; } ///< returns next unique root id, called by the constructor of Root
   int getNodeIndex() { nid++; return nid; } ///< returns next unique node id, called by Root::addNode()
@@ -149,6 +157,56 @@ private:
   mutable std::uniform_real_distribution<double> UD;
   mutable std::normal_distribution<double> ND;
 
+  std::stack<RootSystemState> stateStack = std::stack<RootSystemState>();
+
 };
+
+
+
+
+
+
+
+/**
+ * Sores a state of the RootSystem,
+ * i.e. all data that changes over time (*), i.e. excluding node data that cannot change
+ *
+ * (*) excluding changes regarding RootSystemParameter, any RootTypeParameter, confining geometry, and soil
+ */
+class RootSystemState
+{
+
+	friend RootSystem;
+
+public:
+
+	RootSystemState(const RootSystem& rs);
+
+	void restore(RootSystem& rs);
+
+private:
+
+	  std::vector<RootState> baseRoots;  ///< Base roots of the root system
+
+	  // copy because of random generator seeds
+	  std::vector<Tropism*> tf;
+	  std::vector<GrowthFunction*> gf;
+	  std::vector<RootTypeParameter> rtparam;
+
+	  double simtime = 0;
+	  int rid = -1; // unique root id counter
+	  int nid = -1; // unique node id counter
+	  int old_non=0;
+	  int old_nor=0;
+	  int numberOfCrowns = 0;
+	  bool manualSeed = false;
+
+	  mutable std::mt19937 gen;
+	  mutable std::uniform_real_distribution<double> UD;
+	  mutable std::normal_distribution<double> ND;
+
+};
+
+
 
 #endif /* ROOTSYSTEM_H_ */

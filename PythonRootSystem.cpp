@@ -13,7 +13,7 @@
  *  build a shared library from this file
  *  put comment to line 16 to ignore this file
  */
-#define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
+// #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
 
@@ -95,6 +95,22 @@ public:
 
     virtual std::string toString() const override {
     	return this->get_override("toString")();
+    }
+
+};
+
+class Tropism_Wrap : public Tropism, public wrapper<Tropism> {
+public:
+
+//	Tropism_Wrap(): Tropism() { }
+//	Tropism_Wrap(double n,double sigma): Tropism(n,sigma) { } // todo cant get it working with constructors other than ()
+
+    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override {
+    	return this->get_override("tropismObjective")(pos, old, a, b, dx, root);
+    }
+
+    virtual Tropism* copy() override {
+    	return this->get_override("copy")();
     }
 
 };
@@ -245,16 +261,16 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("setScale", &ProportionalElongation::setScale)
 			.def("__str__",&ProportionalElongation::toString)
 	;
-	class_<RectilinearGrid1D, RectilinearGrid1D*, bases<SoilLookUp>>("RectilinearGrid1D",init<>())
+	class_<Grid1D, Grid1D*, bases<SoilLookUp>>("Grid1D",init<>())
 			.def(init<size_t, std::vector<double>, std::vector<double>>())
-			.def("getValue", &RectilinearGrid1D::getValue, getValue_overloads())
-			.def("__str__",&RectilinearGrid1D::toString)
-			.def("map",&RectilinearGrid1D::map)
-			.def_readwrite("n", &RectilinearGrid1D::n)
-			.def_readwrite("grid", &RectilinearGrid1D::grid)
-			.def_readwrite("data", &RectilinearGrid1D::data)
+			.def("getValue", &Grid1D::getValue, getValue_overloads())
+			.def("__str__",&Grid1D::toString)
+			.def("map",&Grid1D::map)
+			.def_readwrite("n", &Grid1D::n)
+			.def_readwrite("grid", &Grid1D::grid)
+			.def_readwrite("data", &Grid1D::data)
 	;
-	class_<EquidistantGrid1D, EquidistantGrid1D*, bases<RectilinearGrid1D>>("EquidistantGrid1D",init<double, double, size_t>())
+	class_<EquidistantGrid1D, EquidistantGrid1D*, bases<Grid1D>>("EquidistantGrid1D",init<double, double, size_t>())
 			.def(init<double, double, std::vector<double>>())
 			.def("getValue", &EquidistantGrid1D::getValue, getValue_overloads())
 			.def("__str__",&EquidistantGrid1D::toString)
@@ -264,18 +280,38 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def_readwrite("data", &EquidistantGrid1D::data)
 	;
 	/**
-	 *
 	 * tropism.h
 	 */
-	class_<TropismFunction, TropismFunction*>("TropismFunction",init<>())
-			.def(init<double, double>())
-			.def("getHeading",&TropismFunction::getHeading)
-			.def("tropismObjective",&TropismFunction::tropismObjective, tropismObjective_overloads())
-			.def("copy",&TropismFunction::copy, return_value_policy<reference_existing_object>())
-			.def("setSeed",&TropismFunction::setSeed)
-			.def("rand",&TropismFunction::rand)
-			.def("randn",&TropismFunction::randn)
+	class_<Tropism_Wrap, Tropism_Wrap*, boost::noncopyable>("Tropism",init<>())
+			.def("getHeading",&Tropism_Wrap::getHeading)
+			.def("tropismObjective",&Tropism_Wrap::tropismObjective, tropismObjective_overloads())
+			.def("copy",&Tropism_Wrap::copy, return_value_policy<reference_existing_object>())
+			.def("setTropismParameter",&Tropism_Wrap::setTropismParameter)
+			.def("setSeed",&Tropism_Wrap::setSeed)
+			.def("setGeometry",&Tropism_Wrap::setGeometry)
+			.def("rand",&Tropism_Wrap::rand)
+			.def("randn",&Tropism_Wrap::randn)
 	;
+	class_<Tropism, Tropism*>("TropismBase",init<>()) // Base class for the following tropisms
+			.def("getHeading",&Tropism::getHeading)
+			.def("tropismObjective",&Tropism::tropismObjective, tropismObjective_overloads())
+			.def("copy",&Tropism::copy, return_value_policy<reference_existing_object>())
+			.def("setTropismParameter",&Tropism::setTropismParameter)
+			.def("setSeed",&Tropism::setSeed)
+			.def("setGeometry",&Tropism::setGeometry)
+			.def("rand",&Tropism::rand)
+			.def("randn",&Tropism::randn)
+	;
+	class_<Gravitropism, Gravitropism*, bases<Tropism>>("Gravitropism",init<double, double>())
+	;
+	class_<Plagiotropism, Plagiotropism*, bases<Tropism>>("Plagiotropism",init<double, double>())
+	;
+	class_<Exotropism, Exotropism*, bases<Tropism>>("Exotropism",init<double, double>())
+	;
+	class_<Hydrotropism, Hydrotropism*, bases<Tropism>>("Hydrotropism",init<double, double, SoilLookUp*>())
+	;
+//	class_<CombinedTropism, CombinedTropism*, bases<Tropism>>("CombinedTropism",init<>()) // Todo needs some extra work
+//	;
 	/*
 	 * ModelParameter.h
 	 */
@@ -385,6 +421,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("setSoil", &RootSystem::setSoil)
 		.def("reset", &RootSystem::reset)
 		.def("initialize", &RootSystem::initialize, initialize_overloads())
+		.def("setTropism", &RootSystem::setTropism)
 		.def("simulate",simulate1, simulate1_overloads())
 		.def("simulate",simulate2)
 		.def("simulate",simulate3, simulate3_overloads())
@@ -396,7 +433,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getNodes", &RootSystem::getNodes)
 		.def("getPolylines", &RootSystem::getPolylines)
 		.def("getSegments", &RootSystem::getSegments)
-         .def("getShootSegments", &RootSystem::getShootSegments)
+        .def("getShootSegments", &RootSystem::getShootSegments)
 		.def("getSegmentsOrigin", &RootSystem::getSegmentsOrigin)
 		.def("getNETimes", &RootSystem::getNETimes)
 		.def("getScalar", &RootSystem::getScalar)
@@ -411,6 +448,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getNewNodes",&RootSystem::getNewNodes)
 		.def("getNewSegments",&RootSystem::getNewSegments)
 		.def("getNewSegmentsOrigin",&RootSystem::getNewSegmentsOrigin)
+		.def("push",&RootSystem::push)
+		.def("pop",&RootSystem::pop)
 		.def("debugSeed",&RootSystem::debugSeed)
 		.def("rand",&RootSystem::rand)
 		.def("randn",&RootSystem::randn)
@@ -511,4 +550,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
 #endif /* PYTHON_WRAPPER */
 
 #endif /* PY_ROOTBOX_H_ */
+
+// feature/growth-insertion-idx-for-vertices
 

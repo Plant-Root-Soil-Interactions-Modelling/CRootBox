@@ -33,7 +33,7 @@ RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), 
 	roots = std::vector<Root*>(0); // new empty buffer
 
 	// deep copy tropisms
-	tf = std::vector<TropismFunction*>(rs.tf.size());
+	tf = std::vector<Tropism*>(rs.tf.size());
 	for (size_t i=0; i<rs.tf.size(); i++) {
 		tf[i]= rs.tf[i]->copy();
 	}
@@ -179,6 +179,9 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		}
 	}
 
+	// introduce an extra node at nodes[0]
+	getNodeIndex();
+
 	// Create root system
 	const double maxT = 365.; // maximal simulation time
 	RootSystemParameter const &rs = rsparam; // rename
@@ -251,10 +254,11 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		int type = rtparam.at(i).tropismT;
 		double N = rtparam.at(i).tropismN;
 		double sigma = rtparam.at(i).tropismS;
-		TropismFunction* tropism = this->createTropismFunction(type,N,sigma);
+		Tropism* tropism = this->createTropismFunction(type,N,sigma);
 		tropism->setSeed(this->rand()); // fix randomness
+		tropism->setGeometry(geometry);
 		// std::cout << "#" << i << ": type " << type << ", N " << N << ", sigma " << sigma << "\n";
-		tf.push_back(new ConfinedTropism(tropism, geometry)); // wrap confinedTropism around baseTropism
+		tf.push_back(tropism); // wrap confinedTropism around baseTropism
 		int gft = rtparam.at(i).gf;
 		GrowthFunction* gf_ = this->createGrowthFunction(gft);
 		gf_->getAge(1,1,1,nullptr);  // check if getAge is implemented (otherwise an exception is thrown)
@@ -268,10 +272,10 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
  * Manually sets a tropism function for a specific or for all root types.
  * Must be called after RootSystem::initialize()
  */
-void RootSystem::setTropism(TropismFunction* tf_, int rt)
+void RootSystem::setTropism(Tropism* tf_, int rt)
 {
 	if (rt>-1) { // set for a specific root type
-		tf.at(rt) = tf_;
+		tf.at(rt-1) = tf_;
 	} else { // set for all root types (default)
 		for (size_t i=0; i<tf.size(); i++) {
 			tf.at(i) = tf_;
@@ -323,16 +327,16 @@ void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se,
 
 	int i = 0;
 
-	RootSystem* rs_ = new RootSystem(*this);
+	push();
 	se->setScale(1.);
-	rs_->simulate(dt, silence);
-	v_ = rs_->getScalar(RootSystem::st_length);
+	simulate(dt, silence);
+	v_ = getScalar(RootSystem::st_length);
 	double l = std::accumulate(v_.begin(), v_.end(), 0.0);
 	double inc_ = l - ol;
 	if (!silence) {
 		std::cout << "expected increase is " << inc_ << "\n";
 	}
-	delete rs_;
+	pop();
 
 	if ((inc_>maxinc) && (std::abs(inc_-maxinc)>accuracy)) { // check if we have to perform a binary search
 
@@ -342,13 +346,13 @@ void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se,
 		while ( ((std::abs(inc_-maxinc)) > accuracy) && (i<maxiter) )  { // binary search
 
 			double m = (sl+sr)/2.; // mid
-			RootSystem* rs_ = new RootSystem(*this);
+			push();
 			se->setScale(m);
-			rs_->simulate(dt, silence);
-			v_ = rs_->getScalar(RootSystem::st_length);
+			simulate(dt, silence);
+			v_ = getScalar(RootSystem::st_length);
 			l = std::accumulate(v_.begin(), v_.end(), 0.0);
 			inc_ = l - ol;
-			delete rs_;
+			pop();
 			if (!silence) {
 				std::cout << "\t(sl, mid, sr) = (" << sl << ", " <<  m << ", " <<  sr << "), inc " <<  inc_ << ", err: " << std::abs(inc_-maxinc) << " > " << accuracy << "\n";
 			}
@@ -415,15 +419,15 @@ Root* RootSystem::createRoot(int lt, Vector3d  h, double delay, Root* parent, do
  * Creates a specific tropsim,
  * the function must be extended or overwritten to add more tropisms
  */
-TropismFunction* RootSystem::createTropismFunction(int tt, double N, double sigma) {
+Tropism* RootSystem::createTropismFunction(int tt, double N, double sigma) {
 	switch (tt) {
 	case tt_plagio: return new Plagiotropism(N,sigma);
 	case tt_gravi: return new Gravitropism(N,sigma);
 	case tt_exo: return new Exotropism(N,sigma);
 	case tt_hydro: {
-		TropismFunction* gt =  new Gravitropism(N,sigma);
-		TropismFunction* ht= new Hydrotropism(N,sigma,soil);
-		TropismFunction* cht = new CombinedTropism(N,sigma,ht,10.,gt,1.); // does only use the objective functions from gravitropism and hydrotropism
+		Tropism* gt =  new Gravitropism(N,sigma);
+		Tropism* ht= new Hydrotropism(N,sigma,soil);
+		Tropism* cht = new CombinedTropism(N,sigma,ht,10.,gt,1.); // does only use the objective functions from gravitropism and hydrotropism
 		return cht;
 	}
 	default: throw std::invalid_argument( "RootSystem::createTropismFunction() tropism type not implemented" );
@@ -506,6 +510,7 @@ std::vector<Vector3d> RootSystem::getNodes() const
 			nv.at(r->getNodeId(i)) = r->getNode(i); // pray that ids are correct
 		}
 	}
+	nv.at(0) = Vector3d(0.,0.,3.); // add artificial shoot
 	return nv;
 }
 
@@ -554,6 +559,10 @@ std::vector<Vector2i> RootSystem::getSegments() const
 std::vector<Vector2i> RootSystem::getShootSegments() const
 {
 	std::vector<Vector2i> seg = std::vector<Vector2i>(0);
+
+	// connect  basal roots node (seed) to artificial shoot
+	seg.push_back(Vector2i(0,baseRoots.at(0)->getNodeId(0)));
+
 	int n1=0, n2=0;
 	for (int i=0; i<numberOfCrowns-1; i++) { // connecting root crowns
 		int brn = baseRoots.size()-1;
@@ -561,7 +570,7 @@ std::vector<Vector2i> RootSystem::getShootSegments() const
 		n2 = baseRoots.at(brn-(i+1)*rsparam.nC)->getNodeId(0);
 		seg.push_back(Vector2i(n1,n2));
 	}
-	if (numberOfCrowns>0) { // taproot
+	if (numberOfCrowns>0) { // connect to basal roots node (seed)
 		int ti = baseRoots.at(0)->getNodeId(0);
 		seg.push_back(Vector2i(n2,ti));
 	}
@@ -820,6 +829,19 @@ std::vector<Root*> RootSystem::getNewSegmentsOrigin() const
 }
 
 
+void RootSystem::push()
+{
+	stateStack.push(RootSystemState(*this));
+}
+
+void RootSystem::pop()
+{
+	RootSystemState& rss = stateStack.top();
+	rss.restore(*this);
+	stateStack.pop();
+}
+
+
 /**
  * todo
  */
@@ -998,3 +1020,54 @@ void RootSystem::writeGeometry(std::ostream & os) const
 	os << "renderView1 = GetActiveViewOrCreate('RenderView')\n\n";
 	geometry->writePVPScript(os);
 }
+
+
+RootSystemState::RootSystemState(const RootSystem& rs) :rtparam(rs.rtparam), simtime(rs.simtime), rid(rs.rid),nid(rs.nid), old_non(rs.old_non), old_nor(rs.old_nor),
+		numberOfCrowns(rs.numberOfCrowns), manualSeed(rs.manualSeed), gen(rs.gen), UD(rs.UD), ND(rs.ND)
+{
+	tf = std::vector<Tropism*>(rs.tf.size()); // deep copy tropisms
+	for (size_t i=0; i<rs.tf.size(); i++) {
+		tf[i]= rs.tf[i]->copy();
+	}
+	gf = std::vector<GrowthFunction*>(rs.gf.size()); // deep copy growth
+	for (size_t i=0; i<rs.gf.size(); i++) {
+		gf[i]= rs.gf[i]->copy();
+	}
+	baseRoots = std::vector<RootState>(rs.baseRoots.size()); // store base roots
+	for (size_t i=0; i<baseRoots.size(); i++) {
+		baseRoots[i] = RootState(*(rs.baseRoots[i]));
+	}
+}
+
+
+void RootSystemState::restore(RootSystem& rs)
+{
+	rs.roots.clear(); // clear buffer
+	rs.rtparam  = rtparam;
+	rs.simtime = simtime; // copy back everything
+	rs.rid = rid;
+	rs.nid = nid;
+	rs.old_non = old_non;
+	rs.old_nor = old_nor;
+	rs.numberOfCrowns = numberOfCrowns;
+	rs.manualSeed = manualSeed;
+	rs.gen = gen;
+	rs.UD = UD;
+	rs.ND = ND;
+	for (size_t i=0; i<rs.tf.size(); i++) { // restore tropism functions
+		delete rs.tf[i];
+	}
+	for (size_t i=0; i<rs.tf.size(); i++) {
+		rs.tf[i] = tf[i];
+	}
+	for (size_t i=0; i<rs.gf.size(); i++) { // restore growth functions
+		delete rs.gf[i];
+	}
+	for (size_t i=0; i<rs.gf.size(); i++) {
+		rs.gf[i]= gf[i];
+	}
+	for (size_t i=0; i<baseRoots.size(); i++) { // restore base roots
+		baseRoots[i].restore(*(rs.baseRoots[i]));
+	}
+}
+

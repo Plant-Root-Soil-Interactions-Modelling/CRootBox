@@ -449,7 +449,7 @@ $minS$ outside the geometry, and linear slope with length $slope$. At the bounda
 \begin{figure}
 \centering
 \includegraphics[width=0.7\textwidth]{example4a.png}
-\caption{Chemotropism in a nutrient rich layer} \label{fig:chemo}
+\caption{Chemotropism in a nutrient rich layer (Example 4a)} \label{fig:chemo}
 \end{figure}
 
 
@@ -460,10 +460,10 @@ Normally, the simulation is created from a set of parameters. For tropisms these
 There are two ways to add user defined tropisms: 
 
 \begin{enumerate}
-\item The first is C++ only: It is to extend the CRootBox class and overwrite the method RootSystem:createTropismFunction. 
+\item The first is C++ only: It is to extend the CRootBox class and overwrite the method RootSystem:createTropism. 
 This is the function that is called, when the tropisms are created from the parameters ($tt$, $N$, $sigma$). This is necessary when user defined tropism should be created from a parameter file, where $tt$ is the number of the new tropism type. 
 \item The second is to manually set the tropisms using the method RootSystem: :setTropism. 
-The user has to extend the new tropism class from the class TropismFunction. 
+The user has to extend the new tropism class from the class Tropism. 
 Currently, this is working only in C++, but in future it will be possible directly from Python. Make sure to call setTropism($\dots$) after initialize().
 \end{enumerate}
 
@@ -478,7 +478,7 @@ The insertion angle is reported to be dependent on nutrient supply in some speci
 
 The scaling itself can be performed in the following way:
 
-\lstinputlisting[firstline=1,lastline=50, language=Python, caption=Example 4b]{../example4b.py}
+\lstinputlisting[firstline=1,lastline=50, language=Python, caption=Example 4c]{../example4c.py}
 
 \begin{itemize}
 
@@ -503,25 +503,25 @@ Then, we set the scale branching probability function $sbp$ to the soil property
 
 \begin{figure}
 \begin{subfigure}[c]{0.3\textwidth}
-\includegraphics[width=0.99\textwidth]{example4b1.png}
+\includegraphics[width=0.99\textwidth]{example4c1.png}
 \subcaption{Root elongation rate} \label{fig:elongation}
 \end{subfigure}
 \begin{subfigure}[c]{0.3\textwidth}
-\includegraphics[width=0.99\textwidth]{example4b2.png}
+\includegraphics[width=0.99\textwidth]{example4c2.png}
 \subcaption{Insertion angle of laterals} \label{fig:insertion}
 \end{subfigure}
 \begin{subfigure}[c]{0.3\textwidth}
-\includegraphics[width=0.99\textwidth]{example4b3.png}
+\includegraphics[width=0.99\textwidth]{example4c3.png}
 \subcaption{Branching density (probabilistic model)} \label{fig:probability}
 \end{subfigure}
-\caption{Predefined root responses}
+\caption{Predefined root responses (Example 4c)}
 \end{figure}
 
 
 When playing around with the model parameters, it is not always clear if the suggested effect is realized from the figures alone. 
 The following script helps to quantify the effects of above simulation: 
 
-\lstinputlisting[firstline=51,lastline=81, language=Python, caption=Example 4b]{../example4b.py}
+\lstinputlisting[firstline=51,lastline=81, language=Python, caption=Example 4c]{../example4c.py}
 
 
 

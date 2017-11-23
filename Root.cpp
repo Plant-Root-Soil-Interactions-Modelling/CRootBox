@@ -483,3 +483,44 @@ std::string Root::toString() const
 }
 
 
+
+
+RootState::RootState(const Root& r): alive(r.alive), active(r.active), age(r.age), length(r.length), old_non(r.old_non)
+{
+	lNode = r.nodes.back();
+	lNodeId = r.nodeIds.back();
+	lneTime = r.netimes.back();
+	non = r.nodes.size();
+	laterals = std::vector<RootState>(r.laterals.size());
+	for (size_t i=0; i<laterals.size(); i++) {
+		laterals[i] = RootState(*(r.laterals[i]));
+	}
+}
+
+void RootState::restore(Root& r)
+{
+	r.alive = alive; // copy things that changed
+	r.active = active;
+	r.age = age;
+	r.length = length;
+	r.old_non = old_non;
+	r.nodes.resize(non); // shrink vectors
+	r.nodeIds.resize(non);
+	r.netimes.resize(non);
+	r.nodes.back() = lNode; // restore last value
+	r.nodeIds.back() = lNodeId;
+	r.netimes.back() = lneTime;
+	for (size_t i = laterals.size(); i<r.laterals.size(); i++) { // delete roots that have not been created
+		delete r.laterals[i];
+	}
+	r.laterals.resize(laterals.size()); // shrink and restore laterals
+	for (size_t i=0; i<laterals.size(); i++) {
+		laterals[i].restore(*(r.laterals[i]));
+	}
+}
+
+
+
+
+
+
