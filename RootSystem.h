@@ -98,6 +98,7 @@ public:
   std::vector<int> getUpdatedNodeIndices() const; ///< Indices of nodes that were updated in the previous time step
   std::vector<Vector3d> getUpdatedNodes() const; ///< Values of the updated nodes
   std::vector<Vector3d> getNewNodes() const; ///< Nodes created in the previous time step
+  std::vector<int> getNewNodeIndices() const; ///< node indices created in the previous time step
   std::vector<Vector2i> getNewSegments() const; ///< Segments created in the previous time step
   std::vector<Root*> getNewSegmentsOrigin() const; ///< Copies a pointer to the root containing the new segments
   void push();

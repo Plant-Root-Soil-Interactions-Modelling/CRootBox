@@ -773,6 +773,24 @@ std::vector<Vector3d> RootSystem::getNewNodes() const
 }
 
 /**
+ * Returns a vector of newly created node indices since the last call of RootSystem::simulate(dt),
+ * to dynamically add to the old node vector, see also RootSystem::getNodes
+ */
+std::vector<int> RootSystem::getNewNodeIndices() const
+{
+	roots.clear();
+	this->getRoots(); // update roots (if necessary)
+	std::vector<int> nv(this->getNumberOfNewNodes());
+	for (auto const& r: roots) {
+		int onon = std::abs(r->old_non);
+		for (size_t i=onon; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
+			nv.at(r->getNodeId(i)-this->old_non) = r->getNodeId(i); // pray that ids are correct
+		}
+	}
+	return nv;
+}
+
+/**
  * Returns a vector of newly created segments since the last call of RootSystem::simulate(dt),
  * to dynamically add to the old segment index vector, see also RootSystem::getSegments
  */
@@ -1004,9 +1022,6 @@ void RootSystem::writeGeometry(std::ostream & os) const
 }
 
 
-
-
-
 RootSystemState::RootSystemState(const RootSystem& rs) :rtparam(rs.rtparam), simtime(rs.simtime), rid(rs.rid),nid(rs.nid), old_non(rs.old_non), old_nor(rs.old_nor),
 		numberOfCrowns(rs.numberOfCrowns), manualSeed(rs.manualSeed), gen(rs.gen), UD(rs.UD), ND(rs.ND)
 {
@@ -1055,3 +1070,4 @@ void RootSystemState::restore(RootSystem& rs)
 		baseRoots[i].restore(*(rs.baseRoots[i]));
 	}
 }
+
