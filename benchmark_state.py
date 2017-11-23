@@ -3,7 +3,7 @@ from rb_tools import *
 
 # set up simulation
 rs = rb.RootSystem()
-name = "Anagallis_femina_Leitner_2010" 
+name = "Zea_mays_4_Leitner_2014" 
 rs.openFile(name)
 soilcore = rb.SDF_PlantContainer(5,5,40,False)
 rs.setGeometry(soilcore)  # soilcore, or rhizotron
@@ -14,14 +14,14 @@ rs.simulate(20)
 nodes0a = vv2a(rs.getNodes())
 rs.push() # push simualtion at time 20
 
-rs.simulate(10) 
+rs.simulate(100) 
 nodes1a = vv2a(rs.getNodes())
 
 rs.pop() # should be at state 20 again
 nodes0b = vv2a(rs.getNodes())
 stime0 = rs.getSimTime()
 
-rs.simulate(10)
+rs.simulate(100)
 nodes1b = vv2a(rs.getNodes())
 stime1 = rs.getSimTime()
 

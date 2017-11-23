@@ -327,20 +327,16 @@ void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se,
 
 	int i = 0;
 
-	RootSystem* rs_ = new RootSystem(*this);
-	// push();
-
+	push();
 	se->setScale(1.);
-	rs_->simulate(dt, silence);
-	v_ = rs_->getScalar(RootSystem::st_length);
+	simulate(dt, silence);
+	v_ = getScalar(RootSystem::st_length);
 	double l = std::accumulate(v_.begin(), v_.end(), 0.0);
 	double inc_ = l - ol;
 	if (!silence) {
 		std::cout << "expected increase is " << inc_ << "\n";
 	}
-
-	delete rs_;
-	// pop()
+	pop();
 
 	if ((inc_>maxinc) && (std::abs(inc_-maxinc)>accuracy)) { // check if we have to perform a binary search
 
@@ -350,15 +346,13 @@ void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se,
 		while ( ((std::abs(inc_-maxinc)) > accuracy) && (i<maxiter) )  { // binary search
 
 			double m = (sl+sr)/2.; // mid
-			RootSystem* rs_ = new RootSystem(*this);
-			// push();
+			push();
 			se->setScale(m);
-			rs_->simulate(dt, silence);
-			v_ = rs_->getScalar(RootSystem::st_length);
+			simulate(dt, silence);
+			v_ = getScalar(RootSystem::st_length);
 			l = std::accumulate(v_.begin(), v_.end(), 0.0);
 			inc_ = l - ol;
-			delete rs_;
-			//pop();
+			pop();
 			if (!silence) {
 				std::cout << "\t(sl, mid, sr) = (" << sl << ", " <<  m << ", " <<  sr << "), inc " <<  inc_ << ", err: " << std::abs(inc_-maxinc) << " > " << accuracy << "\n";
 			}
