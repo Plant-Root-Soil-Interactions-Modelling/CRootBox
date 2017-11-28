@@ -1,5 +1,4 @@
 import py_rootbox as rb
-import threading
 
 name = "Zea_mays_4_Leitner_2014"
 simtime = 120
@@ -11,11 +10,7 @@ allRS = []
 for i in range(0,N):
     for j in range(0,N):
         rs = rb.RootSystem()
-        rs.openFile(name)
-        # Modify axial resolution
-        for k in range(0,10):  
-            p = rs.getRootTypeParameter(k+1)
-            p.dx = 0.1 # adjust resolution        
+        rs.openFile(name)      
         rs.getRootSystemParameter().seedPos = rb.Vector3d(dist*i,dist*j,-3.) # cm
         rs.initialize()
         allRS.append(rs)
@@ -33,5 +28,4 @@ for i,rs in enumerate(allRS):
        
 # Write all into single file (segments)
 ana.write("results/example_2b_all.vtp") 
-
        

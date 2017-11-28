@@ -6,8 +6,8 @@ const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","o
 /**
  * Constructor
  */
-RootSystem::RootSystem() :gen(std::mt19937(std::chrono::system_clock::now().time_since_epoch().count())), UD(std::uniform_real_distribution<double>(0,1)),
-		ND(std::normal_distribution<double>(0,1))
+RootSystem::RootSystem() :gen(std::mt19937(std::chrono::system_clock::now().time_since_epoch().count())),
+		UD(std::uniform_real_distribution<double>(0,1)), UID(std::uniform_int_distribution<unsigned int>()), ND(std::normal_distribution<double>(0,1))
 {
 	initRTP();
 };
@@ -175,14 +175,14 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 	// fix randomness of root type parameters if the seed was set manually
 	if (manualSeed) {
 		for (auto& rtp : rtparam) {
-			rtp.setSeed(this->rand());
+			rtp.setSeed(UID(gen));
 		}
 	}
 
 	// introduce an extra node at nodes[0]
 	getNodeIndex();
 
-	// Create root system
+	// Create root system from the root system parameter
 	const double maxT = 365.; // maximal simulation time
 	RootSystemParameter const &rs = rsparam; // rename
 	Vector3d iheading(0,0,-1);
@@ -255,7 +255,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		double N = rtparam.at(i).tropismN;
 		double sigma = rtparam.at(i).tropismS;
 		Tropism* tropism = this->createTropismFunction(type,N,sigma);
-		tropism->setSeed(this->rand()); // fix randomness
+		tropism->setSeed(UID(gen)); // fix randomness
 		tropism->setGeometry(geometry);
 		// std::cout << "#" << i << ": type " << type << ", N " << N << ", sigma " << sigma << "\n";
 		tf.push_back(tropism); // wrap confinedTropism around baseTropism
@@ -377,26 +377,16 @@ void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se,
  *
  * @param seed      random number generator seed
  */
-void RootSystem::setSeed(double seed) {
-	std::cout << "Setting random seed "<< seed <<"\n";
+void RootSystem::setSeed(unsigned int seed) {
 	manualSeed = true;
-	gen = std::mt19937(seed);
-	for (auto t : tf) {
-		double s  = rand();
-		t->setSeed(s);
+	this->gen = std::mt19937(seed);
+	// set UD UID ND?
+	for (auto& t : tf) {
+		t->setSeed(UID(gen));
 	}
-	for (auto rp : rtparam) {
-		double s  = rand();
-		rp.setSeed(s);
+	for (auto& rp : rtparam) {
+		rp.setSeed(UID(gen));
 	}
-}
-
-
-void RootSystem::debugSeed() const
-{
-	std::stringstream s;
-	s << "Rootsystem seed "<< gen << "\n";
-	std::cout << s.str();
 }
 
 /**

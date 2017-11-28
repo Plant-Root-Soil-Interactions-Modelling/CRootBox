@@ -450,7 +450,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getNewSegmentsOrigin",&RootSystem::getNewSegmentsOrigin)
 		.def("push",&RootSystem::push)
 		.def("pop",&RootSystem::pop)
-		.def("debugSeed",&RootSystem::debugSeed)
 		.def("rand",&RootSystem::rand)
 		.def("randn",&RootSystem::randn)
 	;

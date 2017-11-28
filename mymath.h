@@ -26,7 +26,7 @@ public:
 
     Vector2i(): x(0), y(0) { } ///< Default constructor
     Vector2i(int x_, int y_): x(x_),y(y_) { } ///< Constructor passing two ints
-    Vector2i(const Vector2i& v): x(v.x), y(v.y) { } ///< Copy Constructor
+    Vector2i(const Vector2i& v): x(v.x), y(v.y) { } ///< Copy constructor
 
     std::string toString() const {
         std::ostringstream strs;

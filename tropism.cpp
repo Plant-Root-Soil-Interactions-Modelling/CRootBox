@@ -77,7 +77,7 @@ Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,cons
  */
 Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const Root* root)
 {
-	Vector2d h = getUCHeading(pos, old, dx, root);
+	Vector2d h = this->getUCHeading(pos, old, dx, root);
 	double a = h.x;
 	double b = h.y;
 

@@ -1,23 +1,19 @@
 import py_rootbox as rb
 
-#
-# User specific tropism 1: print input arguments to the command line
-#
+# User tropism 1: print input arguments to command line
 class My_Info_Tropism(rb.Tropism):
 
     def tropismObjective(self, pos, old, a, b, dx, root):
         print("Postion \t", pos)
         print("Heading \t", old.column(0))
-        print("test for angle alpha = \t", a)
-        print("test for angle beta = \t", b)
-        print("resolution of next segment \t", dx)
+        print("Test for angle alpha = \t", a)
+        print("Test for angle beta = \t", b)
+        print("Eesolution of next segment \t", dx)
         print("Root id", root.id)
         print()                
         return 0.
 
-#
-# User specific tropism 2: depending on root age use plagio- or gravitropism
-#    
+# User tropism 2: depending on root age use plagio- or gravitropism    
 class My_Age_Tropism(rb.Tropism):
     
     def __init__(self, n, sigma, age):
@@ -53,7 +49,6 @@ simtime = 100 # e.g. 30 or 60 days
 dt = 1
 N = round(simtime/dt)
 for _ in range(0,N):
-    # in a dynamic soil setting you would need to update soil_prop        
     rs.simulate(dt)   
 
 # Export results (as vtp)    

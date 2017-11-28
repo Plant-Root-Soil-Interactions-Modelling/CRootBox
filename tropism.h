@@ -37,8 +37,8 @@ public:
     void setGeometry(SignedDistanceFunction* geom) { geometry = geom; }
     void setTropismParameter(double n_,double sigma_) { n=n_; sigma=sigma_; }
 
-    Vector2d getHeading(const Vector3d& pos, Matrix3d old,  double dx, const Root* root = nullptr);
-    ///< changes baseTropism->getHeading() in case geometric boundaries are hit
+    virtual Vector2d getHeading(const Vector3d& pos, Matrix3d old,  double dx, const Root* root = nullptr);
+    virtual Vector2d getUCHeading(const Vector3d& pos, Matrix3d old, double dx, const Root* root);
 
     /**
      * The objective function of the random optimization of getHeading(). Overwrite this function to implement a tropism.
@@ -61,13 +61,12 @@ public:
     ///< Auxiliary function: Applies angles a and b and goes dx [cm] into the new direction
 
     // random numbers
-    void setSeed(double seed) const { gen = std::mt19937(seed); } ///< Sets the seed of the random number generator
+    void setSeed(unsigned int seed) const { gen = std::mt19937(seed); } ///< Sets the seed of the random number generator
     double rand() const { return UD(gen); } ///< Uniformly distributed random number (0,1)
     double randn() const { return ND(gen); } ///< Normally distributed random number (0,1)
 
 protected:
 
-    Vector2d getUCHeading(const Vector3d& pos, Matrix3d old, double dx, const Root* root);
     ///< Get unconfined heading (called by getHeading), dices n times and takes the best shot (according to the objective function)
 
     double n; ///< Number of trials
@@ -184,10 +183,10 @@ public:
         assert(tropisms.size()>0);
         assert(weights.size()>0);
         assert(tropisms.size()==weights.size());
-    } ///< linearly comibines the objective functions of multiple tropisms
+    } ///< linearly combines the objective functions of multiple tropisms
 
     CombinedTropism(double n, double sigma, Tropism* t1, double w1, Tropism* t2, double w2);
-    ///< linearly comibines the objective functions of two tropism funcitons
+    ///< linearly combines the objective functions of two tropism funcitons
 
     CombinedTropism(CombinedTropism& t): Tropism(t), weights(t.weights) {
     	tropisms = std::vector<Tropism*>(t.tropisms.size());

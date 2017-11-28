@@ -48,7 +48,7 @@ public:
 	std::string toString() const { std::stringstream ss; write(ss); return ss.str(); } ///< writes parameter to a string
 
 	// random numbers
-	void setSeed(double seed) const { gen = std::mt19937(seed); } ///< Sets the seed of the random number generator
+	void setSeed(unsigned int  seed) const { gen = std::mt19937(seed); } ///< Sets the seed of the random number generator
 	double rand() const { return UD(gen); } ///< Uniformly distributed random number (0,1)
 	double randn() const { return ND(gen); } ///< Normally distributed random number (0,1)
 

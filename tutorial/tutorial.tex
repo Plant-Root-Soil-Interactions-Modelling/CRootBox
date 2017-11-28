@@ -461,12 +461,32 @@ There are two ways to add user defined tropisms:
 
 \begin{enumerate}
 \item The first is C++ only: It is to extend the CRootBox class and overwrite the method RootSystem:createTropism. 
-This is the function that is called, when the tropisms are created from the parameters ($tt$, $N$, $sigma$). This is necessary when user defined tropism should be created from a parameter file, where $tt$ is the number of the new tropism type. 
-\item The second is to manually set the tropisms using the method RootSystem: :setTropism. 
-The user has to extend the new tropism class from the class Tropism. 
-Currently, this is working only in C++, but in future it will be possible directly from Python. Make sure to call setTropism($\dots$) after initialize().
+This is the function that is called, when the tropisms are created from the parameters ($tt$, $N$, $sigma$). This is necessary when user defined tropism are created from a parameter file, where $tt$ is the number of the new tropism type. 
+\item The second is to manually set the tropisms using the method RootSystem: :setTropism. Make sure to call Rootsystem: :setTropism($\dots$) after Rootsystem: :initialize().
 \end{enumerate}
 
+In both approaches the user has to extend the new tropism class from the class Tropism. 
+If just the objective function of the tropism is changed, it is enough to overwrite Tropism::tropismObjective. 
+This can done in Python or in C++,the classes Hydrotropism, Gravitropism, and Plagiotropism are examples for this procedure.
+
+If the whole concept of the random optimization is altered, Tropism::getUCHeading must be overwritten. If the geometry model is also changed Tropism::getHeading.
+
+The following example shows how to implement a new tropism in Python. Two new tropism are introduced:
+The first does nothing put outputs the incoming arguments of the method Tropism::tropismObjective to the command line.  
+The second one, is a Plagiotropism that changes with time to Gravitropism.
+
+\lstinputlisting[language=Python, caption=Example 4b]{../example4b.py}
+
+\begin{itemize}
+
+\item[3-14] Creates a new tropism that just writes incoming arguments of Tropism::tropismObjective to the command line. This can be used for debugging. The new class is extended from rb.Tropism, 
+and the method Tropism::tropismObjective is overwritten with the right number of arguments.
+
+\item[16-32] Again, we extend the class from Tropism::tropismObjective.
+
+
+
+\end{itemize}
 
 \subsection{Scaling elongation rate, insertion angle, and lateral emergence probability} \label{sec:elongation}
 
