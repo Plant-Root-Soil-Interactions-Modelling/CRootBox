@@ -35,7 +35,6 @@ class RootSystem
 
 public:
 
-<<<<<<< HEAD
 	enum TropismTypes { tt_plagio = 0, tt_gravi = 1, tt_exo = 2, tt_hydro = 3 };  ///< root tropism types
 	enum GrowthFunctionTypes { gft_negexp = 1, gft_linear = 2 }; // root growth function
 	enum ScalarTypes { st_type = 0, st_radius = 1, st_order = 2, st_time = 3, st_length = 4, st_surface = 5, st_volume = 6, st_one = 7,
