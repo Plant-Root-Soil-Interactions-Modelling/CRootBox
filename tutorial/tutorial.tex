@@ -80,8 +80,8 @@ The first example shows how to use CRootBox in the most simple situation: open a
 \noindent 
 Lets revise the above code in more detail: 
 \begin{itemize}
- \item[1] Imports the CRootBox Python library (py\_rootbox), and names it rb
- \item[3] Constructs the root system object
+ \item[1] Imports the CRootBox Python library (py\_rootbox), and names it rb.
+ \item[3] Constructs the root system object.
  \item[7] Opens two text files: the root type parameter file (.rparam) and the root system parameter file (.pparam). Optionally, as a second argument a path can be provided, the default path is (modelparameter/). 
  Alternatively, all parameter can be set or modified directly in Python (see Section \ref{sec:sa}).
  \item[10] Initializes the simulation: Creates the tap root the base roots (i.e. all basal roots, and shoot borne roots that might emerge), creates the tropisms and passes the domain geometry to it, and creates the elongation functions. 
@@ -98,8 +98,8 @@ A SDF returns the distance to the closest boundary, with negative sign if it lie
 
 The geometry is first created by constructing some specialization of the class SignedDistanceFunction, and is passed to the root system by the method setGeometry: 
 \begin{itemize}
- \item[12] Construct a soil core 
- \item[15] Construct a rhizotron
+ \item[12] Construct a soil core. 
+ \item[15] Construct a rhizotron.
  \item[18] Pick one of the two geometries. Note that it is important to call setGeometry before initialize.
  \item[30] Its possible to save the geometry as Paraview Python script for visualization, see Figure \ref{fig:basicB}. Run this script in Paraview by Tools$\rightarrow$Python Shell, Run Script.
 \end{itemize}
@@ -193,6 +193,10 @@ Therefore, we create an SegmentAnalyser object in L24 and merge all segments int
 \caption{Multiple root systems (Example 2b), colors denote the creation time of the root segments} \label{fig:multiple}
 \end{figure}
 
+Each root system has its own random number generator. By default the seed of the generator is initialized with the system clock. 
+If this is not sufficient, e.g. if multiple root systems are initiated at the same time on multi-core systems, or the simulation shall be reproducable, the seed can be set manually using the method RootSystem::setSeed(int).
+
+
 
 
 \section{Analysis of simulation results}
@@ -206,17 +210,17 @@ and how a sensitivity analysis can be performed.
 The class RootSystem offers some post-processing options. Most of them are on a per root level. 
 The following script shows how to analyse length versus time, and how we can obtain root tip or root base positions. 
 
-First lets analyse the root length versus time, and consider the total root length, and root length per type. 
+First, lets analyse the root length versus time, and consider the total root length, and root length per type. 
 
 \lstinputlisting[firstline=1,lastline=41, language=Python, caption=Example 3a (1)]{../example3a.py}
 
 \begin{itemize}
 
 \item[2] Rb\_tools is a small utility package that contains functions to convert the exposed C++ data types to NumPy arrays. 
-\item[3] NumPy is Python's scientific computing package
+\item[3] NumPy is Python's scientific computing package.
 \item[4] Matplotlib is Python's easy way to create figures like in Matlab.
 
-\item[6-9] Sets up the simulation
+\item[6-9] Sets up the simulation.
 
 \item[11-13] Defines the simulation time, time step, and the resulting number of simulate(dt) calls. 
 
@@ -237,7 +241,7 @@ Furthermore, we want to show two options how to retrieve root tip postions and r
 
 \begin{itemize}
 
-\item[43-44] Reset the simulation and simulate for only 7 days (otherwise there are so many root tips)
+\item[43-44] Reset the simulation and simulate for only 7 days (otherwise there are so many root tips).
 
 \item[46-47] Outputs the number of nodes and segments to get an idea how big the resulting root system is. 
 Note that number of segments equals the number of nodes minus the number of base roots that will emerge. Base roots are tap roots, basal roots and shootborne roots.
@@ -334,7 +338,7 @@ First we start with a script that defines the parameter within the script, and s
 
 \item[8,9] Create the root type parameters of type 1 and type 2.
 \item[11-33] We set up a simple root system by hand. First we define the tap root L11-L24, then the laterals L26-L33. In L20 and L21 we have to convert the Python types to the exposed C++ types.
-\item[35,36] Set the root type parameters
+\item[35,36] Set the root type parameters.
 
 \item[38-43] Create the root system parameter stating when basal and shoot borne roots emerge.
 
@@ -442,7 +446,7 @@ $minS$ outside the geometry, and linear slope with length $slope$. At the bounda
 
 \item[39] Exports the root system geometry
 
-\item[42-43] We actually do not wish to set this geometry, but we just abuse the writer of the class RootSytem to export a Python script showing the layer geometry. The resulting ParaView visualization is presented in Figure \ref{fig:chemo}.
+\item[42-43] We actually do not wish to set this geometry, but we abuse the writer of the class RootSytem to export a Python script showing the layer geometry. The resulting ParaView visualization is presented in Figure \ref{fig:chemo}.
 
 \end{itemize}
 
@@ -460,33 +464,54 @@ Normally, the simulation is created from a set of parameters. For tropisms these
 There are two ways to add user defined tropisms: 
 
 \begin{enumerate}
-\item The first is C++ only: It is to extend the CRootBox class and overwrite the method RootSystem:createTropism. 
-This is the function that is called, when the tropisms are created from the parameters ($tt$, $N$, $sigma$). This is necessary when user defined tropism are created from a parameter file, where $tt$ is the number of the new tropism type. 
-\item The second is to manually set the tropisms using the method RootSystem: :setTropism. Make sure to call Rootsystem: :setTropism($\dots$) after Rootsystem: :initialize().
+\item The first is C++ only: It is to extend the CRootBox class and overwrite the method RootSystem::createTropism. 
+This is the function that is called, when the tropisms are created from the parameters ($tt$, $N$, $\sigma$) in RootSystem::initialize(). 
+This is necessary when user defined tropism are created from a parameter file, where $tt$ is the number of the new tropism type. 
+\item The second is to manually set the tropisms using the method RootSystem: :setTropism. Make sure to call Rootsystem::setTropism($\dots$) after Rootsystem::initialize().
 \end{enumerate}
 
 In both approaches the user has to extend the new tropism class from the class Tropism. 
 If just the objective function of the tropism is changed, it is enough to overwrite Tropism::tropismObjective. 
 This can done in Python or in C++,the classes Hydrotropism, Gravitropism, and Plagiotropism are examples for this procedure.
 
-If the whole concept of the random optimization is altered, Tropism::getUCHeading must be overwritten. If the geometry model is also changed Tropism::getHeading.
+If the whole concept of the random optimization is altered, Tropism: :getUCHeading must be overwritten. 
+If the geometry model is also changed Tropism: :getHeading must be overwritten.
 
 The following example shows how to implement a new tropism in Python. Two new tropism are introduced:
-The first does nothing put outputs the incoming arguments of the method Tropism::tropismObjective to the command line.  
-The second one, is a Plagiotropism that changes with time to Gravitropism.
+The first does nothing put to output the incoming arguments of the method Tropism::tropismObjective to the command line (e.g. for debugging).  
+The second one, is a Plagiotropism that changes with time to Gravitropism depending on the root age.
 
 \lstinputlisting[language=Python, caption=Example 4b]{../example4b.py}
 
 \begin{itemize}
 
-\item[3-14] Creates a new tropism that just writes incoming arguments of Tropism::tropismObjective to the command line. This can be used for debugging. The new class is extended from rb.Tropism, 
+\item[3-14] Creates a new tropism that just writes incoming arguments of Tropism: :tropismObjective to the command line. This can be used for debugging. The new class is extended from rb.Tropism, 
 and the method Tropism::tropismObjective is overwritten with the right number of arguments.
 
-\item[16-32] Again, we extend the class from Tropism::tropismObjective.
+\item[16-32] Again, we extend the new class from rb.Tropism. In L19-24 we define our own constructor.
+Doing this two things are important: (1) the constructor of the super class must be called (L20), and (2) the tropism parameters $n$, and $\sigma$ must be set (L23). 
+Furthermore, the constructor defines two tropisms: plagio- and gravitropism, that are used in Tropism::tropismObjective at a later point, and a root age, when to switch from plagi- to gravitropism. \\
+In L26-L32 the method Tropism::tropismObjective is defined. We choose the predefined objective function depending on the root age.
 
+\item[34-38] Sets up the simulation.
 
+\item[40-44] L40,L41 creates the first user defined tropsim. Since we did not define a constructor Tropism::setTropismParameter must be called. L43 creates the second user defined tropism. 
+In L44 the tropism is chosen, using the method Tropism::setTropism. The second argument states for which root type it applies. 
+Number 2 is the root type number of the laterals, -1 states that the tropism applies for all root types (default = -1).
+
+\item[46-51] The simulation loop. 
+
+\item [54] Exports the result producing Figure (\ref{fig:tropism}). Comparing to Figure (\ref{fig:basicA}) we can see the effect of the new user defined tropsim.
 
 \end{itemize}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth]{example4b.png}
+\caption{Depending on root age the laterals follow plagio- or gravitropism (Example 4b)} \label{fig:tropism}
+\end{figure}
+
+
 
 \subsection{Scaling elongation rate, insertion angle, and lateral emergence probability} \label{sec:elongation}
 
@@ -498,7 +523,7 @@ The insertion angle is reported to be dependent on nutrient supply in some speci
 
 The scaling itself can be performed in the following way:
 
-\lstinputlisting[firstline=1,lastline=50, language=Python, caption=Example 4c]{../example4c.py}
+\lstinputlisting[firstline=1,lastline=50, language=Python, caption=Example 4c (1)]{../example4c.py}
 
 \begin{itemize}
 
@@ -507,7 +532,7 @@ The scaling itself can be performed in the following way:
 \item[8-13] We create a confining box with two overlapping boxes left and right. This geometries are used for later analysis.
 
 \item[15-21] We define two static soil properties using SDF (L20, L21) as explained in Section \ref{sec:hydro}. 
-The left compartment has the value $minS$, the right $maxS$, between them is a linear gradient of length $slope$
+The left compartment has the value $minS$, the right $maxS$, between them is a linear gradient of length $slope$.
 
 \item[23-34] Sets the scaling functions. L24-L28 adjusts axial resolution and tortuosity $sigma$. L31 sets the scale elongation function $se$ to the soil property. L34 sets the scale insertion angle function $sa$. 
 Comment and uncomment the relevant code parts to achieve the desired scaling, to achieve the resulting Figures \ref{fig:elongation} and \ref{fig:insertion}.
@@ -516,8 +541,7 @@ Comment and uncomment the relevant code parts to achieve the desired scaling, to
 First, we increase the number of laterals of the first laterals (root type 2) by a factor of five and decrease the inter-nodal distances for the same factor L37-L39. This is the maximal lateral density that can be achieved.
 Then, we set the scale branching probability function $sbp$ to the soil property defined in L21, see Figure \ref{fig:probability}.
 
-\item[44-49] Initialization and simulation loop
-
+\item[44-49] Initialization and simulation loop.
 
 \end{itemize}
 
@@ -537,11 +561,9 @@ Then, we set the scale branching probability function $sbp$ to the soil property
 \caption{Predefined root responses (Example 4c)}
 \end{figure}
 
+When playing with model parameters, it is not always clear if the suggested effect is realized from the figures alone. The following script helps to quantify the effects of above simulation: 
 
-When playing around with the model parameters, it is not always clear if the suggested effect is realized from the figures alone. 
-The following script helps to quantify the effects of above simulation: 
-
-\lstinputlisting[firstline=51,lastline=81, language=Python, caption=Example 4c]{../example4c.py}
+\lstinputlisting[firstline=51,lastline=81, language=Python, caption=Example 4c (2)]{../example4c.py}
 
 
 
