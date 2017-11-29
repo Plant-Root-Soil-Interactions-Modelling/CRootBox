@@ -31,11 +31,10 @@ class My_Age_Tropism(rb.Tropism):
         else:
             return self.gravi.tropismObjective(pos, old, a, b, dx, root)
         
+# set up the root system
 rs = rb.RootSystem()
 name = "Anagallis_femina_Leitner_2010" 
 rs.openFile(name)
-
-# Initialize
 rs.initialize()
 
 # Set useer defined after initialize
