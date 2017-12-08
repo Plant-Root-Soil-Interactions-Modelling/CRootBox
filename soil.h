@@ -99,8 +99,6 @@ protected:
 
 /**
  * 1D look up table
- *
- *
  */
 class Grid1D  : public SoilLookUp
 {
@@ -122,7 +120,7 @@ public:
 		jl=0;
 		jr=n;
 		while (jr-jl > 1) {
-			jm=(jr+jl) >> 1; // thats divided by two
+			jm=(jr+jl) >> 1; // thats a divided by two
 			if (x >= grid[jm])
 				jl=jm;
 			else
@@ -237,7 +235,7 @@ class EquidistantGrid3D : public RectilinearGrid3D
 		delete xgrid;
 		delete ygrid;
 		delete zgrid;
-	};
+	}
 
 };
 
