@@ -39,6 +39,6 @@ for i in range(0,round(N)):
     
     rs.simulate(dt,True)
 
-rs.write("results/example_4b_2.vtp")  
+rs.write("results/example_4c_2.vtp")  
 
 print("fin")

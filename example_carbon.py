@@ -52,21 +52,34 @@ maxinc = 20; # maximal length increment (cm/day), TODO base this value on some f
 rs = rb.RootSystem()
 name = "Zea_mays_4_Leitner_2014" 
 rs.openFile(name) 
+
+# Set up depth dependent elongation scaling function
+scale_elongation = rb.EquidistantGrid1D(0,-50, 100) # for root elongation from 0 cm to -50 cm, 100 nodes = 99 layers
+soil_strength = np.ones((99,))*0.5 # some data for the 99 layers, e.g. np.linspace(0.1, 1., 99)          
+scales = np.exp(-0.4*soil_strength) # scales from some equation (scale = function(soil_strength) ), where scale in (0,1)
+scale_elongation.data = a2v(scales) # set proportionality factors
+  
+# Proportionally scale this function
+se = rb.ProportionalElongation()
+se.setBaseLookUp(scale_elongation)
+  
+# Manually set scaling function 
+for i in range(0,10):  
+    p = rs.getRootTypeParameter(i+1)
+    p.se = se
+
 rs.initialize() 
 
-# Create proportional elongation callback 
-se = rb.ProportionalElongation()
-se.setScale(1.)
-for i in range(0,10): # set scale elongation in the root type parameters
-    p = rs.getRootTypeParameter(i+1)
-    p.se = se # se = scale elongation 
- 
 ol = 0
  
 # Simulation loop
 for i in range(0,N):    
     
-    print("\nSimulation", i)
+    print("\nSimulation step", i)
+
+    # if maxinc is dynamic: set maxinc (cm/day) according to some model
+    
+    # if soil_strength is dynamic: update soil_strength according to some model (update like in L57-L60)
     
     rs.simulate(dt, maxinc, se, True) # True = disable debug messages, False = enable debug messages
         
@@ -74,7 +87,7 @@ for i in range(0,N):
     inc =  l - ol
     ol = l
         
-    print("elongated ", inc, " cm")    
+    print("elongated for", inc, " cm")    
         
 rs.write("results/example_carbon.vtp")
 

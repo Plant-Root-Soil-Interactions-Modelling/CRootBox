@@ -82,16 +82,24 @@ public:
 class ProportionalElongation : public SoilLookUp
 {
 public:
+
 	void setScale(double s) { scale = s; }
 
+	void setBaseLookUp(SoilLookUp* baseLookUp) { this->baseLookUp=baseLookUp; } ///< proportionally scales a base soil look up
+
 	virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
-		return scale;
+		if (baseLookUp==nullptr) {
+			return scale;
+		} else {
+			return baseLookUp->getValue(pos,root)*scale;  //super impose scaling on a base soil look up function
+		}
 	}
 
 	virtual std::string toString() const override { return "ProportionalElongation"; } ///< Quick info about the object for debugging
 
 protected:
 	double scale = 1.;
+	SoilLookUp* baseLookUp = nullptr;
 
 };
 

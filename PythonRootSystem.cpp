@@ -259,6 +259,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	class_<ProportionalElongation, ProportionalElongation*, bases<SoilLookUp>>("ProportionalElongation",init<>())
 			.def("getValue", &ProportionalElongation::getValue, getValue_overloads())
 			.def("setScale", &ProportionalElongation::setScale)
+			.def("setBaseLookUp", &ProportionalElongation::setBaseLookUp)
 			.def("__str__",&ProportionalElongation::toString)
 	;
 	class_<Grid1D, Grid1D*, bases<SoilLookUp>>("Grid1D",init<>())
