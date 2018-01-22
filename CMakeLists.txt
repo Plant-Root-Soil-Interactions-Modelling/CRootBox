@@ -20,6 +20,40 @@ set(CMAKE_BUILD_TYPE Release)
 # add source directory to the include path
 include_directories(${PROJECT_SOURCE_DIR})
 
-# make root box a library
-file(GLOB all_sources *.cpp)
-add_library(CRootBox ${all_sources})
+# 
+# 1 Make RootBox library
+#
+
+# file(GLOB all_sources *.cpp) # i changed that to exclude PythonRootSystem.cpp
+add_library(CRootBox
+analysis.cpp
+ModelParameter.cpp
+Root.cpp
+RootSystem.cpp
+sdf.cpp
+tropism.cpp
+)
+
+#
+# 2 Make py_rootbox library
+#
+
+# Find necessary packages for py_rootbox
+find_package(PythonLibs 3 REQUIRED)
+include_directories( ${PYTHON_INCLUDE_DIRS} ) 
+find_package( Boost COMPONENTS python-py36 REQUIRED )
+include_directories( ${Boost_INCLUDE_DIR} )
+
+# make shared library for Pyhton binding
+add_library(py_rootbox SHARED PythonRootSystem.cpp 
+analysis.cpp
+ModelParameter.cpp
+Root.cpp
+RootSystem.cpp
+sdf.cpp
+tropism.cpp
+examples/Exudation/gauss_legendre.cpp)
+set_property(TARGET py_rootbox PROPERTY POSITION_INDEPENDENT_CODE ON)
+target_link_libraries(py_rootbox ${Boost_LIBRARIES} )
+set_target_properties(py_rootbox PROPERTIES PREFIX "" )
+
