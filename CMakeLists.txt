@@ -21,7 +21,7 @@ set(CMAKE_BUILD_TYPE Release)
 include_directories(${PROJECT_SOURCE_DIR})
 
 # 
-# 1 Make RootBox library
+# 1. Make RootBox library
 #
 
 # file(GLOB all_sources *.cpp) # i changed that to exclude PythonRootSystem.cpp
@@ -35,13 +35,14 @@ tropism.cpp
 )
 
 #
-# 2 Make py_rootbox library
+# 2. Make py_rootbox library
 #
 
 # Find necessary packages for py_rootbox
 find_package(PythonLibs 3 REQUIRED)
+find_package(PythonInterp 3 REQUIRED) # creates PYTHON_VERSION_MAJOR, PYTHON_VERSION_MINOR
 include_directories( ${PYTHON_INCLUDE_DIRS} ) 
-find_package( Boost COMPONENTS python-py36 REQUIRED )
+find_package( Boost COMPONENTS python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} REQUIRED )
 include_directories( ${Boost_INCLUDE_DIR} )
 
 # make shared library for Pyhton binding
