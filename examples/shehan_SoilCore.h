@@ -20,7 +20,7 @@ using namespace std;
 vector<RootSystem*> initializeRootSystems(string name, SignedDistanceFunction* geom = new SignedDistanceFunction())
 {
 	auto gen = mt19937(chrono::system_clock::now().time_since_epoch().count());
-	auto UD = uniform_real_distribution<double>(0,1); // random stuff, does it work now?
+	auto UID = std::uniform_int_distribution<unsigned int>(); // random stuff, does it work now?
 	int M=6;
 	int N=37;
 	double dist1 = 18; // [cm] (M-1)*18 = 90
@@ -34,7 +34,7 @@ vector<RootSystem*> initializeRootSystems(string name, SignedDistanceFunction* g
 			rs->setGeometry(geom);
 			rs->getRootTypeParameter(4)->theta = 80./180.*M_PI; // fix insertion angle of the basal roots
 			rs->getRootSystemParameter()->seedPos = Vector3d(dist1*i,dist2*j,-3); // set position of seed [cm]
-			double s = UD(gen);
+			unsigned int s = UID(gen);
 			rs->setSeed(s); // randomly select a seed
 			rs->initialize();
 		}

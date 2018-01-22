@@ -105,7 +105,6 @@ public:
 	void push();
 	void pop();
 
-
 	// Output Simulation results
 	void write(std::string name) const; /// writes simulation results (type is determined from file extension in name)
 	void writeRSML(std::ostream & os) const; ///< writes current simulation results as RSML
