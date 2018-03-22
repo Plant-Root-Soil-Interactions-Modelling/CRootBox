@@ -1,28 +1,31 @@
 import scipy.sparse.linalg as LA
 from scipy import sparse
+import matplotlib.pylab as plt
 
 import py_rootbox as rb    
 from rb_tools import *
 
 import xylem_flux 
 
+import timeit
+
+
 # Simulate a root system
-name = "Sorghum_bicolor_NA_NA"
+name = "Triticum_aestivum_a_Bingham_2011"
 dt = 30 # days
 rs = rb.RootSystem()
 rs.openFile(name)
 rs.initialize() 
-rs.simulate(dt) 
+rs.simulate(dt)
+# for i in range(0,7):
+#     rs.simulate(1) 
 
 # Create graph
 nodes = vv2a(rs.getNodes())/100 # convert from cm to m 
 rseg = seg2a(rs.getSegments()) # root system segments
 sseg = seg2a(rs.getShootSegments()) # additional shoot segments
 seg = np.vstack((sseg,rseg))
-
-print(sseg)
-print(nodes[0,:])
-print(rseg)
+print("number of segments",len(seg))
 
 # Adjacency matrix
 A = sparse.coo_matrix((np.ones(seg.shape[0]),(seg[:,0],seg[:,1]))) 
@@ -47,33 +50,37 @@ kr.resize((kr.shape[0],1))
 kz = np.array(list(map(lambda t: rs_Kz[int(t)-1], type)))     
 kz.resize((kz.shape[0],1))          
 
+# glue together shoot and root segments
 shoot1 = np.ones((sseg.shape[0],1))                    
 shoot0 = np.ones((sseg.shape[0],1))
-          
+radius = np.vstack((shoot1,radius))
+kr =  np.vstack((shoot0,kr))
+kz =  np.vstack((shoot1,kz))  
+            
 # Call back function for soil potential
 soil = lambda x,y,z : soil_psi
 
-# glue together shoot and root segments
-radius = np.vstack((shoot1,radius))
-kr =  np.vstack((shoot0,kr))
-kz =  np.vstack((shoot1,kz))
-
 # Calculate fluxes within the root system
-Q, b = xylem_flux.linear_system(seg, nodes, radius, kr, kz, rho, g, soil) 
+Q, b = xylem_flux.linear_system(seg, nodes, radius, kr, kz, rho, g, soil)
+# plt.spy(Q)
+# plt.show()
 Q, b = xylem_flux.bc_neumann(Q, b, np.array([0]), np.array([pot_trans]))
-x = LA.spsolve(Q, b) # direct
-          
+
+
+start = timeit.default_timer()
+x = LA.spsolve(Q, b, use_umfpack = True) # direct
+stop = timeit.default_timer()
+print ("linear system solved in", stop - start, " s") 
+      
 # Save results into vtp 
 segP = nodes2seg(nodes,seg,x)# save vtp 
 axial_flux = xylem_flux.axial_flux(x, seg, nodes, kz, rho, g)
 radial_flux = xylem_flux.radial_flux(x, seg, nodes, radius, kr, soil)
 net_flux = axial_flux+radial_flux
 
-print(segP)
+rs_ana.addUserData(a2v(segP[sseg.shape[0]:]),"pressure")
+rs_ana.addUserData(a2v(axial_flux[sseg.shape[0]:]),"axial_flux")
+rs_ana.addUserData(a2v(radial_flux[sseg.shape[0]:]),"radial_flux")
+rs_ana.addUserData(a2v(net_flux[sseg.shape[0]:]),"net_flux")
 
-
-# rs_ana.addUserData(a2v(segP[sseg.shape[0]:-1]),"pressure")
-rs_ana.addUserData(a2v(axial_flux[sseg.shape[0]:-1]),"axial_flux")
-rs_ana.addUserData(a2v(radial_flux[sseg.shape[0]:-1]),"radial_flux")
-rs_ana.addUserData(a2v(net_flux[sseg.shape[0]:-1]),"net_flux")
 rs_ana.write("results/example_5a.vtp")         

@@ -79,7 +79,7 @@ for i in range(0,N):
 
     # if maxinc is dynamic: set maxinc (cm/day) according to some model
     
-    # if soil_strength is dynamic: update soil_strength according to some model (update like in L57-L60)
+    # if soil_strength is dynamic: update soil_strength according to some model (update like in L58-L60)
     
     rs.simulate(dt, maxinc, se, True) # True = disable debug messages, False = enable debug messages
         
