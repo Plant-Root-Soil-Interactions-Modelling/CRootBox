@@ -24,7 +24,7 @@ def toHead(pa): # Pascal (kg/ (m s^2)) to cm pressure head
 
 # Parameters
 
-L = 0.5;               # length of single straight root (m)
+L = 0.5                # length of single straight root (m)
 a = 2.e-3              # radius (m)
 kz = 5.e-13            # axial conductivity (m^5 s / kg) (mal rho ergibt die alten einheiten)
 kr = 2.e-9          # radial conductivity per root type (m^2 s / kg) 
@@ -53,7 +53,7 @@ c = 2*a*pi*kr/kz
 # bot: qz(L) = 0, -> d/dz p_r (L) = rho*g 
 
 AA = np.array([[1,1], [sqrt(c)*exp(-sqrt(c)*L), -sqrt(c)*exp(sqrt(c)*L)] ]) # dirichlet top, neumann bot
-bb = np.array([p0-p_s, rho*g]) #
+bb = np.array([p0-p_s, -rho*g]) #
 
 # AA = np.array([[1,1], [exp(-sqrt(c)*L), exp(sqrt(c)*L)] ]) # dirichlet top & bot
 # bb = np.array([p0-p_s, pL-p_s]) #
