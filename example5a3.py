@@ -53,7 +53,7 @@ c = 2*a*pi*kr/kz
 # bot: qz(L) = 0, -> d/dz p_r (L) = rho*g 
 
 AA = np.array([[1,1], [sqrt(c)*exp(-sqrt(c)*L), -sqrt(c)*exp(sqrt(c)*L)] ]) # dirichlet top, neumann bot
-bb = np.array([p0-p_s, -rho*g]) #
+bb = np.array([p0-p_s, rho*g]) #
 
 # AA = np.array([[1,1], [exp(-sqrt(c)*L), exp(sqrt(c)*L)] ]) # dirichlet top & bot
 # bb = np.array([p0-p_s, pL-p_s]) #

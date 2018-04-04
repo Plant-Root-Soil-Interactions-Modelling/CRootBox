@@ -53,7 +53,7 @@ def linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p):
         bi = a*math.pi*l*kr[c]*p_s # first term of Eqn (12) & (13)            
         
         # edge ij
-        b[i] +=  ( bi + kz[c]*rho*g*vz )  # Eqn (12)     
+        b[i] +=  ( bi - kz[c]*rho*g*vz )  # Eqn (12)     
         
         I[k] = i
         J[k] = i     
@@ -67,7 +67,7 @@ def linear_system(seg, nodes, radius, kr, kz, rho, g, soil_p):
         
         # edge ji
         i, j = j, i
-        b[i] += ( bi - kz[c]*rho*g*vz ) # Eqn (13) 
+        b[i] += ( bi + kz[c]*rho*g*vz ) # Eqn (13) 
   
         I[k] = i
         J[k] = i  
