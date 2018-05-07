@@ -71,7 +71,10 @@ for t in range(0,ntimestep):
 	#https://docs.scipy.org/doc/numpy/reference/generated/numpy.savez.html
 	#np.savez(nameOutputFile, z=z, RLD=RLD)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5408058955cd2d85b9a28a7aac3821732ef341e0
 # Export root systems (for visualisation) as single vtp files (as polylines)
 c = 0
 ana = rb.SegmentAnalyser() # see example 3b
