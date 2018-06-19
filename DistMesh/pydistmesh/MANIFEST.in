@@ -1,3 +1,0 @@
-include README.rst COPYING.txt
-recursive-include distmesh *.pyx
-recursive-include distmesh/src *.c *.h
