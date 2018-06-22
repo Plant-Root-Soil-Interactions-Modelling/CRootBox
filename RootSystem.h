@@ -17,7 +17,47 @@
 class Root;
 class RootState;
 class Tropism;
-class RootSystemState;
+class RootSystem;
+
+/**
+ * Sores a state of the RootSystem,
+ * i.e. all data that changes over time (*), i.e. excluding node data that cannot change
+ *
+ * (*) excluding changes regarding RootSystemParameter, any RootTypeParameter, confining geometry, and soil
+ */
+class RootSystemState
+{
+
+	friend RootSystem;
+
+public:
+
+	RootSystemState(const RootSystem& rs);
+
+	void restore(RootSystem& rs);
+
+private:
+
+	std::vector<RootState> baseRoots;  ///< Base roots of the root system
+
+	// copy because of random generator seeds
+	std::vector<Tropism*> tf;
+	std::vector<GrowthFunction*> gf;
+	std::vector<RootTypeParameter> rtparam;
+
+	double simtime = 0;
+	int rid = -1; // unique root id counter
+	int nid = -1; // unique node id counter
+	int old_non=0;
+	int old_nor=0;
+	int numberOfCrowns = 0;
+	bool manualSeed = false;
+
+	mutable std::mt19937 gen;
+	mutable std::uniform_real_distribution<double> UD;
+	mutable std::normal_distribution<double> ND;
+
+};
 
 /**
  * RootSystem
@@ -157,52 +197,7 @@ private:
 	std::uniform_int_distribution<unsigned int> UID; // to seed other random number generators
 	std::normal_distribution<double> ND;
 
-	std::stack<RootSystemState> stateStack = std::stack<RootSystemState>();
-
+	std::stack<RootSystemState> stateStack;
 };
-
-
-
-/**
- * Sores a state of the RootSystem,
- * i.e. all data that changes over time (*), i.e. excluding node data that cannot change
- *
- * (*) excluding changes regarding RootSystemParameter, any RootTypeParameter, confining geometry, and soil
- */
-class RootSystemState
-{
-
-	friend RootSystem;
-
-public:
-
-	RootSystemState(const RootSystem& rs);
-
-	void restore(RootSystem& rs);
-
-private:
-
-	std::vector<RootState> baseRoots;  ///< Base roots of the root system
-
-	// copy because of random generator seeds
-	std::vector<Tropism*> tf;
-	std::vector<GrowthFunction*> gf;
-	std::vector<RootTypeParameter> rtparam;
-
-	double simtime = 0;
-	int rid = -1; // unique root id counter
-	int nid = -1; // unique node id counter
-	int old_non=0;
-	int old_nor=0;
-	int numberOfCrowns = 0;
-	bool manualSeed = false;
-
-	mutable std::mt19937 gen;
-	mutable std::uniform_real_distribution<double> UD;
-	mutable std::normal_distribution<double> ND;
-
-};
-
-
 
 #endif /* ROOTSYSTEM_H_ */
