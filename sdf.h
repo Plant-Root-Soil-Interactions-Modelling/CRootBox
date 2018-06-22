@@ -182,7 +182,7 @@ class SDF_Difference : public SDF_Intersection
 {
 
 public:
-    SDF_Difference(std::vector<SignedDistanceFunction*> sdfs_) :SDF_Intersection(sdfs) { } ///< Constructs (...((sdfs_[0] \ sdfs_[1]) \ sdfs_[2])...)
+    SDF_Difference(std::vector<SignedDistanceFunction*> sdfs) :SDF_Intersection(sdfs) { } ///< Constructs (...((sdfs_[0] \ sdfs_[1]) \ sdfs_[2])...)
     SDF_Difference(SignedDistanceFunction* sdf1, SignedDistanceFunction* sdf2) :SDF_Intersection(sdf1,sdf2) { } ///< Constructs sdf1 \ sdf2
 
     virtual double getDist(const Vector3d& v) const;  ///< @see SignedDistanceFunction::getDist
