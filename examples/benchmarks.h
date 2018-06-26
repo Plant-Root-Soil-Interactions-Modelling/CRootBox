@@ -22,7 +22,7 @@ void benchmark(const std::string& name, const std::vector<double>& times, const 
 {
   using namespace std;
   RootSystem rs1;
-  rs1.openFile(name,"modelparameter_bu/");
+  rs1.openFile(name,"../modelparameter_bu/");
   rs1.getRootTypeParameter(1)->dx=dx; // apply axial resolution
   rs1.getRootTypeParameter(2)->dx=dx; // apply axial resolution
   rs1.initialize();
