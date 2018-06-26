@@ -28,3 +28,7 @@ To build the shared library py_rootbox for coupling with Python pleaser refer to
 
 # References
 Andrea Schnepf, Daniel Leitner, Magdalena Landl, Guillaume Lobet, Trung Hieu Mai, Shehan Morandage, Cheng Sheng, Mirjam Zörner, Jan Vanderborght, Harry Vereecken; CRootBox: a structural–functional modelling framework for root systems, Annals of Botany, Volume 121, Issue 5, 18 April 2018, Pages 1033–1053, https://doi.org/10.1093/aob/mcx221
+
+STATISTICAL CHARACTERIZATION OF THE ROOT SYSTEM ARCHITECTURE MODEL CROOTBOX
+Andrea Schnepf; Katrin Huber; Magdalena Landl; Félicien Meunier; Lukas Petrich; Volker Schmidt
+doi: 10.2136/vzj2017.12.0212; Date posted: May 04, 2018
