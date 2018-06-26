@@ -7,9 +7,10 @@
 #include "Root.h"
 #include "soil.h"
 
+namespace CRootBox {
+
 class Root;
 class SoilLookUp;
-
 
 
 /**
@@ -189,10 +190,10 @@ public:
     ///< linearly combines the objective functions of two tropism funcitons
 
     CombinedTropism(CombinedTropism& t): Tropism(t), weights(t.weights) {
-    	tropisms = std::vector<Tropism*>(t.tropisms.size());
-    	for (size_t i=0; i<tropisms.size(); i++) {
-    		tropisms[i] = t.tropisms[i]->copy();
-    	}
+        tropisms = std::vector<Tropism*>(t.tropisms.size());
+        for (size_t i=0; i<tropisms.size(); i++) {
+            tropisms[i] = t.tropisms[i]->copy();
+        }
     }
 
     virtual Tropism* copy() override { return new CombinedTropism(*this); } ///< copy constructor
@@ -205,6 +206,6 @@ private:
     std::vector<double> weights;
 };
 
-
+} // end namespace CRootBox
 
 #endif

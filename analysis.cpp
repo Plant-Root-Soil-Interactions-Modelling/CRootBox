@@ -2,6 +2,8 @@
 #include <iostream>
 #include <iomanip>
 
+namespace CRootBox {
+
 /**
  * Copies the segments of the roots system into the analysis class
  *
@@ -9,13 +11,13 @@
  */
 SegmentAnalyser::SegmentAnalyser(const RootSystem& rs)
 {
-	nodes = rs.getNodes();
-	segments = rs.getSegments();
-	ctimes = rs.getNETimes();
-	segO = rs.getSegmentsOrigin();
-	assert(segments.size()==ctimes.size());
-	assert(segments.size()==segO.size());
-	this->rs = &rs; // needed for dgf writer, only
+    nodes = rs.getNodes();
+    segments = rs.getSegments();
+    ctimes = rs.getNETimes();
+    segO = rs.getSegmentsOrigin();
+    assert(segments.size()==ctimes.size());
+    assert(segments.size()==segO.size());
+    this->rs = &rs; // needed for dgf writer, only
 }
 
 /**
@@ -23,7 +25,7 @@ SegmentAnalyser::SegmentAnalyser(const RootSystem& rs)
  */
 void SegmentAnalyser::addSegments(const RootSystem& rs)
 {
-	addSegments(SegmentAnalyser(rs));
+    addSegments(SegmentAnalyser(rs));
 }
 
 /**
@@ -31,18 +33,18 @@ void SegmentAnalyser::addSegments(const RootSystem& rs)
  */
 void SegmentAnalyser::addSegments(const SegmentAnalyser& a)
 {
-	int offset = nodes.size();
-	nodes.insert(nodes.end(),a.nodes.begin(),a.nodes.end()); // copy nodes
-	auto ns = a.segments;
-	for (auto& s : ns) { // shift indices
-		s.x += offset;
-		s.y += offset;
-	}
-	segments.insert(segments.end(),ns.begin(),ns.end()); // copy segments
-	ctimes.insert(ctimes.end(),a.ctimes.begin(),a.ctimes.end()); // copy times
-	segO.insert(segO.end(),a.segO.begin(),a.segO.end());// copy origins
-	assert(segments.size()==ctimes.size());
-	assert(segments.size()==segO.size());
+    int offset = nodes.size();
+    nodes.insert(nodes.end(),a.nodes.begin(),a.nodes.end()); // copy nodes
+    auto ns = a.segments;
+    for (auto& s : ns) { // shift indices
+        s.x += offset;
+        s.y += offset;
+    }
+    segments.insert(segments.end(),ns.begin(),ns.end()); // copy segments
+    ctimes.insert(ctimes.end(),a.ctimes.begin(),a.ctimes.end()); // copy times
+    segO.insert(segO.end(),a.segO.begin(),a.segO.end());// copy origins
+    assert(segments.size()==ctimes.size());
+    assert(segments.size()==segO.size());
 }
 
 /**
@@ -53,73 +55,73 @@ void SegmentAnalyser::addSegments(const SegmentAnalyser& a)
  */
 std::vector<double> SegmentAnalyser::getScalar(int st) const
 {
-	std::vector<double> data(segO.size());
+    std::vector<double> data(segO.size());
 
-	if (st==RootSystem::st_time) {
-		data = ctimes;
-		return data;
-	}
-	if (st==RootSystem::st_userdata1) {
-		data = userData.at(0);
-		return data;
-	}
-	if (st==RootSystem::st_userdata2) {
-		data = userData.at(1);
-		return data;
-	}
-	if (st==RootSystem::st_userdata3) {
-		data = userData.at(2);
-		return data;
-	}
+    if (st==RootSystem::st_time) {
+        data = ctimes;
+        return data;
+    }
+    if (st==RootSystem::st_userdata1) {
+        data = userData.at(0);
+        return data;
+    }
+    if (st==RootSystem::st_userdata2) {
+        data = userData.at(1);
+        return data;
+    }
+    if (st==RootSystem::st_userdata3) {
+        data = userData.at(2);
+        return data;
+    }
 
-	double v = 0; // value
-	for (size_t i=0; i<segO.size(); i++) {
-		const auto& r = segO.at(i);
-		switch (st) {
-		case RootSystem::st_type:
-			v=r->param.type;
-			break;
-		case RootSystem::st_radius:
-			v=r->param.a;
-			break;
-		case RootSystem::st_order: {
-			Root* r_ = r;
-			while (r_->parent!=nullptr) { // find root order
-				v++;
-				r_=r_->parent;
-			}
-		}
-		break;
-		case RootSystem::st_length: { // compute segment length
-			v = getSegmentLength(i);
-		}
-		break;
-		case RootSystem::st_surface: { // compute segment surface
-			v = getSegmentLength(i)*2*M_PI*r->param.a;
-		}
-		break;
-		case RootSystem::st_volume: {
-			v =  getSegmentLength(i)*M_PI*(r->param.a)*(r->param.a);
-		}
-		break;
-		case RootSystem::st_one: { // e.g. for counting segments
-			v = 1;
-		}
-		break;
-		case RootSystem::st_parenttype: {
-			if (r->parent!=nullptr) {
-				v = r->parent->param.type;
-			} else {
-				v = 0;
-			}
-			break;
-		}
-		default:
-			throw std::invalid_argument( "SegmentAnalyser::getScalar: Type not implemented" );
-		}
-		data.at(i) = v;
-	}
-	return data;
+    double v = 0; // value
+    for (size_t i=0; i<segO.size(); i++) {
+        const auto& r = segO.at(i);
+        switch (st) {
+        case RootSystem::st_type:
+            v=r->param.type;
+            break;
+        case RootSystem::st_radius:
+            v=r->param.a;
+            break;
+        case RootSystem::st_order: {
+            Root* r_ = r;
+            while (r_->parent!=nullptr) { // find root order
+                v++;
+                r_=r_->parent;
+            }
+        }
+        break;
+        case RootSystem::st_length: { // compute segment length
+            v = getSegmentLength(i);
+        }
+        break;
+        case RootSystem::st_surface: { // compute segment surface
+            v = getSegmentLength(i)*2*M_PI*r->param.a;
+        }
+        break;
+        case RootSystem::st_volume: {
+            v =  getSegmentLength(i)*M_PI*(r->param.a)*(r->param.a);
+        }
+        break;
+        case RootSystem::st_one: { // e.g. for counting segments
+            v = 1;
+        }
+        break;
+        case RootSystem::st_parenttype: {
+            if (r->parent!=nullptr) {
+                v = r->parent->param.type;
+            } else {
+                v = 0;
+            }
+            break;
+        }
+        default:
+            throw std::invalid_argument( "SegmentAnalyser::getScalar: Type not implemented" );
+        }
+        data.at(i) = v;
+    }
+    return data;
 }
 
 /**
@@ -130,10 +132,10 @@ std::vector<double> SegmentAnalyser::getScalar(int st) const
  */
 double SegmentAnalyser::getSegmentLength(int i) const
 {
-	Vector2i s = segments.at(i);
-	Vector3d x = nodes.at(s.x);
-	Vector3d y = nodes.at(s.y);
-	return (x.minus(y)).length();
+    Vector2i s = segments.at(i);
+    Vector3d x = nodes.at(s.x);
+    Vector3d y = nodes.at(s.y);
+    return (x.minus(y)).length();
 }
 
 /**
@@ -143,51 +145,51 @@ double SegmentAnalyser::getSegmentLength(int i) const
  */
 void SegmentAnalyser::crop(SignedDistanceFunction* geometry)
 {
-	//std::cout << "cropping " << segments.size() << " segments...";
-	std::vector<Vector2i> seg;
-	std::vector<Root*> sO;
-	std::vector<double> ntimes;
-	for (size_t i=0; i<segments.size(); i++) {
-		auto s = segments.at(i);
-		Vector3d x = nodes.at(s.x);
-		Vector3d y = nodes.at(s.y);
-		bool x_ = geometry->getDist(x)<=0; // in?
-		bool y_ = geometry->getDist(y)<=0; // in?
-		if ((x_==true) && (y_==true)) { //segment is inside
-			seg.push_back(s);
-			sO.push_back(segO.at(i));
-			ntimes.push_back(ctimes.at(i));
-		} else if ((x_==false) && (y_==false)) { // segment is outside
+    //std::cout << "cropping " << segments.size() << " segments...";
+    std::vector<Vector2i> seg;
+    std::vector<Root*> sO;
+    std::vector<double> ntimes;
+    for (size_t i=0; i<segments.size(); i++) {
+        auto s = segments.at(i);
+        Vector3d x = nodes.at(s.x);
+        Vector3d y = nodes.at(s.y);
+        bool x_ = geometry->getDist(x)<=0; // in?
+        bool y_ = geometry->getDist(y)<=0; // in?
+        if ((x_==true) && (y_==true)) { //segment is inside
+            seg.push_back(s);
+            sO.push_back(segO.at(i));
+            ntimes.push_back(ctimes.at(i));
+        } else if ((x_==false) && (y_==false)) { // segment is outside
 
-		} else { // one node is inside, one outside
-			// sort
-			Vector3d in;
-			Vector3d out;
-			int ini;
-			if (x_==true) {
-				in = x;
-				ini = s.x;
-				out = y;
-			} else {
-				in = y;
-				ini = s.y;
-				out = x;
-			}
-			// cut
-			Vector3d newnode = cut(in, out, geometry);
-			// add new segment
-			nodes.push_back(newnode);
-			Vector2i newseg(ini,nodes.size()-1);
-			seg.push_back(newseg);
-			sO.push_back(segO.at(i));
-			ntimes.push_back(ctimes.at(i));
-		}
+        } else { // one node is inside, one outside
+            // sort
+            Vector3d in;
+            Vector3d out;
+            int ini;
+            if (x_==true) {
+                in = x;
+                ini = s.x;
+                out = y;
+            } else {
+                in = y;
+                ini = s.y;
+                out = x;
+            }
+            // cut
+            Vector3d newnode = cut(in, out, geometry);
+            // add new segment
+            nodes.push_back(newnode);
+            Vector2i newseg(ini,nodes.size()-1);
+            seg.push_back(newseg);
+            sO.push_back(segO.at(i));
+            ntimes.push_back(ctimes.at(i));
+        }
 
-	}
-	segments = seg;
-	segO  = sO;
-	ctimes = ntimes;
-	//std::cout << " cropped to " << segments.size() << " segments " << "\n";
+    }
+    segments = seg;
+    segO  = sO;
+    ctimes = ntimes;
+    //std::cout << " cropped to " << segments.size() << " segments " << "\n";
 }
 
 /**
@@ -200,20 +202,20 @@ void SegmentAnalyser::crop(SignedDistanceFunction* geometry)
  */
 void SegmentAnalyser::filter(int st, double min, double max)
 {
-	std::vector<double> data = getScalar(st);
-	std::vector<Vector2i> seg;
-	std::vector<Root*> sO;
-	std::vector<double> ntimes;
-	for (size_t i=0; i<segments.size(); i++) {
-		if ((data.at(i)>=min) && (data.at(i)<=max)) {
-			seg.push_back(segments.at(i));
-			sO.push_back(segO.at(i));
-			ntimes.push_back(ctimes.at(i));
-		}
-	}
-	segments = seg;
-	segO  = sO;
-	ctimes = ntimes;
+    std::vector<double> data = getScalar(st);
+    std::vector<Vector2i> seg;
+    std::vector<Root*> sO;
+    std::vector<double> ntimes;
+    for (size_t i=0; i<segments.size(); i++) {
+        if ((data.at(i)>=min) && (data.at(i)<=max)) {
+            seg.push_back(segments.at(i));
+            sO.push_back(segO.at(i));
+            ntimes.push_back(ctimes.at(i));
+        }
+    }
+    segments = seg;
+    segO  = sO;
+    ctimes = ntimes;
 }
 
 /**
@@ -225,20 +227,20 @@ void SegmentAnalyser::filter(int st, double min, double max)
  */
 void SegmentAnalyser::filter(int st, double value)
 {
-	std::vector<double> data = getScalar(st);
-	std::vector<Vector2i> seg;
-	std::vector<Root*> sO;
-	std::vector<double> ntimes;
-	for (size_t i=0; i<segments.size(); i++) {
-		if (data.at(i)==value) {
-			seg.push_back(segments.at(i));
-			sO.push_back(segO.at(i));
-			ntimes.push_back(ctimes.at(i));
-		}
-	}
-	segments = seg;
-	segO  = sO;
-	ctimes = ntimes;
+    std::vector<double> data = getScalar(st);
+    std::vector<Vector2i> seg;
+    std::vector<Root*> sO;
+    std::vector<double> ntimes;
+    for (size_t i=0; i<segments.size(); i++) {
+        if (data.at(i)==value) {
+            seg.push_back(segments.at(i));
+            sO.push_back(segO.at(i));
+            ntimes.push_back(ctimes.at(i));
+        }
+    }
+    segments = seg;
+    segO  = sO;
+    ctimes = ntimes;
 }
 
 /**
@@ -246,23 +248,23 @@ void SegmentAnalyser::filter(int st, double value)
  * This can save a lot of memory, since AnalysisSDF::crop and AnalysisSDF::filter only delete segments, not unused nodes
  */
 void SegmentAnalyser::pack() {
-	std::vector<double> ni(nodes.size());
-	std::fill(ni.begin(),ni.end(), 0.);
-	std::vector<Vector3d> newnodes;
-	for (auto& s:segments) {
-		if (ni.at(s.x)==0) { // the node is new
-			newnodes.push_back(nodes.at(s.x));
-			ni.at(s.x) = newnodes.size()-1; // set index of the new node
-		}
-		s.x = ni.at(s.x);
-		if (ni.at(s.y)==0) { // the node is new
-			newnodes.push_back(nodes.at(s.y));
-			ni.at(s.y) = newnodes.size()-1; // set index of the new node
-		}
-		s.y = ni.at(s.y);
-	}
-	// std::cout << "pack(): nodes: " << nodes.size() << " -> " << newnodes.size() << ", " << double(newnodes.size())/double(nodes.size()) << " \n";
-	nodes = newnodes; // kabum!
+    std::vector<double> ni(nodes.size());
+    std::fill(ni.begin(),ni.end(), 0.);
+    std::vector<Vector3d> newnodes;
+    for (auto& s:segments) {
+        if (ni.at(s.x)==0) { // the node is new
+            newnodes.push_back(nodes.at(s.x));
+            ni.at(s.x) = newnodes.size()-1; // set index of the new node
+        }
+        s.x = ni.at(s.x);
+        if (ni.at(s.y)==0) { // the node is new
+            newnodes.push_back(nodes.at(s.y));
+            ni.at(s.y) = newnodes.size()-1; // set index of the new node
+        }
+        s.y = ni.at(s.y);
+    }
+    // std::cout << "pack(): nodes: " << nodes.size() << " -> " << newnodes.size() << ", " << double(newnodes.size())/double(nodes.size()) << " \n";
+    nodes = newnodes; // kabum!
 }
 
 /**
@@ -275,26 +277,26 @@ void SegmentAnalyser::pack() {
  */
 Vector3d SegmentAnalyser::cut(Vector3d in, Vector3d out, SignedDistanceFunction* geometry)
 {
-	assert(geometry->getDist(in)<=0);
-	assert(geometry->getDist(out)>=0);
-	if (std::abs(geometry->getDist(out))>1e-6) {
-		Vector3d c =  in.plus(out).times(0.5); // mid
-		if (geometry->getDist(c)<0) { // in
-			return cut(c,out,geometry);
-		} else { // out
-			return cut(in,c,geometry);
-		}
-	} else {
-		return out;
-	}
+    assert(geometry->getDist(in)<=0);
+    assert(geometry->getDist(out)>=0);
+    if (std::abs(geometry->getDist(out))>1e-6) {
+        Vector3d c =  in.plus(out).times(0.5); // mid
+        if (geometry->getDist(c)<0) { // in
+            return cut(c,out,geometry);
+        } else { // out
+            return cut(in,c,geometry);
+        }
+    } else {
+        return out;
+    }
 }
 
 /**
  * \return The summed parameter of type @param st (@see RootSystem::ScalarType)
  */
 double SegmentAnalyser::getSummed(int st) const {
-	std::vector<double> v_ = getScalar(st);
-	return std::accumulate(v_.begin(), v_.end(), 0.0);
+    std::vector<double> v_ = getScalar(st);
+    return std::accumulate(v_.begin(), v_.end(), 0.0);
 }
 
 /**
@@ -303,19 +305,19 @@ double SegmentAnalyser::getSummed(int st) const {
  * To sum exactly, first crop to the geometry, then run SegmentAnalyser::getSummed(st).
  */
 double SegmentAnalyser::getSummed(int st, SignedDistanceFunction* g) const {
-	std::vector<double> data = getScalar(st);
-	double v = 0;
-	for (size_t i=0; i<segments.size(); i++) {
-		double d = data.at(i);
-		Vector2i s = segments.at(i);
-		Vector3d n1 = nodes.at(s.x);
-		Vector3d n2 = nodes.at(s.y);
-		Vector3d mid = n1.plus(n2).times(0.5);
-		if (g->getDist(mid)<0) {
-			v += d;
-		}
-	}
-	return v;
+    std::vector<double> data = getScalar(st);
+    double v = 0;
+    for (size_t i=0; i<segments.size(); i++) {
+        double d = data.at(i);
+        Vector2i s = segments.at(i);
+        Vector3d n1 = nodes.at(s.x);
+        Vector3d n2 = nodes.at(s.y);
+        Vector3d mid = n1.plus(n2).times(0.5);
+        if (g->getDist(mid)<0) {
+            v += d;
+        }
+    }
+    return v;
 }
 
 
@@ -325,11 +327,11 @@ double SegmentAnalyser::getSummed(int st, SignedDistanceFunction* g) const {
  */
 std::vector<Root*> SegmentAnalyser::getRoots() const
 {
-	std::set<Root*> rootset;  // praise the stl
-	for (Root* r : segO) {
-		rootset.insert(r);
-	}
-	return std::vector<Root*>(rootset.begin(), rootset.end());
+    std::set<Root*> rootset;  // praise the stl
+    for (Root* r : segO) {
+        rootset.insert(r);
+    }
+    return std::vector<Root*>(rootset.begin(), rootset.end());
 }
 
 /**
@@ -337,8 +339,8 @@ std::vector<Root*> SegmentAnalyser::getRoots() const
  */
 int SegmentAnalyser::getNumberOfRoots() const
 {
-	const auto& rootset = getRoots();
-	return rootset.size();
+    const auto& rootset = getRoots();
+    return rootset.size();
 }
 
 
@@ -354,30 +356,30 @@ int SegmentAnalyser::getNumberOfRoots() const
  */
 SegmentAnalyser SegmentAnalyser::foto(const Vector3d& pos, const Matrix3d& ons, double fl) const
 {
-	SegmentAnalyser f(*this); // copy
-	for (auto& n : f.nodes) { // translate
-		n = n.minus(pos);
-	}
-	Matrix3d m = ons.inverse(); // rotate
-	for (auto& n : f.nodes) {
-		n = m.times(n);
-	}
-	//	// crop to objects in front of the camera
-	Vector3d o(0.,0.,0.);
-	Vector3d plane(0.,0., -1);
-	SDF_HalfPlane sdf = SDF_HalfPlane(o,plane);
-	f.crop(&sdf);
-	f.pack();
-	// project
-	for (auto& a : f.nodes) {
-		a = a.times(fl/(-plane.times(a)));
-		a.z = 0;
-	}
-	// final image crop
-	SDF_PlantBox box(1.,1.,2.); // TODO --> d = sqrt(2) cm
-	f.crop(&box);
-	f.pack();
-	return f;
+    SegmentAnalyser f(*this); // copy
+    for (auto& n : f.nodes) { // translate
+        n = n.minus(pos);
+    }
+    Matrix3d m = ons.inverse(); // rotate
+    for (auto& n : f.nodes) {
+        n = m.times(n);
+    }
+    //	// crop to objects in front of the camera
+    Vector3d o(0.,0.,0.);
+    Vector3d plane(0.,0., -1);
+    SDF_HalfPlane sdf = SDF_HalfPlane(o,plane);
+    f.crop(&sdf);
+    f.pack();
+    // project
+    for (auto& a : f.nodes) {
+        a = a.times(fl/(-plane.times(a)));
+        a.z = 0;
+    }
+    // final image crop
+    SDF_PlantBox box(1.,1.,2.); // TODO --> d = sqrt(2) cm
+    f.crop(&box);
+    f.pack();
+    return f;
 }
 
 /**
@@ -387,21 +389,21 @@ SegmentAnalyser SegmentAnalyser::foto(const Vector3d& pos, const Matrix3d& ons, 
  */
 SegmentAnalyser SegmentAnalyser::cut(const SDF_HalfPlane& plane) const
 {
-	SegmentAnalyser f;
-	f.nodes = nodes; // copy all nodes
-	for (size_t i=0; i<segments.size(); i++) {
-		Vector2i s = segments.at(i);
-		Vector3d n1 = nodes.at(s.x);
-		Vector3d n2 = nodes.at(s.y);
-		double d = plane.getDist(n1)*plane.getDist(n2);
-		if (d<=0) { // one is inside, one is outside
-			f.segments.push_back(s);
-			f.ctimes.push_back(ctimes.at(i));
-			f.segO.push_back(segO.at(i));
-		}
-	}
-	f.pack(); // delete unused nodes
-	return f;
+    SegmentAnalyser f;
+    f.nodes = nodes; // copy all nodes
+    for (size_t i=0; i<segments.size(); i++) {
+        Vector2i s = segments.at(i);
+        Vector3d n1 = nodes.at(s.x);
+        Vector3d n2 = nodes.at(s.y);
+        double d = plane.getDist(n1)*plane.getDist(n2);
+        if (d<=0) { // one is inside, one is outside
+            f.segments.push_back(s);
+            f.ctimes.push_back(ctimes.at(i));
+            f.segO.push_back(segO.at(i));
+        }
+    }
+    f.pack(); // delete unused nodes
+    return f;
 }
 
 /**
@@ -416,22 +418,22 @@ SegmentAnalyser SegmentAnalyser::cut(const SDF_HalfPlane& plane) const
  */
 std::vector<double> SegmentAnalyser::distribution(int st, double top, double bot, int n, bool exact) const
 {
-	std::vector<double> d(n);
-	double dz = (bot-top)/double(n);
-	SDF_PlantBox* layer = new SDF_PlantBox(1e100,1e100,dz);
-	for (int i=0; i<n; i++) {
-		Vector3d t(0,0,top-i*dz);
-		SDF_RotateTranslate g(layer,t);
-		if (exact) {
-			SegmentAnalyser a(*this); // copy everything
-			a.crop(&g); // crop exactly
-			d.at(i) = a.getSummed(st);
-		} else {
-			d.at(i) = this->getSummed(st, &g);
-		}
-	}
-	delete layer;
-	return d;
+    std::vector<double> d(n);
+    double dz = (bot-top)/double(n);
+    SDF_PlantBox* layer = new SDF_PlantBox(1e100,1e100,dz);
+    for (int i=0; i<n; i++) {
+        Vector3d t(0,0,top-i*dz);
+        SDF_RotateTranslate g(layer,t);
+        if (exact) {
+            SegmentAnalyser a(*this); // copy everything
+            a.crop(&g); // crop exactly
+            d.at(i) = a.getSummed(st);
+        } else {
+            d.at(i) = this->getSummed(st, &g);
+        }
+    }
+    delete layer;
+    return d;
 }
 
 /**
@@ -444,18 +446,18 @@ std::vector<double> SegmentAnalyser::distribution(int st, double top, double bot
  */
 std::vector<SegmentAnalyser> SegmentAnalyser::distribution(double top, double bot, int n) const
 {
-	std::vector<SegmentAnalyser> d(n);
-	double dz = (bot-top)/double(n);
-	SDF_PlantBox* layer = new SDF_PlantBox(1e100,1e100,dz);
-	for (int i=0; i<n; i++) {
-		Vector3d t(0,0,top-i*dz);
-		SDF_RotateTranslate g(layer,t);
-		SegmentAnalyser a = SegmentAnalyser(*this); // copy everything
-		a.crop(&g); // crop exactly
-		d.at(i) = a;
-	}
-	delete layer;
-	return d;
+    std::vector<SegmentAnalyser> d(n);
+    double dz = (bot-top)/double(n);
+    SDF_PlantBox* layer = new SDF_PlantBox(1e100,1e100,dz);
+    for (int i=0; i<n; i++) {
+        Vector3d t(0,0,top-i*dz);
+        SDF_RotateTranslate g(layer,t);
+        SegmentAnalyser a = SegmentAnalyser(*this); // copy everything
+        a.crop(&g); // crop exactly
+        d.at(i) = a;
+    }
+    delete layer;
+    return d;
 }
 
 /**
@@ -473,33 +475,33 @@ std::vector<SegmentAnalyser> SegmentAnalyser::distribution(double top, double bo
  */
 std::vector<std::vector<double>> SegmentAnalyser::distribution2(int st, double top, double bot, double left, double right, int n, int m, bool exact) const
 {
-	std::vector<std::vector<double>> d(n);
-	double dz = (bot-top)/double(n);
-	double dx = (right-left)/double(m);
-	SDF_PlantBox* layer = new SDF_PlantBox(dx,1e9,dz);
+    std::vector<std::vector<double>> d(n);
+    double dz = (bot-top)/double(n);
+    double dx = (right-left)/double(m);
+    SDF_PlantBox* layer = new SDF_PlantBox(dx,1e9,dz);
 
-	for (int i=0; i<n; i++) {
+    for (int i=0; i<n; i++) {
 
-		std::vector<double> row(m); // m columns
-		for (int j=0; j<m; j++) {
+        std::vector<double> row(m); // m columns
+        for (int j=0; j<m; j++) {
 
-			Vector3d t(left+(j+0.5)*dx,0.,top-i*dz); // box is [-x/2,-y/2,0] - [x/2,y/2,-z]
-			SDF_RotateTranslate g(layer,t);
+            Vector3d t(left+(j+0.5)*dx,0.,top-i*dz); // box is [-x/2,-y/2,0] - [x/2,y/2,-z]
+            SDF_RotateTranslate g(layer,t);
 
-			if (exact) {
-				SegmentAnalyser a(*this); // copy everything
-				a.crop(&g); // crop exactly
-				row.at(j) = a.getSummed(st);
-			} else {
-				row.at(j) = this->getSummed(st, &g);
-			}
+            if (exact) {
+                SegmentAnalyser a(*this); // copy everything
+                a.crop(&g); // crop exactly
+                row.at(j) = a.getSummed(st);
+            } else {
+                row.at(j) = this->getSummed(st, &g);
+            }
 
-		}
+        }
 
-		d.at(i)=row; // store the row (n rows)
-	}
-	delete layer;
-	return d;
+        d.at(i)=row; // store the row (n rows)
+    }
+    delete layer;
+    return d;
 }
 
 /**
@@ -515,35 +517,35 @@ std::vector<std::vector<double>> SegmentAnalyser::distribution2(int st, double t
  */
 std::vector<std::vector<SegmentAnalyser>> SegmentAnalyser::distribution2(double top, double bot, double left, double right, int n, int m) const
 {
-	std::vector<std::vector<SegmentAnalyser>> d(n);
-	double dz = (bot-top)/double(n);
-	double dx = (right-left)/double(m);
-	SDF_PlantBox* layer = new SDF_PlantBox(dx,1e4,dz);
-	// std::cout << "dx " << dx  <<", dz "<< dz << "\n";
-	for (int i=0; i<n; i++) {
-		for (int j=0; j<m; j++) {
-			Vector3d t(left+(j+0.5)*dx,0.,top-i*dz); // box is [-x/2,-y/2,0] - [x/2,y/2,-z]
-			SDF_RotateTranslate g(layer,t);
-			SegmentAnalyser a(*this); // copy everything
-			a.crop(&g); // crop exactly
-			d.at(i).push_back(a);
+    std::vector<std::vector<SegmentAnalyser>> d(n);
+    double dz = (bot-top)/double(n);
+    double dx = (right-left)/double(m);
+    SDF_PlantBox* layer = new SDF_PlantBox(dx,1e4,dz);
+    // std::cout << "dx " << dx  <<", dz "<< dz << "\n";
+    for (int i=0; i<n; i++) {
+        for (int j=0; j<m; j++) {
+            Vector3d t(left+(j+0.5)*dx,0.,top-i*dz); // box is [-x/2,-y/2,0] - [x/2,y/2,-z]
+            SDF_RotateTranslate g(layer,t);
+            SegmentAnalyser a(*this); // copy everything
+            a.crop(&g); // crop exactly
+            d.at(i).push_back(a);
 
-			if (i==0) {
-				std::stringstream ss;
-				ss << "(" << i << ":" << j << ").py";
-				std::string name = "test"+ss.str();
-				std::ofstream fos;
-				fos.open(name.c_str());
-				fos << "from paraview.simple import *\n";
-				fos << "paraview.simple._DisableFirstRenderCameraReset()\n";
-				fos << "renderView1 = GetActiveViewOrCreate('RenderView')\n\n";
-				g.writePVPScript(fos);
-				fos.close();
-			}
-		}
-	}
-	delete layer;
-	return d;
+            if (i==0) {
+                std::stringstream ss;
+                ss << "(" << i << ":" << j << ").py";
+                std::string name = "test"+ss.str();
+                std::ofstream fos;
+                fos.open(name.c_str());
+                fos << "from paraview.simple import *\n";
+                fos << "paraview.simple._DisableFirstRenderCameraReset()\n";
+                fos << "renderView1 = GetActiveViewOrCreate('RenderView')\n\n";
+                g.writePVPScript(fos);
+                fos.close();
+            }
+        }
+    }
+    delete layer;
+    return d;
 }
 
 /**
@@ -554,23 +556,23 @@ std::vector<std::vector<SegmentAnalyser>> SegmentAnalyser::distribution2(double 
  */
 void SegmentAnalyser::write(std::string name)
 {
-	this->pack(); // a good idea before writing any file
-	std::ofstream fos;
-	fos.open(name.c_str());
-	std::string ext = name.substr(name.size()-3,name.size()); // pick the right writer
-	if (ext.compare("vtp")==0) {
-		std::cout << "writing VTP: " << name << "\n";
-		this->writeVTP(fos,{ RootSystem::st_radius, RootSystem::st_type, RootSystem::st_time });
-	} else if (ext.compare("txt")==0)  {
-		std::cout << "writing text file for Matlab import: "<< name << "\n";
-		writeRBSegments(fos);
-	} else if (ext.compare("dgf")==0)  {
-		std::cout << "writing dgf file: "<< name << "\n";
-		writeDGF(fos);
-	} else {
-		throw std::invalid_argument("SegmentAnalyser::write: Unknown file type");
-	}
-	fos.close();
+    this->pack(); // a good idea before writing any file
+    std::ofstream fos;
+    fos.open(name.c_str());
+    std::string ext = name.substr(name.size()-3,name.size()); // pick the right writer
+    if (ext.compare("vtp")==0) {
+        std::cout << "writing VTP: " << name << "\n";
+        this->writeVTP(fos,{ RootSystem::st_radius, RootSystem::st_type, RootSystem::st_time });
+    } else if (ext.compare("txt")==0)  {
+        std::cout << "writing text file for Matlab import: "<< name << "\n";
+        writeRBSegments(fos);
+    } else if (ext.compare("dgf")==0)  {
+        std::cout << "writing dgf file: "<< name << "\n";
+        writeDGF(fos);
+    } else {
+        throw std::invalid_argument("SegmentAnalyser::write: Unknown file type");
+    }
+    fos.close();
 }
 
 /**
@@ -582,53 +584,53 @@ void SegmentAnalyser::write(std::string name)
  */
 void SegmentAnalyser::writeVTP(std::ostream & os, std::vector<int> types) const
 {
-	assert(segments.size() == segO.size());
-	assert(segments.size() == ctimes.size());
-	os << "<?xml version=\"1.0\"?>";
-	os << "<VTKFile type=\"PolyData\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
-	os << "<PolyData>\n";
-	os << "<Piece NumberOfLines=\""<< segments.size() << "\" NumberOfPoints=\""<< nodes.size()<< "\">\n";
-	// data (CellData)
-	os << "<CellData Scalars=\" CellData\">\n";
-	for (auto i : types) {
-		std::vector<double> data = getScalar(i);
-		os << "<DataArray type=\"Float32\" Name=\"" << RootSystem::scalarTypeNames.at(i) << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-		for (auto const& t : data) {
-			os << t << " ";
-		}
-		os << "\n</DataArray>\n";
-	}
-	// write user data
-	for (size_t i=0; i<userData.size(); i++) {
-		const auto& data = userData.at(i);
-		std::string name = userDataNames.at(i);
-		os << "<DataArray type=\"Float32\" Name=\"" << name << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-		for (auto const& t : data) {
-			os << t << " ";
-		}
-		os << "\n</DataArray>\n";
-	}
-	os << "\n</CellData>\n";
-	// nodes (Points)
-	os << "<Points>\n"<<"<DataArray type=\"Float32\" Name=\"Coordinates\" NumberOfComponents=\"3\" format=\"ascii\" >\n";
-	for (auto const& n:nodes) {
-		os << n.x << " "<< n.y <<" "<< n.z<< " ";
-	}
-	os << "\n</DataArray>\n"<< "</Points>\n";
-	// segments (Lines)
-	os << "<Lines>\n"<<"<DataArray type=\"Int32\" Name=\"connectivity\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-	for (auto const& s:segments) {
-		os << s.x << " " << s.y << " ";
-	}
-	os << "\n</DataArray>\n"<<"<DataArray type=\"Int32\" Name=\"offsets\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-	for (size_t i=0; i<segments.size(); i++) {
-		os << 2*i+2 << " ";
-	}
-	os << "\n</DataArray>\n";
-	os << "\n</Lines>\n";
-	//
-	os << "</Piece>\n";
-	os << "</PolyData>\n" << "</VTKFile>\n";
+    assert(segments.size() == segO.size());
+    assert(segments.size() == ctimes.size());
+    os << "<?xml version=\"1.0\"?>";
+    os << "<VTKFile type=\"PolyData\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
+    os << "<PolyData>\n";
+    os << "<Piece NumberOfLines=\""<< segments.size() << "\" NumberOfPoints=\""<< nodes.size()<< "\">\n";
+    // data (CellData)
+    os << "<CellData Scalars=\" CellData\">\n";
+    for (auto i : types) {
+        std::vector<double> data = getScalar(i);
+        os << "<DataArray type=\"Float32\" Name=\"" << RootSystem::scalarTypeNames.at(i) << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
+        for (auto const& t : data) {
+            os << t << " ";
+        }
+        os << "\n</DataArray>\n";
+    }
+    // write user data
+    for (size_t i=0; i<userData.size(); i++) {
+        const auto& data = userData.at(i);
+        std::string name = userDataNames.at(i);
+        os << "<DataArray type=\"Float32\" Name=\"" << name << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
+        for (auto const& t : data) {
+            os << t << " ";
+        }
+        os << "\n</DataArray>\n";
+    }
+    os << "\n</CellData>\n";
+    // nodes (Points)
+    os << "<Points>\n"<<"<DataArray type=\"Float32\" Name=\"Coordinates\" NumberOfComponents=\"3\" format=\"ascii\" >\n";
+    for (auto const& n:nodes) {
+        os << n.x << " "<< n.y <<" "<< n.z<< " ";
+    }
+    os << "\n</DataArray>\n"<< "</Points>\n";
+    // segments (Lines)
+    os << "<Lines>\n"<<"<DataArray type=\"Int32\" Name=\"connectivity\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
+    for (auto const& s:segments) {
+        os << s.x << " " << s.y << " ";
+    }
+    os << "\n</DataArray>\n"<<"<DataArray type=\"Int32\" Name=\"offsets\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
+    for (size_t i=0; i<segments.size(); i++) {
+        os << 2*i+2 << " ";
+    }
+    os << "\n</DataArray>\n";
+    os << "\n</Lines>\n";
+    //
+    os << "</Piece>\n";
+    os << "</PolyData>\n" << "</VTKFile>\n";
 }
 
 /**
@@ -639,21 +641,21 @@ void SegmentAnalyser::writeVTP(std::ostream & os, std::vector<int> types) const
  */
 void SegmentAnalyser::writeRBSegments(std::ostream & os) const
 {
-	os << "x1 y1 z1 x2 y2 z2 radius R G B time type \n";
-	for (size_t i=0; i<segments.size(); i++) {
-		Vector2i s = segments.at(i);
-		Vector3d n1 = nodes.at(s.x);
-		Vector3d n2 = nodes.at(s.y);
-		Root* r = segO.at(i);
-		double radius = r->param.a;
-		double red = r->getRootTypeParameter()->colorR;
-		double green = r->getRootTypeParameter()->colorG;
-		double blue = r->getRootTypeParameter()->colorB;
-		double time = ctimes.at(i);
-		double type = r->param.type;
-		os << std::fixed << std::setprecision(4)<< n1.x << " " << n1.y << " " << n1.z << " " << n2.x << " " << n2.y << " " << n2.z << " " <<
-				radius << " " << red << " " << green << " " << blue << " " << time<< " " << type << " \n";
-	}
+    os << "x1 y1 z1 x2 y2 z2 radius R G B time type \n";
+    for (size_t i=0; i<segments.size(); i++) {
+        Vector2i s = segments.at(i);
+        Vector3d n1 = nodes.at(s.x);
+        Vector3d n2 = nodes.at(s.y);
+        Root* r = segO.at(i);
+        double radius = r->param.a;
+        double red = r->getRootTypeParameter()->colorR;
+        double green = r->getRootTypeParameter()->colorG;
+        double blue = r->getRootTypeParameter()->colorB;
+        double time = ctimes.at(i);
+        double type = r->param.type;
+        os << std::fixed << std::setprecision(4)<< n1.x << " " << n1.y << " " << n1.z << " " << n2.x << " " << n2.y << " " << n2.z << " " <<
+                radius << " " << red << " " << green << " " << blue << " " << time<< " " << type << " \n";
+    }
 }
 
 /**
@@ -664,32 +666,32 @@ void SegmentAnalyser::writeRBSegments(std::ostream & os) const
 
 void SegmentAnalyser::writeDGF(std::ostream & os) const
 {
-	os << "DGF \n";
-	os << "Vertex \n";
-	for (auto& n : nodes) {
-		os << n.x/100 << " " << n.y/100 << " " << n.z/100 << " \n";
-	}
+    os << "DGF \n";
+    os << "Vertex \n";
+    for (auto& n : nodes) {
+        os << n.x/100 << " " << n.y/100 << " " << n.z/100 << " \n";
+    }
 
-	os << "# \n";
-	os << "SIMPLEX \n";
-	os << "parameters 10 \n";
-	// node1ID, node2ID, type, branchID, surfaceIdx, length, radiusIdx, massIdx, axialPermIdx, radialPermIdx, creationTimeId
-	for (size_t i=0; i<segments.size(); i++) {
-		Vector2i s = segments.at(i);
-		Vector3d n1 = nodes.at(s.x);
-		Vector3d n2 = nodes.at(s.y);
-		Root* r = segO.at(i);
-		int branchnumber = r->id;
-		double radius = r->param.a;
-		double length = sqrt((n1.x-n2.x)*(n1.x-n2.x)+(n1.y-n2.y)*(n1.y-n2.y)+(n1.z-n2.z)*(n1.z-n2.z));
-		double surface = 2*radius*M_PI*length;
-		double time = ctimes.at(i);
-		double type = r->param.type;
-		os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
-	}
-	if (rs!=nullptr) {
-	    auto shoot_segs = rs->getShootSegments();
-	    for (auto& s : shoot_segs) {
+    os << "# \n";
+    os << "SIMPLEX \n";
+    os << "parameters 10 \n";
+    // node1ID, node2ID, type, branchID, surfaceIdx, length, radiusIdx, massIdx, axialPermIdx, radialPermIdx, creationTimeId
+    for (size_t i=0; i<segments.size(); i++) {
+        Vector2i s = segments.at(i);
+        Vector3d n1 = nodes.at(s.x);
+        Vector3d n2 = nodes.at(s.y);
+        Root* r = segO.at(i);
+        int branchnumber = r->id;
+        double radius = r->param.a;
+        double length = sqrt((n1.x-n2.x)*(n1.x-n2.x)+(n1.y-n2.y)*(n1.y-n2.y)+(n1.z-n2.z)*(n1.z-n2.z));
+        double surface = 2*radius*M_PI*length;
+        double time = ctimes.at(i);
+        double type = r->param.type;
+        os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
+    }
+    if (rs!=nullptr) {
+        auto shoot_segs = rs->getShootSegments();
+        for (auto& s : shoot_segs) {
                 Vector3d n1 = nodes.at(s.x);
                 Vector3d n2 = nodes.at(s.y);
                 int branchnumber = -1;
@@ -699,12 +701,13 @@ void SegmentAnalyser::writeDGF(std::ostream & os) const
                 double time = 0;
                 double type = -1;
                 os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
-	    }
-	}
+        }
+    }
 
-	os << "# \n";
-	os << "BOUNDARYDOMAIN \n";
-	os << "default 1 \n";
-	os << "# \n";
+    os << "# \n";
+    os << "BOUNDARYDOMAIN \n";
+    os << "default 1 \n";
+    os << "# \n";
 }
 
+} // end namespace CRootBox

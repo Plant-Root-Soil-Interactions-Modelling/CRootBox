@@ -3,6 +3,8 @@
 
 #include "Root.h"
 
+namespace CRootBox {
+
 class Root;
 
 /**
@@ -77,6 +79,6 @@ public:
     GrowthFunction* copy() override { return new ExponentialGrowth(*this); }
 };
 
-
+} // end namespace CRootBox
 
 #endif

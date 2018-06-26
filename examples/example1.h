@@ -8,10 +8,11 @@
  *
  *  Additionally, exports the line segments as .txt file to import into Matlab for postprocessing
  */
-using namespace std;
+namespace CRootBox {
 
 void example1()
 {
+    using namespace std;
 
     RootSystem rootsystem;
 
@@ -103,5 +104,6 @@ void example1()
 //	cout << "nodes 2: " << nodes2.size() << "\n";
 //
 
-
 }
+
+} // end namespace CRootBox

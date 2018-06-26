@@ -7,7 +7,7 @@
 
 #include "mymath.h"
 
-
+namespace CRootBox {
 
 /**
  * Signed Distance Function (minus is inside, plus is outside)
@@ -220,7 +220,7 @@ class SDF_HalfPlane : public SignedDistanceFunction
 {
 
 public:
-	SDF_HalfPlane(const Vector3d& o, const Vector3d& n_); ///< half plane by origin and normal vector
+    SDF_HalfPlane(const Vector3d& o, const Vector3d& n_); ///< half plane by origin and normal vector
     SDF_HalfPlane(const Vector3d& o, const Vector3d& p1, const Vector3d& p2);  ///< half plane by origin and two linear independent vectors
 
     virtual double getDist(const Vector3d& v) const { return n.times(v.minus(o)); } ///< @see SignedDistanceFunction::getDist
@@ -236,5 +236,6 @@ public:
 
 };
 
+} // end namespace CRootBox
 
 #endif

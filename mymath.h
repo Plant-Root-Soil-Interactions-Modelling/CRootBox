@@ -6,15 +6,15 @@
  * not operator overloading vector matrix classes
  */
 
-#include<cmath>
-#include<assert.h>
-#include<sstream>
+#include <cmath>
+#include <assert.h>
+#include <sstream>
+
+namespace CRootBox {
 
 #ifndef M_PI
     #define M_PI 3.14159265358979323846
 #endif
-
-
 
 /**
  * Vector2i stores two int values
@@ -232,6 +232,6 @@ public:
 
 };
 
-
+} // end namespace CRootBox
 
 #endif

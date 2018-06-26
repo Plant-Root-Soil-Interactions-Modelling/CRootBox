@@ -1,6 +1,6 @@
 #include "tropism.h"
 
-
+namespace CRootBox {
 
 /**
  * Applies angles a and b and goes dx [cm] into the new direction and returns the new position
@@ -15,9 +15,9 @@
  */
 Vector3d Tropism::getPosition(const Vector3d& pos, Matrix3d old, double a, double b, double dx)
 {
-	old.times(Matrix3d::rotX(b)); // TODO not nice, there should be a better way, but no easy
-	old.times(Matrix3d::rotZ(a));
-	return pos.plus(old.column(0).times(dx));
+    old.times(Matrix3d::rotX(b)); // TODO not nice, there should be a better way, but no easy
+    old.times(Matrix3d::rotZ(a));
+    return pos.plus(old.column(0).times(dx));
 }
 
 /**
@@ -32,36 +32,36 @@ Vector3d Tropism::getPosition(const Vector3d& pos, Matrix3d old, double a, doubl
  */
 Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,const Root* root)
 {
-	double a = sigma*randn()*sqrt(dx);
-	double b = rand()*2*M_PI;
-	double v;
+    double a = sigma*randn()*sqrt(dx);
+    double b = rand()*2*M_PI;
+    double v;
 
-	double n_=n*sqrt(dx);
-	if (n_>0) {
-		double dn = n_-floor(n_);
-		if (rand()<dn) {
-			n_ = ceil(n_);
-		} else {
-			n_ = floor(n_);
-		}
-		double bestA = a;
-		double bestB = b;
-		double bestV = this->tropismObjective(pos,old,a,b,dx,root);
-		for (int i=0; i<n_; i++) {
-			b = rand()*2*M_PI;
-			a = sigma*randn()*sqrt(dx);
-			v = this->tropismObjective(pos,old,a,b,dx,root);
-			if (v<bestV) {
-				bestV=v;
-				bestA=a;
-				bestB=b;
-			}
-		}
-		a = bestA;
-		b = bestB;
-	}
+    double n_=n*sqrt(dx);
+    if (n_>0) {
+        double dn = n_-floor(n_);
+        if (rand()<dn) {
+            n_ = ceil(n_);
+        } else {
+            n_ = floor(n_);
+        }
+        double bestA = a;
+        double bestB = b;
+        double bestV = this->tropismObjective(pos,old,a,b,dx,root);
+        for (int i=0; i<n_; i++) {
+            b = rand()*2*M_PI;
+            a = sigma*randn()*sqrt(dx);
+            v = this->tropismObjective(pos,old,a,b,dx,root);
+            if (v<bestV) {
+                bestV=v;
+                bestA=a;
+                bestB=b;
+            }
+        }
+        a = bestA;
+        b = bestB;
+    }
 
-	return Vector2d(a,b);
+    return Vector2d(a,b);
 }
 
 /**
@@ -77,49 +77,49 @@ Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,cons
  */
 Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const Root* root)
 {
-	Vector2d h = this->getUCHeading(pos, old, dx, root);
-	double a = h.x;
-	double b = h.y;
+    Vector2d h = this->getUCHeading(pos, old, dx, root);
+    double a = h.x;
+    double b = h.y;
 
-	if (geometry!=nullptr) {
-		double d = geometry->getDist(this->getPosition(pos,old,a,b,dx));
-		double dmin = d;
+    if (geometry!=nullptr) {
+        double d = geometry->getDist(this->getPosition(pos,old,a,b,dx));
+        double dmin = d;
 
-		double bestA = a;
-		double bestB = b;
-		int i=0; // counts change in alpha
-		int j=0;    // counts change in beta
+        double bestA = a;
+        double bestB = b;
+        int i=0; // counts change in alpha
+        int j=0;    // counts change in beta
 
-		while (d>0) { // not valid
+        while (d>0) { // not valid
 
-			i++;
-			j=0;
-			while ((d>0) && j<betaN) { // change beta
+            i++;
+            j=0;
+            while ((d>0) && j<betaN) { // change beta
 
-				b = 2*M_PI*rand(); // dice
-				d = geometry->getDist(this->getPosition(pos,old,a,b,dx));
-				if (d<dmin) {
-					dmin = d;
-					bestA = a;
-					bestB = b;
-				}
-				j++;
-			}
+                b = 2*M_PI*rand(); // dice
+                d = geometry->getDist(this->getPosition(pos,old,a,b,dx));
+                if (d<dmin) {
+                    dmin = d;
+                    bestA = a;
+                    bestB = b;
+                }
+                j++;
+            }
 
-			if (d>0) {
-				a = a + M_PI/2./double(alphaN);
-			}
+            if (d>0) {
+                a = a + M_PI/2./double(alphaN);
+            }
 
-			if (i>alphaN) {
-				std::cout << "Could not respect geometry boundaries \n";
-				a = bestA;
-				b = bestB;
-				break;
-			}
+            if (i>alphaN) {
+                std::cout << "Could not respect geometry boundaries \n";
+                a = bestA;
+                b = bestB;
+                break;
+            }
 
-		}
-	}
-	return Vector2d(a,b);
+        }
+    }
+    return Vector2d(a,b);
 }
 
 
@@ -129,13 +129,13 @@ Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const
  */
 double Exotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root)
 {
-	old.times(Matrix3d::rotX(b));
-	old.times(Matrix3d::rotZ(a));
-	Vector3d iheading = root->iheading;
-	double s = iheading.times(old.column(0));
-	s*=(1./iheading.length()); // iheading should be normed anyway?
-	s*=(1./old.column(0).length());
-	return acos(s)/M_PI; // 0..1
+    old.times(Matrix3d::rotX(b));
+    old.times(Matrix3d::rotZ(a));
+    Vector3d iheading = root->iheading;
+    double s = iheading.times(old.column(0));
+    s*=(1./iheading.length()); // iheading should be normed anyway?
+    s*=(1./old.column(0).length());
+    return acos(s)/M_PI; // 0..1
 }
 
 
@@ -145,11 +145,11 @@ double Exotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a,
  */
 double Hydrotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root)
 {
-	assert(soil!=nullptr);
-	Vector3d newpos = this->getPosition(pos,old,a,b,dx);
-	double v = soil->getValue(newpos,root);
-	// std::cout << "\n" << newpos.getString() << ", = "<< v;
-	return -v; ///< (-1) because we want to maximize the soil property
+    assert(soil!=nullptr);
+    Vector3d newpos = this->getPosition(pos,old,a,b,dx);
+    double v = soil->getValue(newpos,root);
+    // std::cout << "\n" << newpos.getString() << ", = "<< v;
+    return -v; ///< (-1) because we want to maximize the soil property
 }
 
 
@@ -167,10 +167,10 @@ double Hydrotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double 
  */
 CombinedTropism::CombinedTropism(double n, double sigma,Tropism* t1, double w1, Tropism* t2, double w2): Tropism(n,sigma)
 {
-	tropisms.push_back(t1);
-	tropisms.push_back(t2);
-	weights.push_back(w1);
-	weights.push_back(w2);
+    tropisms.push_back(t1);
+    tropisms.push_back(t2);
+    weights.push_back(w1);
+    weights.push_back(w2);
 }
 
 /**
@@ -178,14 +178,12 @@ CombinedTropism::CombinedTropism(double n, double sigma,Tropism* t1, double w1, 
  */
 double CombinedTropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root)
 {
-	//std::cout << "CombinedTropsim::tropismObjective\n";
-	double v = tropisms[0]->tropismObjective(pos,old,a,b,dx,root)*weights[0];
-	for (size_t i = 1; i< tropisms.size(); i++) {
-		v += tropisms[i]->tropismObjective(pos,old,a,b,dx,root)*weights[i];
-	}
-	return v;
+    //std::cout << "CombinedTropsim::tropismObjective\n";
+    double v = tropisms[0]->tropismObjective(pos,old,a,b,dx,root)*weights[0];
+    for (size_t i = 1; i< tropisms.size(); i++) {
+        v += tropisms[i]->tropismObjective(pos,old,a,b,dx,root)*weights[i];
+    }
+    return v;
 }
 
-
-
-
+} // end namespace CRootBox

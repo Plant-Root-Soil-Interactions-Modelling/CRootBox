@@ -11,6 +11,8 @@
 #include "ModelParameter.h"
 #include "RootSystem.h"
 
+namespace CRootBox {
+
 class RootSystem;
 class RootState;
 
@@ -100,11 +102,11 @@ class RootState {
 
 public:
 
-	RootState() { };
+    RootState() { };
 
-	RootState(const Root& r);
+    RootState(const Root& r);
 
-	void restore(Root& r);
+    void restore(Root& r);
 
 private:
 
@@ -126,6 +128,6 @@ private:
 
 };
 
-
+} // end namespace CRootBox
 
 #endif /* ROOT_H_ */

@@ -13,13 +13,14 @@
  * Single root, with laterals
  *
  */
-using namespace std;
 
+namespace CRootBox {
 
-void benchmark(string name, vector<double> times, vector<double> dt_, double dx,
-               vector<double>& l0, vector<double>& l1, vector<double>& lt,
-               string bm_name)
+void benchmark(const std::string& name, const std::vector<double>& times, const std::vector<double>& dt_, double dx,
+               std::vector<double>& l0, std::vector<double>& l1, std::vector<double>& lt,
+               const std::string& bm_name)
 {
+  using namespace std;
   RootSystem rs1;
   rs1.openFile(name,"modelparameter_bu/");
   rs1.getRootTypeParameter(1)->dx=dx; // apply axial resolution
@@ -49,9 +50,9 @@ void benchmark(string name, vector<double> times, vector<double> dt_, double dx,
 }
 
 
-
 void benchmarks()
 {
+  using namespace std;
   vector<double> times = { 7 ,15, 30, 60 };
 
   vector<double> dt_(times.size());
@@ -74,3 +75,5 @@ void benchmarks()
   benchmark("bm_monocot",times,dt_,dx,l0,l1,lt,"Benchmark 4"); // multiple roots of type benchmark 2
 
 }
+
+} // end namespace CRootBox

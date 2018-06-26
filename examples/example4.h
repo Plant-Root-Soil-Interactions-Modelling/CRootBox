@@ -9,10 +9,12 @@
  * Additionally, exports the confining geometry as paraview pyhton script
  * (run file in Paraview by Tools->Python Shell, Run Script)
  */
-using namespace std;
+
+namespace CRootBox {
 
 void example4()
 {
+    using namespace std;
     RootSystem rootsystem;
 
     string name = "Zea_mays_5_Leitner_2014";
@@ -92,5 +94,6 @@ void example4()
     rootsystem.write(name+".py");
 
     cout << "Finished with a total of " << rootsystem.getNumberOfNodes()<< " nodes\n";
-
 }
+
+} // end namespace CRootBox
