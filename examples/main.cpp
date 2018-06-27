@@ -1,26 +1,26 @@
 // Copyright (C) 2016 Daniel Leitner and Andrea Schnepf. See //license.txt for details.
 
-#include "RootSystem.h"
-#include "analysis.h"
-
 #include <iostream>
 #include <fstream>
 #include <unistd.h>
 
-#include "examples/example1.h"
-#include "examples/example1_wb_dgf.h"
-#include "examples/example2.h"
-#include "examples/example3.h"
-#include "examples/example4.h"
-#include "examples/example5.h"
+#include "RootSystem.h"
+#include "analysis.h"
 
-#include "examples/benchmarks.h"
+#include "example1.h"
+#include "example1_wb_dgf.h"
+#include "example2.h"
+#include "example3.h"
+#include "example4.h"
+#include "example5.h"
 
-#include "examples/shehan_SoilCore.h"
-#include "examples/shehan_RhizoTubes.h"
-#include "examples/shehan_Trenches.h"
+#include "benchmarks.h"
 
-#include "examples/Exudation/example_exudation.h"
+#include "shehan_SoilCore.h"
+#include "shehan_RhizoTubes.h"
+#include "shehan_Trenches.h"
+
+#include "./Exudation/example_exudation.h"
 
 /**
  * Starts an examples (from the examples folder)

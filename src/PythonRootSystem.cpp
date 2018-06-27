@@ -29,7 +29,7 @@
 #include "sdf.h"
 #include "RootSystem.h"
 #include "analysis.h"
-#include "examples/Exudation/example_exudation.h"
+#include "../examples/Exudation/example_exudation.h"
 
 namespace CRootBox {
 
