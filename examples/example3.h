@@ -4,10 +4,12 @@
  * Creates N*N root systems at different locations, no confining geometry
  *
  */
-using namespace std;
+
+namespace CRootBox {
 
 void example3()
 {
+  using namespace std;
   auto gen = default_random_engine(chrono::system_clock::now().time_since_epoch().count());
   auto UD = uniform_real_distribution<double>(0,1); // random stuff
 
@@ -51,3 +53,5 @@ void example3()
   }
 
 }
+
+} // end namespace CRootBox

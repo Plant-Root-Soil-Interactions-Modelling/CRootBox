@@ -27,13 +27,15 @@
  */
 int main(int argc, char* argv[])
 {
-    string name="";
+    using namespace CRootBox;
+
+    std::string name="";
 
     if (argc>1) {
         name= argv[1];
     }
 
-     //example1(); // open parameter file, and output VTP
+    example1(); // open parameter file, and output VTP
     // example1_wb_dgf(); // root growth inside a big box to simulate soil surface, open parameter file, and output VTP
     // example2(); // like example 1, but with put geometry
     // example3(); // more than 1 plant
@@ -49,7 +51,7 @@ int main(int argc, char* argv[])
 //        shehan_SoilCore(); // with default values
 //    }
 //
-     shehan_SoilCore("Anagallis_femina_Leitner_2010",true);
+    // shehan_SoilCore("Anagallis_femina_Leitner_2010",true);
 
     // shehan_RhizoTubes("wheat",true);
 
@@ -59,9 +61,6 @@ int main(int argc, char* argv[])
 
     // example_exudation();
 
-    return(0);
+    return 0;
 
 }
-
-
-

@@ -8,10 +8,12 @@
  *
  *  Additionally, exports the line segments as .txt file to import into Matlab for postprocessing
  */
-using namespace std;
+
+namespace CRootBox {
 
 void example1_wb_dgf()
 {
+    using namespace std;
     RootSystem rootsystem;
 
     string name = "Anagallis_femina_Leitner_2010";
@@ -71,3 +73,5 @@ void example1_wb_dgf()
     cout << "Finished with a total of " << rootsystem.getNumberOfNodes()<< " nodes\n";
 
 }
+
+} // end namespace CRootBox

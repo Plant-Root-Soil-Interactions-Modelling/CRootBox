@@ -1,12 +1,12 @@
 #include "sdf.h"
 
-
+namespace CRootBox {
 
 std::string SignedDistanceFunction::writePVPScript() const
 {
-    	std::stringstream str;
-    	this->writePVPScript(str,1);
-    	return str.str();
+        std::stringstream str;
+        this->writePVPScript(str,1);
+        return str.str();
 }
 
 
@@ -150,7 +150,7 @@ SDF_RotateTranslate::SDF_RotateTranslate(SignedDistanceFunction* sdf_, double a,
     case zaxis:
       A = Matrix3d::rotZ(-a); break;
     default:
-    	throw std::exception();
+        throw std::exception();
   }
 }
 
@@ -300,22 +300,22 @@ double SDF_Difference::getDist(const Vector3d& v) const
  */
 SDF_HalfPlane::SDF_HalfPlane(const Vector3d& o, const Vector3d& n_)
 {
-	n = n_;
-	n.normalize();
-	Matrix3d A = Matrix3d::ons(n);
-	p1 = A.column(1);
-	p2 = A.column(2);
-	p1.times(10.); // rescale to 10 cm
-	p2.times(10.);
+    n = n_;
+    n.normalize();
+    Matrix3d A = Matrix3d::ons(n);
+    p1 = A.column(1);
+    p2 = A.column(2);
+    p1.times(10.); // rescale to 10 cm
+    p2.times(10.);
 }
 
 
 SDF_HalfPlane::SDF_HalfPlane(const Vector3d& o, const Vector3d& p1, const Vector3d& p2): o(o), p1(p1), p2(p2)
 {
-	Vector3d v1 = p1.minus(o);
-	Vector3d v2 = p2.minus(o);
-	n = v1.cross(v2);
-	n.normalize();
+    Vector3d v1 = p1.minus(o);
+    Vector3d v2 = p2.minus(o);
+    n = v1.cross(v2);
+    n.normalize();
 //	std::cout << "SDF_HalfPlane normal:"<< n.toString() << "\n" ;
 };
 
@@ -329,20 +329,21 @@ SDF_HalfPlane::SDF_HalfPlane(const Vector3d& o, const Vector3d& p1, const Vector
  */
 int SDF_HalfPlane::writePVPScript(std::ostream & cout, int c) const
 {
-	  std::string name = "obj";
-	  name.append(std::to_string(c));
+      std::string name = "obj";
+      name.append(std::to_string(c));
 
-	  cout << name <<" = Plane()\n" <<
-	      name << ".Origin = [" << o.x << ", " << o.y << ", " << o.z << "]\n" <<
-	      name << ".Point1 = [" << p1.x << ", " << p1.y << ", " << p1.z << "]\n" <<
-	      name << ".Point2 = [" << p2.x << ", " << p2.y << ", " << p2.z << "]\n\n";
+      cout << name <<" = Plane()\n" <<
+          name << ".Origin = [" << o.x << ", " << o.y << ", " << o.z << "]\n" <<
+          name << ".Point1 = [" << p1.x << ", " << p1.y << ", " << p1.z << "]\n" <<
+          name << ".Point2 = [" << p2.x << ", " << p2.y << ", " << p2.z << "]\n\n";
 
-	  cout << name << "Display = Show(" << name << ",renderView1)\n" <<
-	      name << "Display.Opacity = 0.2\n";
-	      //name<< "Display.DiffuseColor = [0., 0., 1.0]\n" << "renderView1.ResetCamera()\n";
+      cout << name << "Display = Show(" << name << ",renderView1)\n" <<
+          name << "Display.Opacity = 0.2\n";
+          //name<< "Display.DiffuseColor = [0., 0., 1.0]\n" << "renderView1.ResetCamera()\n";
 
-	  // created 1 object and corresponding Display
-	  c++;
-	  return c;
+      // created 1 object and corresponding Display
+      c++;
+      return c;
 }
 
+} // end namespace CRootBox

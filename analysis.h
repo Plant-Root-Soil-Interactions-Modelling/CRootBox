@@ -4,6 +4,8 @@
 #include "RootSystem.h"
 #include <set>
 
+namespace CRootBox {
+
 /**
  * Meshfree analysis of the root system based on signed distance functions.
  */
@@ -74,5 +76,7 @@ protected:
 
 inline bool operator==(const SegmentAnalyser& lhs, const SegmentAnalyser& rhs){ return (&lhs==&rhs); } // only address wise, needed for boost python indexing suite
 inline bool operator!=(const SegmentAnalyser& lhs, const SegmentAnalyser& rhs){ return !(lhs == rhs); }
+
+} // end namespace CRootBox
 
 #endif

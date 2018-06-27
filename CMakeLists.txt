@@ -26,13 +26,13 @@ include_directories(${PROJECT_SOURCE_DIR})
 
 # file(GLOB all_sources *.cpp) # i changed that to exclude PythonRootSystem.cpp
 add_library(CRootBox
-analysis.cpp
-ModelParameter.cpp
-Root.cpp
-RootSystem.cpp
-sdf.cpp
-tropism.cpp
-)
+            analysis.cpp
+            ModelParameter.cpp
+            Root.cpp
+            RootSystem.cpp
+            sdf.cpp
+            tropism.cpp
+            examples/Exudation/gauss_legendre.cpp)
 
 #
 # 2. Make py_rootbox library
@@ -65,3 +65,10 @@ else ()
   message(WARNING "Python 3 was not found on your system! You can only use the C++ interface of CRootBox. \
                    Install Python 3 and rerun CMake to build the py_rootbox library.")
 endif ()
+
+#
+# 3. Make the C++ example
+#
+
+add_executable(test_crootbox main.cpp)
+target_link_libraries(test_crootbox CRootBox)
