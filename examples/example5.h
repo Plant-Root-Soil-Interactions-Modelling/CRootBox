@@ -5,10 +5,13 @@
  * proof of concept, with a static soil water content
  *
  */
-using namespace std;
+
+namespace CRootBox {
 
 void example5()
 {
+    using namespace std;
+
     RootSystem rootsystem;
 
     string name = "Zea_mays_5_Leitner_2014";
@@ -69,3 +72,5 @@ void example5()
 
     cout << "Finished with a total of " << rootsystem.getNumberOfNodes()<< " nodes\n";
 }
+
+} // end namespace CRootBox

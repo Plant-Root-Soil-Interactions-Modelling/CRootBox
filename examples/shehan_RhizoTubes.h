@@ -7,7 +7,7 @@
  * uses trenches to analyse the number of roots in a coarse grid
  * *
  */
-using namespace std;
+namespace CRootBox {
 
 /*
  * Creates the geometry of the rhizo tubes
@@ -17,6 +17,7 @@ using namespace std;
  */
 SignedDistanceFunction* fieldRhizoTubes(double r)
 {
+  using namespace std;
   double l = 90; // cm tube length
   SDF_PlantContainer* rhizotube = new SDF_PlantContainer(r,r,l,false);
   SDF_RotateTranslate* rhizoX = new SDF_RotateTranslate(rhizotube, l, SDF_RotateTranslate::yaxis, Vector3d(l,0.,0.));
@@ -36,7 +37,8 @@ SignedDistanceFunction* fieldRhizoTubes(double r)
  *
  * \return Positions of the fotos
  */
-vector<Vector3d> fotoPos() {
+std::vector<Vector3d> fotoPos() {
+  using namespace std;
   double l = 90; // cm
   vector<Vector3d> fP;
   const int tubeN=6;
@@ -55,8 +57,9 @@ vector<Vector3d> fotoPos() {
 /**
  * Rhizo tube analysis in the virtual field experiment
  */
-void shehan_RhizoTubes(string name = "wheat", bool exportVTP = false)
+void shehan_RhizoTubes(const std::string& name = "wheat", bool exportVTP = false)
 {
+  using namespace std;
   /*
    * Initialize
    */
@@ -199,3 +202,5 @@ void shehan_RhizoTubes(string name = "wheat", bool exportVTP = false)
       allRS[0]->write(gname2);
   }
 }
+
+} // end namespace CRootBox

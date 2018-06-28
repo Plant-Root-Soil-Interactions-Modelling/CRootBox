@@ -1,53 +1,53 @@
 /*
-	Numerical Integration by Gauss-Legendre Quadrature Formulas of high orders.
-	High-precision abscissas and weights are used.
+    Numerical Integration by Gauss-Legendre Quadrature Formulas of high orders.
+    High-precision abscissas and weights are used.
 
-	Project homepage: http://www.holoborodko.com/pavel/?page_id=679
-	Contact e-mail:   pavel@holoborodko.com
+    Project homepage: http://www.holoborodko.com/pavel/?page_id=679
+    Contact e-mail:   pavel@holoborodko.com
 
-	Copyright (c)2007-2010 Pavel Holoborodko
-	All rights reserved.
+    Copyright (c)2007-2010 Pavel Holoborodko
+    All rights reserved.
 
-	Redistribution and use in source and binary forms, with or without
-	modification, are permitted provided that the following conditions
-	are met:
-	
-	1. Redistributions of source code must retain the above copyright
-	notice, this list of conditions and the following disclaimer.
-	
-	2. Redistributions in binary form must reproduce the above copyright
-	notice, this list of conditions and the following disclaimer in the
-	documentation and/or other materials provided with the distribution.
-	
-	3. Redistributions of any form whatsoever must retain the following
-	acknowledgment:
-	"
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+
+    1. Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+    2. Redistributions in binary form must reproduce the above copyright
+    notice, this list of conditions and the following disclaimer in the
+    documentation and/or other materials provided with the distribution.
+
+    3. Redistributions of any form whatsoever must retain the following
+    acknowledgment:
+    "
          This product includes software developed by Pavel Holoborodko
          Web: http://www.holoborodko.com/pavel/
          e-mail: pavel@holoborodko.com
 
-	"
+    "
 
-	4. This software cannot be, by any means, used for any commercial 
-	purpose without the prior permission of the copyright holder.
-	
-	Any of the above conditions can be waived if you get permission from 
-	the copyright holder. 
+    4. This software cannot be, by any means, used for any commercial
+    purpose without the prior permission of the copyright holder.
 
-	THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
-	ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-	IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-	ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
-	FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-	DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-	OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-	HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-	LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-	OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-	SUCH DAMAGE.
+    Any of the above conditions can be waived if you get permission from
+    the copyright holder.
 
-	Contributors
-	Konstantin Holoborodko - Optimization of Legendre polynomial computing.
+    THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+    ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+    FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+    DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+    OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+    OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+    SUCH DAMAGE.
+
+    Contributors
+    Konstantin Holoborodko - Optimization of Legendre polynomial computing.
 
 */
 
@@ -56,12 +56,14 @@
 #include <float.h>
 #include "gauss_legendre.h"
 
+namespace CRootBox {
+
 #ifndef PI
-	#define PI 3.1415926535897932384626433832795028841971693993751
+    #define PI 3.1415926535897932384626433832795028841971693993751
 #endif
 
 #ifndef FABS
-	#define FABS(a) ((a)>=0?(a):-(a))
+    #define FABS(a) ((a)>=0?(a):-(a))
 #endif
 
 /* n = 2 */
@@ -174,259 +176,259 @@ static double w19[10] = {0.1610544498487836959791636,0.1589688433939543476499564
 
 /* Merge all together */
 typedef struct tagGLAW{
-	int n;
+    int n;
     double* x;
-	double* w;
+    double* w;
 }GLAW;
 
 static GLAW glaw[] = {
-								{2,x2,w2},
-								{3,x3,w3},
-								{4,x4,w4},
-								{5,x5,w5},
-								{6,x6,w6},
-								{7,x7,w7},
-								{8,x8,w8},
-								{9,x9,w9},
-								{10,x10,w10},
-								{11,x11,w11},
-								{12,x12,w12},
-								{13,x13,w13},
-								{14,x14,w14},
-								{15,x15,w15},
-								{16,x16,w16},
-								{17,x17,w17},
-								{18,x18,w18},
-								{19,x19,w19},
-								{20,x20,w20},
-								{32,x32,w32},
-								{64,x64,w64},
-								{96,x96,w96},
-								{100,x100,w100},
-								{128,x128,w128},
-								{256,x256,w256},
-								{512,x512,w512},
-								{1024,x1024,w1024}
-							};
+                                {2,x2,w2},
+                                {3,x3,w3},
+                                {4,x4,w4},
+                                {5,x5,w5},
+                                {6,x6,w6},
+                                {7,x7,w7},
+                                {8,x8,w8},
+                                {9,x9,w9},
+                                {10,x10,w10},
+                                {11,x11,w11},
+                                {12,x12,w12},
+                                {13,x13,w13},
+                                {14,x14,w14},
+                                {15,x15,w15},
+                                {16,x16,w16},
+                                {17,x17,w17},
+                                {18,x18,w18},
+                                {19,x19,w19},
+                                {20,x20,w20},
+                                {32,x32,w32},
+                                {64,x64,w64},
+                                {96,x96,w96},
+                                {100,x100,w100},
+                                {128,x128,w128},
+                                {256,x256,w256},
+                                {512,x512,w512},
+                                {1024,x1024,w1024}
+                            };
 
 static const int GLAWSIZE = sizeof(glaw)/sizeof(glaw[0]);
 
-/* 
+/*
 Gauss-Legendre n-points quadrature, exact for polynomial of degree <=2n-1
 
 1. n - even:
 
-int(f(t),t=a..b) = A*sum(w[i]*f(A*x[i]+B),i=0..n-1) 
-		 = A*sum(w[k]*[f(B+A*x[k])+f(B-A*x[k])],k=0..n/2-1)
-	A = (b-a)/2, 
-	B = (a+b)/2
+int(f(t),t=a..b) = A*sum(w[i]*f(A*x[i]+B),i=0..n-1)
+         = A*sum(w[k]*[f(B+A*x[k])+f(B-A*x[k])],k=0..n/2-1)
+    A = (b-a)/2,
+    B = (a+b)/2
 
-	
+
 2. n - odd:
 
-int(f(t),t=a..b) = A*sum(w[i]*f(A*x[i]+B),i=0..n-1) 
-		 = A*w[0]*f(B)+A*sum(w[k]*[f(B+A*x[k])+f(B-A*x[k])],k=1..(n-1)/2)
-	A = (b-a)/2, 
-	B = (a+b)/2
+int(f(t),t=a..b) = A*sum(w[i]*f(A*x[i]+B),i=0..n-1)
+         = A*w[0]*f(B)+A*sum(w[k]*[f(B+A*x[k])+f(B-A*x[k])],k=1..(n-1)/2)
+    A = (b-a)/2,
+    B = (a+b)/2
 */
 
 double gauss_legendre(int n, double (*f)(double,void*), void* data, double a, double b)
 {
-	double* x = NULL;
-	double* w = NULL;
-	double A,B,Ax,s;
-	int i, dtbl, m;
+    double* x = NULL;
+    double* w = NULL;
+    double A,B,Ax,s;
+    int i, dtbl, m;
 
-	m = (n+1)>>1;
+    m = (n+1)>>1;
 
-	/* Load appropriate predefined table */
-	dtbl = 0;
-	for (i = 0; i<GLAWSIZE;i++)
-	{
-		if(n==glaw[i].n)
-		{
-			x = glaw[i].x;
-			w = glaw[i].w;
-			break;
-		}
-	}
-	
-	/* Generate new if non-predefined table is required */
-	/* with precision of 1e-10 */
-	if(NULL==x)
-	{
-		dtbl = 1;
+    /* Load appropriate predefined table */
+    dtbl = 0;
+    for (i = 0; i<GLAWSIZE;i++)
+    {
+        if(n==glaw[i].n)
+        {
+            x = glaw[i].x;
+            w = glaw[i].w;
+            break;
+        }
+    }
 
-		x = (double*)malloc(m*sizeof(double));
-		w = (double*)malloc(m*sizeof(double));
+    /* Generate new if non-predefined table is required */
+    /* with precision of 1e-10 */
+    if(NULL==x)
+    {
+        dtbl = 1;
 
-		gauss_legendre_tbl(n,x,w,1e-10);
-	}
+        x = (double*)malloc(m*sizeof(double));
+        w = (double*)malloc(m*sizeof(double));
+
+        gauss_legendre_tbl(n,x,w,1e-10);
+    }
 
 
-	A = 0.5*(b-a);
-	B = 0.5*(b+a);
+    A = 0.5*(b-a);
+    B = 0.5*(b+a);
 
-	if(n&1) /* n - odd */
-	{
-		s = w[0]*((*f)(B,data));
-		for (i=1;i<m;i++)
-		{
-			Ax = A*x[i];
-			s += w[i]*((*f)(B+Ax,data)+(*f)(B-Ax,data));
-		}
+    if(n&1) /* n - odd */
+    {
+        s = w[0]*((*f)(B,data));
+        for (i=1;i<m;i++)
+        {
+            Ax = A*x[i];
+            s += w[i]*((*f)(B+Ax,data)+(*f)(B-Ax,data));
+        }
 
-	}else{ /* n - even */
-		
-		s = 0.0;
-		for (i=0;i<m;i++)
-		{
-			Ax = A*x[i];
-			s += w[i]*((*f)(B+Ax,data)+(*f)(B-Ax,data));			
-		}
-	}
+    }else{ /* n - even */
 
-	if (dtbl)
-	{
-		free(x);
-		free(w);
-	}
-	return A*s;
+        s = 0.0;
+        for (i=0;i<m;i++)
+        {
+            Ax = A*x[i];
+            s += w[i]*((*f)(B+Ax,data)+(*f)(B-Ax,data));
+        }
+    }
+
+    if (dtbl)
+    {
+        free(x);
+        free(w);
+    }
+    return A*s;
 }
 
 
-/* 2D Numerical computation of int(f(x,y),x=a..b,y=c..d) by Gauss-Legendre n-th order high precision quadrature 
-		[in]n     - quadrature order
-		[in]f     - integrand
-		[in]data  - pointer on user-defined data which will 
-					be passed to f every time it called (as third parameter).
-		[in][a,b] - interval of integration
+/* 2D Numerical computation of int(f(x,y),x=a..b,y=c..d) by Gauss-Legendre n-th order high precision quadrature
+        [in]n     - quadrature order
+        [in]f     - integrand
+        [in]data  - pointer on user-defined data which will
+                    be passed to f every time it called (as third parameter).
+        [in][a,b] - interval of integration
 
-	return:
-			-computed integral value or -1.0 if n order quadrature is not supported
+    return:
+            -computed integral value or -1.0 if n order quadrature is not supported
 
-	1. n - even:
+    1. n - even:
 
-	int(f(t,p),t=a..b,p=c..d) = C*A*sum(w[i]*w[j]*f(A*x[i]+B,C*y[j]+D),i=0..n-1,j=0..n-1) 
-			 = C*A*sum(w[k]*w[l]*[f(B+A*x[k],C*y[l]+D)+f(B-A*x[k],C*y[l]+D)],k=0..n/2-1,l=0..n-1)
-			 = C*A*sum(w[k]*w[l]*[f(B+A*x[k],C*y[l]+D)+f(B+A*x[k],D-C*y[l])+
-								 +f(B-A*x[k],C*y[l]+D)+f(B-A*x[k],D-C*y[l])],k=0..n/2-1,l=0..n/2-1)
-		A = (b-a)/2 
-		B = (a+b)/2
-		C = (d-c)/2
-		D = (d+c)/2
+    int(f(t,p),t=a..b,p=c..d) = C*A*sum(w[i]*w[j]*f(A*x[i]+B,C*y[j]+D),i=0..n-1,j=0..n-1)
+             = C*A*sum(w[k]*w[l]*[f(B+A*x[k],C*y[l]+D)+f(B-A*x[k],C*y[l]+D)],k=0..n/2-1,l=0..n-1)
+             = C*A*sum(w[k]*w[l]*[f(B+A*x[k],C*y[l]+D)+f(B+A*x[k],D-C*y[l])+
+                                 +f(B-A*x[k],C*y[l]+D)+f(B-A*x[k],D-C*y[l])],k=0..n/2-1,l=0..n/2-1)
+        A = (b-a)/2
+        B = (a+b)/2
+        C = (d-c)/2
+        D = (d+c)/2
 
-		
-	2. n - odd:
 
-	int(f(t,p),t=a..b,p=c..d) = C*A*sum(w[i]*w[j]*f(A*x[i]+B,C*y[j]+D),i=0..n-1,j=0..n-1) 
-			 = C*A*[w[0]*w[0]*f(B,D)+sum(w[0]*w[j]*(f(B,C*y[j]+D)+f(B,D-C*y[j])),j=1..(n-1)/2)+
-			                        +sum(w[i]*w[0]*(f(B+A*x[i],D)+f(B-A*x[i],D)),i=1..(n-1)/2)+
-									+sum(w[k]*w[l]*[f(B+A*x[k],C*y[l]+D)+f(B+A*x[k],D-C*y[l])+
-										  +f(B-A*x[k],C*y[l]+D)+f(B-A*x[k],D-C*y[l])],k=1..(n-1)/2,l=1..(n-1)/2)]
-		
-		A = (b-a)/2, 
-		B = (a+b)/2
-		C = (d-c)/2
-		D = (d+c)/2
+    2. n - odd:
+
+    int(f(t,p),t=a..b,p=c..d) = C*A*sum(w[i]*w[j]*f(A*x[i]+B,C*y[j]+D),i=0..n-1,j=0..n-1)
+             = C*A*[w[0]*w[0]*f(B,D)+sum(w[0]*w[j]*(f(B,C*y[j]+D)+f(B,D-C*y[j])),j=1..(n-1)/2)+
+                                    +sum(w[i]*w[0]*(f(B+A*x[i],D)+f(B-A*x[i],D)),i=1..(n-1)/2)+
+                                    +sum(w[k]*w[l]*[f(B+A*x[k],C*y[l]+D)+f(B+A*x[k],D-C*y[l])+
+                                          +f(B-A*x[k],C*y[l]+D)+f(B-A*x[k],D-C*y[l])],k=1..(n-1)/2,l=1..(n-1)/2)]
+
+        A = (b-a)/2,
+        B = (a+b)/2
+        C = (d-c)/2
+        D = (d+c)/2
 
 */
 double gauss_legendre_2D_cube(int n, double (*f)(double,double,void*), void* data, double a, double b, double c, double d)
 {
-	double* x = NULL;
-	double* w = NULL;
-	double A,B,C,D,Ax,Cy,s,t;
-	int i,j, dtbl, m;
+    double* x = NULL;
+    double* w = NULL;
+    double A,B,C,D,Ax,Cy,s,t;
+    int i,j, dtbl, m;
 
-	m = (n+1)>>1;
+    m = (n+1)>>1;
 
-	/* Load appropriate predefined table */
-	dtbl = 0;
-	for (i = 0; i<GLAWSIZE;i++)
-	{
-		if(n==glaw[i].n)
-		{
-			x = glaw[i].x;
-			w = glaw[i].w;
-			break;
-		}
-	}
+    /* Load appropriate predefined table */
+    dtbl = 0;
+    for (i = 0; i<GLAWSIZE;i++)
+    {
+        if(n==glaw[i].n)
+        {
+            x = glaw[i].x;
+            w = glaw[i].w;
+            break;
+        }
+    }
 
-	/* Generate new if non-predefined table is required */
-	/* with precision of 1e-10 */
-	if(NULL==x)
-	{
-		dtbl = 1;
+    /* Generate new if non-predefined table is required */
+    /* with precision of 1e-10 */
+    if(NULL==x)
+    {
+        dtbl = 1;
 
-		x = (double*)malloc(m*sizeof(double));
-		w = (double*)malloc(m*sizeof(double));
+        x = (double*)malloc(m*sizeof(double));
+        w = (double*)malloc(m*sizeof(double));
 
-		gauss_legendre_tbl(n,x,w,1e-10);
-	}
+        gauss_legendre_tbl(n,x,w,1e-10);
+    }
 
 
-	A = 0.5*(b-a);
-	B = 0.5*(b+a);
-	C = 0.5*(d-c);
-	D = 0.5*(d+c);
+    A = 0.5*(b-a);
+    B = 0.5*(b+a);
+    C = 0.5*(d-c);
+    D = 0.5*(d+c);
 
-	if(n&1) /* n - odd */
-	{
+    if(n&1) /* n - odd */
+    {
 
-		s = w[0]*w[0]*(*f)(B,D,data);
-		
-		for (j=1,t=0.0;j<m;j++)
-		{
-			Cy = C*x[j];
-			t += w[j]*((*f)(B,D+Cy,data)+(*f)(B,D-Cy,data));
-		}
-		s += w[0]*t;
+        s = w[0]*w[0]*(*f)(B,D,data);
 
-		for (i=1,t=0.0;i<m;i++)
-		{
-			Ax = A*x[i];
-			t += w[i]*((*f)(B+Ax,D,data)+(*f)(B-Ax,D,data));
-		}
-		s += w[0]*t;
+        for (j=1,t=0.0;j<m;j++)
+        {
+            Cy = C*x[j];
+            t += w[j]*((*f)(B,D+Cy,data)+(*f)(B,D-Cy,data));
+        }
+        s += w[0]*t;
 
-		for (i=1;i<m;i++)
-		{
-			Ax = A*x[i];
-			for (j=1;j<m;j++)
-			{
-				Cy = C*x[j];
-				s += w[i]*w[j]*( (*f)(B+Ax,D+Cy,data)+(*f)(Ax+B,D-Cy,data)+(*f)(B-Ax,D+Cy,data)+(*f)(B-Ax,D-Cy,data));
-			}
-		}
+        for (i=1,t=0.0;i<m;i++)
+        {
+            Ax = A*x[i];
+            t += w[i]*((*f)(B+Ax,D,data)+(*f)(B-Ax,D,data));
+        }
+        s += w[0]*t;
 
-	}else{ /* n - even */
+        for (i=1;i<m;i++)
+        {
+            Ax = A*x[i];
+            for (j=1;j<m;j++)
+            {
+                Cy = C*x[j];
+                s += w[i]*w[j]*( (*f)(B+Ax,D+Cy,data)+(*f)(Ax+B,D-Cy,data)+(*f)(B-Ax,D+Cy,data)+(*f)(B-Ax,D-Cy,data));
+            }
+        }
 
-		s = 0.0;
-		for (i=0;i<m;i++)
-		{
-			Ax = A*x[i];
-			for (j=0;j<m;j++)
-			{
-				Cy = C*x[j];
-				s += w[i]*w[j]*( (*f)(B+Ax,D+Cy,data)+(*f)(Ax+B,D-Cy,data)+(*f)(B-Ax,D+Cy,data)+(*f)(B-Ax,D-Cy,data));
-			}
-		}
-	}
+    }else{ /* n - even */
 
-	if (dtbl)
-	{
-		free(x);
-		free(w);
-	}
-	return C*A*s;
+        s = 0.0;
+        for (i=0;i<m;i++)
+        {
+            Ax = A*x[i];
+            for (j=0;j<m;j++)
+            {
+                Cy = C*x[j];
+                s += w[i]*w[j]*( (*f)(B+Ax,D+Cy,data)+(*f)(Ax+B,D-Cy,data)+(*f)(B-Ax,D+Cy,data)+(*f)(B-Ax,D-Cy,data));
+            }
+        }
+    }
+
+    if (dtbl)
+    {
+        free(x);
+        free(w);
+    }
+    return C*A*s;
 }
 
 
 /* Computing of abscissas and weights for Gauss-Legendre quadrature for any(reasonable) order n
-	[in] n   - order of quadrature
-	[in] eps - required precision (must be eps>=macheps(double), usually eps = 1e-10 is ok)
-	[out]x   - abscisass, size = (n+1)>>1
-	[out]w   - weights, size = (n+1)>>1 
+    [in] n   - order of quadrature
+    [in] eps - required precision (must be eps>=macheps(double), usually eps = 1e-10 is ok)
+    [out]x   - abscisass, size = (n+1)>>1
+    [out]w   - weights, size = (n+1)>>1
 */
 
 /* Look up table for fast calculation of Legendre polynomial for n<1024 */
@@ -435,105 +437,107 @@ static double ltbl[1024] = {0.00000000000000000000,0.00000000000000000000,0.5000
 
 void gauss_legendre_tbl(int n, double* x, double* w, double eps)
 {
-	double x0,  x1,  dx;	/* Abscissas */
-	double w0,  w1,  dw;	/* Weights */
-	double P0, P_1, P_2;	/* Legendre polynomial values */
-	double dpdx;			/* Legendre polynomial derivative */
-	int i, j, k, m;			/* Iterators */
-	double t0, t1, t2, t3;
+    double x0,  x1,  dx;	/* Abscissas */
+    double w0,  w1,  dw;	/* Weights */
+    double P0, P_1, P_2;	/* Legendre polynomial values */
+    double dpdx;			/* Legendre polynomial derivative */
+    int i, j, k, m;			/* Iterators */
+    double t0, t1, t2, t3;
 
-	m = (n+1)>>1;
-	
-	t0 = (1.0-(1.0-1.0/(double)n)/(8.0*(double)n*(double)n));
-	t1 = 1.0/(4.0*(double)n+2.0);
+    m = (n+1)>>1;
 
-	for (i = 1; i <= m; i++)
-	{
-		/* Find i-th root of Legendre polynomial */
+    t0 = (1.0-(1.0-1.0/(double)n)/(8.0*(double)n*(double)n));
+    t1 = 1.0/(4.0*(double)n+2.0);
 
-		/* Initial guess */
-		x0 = cos(PI*(double)((i<<2)-1)*t1)*t0;
+    for (i = 1; i <= m; i++)
+    {
+        /* Find i-th root of Legendre polynomial */
 
-		/* Newton iterations, at least one */
-		j = 0;
-		dx = dw = DBL_MAX;
-		do 
-		{
-			/* Compute Legendre polynomial value at x0 */
-			P_1 = 1.0;
-			P0  = x0;
+        /* Initial guess */
+        x0 = cos(PI*(double)((i<<2)-1)*t1)*t0;
+
+        /* Newton iterations, at least one */
+        j = 0;
+        dx = dw = DBL_MAX;
+        do
+        {
+            /* Compute Legendre polynomial value at x0 */
+            P_1 = 1.0;
+            P0  = x0;
 #if 0
-			/* Simple, not optimized version */
-			for (k = 2; k <= n; k++)
-			{
-				P_2 = P_1;
-				P_1 = P0;
-				t2 = x0*P_1;
-				t3 = (double)(k-1)/(double)k;
+            /* Simple, not optimized version */
+            for (k = 2; k <= n; k++)
+            {
+                P_2 = P_1;
+                P_1 = P0;
+                t2 = x0*P_1;
+                t3 = (double)(k-1)/(double)k;
 
-				P0 = t2 + t3*(t2 - P_2);
-			}
+                P0 = t2 + t3*(t2 - P_2);
+            }
 #else
-			/* Optimized version using lookup tables */
-			if (n<1024)
-			{
-				/* Use fast algorithm for small n*/
-				for (k = 2; k <= n; k++)
-				{
-					P_2 = P_1;
-					P_1 = P0;
-					t2  = x0*P_1;
+            /* Optimized version using lookup tables */
+            if (n<1024)
+            {
+                /* Use fast algorithm for small n*/
+                for (k = 2; k <= n; k++)
+                {
+                    P_2 = P_1;
+                    P_1 = P0;
+                    t2  = x0*P_1;
 
-					P0 = t2 + ltbl[k]*(t2 - P_2);
+                    P0 = t2 + ltbl[k]*(t2 - P_2);
 
-				}
+                }
 
-			}else{
+            }else{
 
-				/* Use general algorithm for other n */
-				for (k = 2; k < 1024; k++)
-				{
-					P_2 = P_1;
-					P_1 = P0;
-					t2  = x0*P_1;
+                /* Use general algorithm for other n */
+                for (k = 2; k < 1024; k++)
+                {
+                    P_2 = P_1;
+                    P_1 = P0;
+                    t2  = x0*P_1;
 
-					P0 = t2 + ltbl[k]*(t2 - P_2);
-				}
+                    P0 = t2 + ltbl[k]*(t2 - P_2);
+                }
 
-				for (k = 1024; k <= n; k++)
-				{
-					P_2 = P_1;
-					P_1 = P0;
-					t2 = x0*P_1;
-					t3 = (double)(k-1)/(double)k;
-					
-					P0 = t2 + t3*(t2 - P_2);
-				}
-			}
+                for (k = 1024; k <= n; k++)
+                {
+                    P_2 = P_1;
+                    P_1 = P0;
+                    t2 = x0*P_1;
+                    t3 = (double)(k-1)/(double)k;
+
+                    P0 = t2 + t3*(t2 - P_2);
+                }
+            }
 #endif
-			/* Compute Legendre polynomial derivative at x0 */
-			dpdx = ((x0*P0-P_1)*(double)n)/(x0*x0-1.0);
+            /* Compute Legendre polynomial derivative at x0 */
+            dpdx = ((x0*P0-P_1)*(double)n)/(x0*x0-1.0);
 
-			/* Newton step */
-			x1 = x0-P0/dpdx;
+            /* Newton step */
+            x1 = x0-P0/dpdx;
 
-			/* Weight computing */
-			w1 = 2.0/((1.0-x1*x1)*dpdx*dpdx);
+            /* Weight computing */
+            w1 = 2.0/((1.0-x1*x1)*dpdx*dpdx);
 
-			/* Compute weight w0 on first iteration, needed for dw */
-			if (j==0) w0 = 2.0/((1.0-x0*x0)*dpdx*dpdx);
+            /* Compute weight w0 on first iteration, needed for dw */
+            if (j==0) w0 = 2.0/((1.0-x0*x0)*dpdx*dpdx);
 
-			dx = x0-x1;
-			dw = w0-w1;
+            dx = x0-x1;
+            dw = w0-w1;
 
-			x0 = x1;
-			w0 = w1;
-			j++;
-		} while((FABS(dx)>eps || FABS(dw)>eps) && j<100);
+            x0 = x1;
+            w0 = w1;
+            j++;
+        } while((FABS(dx)>eps || FABS(dw)>eps) && j<100);
 
-		x[(m-1)-(i-1)] = x1;
-		w[(m-1)-(i-1)] = w1;
-	}
+        x[(m-1)-(i-1)] = x1;
+        w[(m-1)-(i-1)] = w1;
+    }
 
-	return;
+    return;
 }
+
+} // end namespace CRootBox
