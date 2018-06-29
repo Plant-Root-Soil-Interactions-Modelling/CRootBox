@@ -53,7 +53,7 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
  * Copies the root tree
  */
 Root::Root(const Root& r, RootSystem& rs) :rootsystem(&rs), param(r.param), iheading(r.iheading), id(r.id), parent_base_length(r.parent_base_length), parent_ni(r.parent_ni), alive(r.alive),
-        active(r.active), age(r.age), length(r.length), old_non(r.old_non), parent(r.parent), smallDx(r.smallDx), nodes(r.nodes), nodeIds(r.nodeIds), netimes(r.netimes)
+    active(r.active), age(r.age), length(r.length), old_non(r.old_non), parent(r.parent), smallDx(r.smallDx), nodes(r.nodes), nodeIds(r.nodeIds), netimes(r.netimes)
 {
     laterals = std::vector<Root*>(r.laterals.size());
     for (size_t i=0; i< r.laterals.size(); i++) {

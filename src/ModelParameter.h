@@ -34,9 +34,9 @@ public:
     virtual ~RootTypeParameter() { };
 
     void set(int type, double lb, double lbs, double la, double las, double ln, double lns, double nob, double nobs,
-            double r, double rs, double a, double as,  double colorR, double colorG, double colorB, double tropismT, double tropismN, double tropsimS,
-            double dx, const std::vector<int>& successor, const std::vector<double>& successorP, double theta, double thetas, double rlt, double rlts,
-            int gf, const std::string& name); ///< sets all parameters
+        double r, double rs, double a, double as,  double colorR, double colorG, double colorB, double tropismT, double tropismN, double tropsimS,
+        double dx, const std::vector<int>& successor, const std::vector<double>& successorP, double theta, double thetas, double rlt, double rlts,
+        int gf, const std::string& name); ///< sets all parameters
 
     RootParameter realize(); ///< Creates a specific root from the root parameter set
     int getLateralType(const Vector3d& pos); ///< Choose (dice) lateral type based on root parameter set

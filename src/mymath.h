@@ -13,7 +13,7 @@
 namespace CRootBox {
 
 #ifndef M_PI
-    #define M_PI 3.14159265358979323846
+#define M_PI 3.14159265358979323846
 #endif
 
 /**
@@ -155,8 +155,8 @@ public:
         Vector3d v2;
         Vector3d v3;
         if ((std::abs(v.x)>=std::abs(v.y)) && (std::abs(v.x)>=std::abs(v.z))) { // choose x and z
-             v2 = Vector3d(-v.z, 0, v.x);
-             v3 = v.cross(v2);
+            v2 = Vector3d(-v.z, 0, v.x);
+            v3 = v.cross(v2);
         } else if ((std::abs(v.y)>=std::abs(v.x)) && (std::abs(v.y)>=std::abs(v.z))) { // choose y and z
             v2 = Vector3d(0,-v.z, v.y);
             v3 = v.cross(v2);

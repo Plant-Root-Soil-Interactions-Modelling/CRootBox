@@ -3,13 +3,13 @@
 namespace CRootBox {
 
 const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","volume","1","userdata 1", "userdata 2", "userdata 3", "parent type",
-        "basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance"};
+    "basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance"};
 
 /**
  * Constructor
  */
 RootSystem::RootSystem() :gen(std::mt19937(std::chrono::system_clock::now().time_since_epoch().count())),
-        UD(std::uniform_real_distribution<double>(0,1)), UID(std::uniform_int_distribution<unsigned int>()), ND(std::normal_distribution<double>(0,1))
+    UD(std::uniform_real_distribution<double>(0,1)), UID(std::uniform_int_distribution<unsigned int>()), ND(std::normal_distribution<double>(0,1))
 {
     initRTP();
 };
@@ -22,7 +22,7 @@ RootSystem::RootSystem() :gen(std::mt19937(std::chrono::system_clock::now().time
  * empties buffer
  */
 RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), rsparam(rs.rsparam), rtparam(rs.rtparam), gf(rs.gf), tf(rs.tf), geometry(rs.geometry), soil(rs.soil),
-        simtime(rs.simtime), rid(rs.rid), nid(rs.nid), old_non(rs.old_non), old_nor(rs.old_nor), maxtypes(rs.maxtypes), gen(rs.gen), UD(rs.UD), ND(rs.ND)
+    simtime(rs.simtime), rid(rs.rid), nid(rs.nid), old_non(rs.old_non), old_nor(rs.old_nor), maxtypes(rs.maxtypes), gen(rs.gen), UD(rs.UD), ND(rs.ND)
 {
     // std::cout << "Copying root system ("<<rs.baseRoots.size()<< " base roots) \n";
 
@@ -1032,7 +1032,7 @@ void RootSystem::writeGeometry(std::ostream & os) const
 
 
 RootSystemState::RootSystemState(const RootSystem& rs) :rtparam(rs.rtparam), simtime(rs.simtime), rid(rs.rid),nid(rs.nid), old_non(rs.old_non), old_nor(rs.old_nor),
-        numberOfCrowns(rs.numberOfCrowns), manualSeed(rs.manualSeed), gen(rs.gen), UD(rs.UD), ND(rs.ND)
+    numberOfCrowns(rs.numberOfCrowns), manualSeed(rs.manualSeed), gen(rs.gen), UD(rs.UD), ND(rs.ND)
 {
     tf = std::vector<Tropism*>(rs.tf.size()); // deep copy tropisms
     for (size_t i=0; i<rs.tf.size(); i++) {

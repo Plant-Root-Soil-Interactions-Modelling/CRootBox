@@ -12,13 +12,14 @@ namespace CRootBox {
  */
 RootTypeParameter::RootTypeParameter() {
     set(-1, 0., 0., 10., 0., 1., 0., 0., 0., 1., 0, 0.1, 0., 150./255.,150./255.,50./255., 1, 1. ,0.2, 0.1,
-            successor, successorP, 1.22, 0., 1.e9, 0., 1, "undefined");
+        successor, successorP, 1.22, 0., 1.e9, 0., 1, "undefined");
 }
 
 void RootTypeParameter::set(int type, double lb, double lbs, double la, double las, double ln, double lns, double nob, double nobs,
-        double r, double rs, double a, double as,  double colorR, double colorG, double colorB, double tropismT, double tropismN, double tropismS,
-        double dx, const std::vector<int>& successor, const std::vector<double>& successorP, double theta, double thetas, double rlt, double rlts,
-        int gf, const std::string& name) {
+    double r, double rs, double a, double as,  double colorR, double colorG, double colorB, double tropismT, double tropismN, double tropismS,
+    double dx, const std::vector<int>& successor, const std::vector<double>& successorP, double theta, double thetas, double rlt, double rlts,
+    int gf, const std::string& name) {
+
     this->type = type;
     this->lb = lb;		this->lbs = lbs;
     this->la = la;		this->las = las;
@@ -100,9 +101,9 @@ int RootTypeParameter::getLateralType(const Vector3d& pos)
 void RootTypeParameter::write(std::ostream & cout) const {
     cout << "# Root type parameter for " << name << "\n";
     cout << "type\t" << type << "\n" << "name\t" << name << "\n" << "lb\t"<< lb <<"\t"<< lbs << "\n" << "la\t"<< la <<"\t"<< las << "\n"
-            << "ln\t" << ln << "\t" << lns << "\n" << "nob\t"<< nob <<"\t"<< nobs << "\n" << "r\t"<< r <<"\t"<< rs << "\n" <<
-            "a\t" << a << "\t" << as << "\n" << "color\t"<< colorR <<"\t"<< colorG << "\t" << colorB << "\n"
-            << "tropism\t"<< tropismT <<"\t"<< tropismN << "\t" << tropismS << "\n" << "dx\t" << dx << "\n" << "successor\t" << successor.size() << "\t";
+        << "ln\t" << ln << "\t" << lns << "\n" << "nob\t"<< nob <<"\t"<< nobs << "\n" << "r\t"<< r <<"\t"<< rs << "\n" <<
+        "a\t" << a << "\t" << as << "\n" << "color\t"<< colorR <<"\t"<< colorG << "\t" << colorB << "\n"
+        << "tropism\t"<< tropismT <<"\t"<< tropismN << "\t" << tropismS << "\n" << "dx\t" << dx << "\n" << "successor\t" << successor.size() << "\t";
     for (size_t i=0; i<successor.size(); i++) {
         cout << successor[i] << "\t";
     }
@@ -212,7 +213,7 @@ void RootParameter::write(std::ostream & cout) const {
  */
 RootSystemParameter::RootSystemParameter() {
     set(3.,1.e9,0.,0, //pd, fB, dB, mB,
-            0,1.e9,1.e9,0.,0.,30.);  // nC, fSB, dSB, dRC, nz
+        0,1.e9,1.e9,0.,0.,30.);  // nC, fSB, dSB, dRC, nz
 }
 
 
@@ -232,8 +233,8 @@ void RootSystemParameter::read(std::istream & cin) {
 void RootSystemParameter::write(std::ostream & cout) const {
     double pd = -seedPos.z;
     cout <<  "plantingdepth\t" << pd << "\n" <<  "firstB\t" << firstB << "\n" <<  "delayB\t" << delayB << "\n"
-            <<  "maxB\t" << maxB << "\n" <<  "nC\t" << nC << "\n" <<  "firstSB\t" << firstSB << "\n"
-            <<  "delaySB\t" << delaySB << "\n" <<  "delayRC\t" << delayRC << "\n" <<  "nz\t" << nz << "\n" << "simulationTime\t" << simtime << "\n";
+        <<  "maxB\t" << maxB << "\n" <<  "nC\t" << nC << "\n" <<  "firstSB\t" << firstSB << "\n"
+        <<  "delaySB\t" << delaySB << "\n" <<  "delayRC\t" << delayRC << "\n" <<  "nz\t" << nz << "\n" << "simulationTime\t" << simtime << "\n";
 }
 
 /**
