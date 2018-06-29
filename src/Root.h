@@ -1,3 +1,4 @@
+// -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 #ifndef ROOT_H_
 #define ROOT_H_
 

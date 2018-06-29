@@ -1,3 +1,4 @@
+// -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 #ifndef MYMATH_H_
 #define MYMATH_H_
 

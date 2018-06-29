@@ -1,3 +1,4 @@
+// -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 #ifndef TROPISM_H
 #define TROPISM_H
 
