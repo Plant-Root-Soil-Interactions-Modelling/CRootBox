@@ -75,7 +75,7 @@ For further documentation please refer to the Doxygen class documentation of the
  
 The first example shows how to use CRootBox in the most simple situation: open a parameter file (L7), do the simulation (L13), and save the result (L16). 
 
-\lstinputlisting[language=Python, caption=Example 1a]{../example1a.py} % basicstyle=\footnotesize, 
+\lstinputlisting[language=Python, caption=Example 1a]{../python/example1a.py} % basicstyle=\footnotesize, 
 
 \noindent 
 Lets revise the above code in more detail: 
@@ -94,7 +94,7 @@ The next example is an extension of the previous one, where the root system grow
 Such geometries are important if we want to mimic experimental settings. In CRootBox the domain geometry is represented in a mesh free way using signed distance functions (SDF).
 A SDF returns the distance to the closest boundary, with negative sign if it lies inside of the domain, and a positive if it the point is outside.
 
-\lstinputlisting[language=Python, caption=Example 1b]{../example1b.py}
+\lstinputlisting[language=Python, caption=Example 1b]{../python/example1b.py}
 
 The geometry is first created by constructing some specialization of the class SignedDistanceFunction, and is passed to the root system by the method setGeometry: 
 \begin{itemize}
@@ -131,7 +131,7 @@ Second, we create a split box experiment, and finally rhizotubes as obstacles.
 
 The examples show how to build more complex geometries with rotation, translation and using set operations on the SDF.
 
-\lstinputlisting[language=Python, caption=Example 2a]{../example2a.py}
+\lstinputlisting[language=Python, caption=Example 2a]{../python/example2a.py}
 
 \begin{itemize}
 
@@ -172,7 +172,7 @@ L43 and L44 compose the final geometry by to set operation, first a union of all
 
 Its possible to simulate multiple root systems. In the following we show a small plot scale simulation.
 
-\lstinputlisting[language=Python, caption=Example 2b]{../example2b.py}
+\lstinputlisting[language=Python, caption=Example 2b]{../python/example2b.py}
 
 \begin{itemize}
 
@@ -212,7 +212,7 @@ The following script shows how to analyse length versus time, and how we can obt
 
 First, lets analyse the root length versus time, and consider the total root length, and root length per type. 
 
-\lstinputlisting[firstline=1,lastline=41, language=Python, caption=Example 3a (1)]{../example3a.py}
+\lstinputlisting[firstline=1,lastline=41, language=Python, caption=Example 3a (1)]{../python/example3a.py}
 
 \begin{itemize}
 
@@ -237,7 +237,7 @@ The functions v2a is defined in the package rb\_tools and converts the C++ vecto
 
 Furthermore, we want to show two options how to retrieve root tip postions and root base positions from a simulation:
 
-\lstinputlisting[firstline=42, language=Python, caption=Example 3a (2)]{../example3a.py}
+\lstinputlisting[firstline=42, language=Python, caption=Example 3a (2)]{../python/example3a.py}
 
 \begin{itemize}
 
@@ -278,7 +278,7 @@ The class SegmentAnalyser offers post-processing methods per root segment.
 The advantage is that we can do distributions or densities, and that we can crop the segments with any geometry for analysis. 
 The following script demonstrates some of the possibilities by setting up a virtual soil core experiment. 
 
-\lstinputlisting[language=Python, caption=Example 3b]{../example3b.py}
+\lstinputlisting[language=Python, caption=Example 3b]{../python/example3b.py}
 
 \begin{itemize}
 
@@ -332,7 +332,7 @@ This is especially important if we want to modify the parameters in our scripts 
 
 First we start with a script that defines the parameter within the script, and secondly, we show how we can use this to perform a sensitivity analysis.
 
-\lstinputlisting[language=Python, caption=Example 3c]{../example3c.py}
+\lstinputlisting[language=Python, caption=Example 3c]{../python/example3c.py}
 
 \begin{itemize}
 
@@ -355,7 +355,7 @@ This is performed in the script benchmark.py, which is used to test and validate
 In the next part we vary given parameters in order to make a sensitivity analysis. This takes a lot of simulation runs and we demonstrate the of use parallel computing to speed up execution.
 We vary the insertion angle of the tap root and basal root, and look at the change in mean root tip depth and radial distance. 
 
-\lstinputlisting[language=Python, caption=Example 3d]{../example3d.py}
+\lstinputlisting[language=Python, caption=Example 3d]{../python/example3d.py}
 
 \begin{itemize}
 
@@ -390,7 +390,7 @@ A specific frame is then obtained by thresholding within Paraview using the segm
 
 We modify example1b.py to demonstrate how to create an animation.
 
-\lstinputlisting[language=Python, caption=Example 3e (modified from Example 1b)]{../example3e.py}
+\lstinputlisting[language=Python, caption=Example 3e (modified from Example 1b)]{../python/example3e.py}
 
 \begin{itemize}
 
@@ -427,7 +427,7 @@ Implemented root responses are (1) the change in direction of the growing root t
 Root growth direction is influenced by soil conditions such as water content, soil strength, or nutrient concentration. 
 In the following we show how this is achieved in CRootBox.
 
-\lstinputlisting[language=Python, caption=Example 4a]{../example4a.py}
+\lstinputlisting[language=Python, caption=Example 4a]{../python/example4a.py}
 
 \begin{itemize}
 
@@ -481,7 +481,7 @@ The following example shows how to implement a new tropism in Python. Two new tr
 The first does nothing put to output the incoming arguments of the method Tropism::tropismObjective to the command line (e.g. for debugging).  
 The second one, is a Plagiotropism that changes with time to Gravitropism depending on the root age.
 
-\lstinputlisting[language=Python, caption=Example 4b]{../example4b.py}
+\lstinputlisting[language=Python, caption=Example 4b]{../python/example4b.py}
 
 \begin{itemize}
 
@@ -523,7 +523,7 @@ The insertion angle is reported to be dependent on nutrient supply in some speci
 
 The scaling itself can be performed in the following way:
 
-\lstinputlisting[firstline=1,lastline=50, language=Python, caption=Example 4c (1)]{../example4c.py}
+\lstinputlisting[firstline=1,lastline=50, language=Python, caption=Example 4c (1)]{../python/example4c.py}
 
 \begin{itemize}
 
@@ -563,7 +563,7 @@ Then, we set the scale branching probability function $sbp$ to the soil property
 
 When playing with model parameters, it is not always clear if the suggested effect is realized from the figures alone. The following script helps to quantify the effects of above simulation: 
 
-\lstinputlisting[firstline=51,lastline=81, language=Python, caption=Example 4c (2)]{../example4c.py}
+\lstinputlisting[firstline=51,lastline=81, language=Python, caption=Example 4c (2)]{../python/example4c.py}
 
 
 
@@ -595,7 +595,7 @@ Finally, we present features that can be used to analyse the dynamic behaviour o
 
 In this section we show how to build an adjacency matrix, and how to calculate fluxes within the root system.
 
-\lstinputlisting[language=Python, caption=Example 5a]{../example5a.py}
+\lstinputlisting[language=Python, caption=Example 5a]{../python/example5a.py}
 
 \subsection{Coupling to 1D water content} \label{sec:fullcoupling} 
 
@@ -611,7 +611,7 @@ These methods are especially important if we couple to other numerical software 
 
 
 
-\lstinputlisting[firstline=1, lastline=58, language=Python, caption=Example 5b]{../example5b.py}
+\lstinputlisting[firstline=1, lastline=58, language=Python, caption=Example 5b]{../python/example5b.py}
 
 \bibliographystyle{apalike}
 \bibliography{references}
