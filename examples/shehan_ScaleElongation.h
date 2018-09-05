@@ -1,3 +1,6 @@
+#include <sstream>
+#include <fstream>
+
 /**
  * Example for Shehan
  *
@@ -8,9 +11,60 @@
 
 namespace CRootBox {
 
+/*
+ *  reads a csv into a vector^2
+ */
+std::vector<std::vector<double>> readCSV(std::string name, char delimeter, int ignore_rows, int ignore_cols)
+{
+    std::ifstream file(name);
+    std::vector<std::vector<double>> data(0);
+    int rc = 0;
+    std::string line = "sfdfsdffs";
+    std::getline(file, line);
+    std::cout << line << rc << "!!!!\n";
+
+    while (getline(file, line)) {
+        std::cout << line << rc << "\n";
+        rc++;
+        if (rc>ignore_rows) {
+            std::stringstream rss(line);
+            std::vector<double> row(0);
+            int cc = 0;
+            std::string val;
+            while (std::getline(rss, val, delimeter)) {
+                cc++;
+                if (cc>ignore_cols) {
+                    std::stringstream convert(val);
+                    double d;
+                    convert >> d;
+                    row.push_back(d);
+                }
+            }
+            if (rss.bad()) {
+                std::cout << "bad file";
+            } else if (!rss.eof()) {
+                std::cout << "format error2";
+            } else {
+                std::cout << "eof";
+            }
+            data.push_back(row);
+        }
+    }
+    if (file.bad()) {
+        std::cout << "bad file";
+    } else if (!file.eof()) {
+        std::cout << "format error1";
+    } else {
+        std::cout << "eof";
+    }
+    std::cout << std::flush;
+
+    return data;
+}
+
 /**
  * The elongation rate is calculated in dependence of water content and temperature,
- * put the empirical relationship into the private function f in line 43.
+ * The empirical relationship is located in the private function f.
  *
  */
 class ScaleElongation :public SoilLookUp
@@ -69,27 +123,24 @@ void shehan_ScaleElongation()
      * Create the tables for water content and temperature and the scale elongation function
      */
     // grid coordinates
-    int n = 100;
-    double topZ = 0;
-    double botZ = -100; // cm
-    std::vector<double> z_(n);
-    for (size_t i = 0; i<z_.size(); i++) {
-        z_[i] = botZ + i*(topZ-botZ)/(n-1);
-    }
-    // temperature data (located between the grid coordinates, i.e.l n-1 data points), where do the data come from? read from file? or copy paste into the code?
-    std::vector<double> temperature(n-1);
-    for (size_t i = 0; i<temperature.size(); i++) {
-        temperature[i] = 0.5;
-    }
+    int n = 7;
+    std::vector<double> z_{0., 15., 25., 50., 70., 100., 140.};
+
+    // temperature data
+    std::cout << "reading temperature data ...";
+    auto field_temp = readCSV("wheat.csv",';',2,1);
+    std::vector<double> temp = field_temp.at(0);
+
     // water content data (located between the grid coordinates, i.e.l n-1 data points), where do the data come from? read from file? or copy paste into the code?
-    std::vector<double> water_content(n-1);
-    for (size_t i = 0; i<water_content.size(); i++) {
-        water_content[i] = 0.5;
+    std::vector<double> wc(n-1);
+    for (size_t i = 0; i<wc.size(); i++) {
+        wc[i] = 0.5;
     }
+
     // create scale elongation function
-    Grid1D wc = Grid1D(n, z_, water_content);
-    Grid1D temp = Grid1D(n, z_, temperature);
-    ScaleElongation se = ScaleElongation(&wc, &temp);
+    Grid1D water_content = Grid1D(n, z_, wc);
+    Grid1D temperature = Grid1D(n, z_, temp );
+    ScaleElongation se = ScaleElongation(&water_content, &temperature);
     // "manually" set the scale elongation function
     for (int i=1; i<7; i++) {
         rootsystem.getRootTypeParameter(i)->se = &se;
@@ -103,11 +154,20 @@ void shehan_ScaleElongation()
     /*
      * Simulate
      */
-    double simtime = 30; // e.g. 30 or 60 days
-    double dt = simtime;
-    int N = round(simtime/dt);
-    for (int i=0; i<N; i++) {
+    double simtime = 7*30; // days
+    double dt = 0.5 * 1./24.;  // days
+    size_t N = round(simtime/dt);
+
+    assert(N<=field_temp.size()); // check if enough data are available
+
+    for (size_t i=0; i<N; i++) {
+
         rootsystem.simulate(dt);
+
+        // update field data by
+        // water_content.data = ... (type is vector<double>)
+        temperature.data =  field_temp.at(i);
+
     }
 
     /**
