@@ -61,7 +61,8 @@ int main(int argc, char* argv[])
     // example_dumux(); // tests the suggested dumux coupling
 
     // example_exudation();
-    shehan_ScaleElongation();
+    shehan_ScaleElongation();//
+//
     return 0;
 
 }
