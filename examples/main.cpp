@@ -4,8 +4,8 @@
 #include <fstream>
 #include <unistd.h>
 
-#include "RootSystem.h"
-#include "analysis.h"
+#include "../src/RootSystem.h"
+#include "../src/analysis.h"
 
 #include "example1.h"
 #include "example1_wb_dgf.h"
@@ -19,6 +19,7 @@
 #include "shehan_SoilCore.h"
 #include "shehan_RhizoTubes.h"
 #include "shehan_Trenches.h"
+#include "shehan_ScaleElongation.h"
 
 #include "./Exudation/example_exudation.h"
 
@@ -35,7 +36,7 @@ int main(int argc, char* argv[])
         name= argv[1];
     }
 
-    example1(); // open parameter file, and output VTP
+    // example1(); // open parameter file, and output VTP
     // example1_wb_dgf(); // root growth inside a big box to simulate soil surface, open parameter file, and output VTP
     // example2(); // like example 1, but with put geometry
     // example3(); // more than 1 plant
@@ -60,7 +61,7 @@ int main(int argc, char* argv[])
     // example_dumux(); // tests the suggested dumux coupling
 
     // example_exudation();
-
+    shehan_ScaleElongation();
     return 0;
 
 }
