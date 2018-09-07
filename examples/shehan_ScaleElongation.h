@@ -15,7 +15,7 @@ namespace CRootBox {
  *  reads a csv into a vector^2
  */
 std::vector<std::vector<double>> readCSV(std::string name, char delimeter, int ignore_rows, int ignore_cols)
-{
+    {
     std::ifstream file(name);
     std::vector<std::vector<double>> data(0);
     int rc = 0;
@@ -24,7 +24,6 @@ std::vector<std::vector<double>> readCSV(std::string name, char delimeter, int i
     std::cout << line << rc << "!!!!\n";
 
     while (getline(file, line)) {
-        std::cout << line << rc << "\n";
         rc++;
         if (rc>ignore_rows) {
             std::stringstream rss(line);
@@ -38,29 +37,14 @@ std::vector<std::vector<double>> readCSV(std::string name, char delimeter, int i
                     double d;
                     convert >> d;
                     row.push_back(d);
+                    //std::cout << d << "\n";
                 }
-            }
-            if (rss.bad()) {
-                std::cout << "bad file";
-            } else if (!rss.eof()) {
-                std::cout << "format error2";
-            } else {
-                std::cout << "eof";
             }
             data.push_back(row);
         }
     }
-    if (file.bad()) {
-        std::cout << "bad file";
-    } else if (!file.eof()) {
-        std::cout << "format error1";
-    } else {
-        std::cout << "eof";
-    }
-    std::cout << std::flush;
-
     return data;
-}
+    }
 
 /**
  * The elongation rate is calculated in dependence of water content and temperature,
@@ -73,10 +57,10 @@ class ScaleElongation :public SoilLookUp
 public:
 
     ScaleElongation(Grid1D* wc, Grid1D* temp)
-    {
+{
         water_content = wc;
         temperature = temp;
-    }
+}
 
     virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const ///< Returns a scalar property of the soil, 1. per default
     {
@@ -128,7 +112,7 @@ void shehan_ScaleElongation()
 
     // temperature data
     std::cout << "reading temperature data ...";
-    auto field_temp = readCSV("wheat.csv",';',2,1);
+    auto field_temp = readCSV("/home/daniel/workspace/CRootBox/examples/wheat.csv",';',2,1);
     std::vector<double> temp = field_temp.at(0);
 
     // water content data (located between the grid coordinates, i.e.l n-1 data points), where do the data come from? read from file? or copy paste into the code?
@@ -154,7 +138,7 @@ void shehan_ScaleElongation()
     /*
      * Simulate
      */
-    double simtime = 7*30; // days
+    double simtime = 0*7*30; // days
     double dt = 0.5 * 1./24.;  // days
     size_t N = round(simtime/dt);
 
