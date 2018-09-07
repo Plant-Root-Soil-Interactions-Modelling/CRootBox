@@ -111,7 +111,7 @@ public:
 
 private:
 
-    /* parameters that are given per root that maybaseRoots change with time */
+    /* parameters that are given per root that may change with time */
     bool alive = 1; ///< true: alive, false: dead
     bool active = 1; ///< true: active, false: root stopped growing
     double age = 0; ///< current age [days]

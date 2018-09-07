@@ -61,6 +61,7 @@ public:
 
     virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const ///< Returns a scalar property of the soil, 1. per default
     {
+        // std::cout << "type : " << root->param.type << "\n";
         double wc = water_content->getValue(pos,root);
         double temp = temperature->getValue(pos,root);
         return f(wc,temp);
@@ -76,11 +77,30 @@ private:
     // this function describes the dependency the elongation scale to
     double f(double wc, double temp) const
     {
-        return 0.5*(temp-minT)/(maxT-minT)+0.5; // <- TODO put the magic function here
+        if (temp<minT) {
+            return 0;
+        }
+        if (temp>maxT) {
+            return 0;
+        }
+        double sigma;
+        double impt;
+        if (optT < 0.5*(minT+maxT)) {
+            sigma = log(0.5) /log((optT-minT)/(maxT-minT));
+            double t = (temp-minT)/(maxT-minT); // scaled temperature
+            impt = pow(sin(M_PI*t),sigma);
+        } else {
+            sigma = log(0.5) /log((optT-maxT)/(minT-maxT));
+            double t = (temp-maxT)/(minT-maxT); // scaled temperature
+            impt = pow(sin(M_PI*t),sigma);
+        }
+        // std::cout << impt << " \n";
+        return impt;
     }
 
-    double minT = -10;
-    double maxT = 40;
+    double minT = 0;
+    double maxT = 30;
+    double optT = 20;
 
 };
 
@@ -147,6 +167,7 @@ void shehan_ScaleElongation()
 
         // update field data by
         // water_content.data = ... (type is vector<double>)
+        ScaleElongation se = ScaleElongation(&water_content, &temperature);
         temperature.data =  field_temp.at(i);
 
     }
@@ -156,7 +177,9 @@ void shehan_ScaleElongation()
      */
     rootsystem.write(name+".vtp");
 
-    cout << "Finished with a total of " << rootsystem.getNumberOfNodes()<< " nodes\n";
+    auto rl = rootsystem.getScalar(RootSystem::st_length);
+    double tl = std::accumulate(rl.begin(), rl.end(), 0);
+    cout << "Finished with a total of " << rootsystem.getNumberOfNodes()<< " nodes, " << tl << " cm total length \n";
 }
 
 } // end namespace CRootBox
