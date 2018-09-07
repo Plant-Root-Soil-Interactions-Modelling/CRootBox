@@ -15,14 +15,11 @@ namespace CRootBox {
  *  reads a csv into a vector^2
  */
 std::vector<std::vector<double>> readCSV(std::string name, char delimeter, int ignore_rows, int ignore_cols)
-    {
+{
     std::ifstream file(name);
     std::vector<std::vector<double>> data(0);
     int rc = 0;
-    std::string line = "sfdfsdffs";
-    std::getline(file, line);
-    std::cout << line << rc << "!!!!\n";
-
+    std::string line = "";
     while (getline(file, line)) {
         rc++;
         if (rc>ignore_rows) {
@@ -44,7 +41,7 @@ std::vector<std::vector<double>> readCSV(std::string name, char delimeter, int i
         }
     }
     return data;
-    }
+}
 
 /**
  * The elongation rate is calculated in dependence of water content and temperature,
@@ -138,8 +135,8 @@ void shehan_ScaleElongation()
     /*
      * Simulate
      */
-    double simtime = 0*7*30; // days
-    double dt = 0.5 * 1./24.;  // days
+    double simtime = 7*30; // days
+    double dt = 0.5 * 1./24.;  // dt is half an hour
     size_t N = round(simtime/dt);
 
     assert(N<=field_temp.size()); // check if enough data are available
