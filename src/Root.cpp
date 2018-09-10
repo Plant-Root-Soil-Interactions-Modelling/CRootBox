@@ -116,13 +116,17 @@ void Root::simulate(double dt, bool silence)
             if (active) {
 
                 // length increment
-                double lengthMax = getLength(std::max(age-dt,0.)); // length of the root for unimpeded growth (i.e. length_==length for unimpeded growth)
-                double lengthMin = length; // realized length
-                double length_ = (lengthMax+lengthMin)/2.; // best i could think of
-                double targetlength = getLength(age);
-                double e = targetlength-length_; //elongation in time step dt
-                double scale = rootsystem->getRootTypeParameter(param.type)->se->getValue(nodes.back(),this); // hope some of this is optimized out if not set
-                double dl = std::max(scale*e, double(0)); // length increment, dt is not used anymore
+                double age_ = getAge(length); // subjective root age
+                double dt_; // time step
+                if (age<dt) {
+                    dt_= age;
+                } else {
+                    dt_=dt;
+                }
+                double targetlength = getLength(age_+dt_);
+                double e = targetlength-length; //elongation in time step dt
+                double scale = rootsystem->getRootTypeParameter(param.type)->se->getValue(nodes.back(),this);
+                double dl = std::max(scale*e, 0.); // length increment
 
                 // create geometry
                 if (p.nob>0) { // root has laterals
