@@ -86,6 +86,7 @@ std::vector<double> SegmentAnalyser::getScalar(int st) const
             v=r->param.a;
             break;
         case RootSystem::st_order: {
+            v = 0;
             Root* r_ = r;
             while (r_->parent!=nullptr) { // find root order
                 v++;

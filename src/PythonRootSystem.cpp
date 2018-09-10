@@ -80,6 +80,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate1_overloads,simulate,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate3_overloads,simulate,3,4);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getValue_overloads,getValue,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(tropismObjective_overloads,tropismObjective,5,6);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNumberOfRoots_overloads,getNumberOfRoots,0,1);
 
 
 
@@ -429,6 +430,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
              .def("getSimTime", &RootSystem::getSimTime)
              .def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
              .def("getNumberOfSegments", &RootSystem::getNumberOfSegments)
+             .def("getNumberOfRoots", &RootSystem::getNumberOfRoots, getNumberOfRoots_overloads())
              .def("getRoots", &RootSystem::getRoots)
              .def("getBaseRoots", &RootSystem::getBaseRoots)
              .def("getNodes", &RootSystem::getNodes)
