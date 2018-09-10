@@ -165,10 +165,9 @@ void shehan_ScaleElongation()
 
         rootsystem.simulate(dt);
 
-        // update field data by
-        // water_content.data = ... (type is vector<double>)
-        ScaleElongation se = ScaleElongation(&water_content, &temperature);
+        // update field data:
         temperature.data =  field_temp.at(i);
+        // water_content.data = ... (type is vector<double>)
 
     }
 
