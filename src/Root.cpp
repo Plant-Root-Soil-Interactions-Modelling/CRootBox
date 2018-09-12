@@ -117,6 +117,7 @@ void Root::simulate(double dt, bool silence)
 
                 // length increment
                 double age_ = getAge(length); // subjective root age
+
                 double dt_; // time step
                 if (age<dt) {
                     dt_= age;
@@ -178,7 +179,7 @@ void Root::simulate(double dt, bool silence)
                         createSegments(dl,silence);
                         length+=dl;
                     }
-                } // if laterals
+                } // if lateralgetLengths
             } // if active
             active = length<(p.getK()-dx()/10); // become inactive, if final length is nearly reached
         }
@@ -295,8 +296,11 @@ void Root::createSegments(double l, bool silence)
         if (nn>1) {
             auto n2 = nodes.at(nn-2);
             auto n1 = nodes.at(nn-1);
-            double olddx = n1.minus(n2).length();
+            double olddx = n1.minus(n2).length(); // length of last segment
             if (olddx<dx()*0.99) { // shift node instead of creating a new node
+
+                double newdx = std::min(dx()-olddx, l);
+                double sdx = olddx + newdx; // length of new segment
 
                 Vector3d h; // current heading
                 if (nn>2) {
@@ -305,24 +309,25 @@ void Root::createSegments(double l, bool silence)
                 } else {
                     h = iheading;
                 }
-                double sdx = std::min(dx()-olddx,l);
 
                 Matrix3d ons = Matrix3d::ons(h);
-                Vector2d ab = rootsystem->tf.at(param.type-1)->getHeading(nodes.back(),ons,olddx+sdx,this);
+                Vector2d ab = rootsystem->tf.at(param.type-1)->getHeading(n2,ons,sdx,this);
                 ons.times(Matrix3d::rotX(ab.y));
                 ons.times(Matrix3d::rotZ(ab.x));
-                Vector3d newdx = Vector3d(ons.column(0).times(sdx));
 
-                Vector3d newnode = Vector3d(nodes.back().plus(newdx));
-                sl = sdx;
-                double et = this->getCreationTime(length+sl);
+                Vector3d newdxv = Vector3d(ons.column(0).times(sdx));
+                Vector3d newnode = Vector3d(n2.plus(newdxv));
                 nodes[nn-1] = newnode;
+
+                double et = this->getCreationTime(length+newdx);
                 netimes[nn-1] = std::max(et,rootsystem->getSimTime()); // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
+
                 old_non = nn;
-                l -= sdx;
+                l -= newdx;
                 if (l<=0) { // ==0 should be enough
                     return;
                 }
+
             } else {
                 old_non = -nn;
             }
@@ -339,8 +344,8 @@ void Root::createSegments(double l, bool silence)
     }
 
     int n = floor(l/dx());
-    // create n+1 new nodes
-    for (int i=0; i<n+1; i++) {
+
+    for (int i=0; i<n+1; i++) { // create n+1 new nodes
 
         Vector3d h; // current heading
         if (nodes.size()>1) {
@@ -370,6 +375,7 @@ void Root::createSegments(double l, bool silence)
         ons.times(Matrix3d::rotZ(ab.x));
         Vector3d newdx = Vector3d(ons.column(0).times(sdx));
         Vector3d newnode = Vector3d(nodes.back().plus(newdx));
+
         double et = this->getCreationTime(length+sl);
         et = std::max(et,rootsystem->getSimTime()); // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
         addNode(newnode,et);

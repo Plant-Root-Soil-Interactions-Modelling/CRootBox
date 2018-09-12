@@ -70,10 +70,12 @@ class ExponentialGrowth : public GrowthFunction
 public:
     double getLength(double t, double r, double k, Root* root) const override { return k*(1-exp(-(r/k)*t)); } ///< @see GrowthFunction
     double getAge(double l, double r, double k, Root* root) const override {
-        if (l>(0.999*k)) { // 0.999*k is reached in finite time
-            l=0.999*k;
+        double age = - k/r*log(1-l/k);
+        if (std::isfinite(age)) { // the age can not be computed when root length approaches max length
+            return age;
+        } else {
+            return 1.e3; // very old
         }
-        return - k/r*log(1-l/k);
     } ///< @see GrowthFunction
 
     GrowthFunction* copy() override { return new ExponentialGrowth(*this); }

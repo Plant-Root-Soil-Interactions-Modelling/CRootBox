@@ -14,7 +14,7 @@ def simulate(name, simtime):
     return rs 
 
 def analyse(rs, name, simtime, tv0):
-    top = rb.SDF_PlantContainer(1e6, 1e6, 42, False) # do we know the 42 cm for certain?
+    top = rb.SDF_PlantBox(1e6, 1e6, 42) 
     bot = rb.SDF_Complement(top)    
     ana = rb.SegmentAnalyser(rs)
         
@@ -51,6 +51,13 @@ def analyse(rs, name, simtime, tv0):
     print("V0 (cm^3)   ", tv)
     print("rVol        ", tv/tv0)
     print()
+    
+#     c = 0
+#     dx = ana.getScalar(rb.ScalarType.length)
+#     for dx_ in dx: 
+#         if dx_>0.49:
+#             c += 1            
+#     print(">0.4 dx:", c) 
 
 names = ["maize_p1_zero_std", "maize_p2_zero_std", "maize_p3_zero_std"] 
 ages = [64, 60, 62 ]

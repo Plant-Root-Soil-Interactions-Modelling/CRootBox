@@ -467,7 +467,7 @@ There are two ways to add user defined tropisms:
 \item The first is C++ only: It is to extend the CRootBox class and overwrite the method RootSystem::createTropism. 
 This is the function that is called, when the tropisms are created from the parameters ($tt$, $N$, $\sigma$) in RootSystem::initialize(). 
 This is necessary when user defined tropism are created from a parameter file, where $tt$ is the number of the new tropism type. 
-\item The second is to manually set the tropisms using the method RootSystem: :setTropism. Make sure to call Rootsystem::setTropism($\dots$) after Rootsystem::initialize().
+\item The second is to manually set the tropisms using the method RootSystem::setTropism. Make sure to call Rootsystem::setTropism($\dots$) after Rootsystem::initialize().
 \end{enumerate}
 
 In both approaches the user has to extend the new tropism class from the class Tropism. 
