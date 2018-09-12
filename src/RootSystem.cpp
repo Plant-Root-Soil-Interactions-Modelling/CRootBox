@@ -638,7 +638,7 @@ std::vector<double> RootSystem::getScalar(int stype) const
     this->getRoots(); // update roots (if necessary)
     std::vector<double> scalars(roots.size());
     for (size_t i=0; i<roots.size(); i++) {
-        double value=0;
+        double value = 0;
         switch(stype) {
         case st_type:  // type
             value = roots[i]->param.type;

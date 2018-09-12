@@ -20,6 +20,7 @@
 #include "shehan_RhizoTubes.h"
 #include "shehan_Trenches.h"
 #include "shehan_ScaleElongation.h"
+#include "example_volume.h"
 
 #include "./Exudation/example_exudation.h"
 
@@ -61,7 +62,9 @@ int main(int argc, char* argv[])
     // example_dumux(); // tests the suggested dumux coupling
 
     // example_exudation();
-    shehan_ScaleElongation();//
+  //  shehan_ScaleElongation();//
+
+    example_volume();
 //
     return 0;
 
