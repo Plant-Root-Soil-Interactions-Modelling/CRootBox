@@ -13,7 +13,7 @@ namespace CRootBox {
 void example_volume()
 {
     RootSystem rs;
-    std::string name = "maize_p3_zero_std"; // "maize_p1_zero_std", "maize_p2_zero_std", "maize_p3_zero_std"
+    std::string name = "maize_p1_zero_std"; // "maize_p1_zero_std", "maize_p2_zero_std", "maize_p3_zero_std"
     rs.openFile(name, "params/");
     rs.initialize();
 
