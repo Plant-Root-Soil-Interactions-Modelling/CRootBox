@@ -130,7 +130,7 @@ public:
     std::vector<Vector2i> getSegments() const; ///< Copies all root system segment indices into a vector
     std::vector<Vector2i> getShootSegments() const; ///< Copies the segments connecting tap, basal root, shootborne roots
     std::vector<Root*> getSegmentsOrigin() const; ///< Copies a pointer to the root containing the segment
-    std::vector<double> getNETimes() const; ///< Copies all node emergence times into a vector
+    std::vector<double> getNETimes(bool persegment = true) const; ///< Copies all node emergence times into a vector
     std::vector<std::vector<double>> getPolylinesNET() const; ///< Copies the node emergence times of each root into a vector and returns all resulting vectors
     std::vector<double> getScalar(int stype=RootSystem::st_length) const; ///< Copies a scalar root parameter that is constant per root to a vector
     std::vector<int> getRootTips() const; ///< Node indices of the root tips

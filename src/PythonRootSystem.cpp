@@ -9,10 +9,6 @@
  *  put comment to line 16 to ignore this file
  */
 
-
-
-
-
 #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
@@ -81,7 +77,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate3_overloads,simulate,3,4);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getValue_overloads,getValue,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(tropismObjective_overloads,tropismObjective,5,6);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNumberOfRoots_overloads,getNumberOfRoots,0,1);
-
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNETimes_overloads, getNETimes, 0, 1);
 
 
 /**
@@ -438,7 +434,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
              .def("getSegments", &RootSystem::getSegments)
              .def("getShootSegments", &RootSystem::getShootSegments)
              .def("getSegmentsOrigin", &RootSystem::getSegmentsOrigin)
-             .def("getNETimes", &RootSystem::getNETimes)
+             .def("getNETimes",
+        &RootSystem::getNETimes, getNETimes_overloads())
              .def("getScalar", &RootSystem::getScalar)
              .def("getRootTips", &RootSystem::getRootTips)
              .def("getRootBases", &RootSystem::getRootBases)

@@ -571,8 +571,6 @@ std::vector<Vector2i> RootSystem::getShootSegments() const
     return seg;
 }
 
-
-
 /**
  * Returns pointers of the roots corresponding to each segment
  */
@@ -592,22 +590,40 @@ std::vector<Root*> RootSystem::getSegmentsOrigin() const
 }
 
 /**
- * Copies the node emergence times of the root systems into a sequential vector,
- * see RootSystem::getNodes()
+ * Copies the node emergence times of the root system per segment or per node into a sequential vector,
+ * see RootSystem::getNodes(), RootSystem::getSegments()
  */
-std::vector<double> RootSystem::getNETimes() const
+std::vector<double> RootSystem::getNETimes(bool persegment) const
 {
     this->getRoots(); // update roots (if necessary)
-    int nos=getNumberOfSegments();
-    std::vector<double> netv = std::vector<double>(nos); // reserve big enough vector
-    int c=0;
-    for (auto const& r: roots) {
-        for (size_t i=1; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
-            netv.at(c) = r->getNodeETime(i); // pray that ids are correct
-            c++;
+    if (persegment) {
+        int nos = getNumberOfSegments();
+        std::vector<double> netv = std::vector<double>(nos); // reserve big enough vector
+        int c = 0;
+        for (auto const& r : roots) {
+            for (size_t i = 1; i < r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
+                netv.at(c) = r->getNodeETime(i); // pray that ids are correct
+                c++;
+            }
         }
+        return netv;
+    } else {
+
+        int non = getNumberOfNodes();
+        std::vector<double> nv = std::vector<double>(non); // reserve big enough vector
+        // copy initial nodes (roots might not have developed)
+        for (auto const& r : baseRoots) {
+            nv.at(r->getNodeId(0)) = r->getNodeETime(0);
+        }
+        // copy root nodes
+        for (auto const& r : roots) {
+            for (size_t i = 0; i < r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
+                nv.at(r->getNodeId(i)) = r->getNodeETime(i); // pray that ids are correct
+            }
+        }
+        nv.at(0) = 0; // add artificial shoot
+        return nv;
     }
-    return netv;
 }
 
 /**
