@@ -337,7 +337,8 @@ void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se,
     double l = std::accumulate(v_.begin(), v_.end(), 0.0);
     double inc_ = l - ol;
     if (!silence) {
-        std::cout << "expected increase is " << inc_ << "\n";
+        std::cout << "expected increase is " << inc_ << " maximum is " << maxinc
+            << "\n";
     }
     pop();
 

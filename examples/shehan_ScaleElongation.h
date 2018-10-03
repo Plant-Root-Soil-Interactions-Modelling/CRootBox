@@ -169,6 +169,10 @@ void shehan_ScaleElongation()
         temperature.data =  field_temp.at(i);
         // water_content.data = ... (type is vector<double>)
 
+//        auto rl = rootsystem.getScalar(RootSystem::st_length);
+//        double tl = std::accumulate(rl.begin(), rl.end(), 0);
+//        cout << "Time step i " << tl << " cm total length \n";
+
     }
 
     /**
