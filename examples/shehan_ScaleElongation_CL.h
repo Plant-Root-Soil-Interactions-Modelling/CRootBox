@@ -15,11 +15,11 @@
 namespace CRootBox {
 
 /**
- * The maximal possible total root system length increment per day for time t, and duration dt
+ * The maximal possible total root system length increment per day (cm/day) at time t
  * (based on carbon, or leaf area)
  */
-double length_increment(double t, double dt) {
-    return 5. / dt; // 1 cm per day
+double length_increment(double t) {
+    return 300.; //cm per day
 }
 
 /**
@@ -86,7 +86,7 @@ void shehan_ScaleElongation_CL()
 
     for (size_t i=0; i<N; i++) {
 
-        rootsystem.simulate(dt, length_increment(i * dt, dt), &pe, false);
+        rootsystem.simulate(dt, length_increment(i * dt), &pe, false);
 
         // update field data:
         temperature.data =  field_temp.at(i);
