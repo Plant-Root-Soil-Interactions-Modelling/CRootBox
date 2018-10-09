@@ -18,8 +18,10 @@ namespace CRootBox {
  * The maximal possible total root system length increment per day (cm/day) at time t
  * (based on carbon, or leaf area)
  */
-double length_increment(double t) {
-    return 300.; //cm per day
+double length_increment(double t, Grid1D& grid) {
+    double lai = grid.getValue(Vector3d(0., 0., t), nullptr); // leaf arrea index
+    double li = 2 * lai; // TODO calculate increment based on lai with some magic formula
+    return li; //cm per day
 }
 
 /**
@@ -45,9 +47,24 @@ void shehan_ScaleElongation_CL()
     int n = 7;
     std::vector<double> z_{0., 15., 25., 50., 70., 100., 140.};
 
+    // LAI data
+    std::cout << "reading lai data ...\n";
+    auto field_lai = readCSV(
+        "/home/daniel/workspace/CRootBox/examples/lai.csv",
+        ',', 0, 0);
+    std::vector<double> time = field_lai.at(0); // n time data points (eg.; 0, 1, 2, 3 days)
+    std::vector<double> lai_data = field_lai.at(1); // n-1 lai data points (value 1 is between day 0-1, value 2, between day 1-2, and so on)
+//    std::cout << "all " << field_lai.size() << "\n";
+//    std::cout << "Time " << time.size() << "\n";
+//    std::cout << "LAI " << lai_data.size() << "\n";
+
+    lai_data.pop_back(); // the last value is thrown away (i.e. we give n lai_data points in the file, but only use n-1)
+    Grid1D lai_grid = Grid1D(time.size(), time, lai_data);
+
     // temperature data
-    std::cout << "reading temperature data ...";
-    auto field_temp = readCSV("/home/daniel/workspace/CRootBox/examples/wheat.csv",';',2,1);
+    std::cout << "reading temperature data ...\n";
+    auto field_temp = readCSV(
+        "/home/daniel/workspace/CRootBox/examples/wheat.csv", ';', 2, 1);
     std::vector<double> temp = field_temp.at(0);
 
     // water content data (located between the grid coordinates, i.e.l n-1 data points), where do the data come from? read from file? or copy paste into the code?
@@ -78,21 +95,39 @@ void shehan_ScaleElongation_CL()
     /*
      * Simulate
      */
-    double simtime = 7*30; // days
+    double simtime = 1; // 7*30; // days
     double dt = 0.5 * 1./24.;  // dt is half an hour
     size_t N = round(simtime/dt);
 
     assert(N<=field_temp.size()); // check if enough data are available
 
+    string matname = "rld.csv";
+    std::ofstream fos;
+    fos.open(matname.c_str());
+    double h = 160; // depth of the soil core (cm)
+    double dz = 5; // width of layer (cm)
+
+
     for (size_t i=0; i<N; i++) {
 
-        rootsystem.simulate(dt, length_increment(i * dt), &pe, false);
+        rootsystem.simulate(dt, length_increment(i * dt, lai_grid), &pe, false);
 
         // update field data:
         temperature.data =  field_temp.at(i);
         // water_content.data = ... (type is vector<double>)
 
+        // compute and write RLD
+        SegmentAnalyser ana = SegmentAnalyser(rootsystem);
+        vector<double> tl = ana.distribution(RootSystem::st_length, 0, h,
+            round(h / dz), true);  // vertical distribution
+        for (size_t i = 0; i < tl.size(); i++) {
+            fos << tl[i] << ", ";
+        }
+        fos << "\n";
+
     }
+
+    fos.close();
 
     /**
      * Export results (as vtp)
