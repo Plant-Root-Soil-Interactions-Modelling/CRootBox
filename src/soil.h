@@ -126,8 +126,8 @@ public:
 
     virtual size_t map(double x) const {
         unsigned int jr,jm,jl;
-        jl=0;
-        jr=n;
+        jl = 0;
+        jr = n - 1;
         while (jr-jl > 1) {
             jm=(jr+jl) >> 1; // thats a divided by two
             if (x >= grid[jm])

@@ -129,14 +129,13 @@ void shehan_ScaleElongation()
 
     // temperature data
     std::cout << "reading temperature data ...";
-    auto field_temp = readCSV("/home/daniel/workspace/CRootBox/examples/wheat.csv",';',2,1);
+    auto field_temp = readCSV("/home/daniel/workspace/CRootBox/examples/TEMP.csv", ';', 2, 1);
     std::vector<double> temp = field_temp.at(0);
 
-    // water content data (located between the grid coordinates, i.e.l n-1 data points), where do the data come from? read from file? or copy paste into the code?
-    std::vector<double> wc(n-1);
-    for (size_t i = 0; i<wc.size(); i++) {
-        wc[i] = 0.5;
-    }
+    // water content data
+    std::cout << "reading water content data ...";
+    auto field_wc = readCSV("/home/daniel/workspace/CRootBox/examples/WC.csv", ',', 2, 1);
+    std::vector<double> wc = field_wc.at(0);
 
     // create scale elongation function
     Grid1D water_content = Grid1D(n, z_, wc);
@@ -167,7 +166,7 @@ void shehan_ScaleElongation()
 
         // update field data:
         temperature.data =  field_temp.at(i);
-        // water_content.data = ... (type is vector<double>)
+        water_content.data = field_wc.at(i);
 
 //        auto rl = rootsystem.getScalar(RootSystem::st_length);
 //        double tl = std::accumulate(rl.begin(), rl.end(), 0);

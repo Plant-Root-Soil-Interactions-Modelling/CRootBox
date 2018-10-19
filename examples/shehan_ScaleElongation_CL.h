@@ -19,7 +19,7 @@ namespace CRootBox {
  * (based on carbon, or leaf area)
  */
 double length_increment(double t, Grid1D& grid) {
-    double lai = grid.getValue(Vector3d(0., 0., t), nullptr); // leaf arrea index
+    double lai = grid.getValue(Vector3d(0., 0., t), nullptr); // leaf area index
     double li = 2 * lai; // TODO calculate increment based on lai with some magic formula
     return li; //cm per day
 }
@@ -49,29 +49,21 @@ void shehan_ScaleElongation_CL()
 
     // LAI data
     std::cout << "reading lai data ...\n";
-    auto field_lai = readCSV(
-        "/home/daniel/workspace/CRootBox/examples/lai.csv",
-        ',', 0, 0);
+    auto field_lai = readCSV("/home/daniel/workspace/CRootBox/examples/lai.csv", ',', 0, 0);
     std::vector<double> time = field_lai.at(0); // n time data points (eg.; 0, 1, 2, 3 days)
     std::vector<double> lai_data = field_lai.at(1); // n-1 lai data points (value 1 is between day 0-1, value 2, between day 1-2, and so on)
-//    std::cout << "all " << field_lai.size() << "\n";
-//    std::cout << "Time " << time.size() << "\n";
-//    std::cout << "LAI " << lai_data.size() << "\n";
-
     lai_data.pop_back(); // the last value is thrown away (i.e. we give n lai_data points in the file, but only use n-1)
     Grid1D lai_grid = Grid1D(time.size(), time, lai_data);
 
     // temperature data
     std::cout << "reading temperature data ...\n";
-    auto field_temp = readCSV(
-        "/home/daniel/workspace/CRootBox/examples/wheat.csv", ';', 2, 1);
+    auto field_temp = readCSV("/home/daniel/workspace/CRootBox/examples/TEMP.csv", ';', 2, 1);
     std::vector<double> temp = field_temp.at(0);
 
-    // water content data (located between the grid coordinates, i.e.l n-1 data points), where do the data come from? read from file? or copy paste into the code?
-    std::vector<double> wc(n-1);
-    for (size_t i = 0; i<wc.size(); i++) {
-        wc[i] = 0.5;
-    }
+    // water content data
+    std::cout << "reading water content data ...";
+    auto field_wc = readCSV("/home/daniel/workspace/CRootBox/examples/WC.csv", ',', 2, 1);
+    std::vector<double> wc = field_wc.at(0);
 
     // create scale elongation function
     Grid1D water_content = Grid1D(n, z_, wc);
@@ -114,7 +106,7 @@ void shehan_ScaleElongation_CL()
 
         // update field data:
         temperature.data =  field_temp.at(i);
-        // water_content.data = ... (type is vector<double>)
+        water_content.data = field_wc.at(i);
 
         // compute and write RLD
         SegmentAnalyser ana = SegmentAnalyser(rootsystem);
