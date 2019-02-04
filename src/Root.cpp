@@ -298,36 +298,17 @@ void Root::createSegments(double l, bool silence)
             auto n1 = nodes.at(nn-1);
             double olddx = n1.minus(n2).length(); // length of last segment
             if (olddx<dx()*0.99) { // shift node instead of creating a new node
-
                 double newdx = std::min(dx()-olddx, l);
                 double sdx = olddx + newdx; // length of new segment
-
-                Vector3d h; // current heading
-                if (nn>2) {
-                    h = n2.minus(nodes.at(nn-3));
-                    h.normalize();
-                } else {
-                    h = iheading;
-                }
-
-                Matrix3d ons = Matrix3d::ons(h);
-                Vector2d ab = rootsystem->tf.at(param.type-1)->getHeading(n2,ons,sdx,this);
-                ons.times(Matrix3d::rotX(ab.y));
-                ons.times(Matrix3d::rotZ(ab.x));
-
-                Vector3d newdxv = Vector3d(ons.column(0).times(sdx));
-                Vector3d newnode = Vector3d(n2.plus(newdxv));
-                nodes[nn-1] = newnode;
-
+                Vector3d newdxv = getIncrement(n2, sdx);
+                nodes[nn - 1] = Vector3d(n2.plus(newdxv));
                 double et = this->getCreationTime(length+newdx);
                 netimes[nn-1] = std::max(et,rootsystem->getSimTime()); // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
-
                 old_non = nn;
                 l -= newdx;
                 if (l<=0) { // ==0 should be enough
                     return;
                 }
-
             } else {
                 old_non = -nn;
             }
@@ -343,17 +324,9 @@ void Root::createSegments(double l, bool silence)
         return;
     }
 
+    // create n+1 new nodes
     int n = floor(l/dx());
-
-    for (int i=0; i<n+1; i++) { // create n+1 new nodes
-
-        Vector3d h; // current heading
-        if (nodes.size()>1) {
-            h = nodes.back().minus(nodes.at(nodes.size()-2));
-            h.normalize();
-        } else {
-            h = iheading;
-        }
+    for (int i = 0; i < n + 1; i++) {
 
         double sdx; // segment length (<=dx)
         if (i<n) {  // normal case
@@ -367,21 +340,37 @@ void Root::createSegments(double l, bool silence)
                 return;
             }
         }
-        sl+=sdx;
+        sl += sdx; //
 
-        Matrix3d ons = Matrix3d::ons(h);
-        Vector2d ab = rootsystem->tf.at(param.type-1)->getHeading(nodes.back(),ons,sdx,this);
-        ons.times(Matrix3d::rotX(ab.y));
-        ons.times(Matrix3d::rotZ(ab.x));
-        Vector3d newdx = Vector3d(ons.column(0).times(sdx));
+        Vector3d newdx = getIncrement(nodes.back(), sdx);
         Vector3d newnode = Vector3d(nodes.back().plus(newdx));
-
         double et = this->getCreationTime(length+sl);
         et = std::max(et,rootsystem->getSimTime()); // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
         addNode(newnode,et);
 
     } // for
 
+}
+
+/**
+ * Returns the increment of the next segments
+ *
+ *  @param p       postion of previous node
+ *  @param sdx     length of next segment
+ */
+Vector3d Root::getIncrement(const Vector3d& p, double sdx) {
+    Vector3d h; // current heading
+    if (nodes.size() > 1) {
+        h = nodes.back().minus(nodes.at(nodes.size() - 2));
+        h.normalize();
+    } else {
+        h = iheading;
+    }
+    Matrix3d ons = Matrix3d::ons(h);
+    Vector2d ab = rootsystem->tf.at(param.type - 1)->getHeading(p, ons, sdx, this);
+    ons.times(Matrix3d::rotX(ab.y));
+    ons.times(Matrix3d::rotZ(ab.x)); // todo simplify
+    return ons.column(0).times(sdx);
 }
 
 /**
