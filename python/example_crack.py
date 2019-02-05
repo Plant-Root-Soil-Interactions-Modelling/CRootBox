@@ -4,18 +4,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 rs = rb.RootSystem()
-# name = "Zea_mays_1_Leitner_2010"
-name = "Triticum_aestivum_a_Bingham_2011"
+# name = "Triticum_aestivum_a_Bingham_2011" # is this the same as your wheat, Shehan?
+name = "Zea_mays_1_Leitner_2010"
 rs.openFile(name)
 
 # Adjust Tropism
-# sigma = [0.4, 1., 1., 1., 1. ] * 2
-# for i in range(0, 10):
-#     p = rs.getRootTypeParameter(i + 1)
-#     p.dx = 0.25  # adjust resolution
-#     p.tropismT = rb.TropismType.gravi
-#     p.tropismN = 1.0  # strength of tropism
-#     p.tropismS = sigma[i]
+sigma = [0.4] * 10
+for i in range(0, 10):
+    p = rs.getRootTypeParameter(i + 1)
+    p.dx = 0.25  # adjust resolution
+    p.tropismT = rb.TropismType.gravi
+    p.tropismN = 1  # strength of tropism
+    p.tropismS = sigma[i]
 
 # Pore Geometry
 x_ = (-10, -5, 1, 15)  # not 0, otherwise we start in crack
