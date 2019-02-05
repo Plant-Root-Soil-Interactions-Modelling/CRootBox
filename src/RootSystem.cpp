@@ -317,7 +317,7 @@ void RootSystem::simulate()
 /**
  * Simulates root system growth for the time span dt [days],
  * elongates a maximum of maxinc total length [cm/day]
- * using the proportional elongation se
+ * using the proportional elongation se to impede overall growth
  */
 void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se, bool silence)
 {
@@ -394,7 +394,7 @@ void RootSystem::setSeed(unsigned int seed) {
 }
 
 /**
- * Creates a new lateral root (called by Root:createLateral)
+ * Creates a new lateral root (called by RootSystem::initialize, Root:createLateral)
  *
  * @param lt       lateral root type
  * @param h        initial heading of the new root
@@ -405,7 +405,6 @@ void RootSystem::setSeed(unsigned int seed) {
  *
  */
 Root* RootSystem::createRoot(int lt, Vector3d  h, double delay, Root* parent, double pbl, int pni) {
-    // call Root* lateral = rootsystem->createRoot(lt,  h, delay,  this, length, nodes.size()-1);
     return new Root(this,lt,h,delay,parent,pbl,pni);
 }
 

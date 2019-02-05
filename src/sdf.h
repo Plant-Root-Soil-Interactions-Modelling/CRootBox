@@ -47,6 +47,20 @@ public:
 
     virtual std::string writePVPScript() const; ///< Writes the ParaView Phython script into a string
 
+    /**
+     * Returns the gradient of the sdf
+     *
+     * @param p     spatial position [cm]
+     * @param eps   central differences epsilon
+     */
+    Vector3d getGradient(const Vector3d& p, double eps = 5.e-4) {
+        auto epsX = Vector3d(eps, 0, 0);
+        auto epsY = Vector3d(0, eps, 0);
+        auto epsZ = Vector3d(0, 0, eps);
+        return Vector3d(0.5 * (getDist(p.plus(epsX)) - getDist(p.minus(epsX))), 0.5 * (getDist(p.plus(epsY)) - getDist(p.minus(epsY))),
+            0.5 * (getDist(p.plus(epsZ)) - getDist(p.minus(epsZ))));
+    }
+
 };
 
 

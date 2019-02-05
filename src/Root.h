@@ -32,20 +32,14 @@ class Root
 
 public:
 
-    Root(RootSystem* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of RootSystem, or Root::createLaterals()
+    Root(RootSystem* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of Root::createLaterals()
     Root(const Root& r, RootSystem& rs); ///< deep copy of the tree
     virtual ~Root();
 
+    /* Grow */
     void simulate(double dt, bool silence = false); ///< root growth for a time span of \param dt
 
-    /* exact from analytical equations */
-    double getCreationTime(double lenght); ///< analytical creation (=emergence) time of a node at a length
-    double getLength(double age); ///< analytical length of the root
-    double getAge(double length); ///< analytical age of the root
-
-    RootTypeParameter* getRootTypeParameter() const;  ///< returns the root type parameter of the root
-    double dx() const { return getRootTypeParameter()->dx; } ///< returns the axial resolution
-
+    /* Roots as sequential list */
     std::vector<Root*> getRoots(); ///< return the root including laterals as sequential vector
     void getRoots(std::vector<Root*>& v); ///< return the root system as sequential vector
 
@@ -56,27 +50,37 @@ public:
     size_t getNumberOfNodes() const {return nodes.size(); }  ///< return the number of the nodes of the root
     void addNode(Vector3d n,double t); //< adds a node to the root
 
+    /* From analytical equations */
+    double getCreationTime(double lenght); ///< analytical creation (=emergence) time of a node at a length
+    double getLength(double age); ///< analytical length of the root
+    double getAge(double length); ///< analytical age of the root
+
+    /* Abbreviations */
+    RootTypeParameter* getRootTypeParameter() const;  ///< returns the root type parameter of the root
+    double dx() const { return getRootTypeParameter()->dx; } ///< returns the axial resolution
+
     /* IO */
     void writeRSML(std::ostream & cout, std::string indent) const; ///< writes a RSML root tag
     std::string toString() const;
 
+    /* Parameters */
     RootSystem* rootsystem; ///< the root system this root is part of
 
-    /* parameters that are given per root that are constant*/
+    /* Parameters that are given per root that are constant*/
     RootParameter param; ///< the parameters of this root
     Vector3d iheading; ///< the initial heading of the root, when it was created
     int id; ///< unique root id, (not used so far)
     double parent_base_length; ///< length [cm]
     int parent_ni; ///< parent node index
 
-    /* parameters that are given per root that may change with time */
+    /* Parameters that are given per root that may change with time */
     bool alive = 1; ///< true: alive, false: dead
     bool active = 1; ///< true: active, false: root stopped growing
     double age = 0; ///< current age [days]
     double length = 0; ///< actual length [cm] of the root. might differ from getLength(age) in case of impeded root growth
     int old_non = 1; ///< number of old nodes, the sign is positive if the last node was updated, otherwise its negative
 
-    /* up and down */
+    /* Up and down the tree*/
     Root* parent; ///< pointer to the parent root (equals nullptr if it is a base root)
     std::vector<Root*> laterals; ///< the lateral roots of this root
 
@@ -85,7 +89,7 @@ public:
 protected:
 
     void createSegments(double l, bool silence); ///< creates segments of length l, called by Root::simulate()
-    Vector3d getIncrement(const Vector3d& p, double sdx); ///< called by createSegments, to determine growth direction
+    virtual Vector3d getIncrement(const Vector3d& p, double sdx); ///< called by createSegments, to determine growth direction
     void createLateral(bool silence); ///< creates a new lateral, called by Root::simulate()
 
     /* parameters that are given per node */
@@ -98,7 +102,8 @@ protected:
 
 
 /**
- * Stores a state of the root that can later be restored
+ * Stores a state of the root that can be restored at a later point
+ * (for RootSystem::push and RootSystem::pop)
  */
 class RootState {
 

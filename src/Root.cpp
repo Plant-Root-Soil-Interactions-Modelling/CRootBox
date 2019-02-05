@@ -4,9 +4,7 @@
 namespace CRootBox {
 
 /**
- * Constructor
- *
- * Typically called by the RootSystem::RootSystem(), or Root::createNewRoot().
+ * Should be only called by Root::createNewRoot().
  * For base roots the initial node and node emergence time (netime) must be set from outside
  *
  * @param rs 			points to RootSystem
@@ -64,7 +62,7 @@ Root::Root(const Root& r, RootSystem& rs) :rootsystem(&rs), param(r.param), ihea
 }
 
 /**
- * Destructor, spread the word
+ * Destructor (spread the word)
  */
 Root::~Root()
 {
@@ -82,7 +80,6 @@ Root::~Root()
 void Root::simulate(double dt, bool silence)
 {
     old_non = 0; // is set in Root:createSegments, (the zero indicates the first call to createSegments)
-
     const RootParameter &p = param; // rename
 
     // increase age
@@ -94,7 +91,7 @@ void Root::simulate(double dt, bool silence)
 
     if (alive) { // dead roots wont grow
 
-        // probabilistic branching model (todo test)
+        // probabilistic branching model
         if ((age>0) && (age-dt<=0)) { // the root emerges in this time step
             double P = rootsystem->getRootTypeParameter(param.type)->sbp->getValue(nodes.back(),this);
             if (P<1.) { // P==1 means the lateral emerges with probability 1 (default case)
@@ -116,7 +113,7 @@ void Root::simulate(double dt, bool silence)
             if (active) {
 
                 // length increment
-                double age_ = getAge(length); // subjective root age
+                double age_ = getAge(length); // root age
 
                 double dt_; // time step
                 if (age<dt) {
@@ -198,13 +195,9 @@ void Root::simulate(double dt, bool silence)
  */
 double Root::getCreationTime(double length)
 {
-    assert(length>=0);
+    assert(length >= 0 && "Root::getCreationTime() negative length");
     double rootage = getAge(length);
-    if (rootage<0) {
-        std::cout << "Root::getCreationTime() negative root age "<<rootage<<" at length "<< length;
-        std::cout.flush();
-        throw std::invalid_argument( "bugbugbug" );
-    }
+    assert(rootage >= 0 && "Root::getCreationTime() negative root age");
     if (parent!=nullptr) {
         double pl = parent_base_length+parent->param.la; // parent length, when this root was created
         double page=parent->getCreationTime(pl);
@@ -222,7 +215,7 @@ double Root::getCreationTime(double length)
  */
 double Root::getLength(double age)
 {
-    assert(age>=0);
+    assert(age >= 0 && "Root::getLength() negative root age");
     return rootsystem->gf.at(param.type-1)->getLength(age,param.r,param.getK(),this);
 }
 
@@ -233,7 +226,7 @@ double Root::getLength(double age)
  */
 double Root::getAge(double length)
 {
-    assert(length>=0);
+    assert(length >= 0 && "Root::getAge() negative root length");
     return rootsystem->gf.at(param.type-1)->getAge(length,param.r,param.getK(),this);
 }
 
@@ -249,18 +242,14 @@ RootTypeParameter* Root::getRootTypeParameter() const
  */
 void Root::createLateral(bool silence)
 {
-    // std::cout << "createLateral()\n";
     const RootParameter &p = param; // rename
-
     int lt = rootsystem->getRootTypeParameter(p.type)->getLateralType(nodes.back());
-    //std::cout << "lateral type " << lt << "\n";
 
     if (lt>0) {
 
         Vector3d h; // old heading
         if (nodes.size()>1) {
             h = nodes.back().minus(nodes.at(nodes.size()-2)); // getHeading(b-a)
-            // std::cout << "Heading " << h.toString() << "\n";
         } else {
             h= iheading;
         }
@@ -272,7 +261,6 @@ void Root::createLateral(bool silence)
         Root* lateral = rootsystem->createRoot(lt,  h, delay,  this, length, nodes.size()-1);
         laterals.push_back(lateral);
         lateral->simulate(age-ageLN,silence); // pass time overhead (age we want to achieve minus current age)
-        //cout << "time overhead " << age-ageLN << "\n";
     }
 }
 
@@ -355,10 +343,11 @@ void Root::createSegments(double l, bool silence)
 /**
  * Returns the increment of the next segments
  *
- *  @param p       postion of previous node
+ *  @param p       position of previous node
  *  @param sdx     length of next segment
  */
 Vector3d Root::getIncrement(const Vector3d& p, double sdx) {
+
     Vector3d h; // current heading
     if (nodes.size() > 1) {
         h = nodes.back().minus(nodes.at(nodes.size() - 2));
@@ -369,8 +358,13 @@ Vector3d Root::getIncrement(const Vector3d& p, double sdx) {
     Matrix3d ons = Matrix3d::ons(h);
     Vector2d ab = rootsystem->tf.at(param.type - 1)->getHeading(p, ons, sdx, this);
     ons.times(Matrix3d::rotX(ab.y));
-    ons.times(Matrix3d::rotZ(ab.x)); // todo simplify
-    return ons.column(0).times(sdx);
+    ons.times(Matrix3d::rotZ(ab.x));
+
+//    auto v = Vector3d(cos(ab.x),sin(ab.x),0); // first column of rotZ(ab.x)
+//    v = (Matrix3d::rotX(ab.y)).times(v);
+//    return (ons.times(v)).times(sdx);
+
+    return (ons.column(0)).times(sdx);
 }
 
 /**

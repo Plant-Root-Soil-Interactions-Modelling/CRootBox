@@ -104,11 +104,11 @@ public:
     void setGeometry(SignedDistanceFunction* geom) { geometry = geom; } ///< optionally, sets a confining geometry (call before RootSystem::initialize())
     void setSoil(SoilLookUp* soil_) { soil = soil_; } ///< optionally sets a soil for hydro tropism (call before RootSystem::initialize())
     void reset(); ///< resets the root class, keeps the root type parameters
-    void initialize(int basal=4, int shootborne=5); ///< creates the base roots, call before simulation and after setting the plant and root parameters
+    virtual void initialize(int basal = 4, int shootborne = 5); ///< creates the base roots, call before simulation and after setting the plant and root parameters
     void setTropism(Tropism* tf, int rt = -1);
     void simulate(double dt, bool silence = false); ///< simulates root system growth for time span dt
     void simulate(); ///< simulates root system growth for the time defined in the root system parameters
-    void simulate(double dt, double maxinc, ProportionalElongation* se, bool silence = false);
+    void simulate(double dt, double maxinc, ProportionalElongation* se, bool silence = false); // simulates the root system with a maximal overall elongation
     double getSimTime() const { return simtime; } ///< returns the current simulation time
 
     // call back functions (todo simplify)

@@ -152,7 +152,6 @@ public:
      * \return            three orthonormal column vectors
      */
     static Matrix3d ons(Vector3d& v) {
-        // strange enough, but too lazy to change the original model
         Vector3d v2;
         Vector3d v3;
         if ((std::abs(v.x)>=std::abs(v.y)) && (std::abs(v.x)>=std::abs(v.z))) { // choose x and z
