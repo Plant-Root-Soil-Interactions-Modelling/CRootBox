@@ -360,7 +360,7 @@ Vector3d Root::getIncrement(const Vector3d& p, double sdx) {
     } else {
         if (rootsystem->poreGeometry->getDist(p)<0) { // inside the pore
             auto sv1 = rootsystem->applyPoreConductivities(sv);
-            std::cout << "Length before " << sv.length() << ", length after " << sv1.length() << "\n";
+            // std::cout << "Length before " << sv.length() << ", length after " << sv1.length() << "\n";
             sv1.normalize();
             return sv1.times(sdx);
         } else {
