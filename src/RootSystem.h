@@ -159,8 +159,14 @@ public:
 
     // Macro pores
     void setPoreGeometry(SignedDistanceFunction* geom) { poreGeometry = geom; }
-//    virtual Matrix3d getPoreLocalCoordinates(Vector3d p) { };
-//    virtual Matrix3d getPoreConductivity() { };
+    void setPoreConductivity(Matrix3d m) { poreConductivity = m; }
+    void setPoreLocalAxes(Matrix3d m) {
+        poreLocalAxes = m;
+        invPoreLocalAxes = m.inverse();
+    }
+    Vector3d applyPoreConductivities(Vector3d v) {
+        return poreLocalAxes.times(poreConductivity.times(invPoreLocalAxes.times(v))); // Landl et al. 2016, Eqn (12), K*v = [M*K'*(M^-1)]*v
+    }
 
     // random stuff
     void setSeed(unsigned int seed); ///< help fate (sets the seed of all random generators)
@@ -168,6 +174,11 @@ public:
     double randn() { return ND(gen); } ///< Normally distributed random number (0,1)
 
 private:
+
+    // todo currently everything is constant...
+    Matrix3d poreConductivity = Matrix3d();
+    Matrix3d poreLocalAxes= Matrix3d();
+    Matrix3d invPoreLocalAxes = Matrix3d();
 
     const int rsmlReduction = 5; ///< only each n-th node is written to the rsml file (to coarsely adjust axial resolution for output)
 

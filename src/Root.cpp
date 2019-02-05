@@ -354,7 +354,19 @@ Vector3d Root::getIncrement(const Vector3d& p, double sdx) {
     }
     Matrix3d ons = Matrix3d::ons(h);
     Vector2d ab = rootsystem->tf.at(param.type - 1)->getHeading(p, ons, sdx, this);
-    return (ons.times(Vector3d::rotAB(ab.x,ab.y))).times(sdx);
+    Vector3d sv = ons.times(Vector3d::rotAB(ab.x,ab.y));
+    if (rootsystem->poreGeometry==nullptr) { // no pores defined
+        return sv.times(sdx);
+    } else {
+        if (rootsystem->poreGeometry->getDist(p)<0) { // inside the pore
+            auto sv1 = rootsystem->applyPoreConductivities(sv);
+            std::cout << "Length before " << sv.length() << ", length after " << sv1.length() << "\n";
+            sv1.normalize();
+            return sv1.times(sdx);
+        } else {
+            return sv.times(sdx);
+        }
+    }
 }
 
 // Root::getPoreIncrement
