@@ -157,6 +157,11 @@ public:
 
     std::string toString() const; ///< infos about current root system state (for debugging)
 
+    // Macro pores
+    void setPoreGeometry(SignedDistanceFunction* geom) { poreGeometry = geom; }
+//    virtual Matrix3d getPoreLocalCoordinates(Vector3d p) { };
+//    virtual Matrix3d getPoreConductivity() { };
+
     // random stuff
     void setSeed(unsigned int seed); ///< help fate (sets the seed of all random generators)
     double rand() { return UD(gen); } ///< Uniformly distributed random number (0,1)
@@ -173,6 +178,8 @@ private:
     std::vector<Tropism*> tf;  ///< Tropism per root type
     SignedDistanceFunction* geometry = new SignedDistanceFunction(); ///< Confining geometry (unconfined by default)
     SoilLookUp* soil = nullptr; ///< callback for hydro, or chemo tropism (needs to set before initialize()) TODO should be a part of tf, or rtparam
+
+    SignedDistanceFunction* poreGeometry = nullptr;
 
     double simtime = 0;
     int rid = -1; // unique root id counter

@@ -16,9 +16,7 @@ namespace CRootBox {
  */
 Vector3d Tropism::getPosition(const Vector3d& pos, Matrix3d old, double a, double b, double dx)
 {
-    old.times(Matrix3d::rotX(b)); // TODO not nice, there should be a better way, but no easy
-    old.times(Matrix3d::rotZ(a));
-    return pos.plus(old.column(0).times(dx));
+    return pos.plus((old.times(Vector3d::rotAB(a,b))).times(dx));
 }
 
 /**
@@ -130,10 +128,8 @@ Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const
  */
 double Exotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root)
 {
-    old.times(Matrix3d::rotX(b));
-    old.times(Matrix3d::rotZ(a));
     Vector3d iheading = root->iheading;
-    double s = iheading.times(old.column(0));
+    double s = iheading.times(old.times(Vector3d::rotAB(a,b)));
     s*=(1./iheading.length()); // iheading should be normed anyway?
     s*=(1./old.column(0).length());
     return acos(s)/M_PI; // 0..1

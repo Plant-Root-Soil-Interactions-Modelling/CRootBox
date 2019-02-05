@@ -22,14 +22,12 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
     param = rs->getRootTypeParameter(type)->realize(); // throw the dice
     double beta = 2*M_PI*rs->rand(); // initial rotation
     Matrix3d ons = Matrix3d::ons(pheading);
-    ons.times(Matrix3d::rotX(beta));
     double theta = param.theta;
     if (parent!=nullptr) { // scale if not a baseRoot
         double scale = rs->getRootTypeParameter(type)->sa->getValue(parent->getNode(pni),this);
         theta*=scale;
     }
-    ons.times(Matrix3d::rotZ(theta));
-    this->iheading = ons.column(0);  // new initial heading
+    this->iheading = ons.times(Vector3d::rotAB(theta,beta));  // new initial heading
     //
     age = -delay; // the root starts growing when age>0
     alive = 1; // alive per default
@@ -347,7 +345,6 @@ void Root::createSegments(double l, bool silence)
  *  @param sdx     length of next segment
  */
 Vector3d Root::getIncrement(const Vector3d& p, double sdx) {
-
     Vector3d h; // current heading
     if (nodes.size() > 1) {
         h = nodes.back().minus(nodes.at(nodes.size() - 2));
@@ -357,15 +354,10 @@ Vector3d Root::getIncrement(const Vector3d& p, double sdx) {
     }
     Matrix3d ons = Matrix3d::ons(h);
     Vector2d ab = rootsystem->tf.at(param.type - 1)->getHeading(p, ons, sdx, this);
-    ons.times(Matrix3d::rotX(ab.y));
-    ons.times(Matrix3d::rotZ(ab.x));
-
-//    auto v = Vector3d(cos(ab.x),sin(ab.x),0); // first column of rotZ(ab.x)
-//    v = (Matrix3d::rotX(ab.y)).times(v);
-//    return (ons.times(v)).times(sdx);
-
-    return (ons.column(0)).times(sdx);
+    return (ons.times(Vector3d::rotAB(ab.x,ab.y))).times(sdx);
 }
+
+// Root::getPoreIncrement
 
 /**
  * Returns the root system as sequential list,

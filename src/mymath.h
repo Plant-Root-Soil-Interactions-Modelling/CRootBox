@@ -82,6 +82,11 @@ public:
     Vector3d(double x_, double y_, double z_): x(x_), y(y_), z(z_) { } ///< Constructor passing three doubles
     Vector3d(const Vector3d& v): x(v.x), y(v.y), z(v.z) { } ///< Copy Constructor
 
+    static Vector3d rotAB(double a, double b) { ///< first column of Rx(b)*Rz(a)
+        double sa = sin(a);
+        return Vector3d(cos(a), sa*cos(b), sa*sin(b) );
+    };
+
     void normalize() { double l=length(); x/=l; y/=l; z/=l; } ///< normalizes the vector
 
     double times(const Vector3d& v) const { return v.x*x+v.y*y+v.z*z; } ///< inner product
@@ -211,9 +216,9 @@ public:
     } ///< returns the i-th row of the matrix (i=0..2)
 
     void times(const Matrix3d& m) {
-        r0 = Vector3d(r0.times(m.r0), r0.times(m.r1), r0.times(m.r2) );
-        r1 = Vector3d(r1.times(m.r0), r1.times(m.r1), r1.times(m.r2) );
-        r2 = Vector3d(r2.times(m.r0), r2.times(m.r1), r2.times(m.r2) );
+        r0 = Vector3d(r0.times(m.column(0)), r0.times(m.column(1)), r0.times(m.column(2)) );
+        r1 = Vector3d(r1.times(m.column(0)), r1.times(m.column(1)), r1.times(m.column(2)) );
+        r2 = Vector3d(r2.times(m.column(0)), r2.times(m.column(1)), r2.times(m.column(2)) );
     } ///< Multiplies matrix m from right
 
     Vector3d times(const Vector3d& v) const {
