@@ -8,15 +8,6 @@ rs = rb.RootSystem()
 name = "Zea_mays_1_Leitner_2010"
 rs.openFile(name)
 
-# Adjust Tropism
-sigma = [0.4] * 10
-for i in range(0, 10):
-    p = rs.getRootTypeParameter(i + 1)
-    p.dx = 0.25  # adjust resolution
-    p.tropismT = rb.TropismType.gravi
-    p.tropismN = 1  # strength of tropism
-    p.tropismS = sigma[i]
-
 # Pore Geometry
 x_ = (-10, -5, 1, 15)  # not 0, otherwise we start in crack
 y_ = (0, 0, 0, 0)
@@ -31,6 +22,22 @@ for i in range(0, len(y_)):
 
 cracks = rb.SDF_Union(cracks_)
 rs.setPoreGeometry(cracks)
+
+# Increased elongation within the pores
+maxS = 2  # twice the elongation rate within the pore
+minS = 1  # normal elongation rate
+slope = 0
+soil_prop = rb.SoilLookUpSDF(cracks, maxS, minS, slope)
+
+# Adjust Tropism
+sigma = [0.4] * 10
+for i in range(0, 10):
+    p = rs.getRootTypeParameter(i + 1)
+    p.dx = 0.25  # adjust resolution
+    p.tropismT = rb.TropismType.gravi
+    p.tropismN = 1  # strength of tropism
+    p.tropismS = sigma[i]
+    p.se = soil_prop
 
 # Pore Local Axes
 v1 = rb.Vector3d(0, 0, -1)
