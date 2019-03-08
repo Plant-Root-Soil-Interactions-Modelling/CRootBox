@@ -30,15 +30,61 @@ public:
     double age_r;
     Vector3d tip;
     Vector3d v;
+    Root* r;
 
     // update for each position
     Vector3d pos;
 };
 
 /**
- * The integrand
+ * returns an interpolated point of root r with age a
  */
-double integrand(double t,void* param) {
+Vector3d pointAtAge(Root* r, double a) {
+    double et = r->getNodeETime(0)+a; // age -> emergence time
+    size_t i=0;
+    while (i<r->getNumberOfNodes()) {
+        if (r->getNodeETime(i)>=et) { // first index bigger than emergence time, interpolate i-1, i
+            break;
+        }
+        i++;
+    }
+    if (i==r->getNumberOfNodes()) {
+        i--;
+        // std::cout << "root " << r->id << " is younger than age " << r->getNodeETime(i) << ", " << et << "\n";
+    }
+    Vector3d n1 = r->getNode(i-1);
+    Vector3d n2 = r->getNode(i);
+    double t = (r->getNodeETime(i)-et)/(r->getNodeETime(i)-r->getNodeETime(i-1)); // t in (0,1]
+    return (n1.times(t)).plus(n2.times(1.-t));
+}
+
+/**
+ * point source, root is represented by a straight segments
+ */
+double integrandPSS(double t,void* param) {
+    ExudationParameters* p = (ExudationParameters*) param;
+
+    double dn = 4*p->R*p->Dl*(p->age_r-t);
+
+    Vector3d pos = pointAtAge(p->r, p->age_r-t);
+
+    double x1 = pos.x;
+    double exp_x = -x1*x1/dn;
+
+    double y1 = pos.y;
+    double exp_y = -y1*y1/dn;
+
+    double z1 = pos.z;
+    double exp_z = -z1*z1/dn;
+
+    return p->M/(8*p->theta*sqrt(M_PI*M_PI*M_PI*p->Dt*p->Dt*p->Dl*(p->age_r-t)*(p->age_r-t)*(p->age_r-t)))*
+        exp(exp_x + exp_y + exp_z - p->lambda_ * (p->age_r - t) / p->R);
+}
+
+/**
+ * point source, root is represented by a single straight line
+ */
+double integrandPS(double t,void* param) {
     ExudationParameters* p = (ExudationParameters*) param;
 
     double dn = 4*p->R*p->Dl*(p->age_r-t);
@@ -53,7 +99,7 @@ double integrand(double t,void* param) {
     double exp_z = -z1*z1/dn;
 
     return p->M/(8*p->theta*sqrt(M_PI*M_PI*M_PI*p->Dt*p->Dt*p->Dl*(p->age_r-t)*(p->age_r-t)*(p->age_r-t)))*
-            exp( exp_x + exp_y + exp_z  - p->lambda_*(p->age_r-t)/p->R );
+        exp(exp_x + exp_y + exp_z - p->lambda_ * (p->age_r - t) / p->R);
 }
 
 /**
@@ -64,7 +110,7 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
     const auto& roots = rootsystem.getRoots();
     const auto& nodes = rootsystem.getNodes();
 
-    auto tipsI = rootsystem.getRootTips(); // nodes
+    auto tipsI = rootsystem.getRootTips();
     std::vector<Vector3d> tips;
     for (auto i : tipsI) {
         tips.push_back(nodes[i]);
@@ -77,7 +123,7 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
 
     double simtime = rootsystem.getSimTime();
 
-    std::vector<double> ages;
+    std::vector<double> ages; // age per root
     for (const auto& r : roots) {
         if (r->getNumberOfNodes()>1) {
             ages.push_back(simtime - r->getNodeETime(0));
@@ -105,19 +151,20 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
             params.v = v;
             params.tip = tips[i];
             params.age_r = ages[i];
+            params.r = roots[i];
 
             for (int x=0; x<X; x++) {
                 for(int y=0; y<Y; y++) {
                     for (int z=0; z<Z; z++ ) {
 
                         params.pos = Vector3d(((double(x)-double(X)/2.)/X)*width,
-                                ((double(y)-double(Y)/2.)/Y)*width,
-                                ((-double(z))/Z)*depth);
+                            ((double(y) - double(Y) / 2.) / Y) * width,
+                            ((-double(z)) / Z) * depth);
 
                         int ind = x*Y*Z+y*Z+z;
-                        // int ind = z*Y*X+y*X+x; // one is c, one is fortran ordering
+                        // int ind = z*Y*X+y*X+x; // one is c, one is Fortran ordering
 
-                        allc[ind] += gauss_legendre(5,integrand,&params,0,params.age_r);
+                        allc[ind] += gauss_legendre(5,integrandPSS,&params,0,params.age_r);
                         // gauss_legendre_2D_cube()
                     }
                 }
@@ -185,17 +232,17 @@ void example_exudation()
 
     std::vector<double> allC = getExudateConcentration(rootsystem, params, 10, 10, 100, 30, 50);
 
-//    /*
-//     * write as txt file
-//     */
-//    std::ofstream fos;
-//    fos.open(name+".txt");
-//    for (size_t i=0; i<allc.size(); i++) {
-//    	fos << allc[i] << "\n";
-//    }
-//    fos.close();
-//
-//    cout << "fin \n";
+    //    /*
+    //     * write as txt file
+    //     */
+    //    std::ofstream fos;
+    //    fos.open(name+".txt");
+    //    for (size_t i=0; i<allc.size(); i++) {
+    //    	fos << allc[i] << "\n";
+    //    }
+    //    fos.close();
+    //
+    //    cout << "fin \n";
 
 }
 

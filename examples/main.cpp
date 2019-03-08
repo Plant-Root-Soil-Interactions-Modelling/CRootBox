@@ -19,7 +19,8 @@
 #include "shehan_SoilCore.h"
 #include "shehan_RhizoTubes.h"
 #include "shehan_Trenches.h"
-#include "shehan_ScaleElongation.h"
+// #include "shehan_ScaleElongation.h"
+#include "shehan_WC.h"
 #include "shehan_ScaleElongation_CL.h"
 #include "example_volume.h"
 
@@ -62,9 +63,10 @@ int main(int argc, char* argv[])
 
     // example_dumux(); // tests the suggested dumux coupling
 
-    // example_exudation();
+    example_exudation();
     // shehan_ScaleElongation();
-    shehan_ScaleElongation_CL();
+    // shehan_ScaleElongation_CL();
+    // shehan_WC();
 
     // example_volume();
     //
