@@ -1,5 +1,7 @@
 #include "gauss_legendre.h"
 
+#include <functional>
+
 namespace CRootBox {
 
 /**
@@ -50,23 +52,25 @@ Vector3d pointAtAge(Root* r, double a) {
     }
     if (i == r->getNumberOfNodes()) { // this happens if a root has stopped growing
         i--;
-        // std::cout << "root " << r->id << " is younger than age " << r->getNodeETime(i) << ", " << et << "\n";
+        std::cout << "root " << r->id << " is younger than age " << r->getNodeETime(i) << ", " << et << "\n";
     }
     Vector3d n1 = r->getNode(i-1);
     Vector3d n2 = r->getNode(i);
-    double t = (r->getNodeETime(i)-et)/(r->getNodeETime(i)-r->getNodeETime(i-1)); // t in (0,1]
-    return (n1.times(t)).plus(n2.times(1.-t));
+    double t = (et - r->getNodeETime(i - 1)) / (r->getNodeETime(i) - r->getNodeETime(i - 1)); // t in (0,1]
+    // std::cout << "root " << r->id << " age between (" << r->getNodeETime(i - 1) << " and " << r->getNodeETime(i) << "], at " << et << "\n";
+    // std::cout << " pos " << (n1.times(1. - t)).plus(n2.times(t)).toString() << "\n";
+    return (n1.times(1. - t)).plus(n2.times(t));
 }
 
 /**
- * point source, root is represented by a straight segments
+ * segment moving point source, root is represented by a straight segments
  */
-double integrandPSS(double t,void* param) {
+double integrandSMPS(double t, void* param) {
     ExudationParameters* p = (ExudationParameters*) param;
 
     double dn = 4*p->R*p->Dl*(p->age_r-t);
 
-    Vector3d pos = pointAtAge(p->r, p->age_r-t);
+    Vector3d pos = pointAtAge(p->r, t); // oder p->age_r-t ???
 
     double x1 = p->pos.x - pos.x;
     double exp_x = -x1*x1/dn;
@@ -82,9 +86,9 @@ double integrandPSS(double t,void* param) {
 }
 
 /**
- * point source, root is represented by a single straight line
+ * moving point source, root is represented by a single straight line
  */
-double integrandPS(double t,void* param) {
+double integrandMPS(double t, void* param) {
     ExudationParameters* p = (ExudationParameters*) param;
 
     double dn = 4*p->R*p->Dl*(p->age_r-t);
@@ -105,10 +109,22 @@ double integrandPS(double t,void* param) {
 /**
  * TODO
  */
-std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationParameters& params, int X, int Y, int Z, double width, double depth) {
+std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationParameters& params, int X, int Y, int Z, double width, double depth,
+    int type = 0) {
 
     const auto& roots = rootsystem.getRoots();
     const auto& nodes = rootsystem.getNodes();
+
+    double (*integrand)(double, void*);
+
+    if (type == 0) {
+        std::cout << "getExudateConcentration() with linear moving points source\n";
+        integrand = integrandMPS;
+    }
+    if (type == 1) {
+        std::cout << "getExudateConcentration() with segment wise moving point source\n";
+        integrand = integrandSMPS;
+    }
 
     auto tipsI = rootsystem.getRootTips();
     std::vector<Vector3d> tips;
@@ -164,7 +180,7 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
                         int ind = x*Y*Z+y*Z+z;
                         // int ind = z*Y*X+y*X+x; // one is c, one is Fortran ordering
 
-                        allc[ind] += gauss_legendre(5,integrandPSS,&params,0,params.age_r);
+                        allc[ind] += gauss_legendre(5, integrand, &params, 0, params.age_r);
                         // gauss_legendre_2D_cube()
                     }
                 }
