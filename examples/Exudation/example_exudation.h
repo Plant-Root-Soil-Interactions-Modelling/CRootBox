@@ -48,7 +48,7 @@ Vector3d pointAtAge(Root* r, double a) {
         }
         i++;
     }
-    if (i==r->getNumberOfNodes()) {
+    if (i == r->getNumberOfNodes()) { // this happens if a root has stopped growing
         i--;
         // std::cout << "root " << r->id << " is younger than age " << r->getNodeETime(i) << ", " << et << "\n";
     }
@@ -68,13 +68,13 @@ double integrandPSS(double t,void* param) {
 
     Vector3d pos = pointAtAge(p->r, p->age_r-t);
 
-    double x1 = pos.x;
+    double x1 = p->pos.x - pos.x;
     double exp_x = -x1*x1/dn;
 
-    double y1 = pos.y;
+    double y1 = p->pos.y - pos.y;
     double exp_y = -y1*y1/dn;
 
-    double z1 = pos.z;
+    double z1 = p->pos.z - pos.z;
     double exp_z = -z1*z1/dn;
 
     return p->M/(8*p->theta*sqrt(M_PI*M_PI*M_PI*p->Dt*p->Dt*p->Dl*(p->age_r-t)*(p->age_r-t)*(p->age_r-t)))*
