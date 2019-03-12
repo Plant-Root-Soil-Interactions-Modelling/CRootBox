@@ -31,6 +31,10 @@ name = "Anagallis_straight_simple"
 #
 rootsystem.openFile(name)
 
+for i in range(0, 10):
+    p = rootsystem.getRootTypeParameter(i + 1)
+    p.gf = 2  # linear growth function
+
 #
 # Initialize
 #
@@ -82,7 +86,7 @@ print("this is " + str(num_th * 0.125 / (15 * 15 * 30) * 100) + "% of the overal
 fig1 = plt.figure()
 ax = plt.axes()
 C_ = C[:, 10, :]
-levels = np.logspace(np.log10(np.max(C_))-1.5, np.log10(np.max(C_)), 100)  # -8 -6.3
+levels = np.logspace(np.log10(np.max(C_)) - 1.5, np.log10(np.max(C_)), 100)  # -8 -6.3
 cs = ax.contourf(X_[:, 10, :], Z_[:, 10, :], C_, levels = levels, locator = ticker.LogLocator(), cmap = 'jet')
 ax.set_xlabel('x')
 ax.set_ylabel('z')

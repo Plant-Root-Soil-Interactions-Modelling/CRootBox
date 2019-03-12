@@ -68,8 +68,6 @@ Vector3d pointAtAge(Root* r, double a) {
 double integrandSMPS(double t, void* param) {
     ExudationParameters* p = (ExudationParameters*) param;
 
-    // double t = p->age_r-t_;
-
     Vector3d xtip = pointAtAge(p->r, p->age_r-t);
     double x = p->pos.x - xtip.x;
     double y = p->pos.y - xtip.y;
@@ -172,7 +170,7 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
                         int ind = x*Y*Z+y*Z+z;
                         // int ind = z*Y*X+y*X+x; // one is c, one is Fortran ordering
 
-                        allc[ind] += gauss_legendre(5, integrand, &params, 0, params.age_r);
+                        allc[ind] += gauss_legendre(125, integrand, &params, 0, params.age_r);
                         // gauss_legendre_2D_cube()
                     }
                 }
