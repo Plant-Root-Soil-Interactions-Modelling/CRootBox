@@ -56,10 +56,9 @@ Vector3d pointAtAge(Root* r, double a) {
     }
     Vector3d n1 = r->getNode(i-1);
     Vector3d n2 = r->getNode(i);
-
-    // std::cout << "root " << r->id << " age between (" << r->getNodeETime(i - 1) << " and " << r->getNodeETime(i) << "], at " << et << "\n";
-    // std::cout << " pos " << (n1.times(1. - t)).plus(n2.times(t)).toString() << "\n";
     double t = (et - r->getNodeETime(i - 1)) / (r->getNodeETime(i) - r->getNodeETime(i - 1)); // t in (0,1]
+//    std::cout << "root " << r->id << " age between (" << r->getNodeETime(i - 1) << " and " << r->getNodeETime(i) << "], at " << et << "\n";
+//    std::cout << " pos " << (n1.times(1. - t)).plus(n2.times(t)).toString() << "\n";
     return (n1.times(1. - t)).plus(n2.times(t));
 }
 
@@ -69,7 +68,9 @@ Vector3d pointAtAge(Root* r, double a) {
 double integrandSMPS(double t, void* param) {
     ExudationParameters* p = (ExudationParameters*) param;
 
-    Vector3d xtip = pointAtAge(p->r, p->age_r -t); // p->age_r -t
+    // double t = p->age_r-t_;
+
+    Vector3d xtip = pointAtAge(p->r, p->age_r-t);
     double x = p->pos.x - xtip.x;
     double y = p->pos.y - xtip.y;
     double z = p->pos.z - xtip.z;
@@ -77,7 +78,7 @@ double integrandSMPS(double t, void* param) {
 
     double d = 8*p->theta*sqrt(M_PI*M_PI*M_PI*p->Dl*p->Dl*p->Dl*t*t*t);
 
-    return (p->M*sqrt(p->R))/d *exp(c*(x*x+y*y+z*z) - p->lambda_/p->R * t); // M = Qs,p, Eqn (11)
+    return (p->M*sqrt(p->R))/d *exp(c*(x*x+y*y+z*z) - p->lambda_/p->R * t); // Eqn (11)
 }
 
 /**
@@ -86,19 +87,15 @@ double integrandSMPS(double t, void* param) {
 double integrandMPS(double t, void* param) {
     ExudationParameters* p = (ExudationParameters*) param;
 
-    double dn = 4*p->R*p->Dl*(p->age_r-t);
+    double x = p->pos.x - ( p->tip.x + p->v.x*(p->age_r-t) );
+    double y = p->pos.y - ( p->tip.y + p->v.y*(p->age_r-t) );
+    double z = p->pos.z - ( p->tip.z + p->v.z*(p->age_r-t) );
 
-    double x1 = (p->pos.x - p->tip.x)*p->R -p->v.x*(p->age_r-t);
-    double exp_x = -x1*x1/dn;
+    double c = -p->R / (4*p->Dl*(p->age_r-t));
 
-    double y1= (p->pos.y-p->tip.y)*p->R -p->v.y*(p->age_r-t);
-    double exp_y = -y1*y1/dn;
+    double d = 8*p->theta*sqrt(M_PI*M_PI*M_PI*p->Dt*p->Dt*p->Dl*(p->age_r-t)*(p->age_r-t)*(p->age_r-t));
 
-    double z1 = (p->pos.z-p->tip.z)*p->R -p->v.z*(p->age_r-t);
-    double exp_z = -z1*z1/dn;
-
-    return p->M/(8*p->theta*sqrt(M_PI*M_PI*M_PI*p->Dt*p->Dt*p->Dl*(p->age_r-t)*(p->age_r-t)*(p->age_r-t)))*
-        exp(exp_x + exp_y + exp_z - p->lambda_ * (p->age_r - t) / p->R);
+    return (p->M*sqrt(p->R)) / d * exp(c*(x*x+y*y+z*z)  - p->lambda_/p->R*(p->age_r - t)); // Eqn (11)
 }
 
 /**
@@ -157,7 +154,7 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
             double vy = - (tips[i].y-bases[i].y)/ages[i];
             double vz = - (tips[i].z-bases[i].z)/ages[i];
             Vector3d v = Vector3d(vx,vy,vz);
-            v.normalize();
+            // v.normalize();
 
             params.v = v;
             params.tip = tips[i];
