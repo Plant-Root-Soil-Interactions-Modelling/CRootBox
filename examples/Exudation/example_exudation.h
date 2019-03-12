@@ -56,9 +56,10 @@ Vector3d pointAtAge(Root* r, double a) {
     }
     Vector3d n1 = r->getNode(i-1);
     Vector3d n2 = r->getNode(i);
-    double t = (et - r->getNodeETime(i - 1)) / (r->getNodeETime(i) - r->getNodeETime(i - 1)); // t in (0,1]
+
     // std::cout << "root " << r->id << " age between (" << r->getNodeETime(i - 1) << " and " << r->getNodeETime(i) << "], at " << et << "\n";
     // std::cout << " pos " << (n1.times(1. - t)).plus(n2.times(t)).toString() << "\n";
+    double t = (et - r->getNodeETime(i - 1)) / (r->getNodeETime(i) - r->getNodeETime(i - 1)); // t in (0,1]
     return (n1.times(1. - t)).plus(n2.times(t));
 }
 
@@ -68,21 +69,15 @@ Vector3d pointAtAge(Root* r, double a) {
 double integrandSMPS(double t, void* param) {
     ExudationParameters* p = (ExudationParameters*) param;
 
-    double dn = 4*p->R*p->Dl*(p->age_r-t);
+    Vector3d xtip = pointAtAge(p->r, p->age_r -t); // p->age_t -t
+    double x = p->pos.x - xtip.x;
+    double y = p->pos.y - xtip.y;
+    double z = p->pos.z - xtip.z;
+    double c = p->R / ( 4*p->Dl*t );
 
-    Vector3d pos = pointAtAge(p->r, t); // oder p->age_r-t ???
+    double d = 8*p->theta*sqrt(M_PI*M_PI*M_PI*p->Dl*p->Dl*p->Dl*t*t*t);
 
-    double x1 = p->pos.x - pos.x;
-    double exp_x = -x1*x1/dn;
-
-    double y1 = p->pos.y - pos.y;
-    double exp_y = -y1*y1/dn;
-
-    double z1 = p->pos.z - pos.z;
-    double exp_z = -z1*z1/dn;
-
-    return p->M/(8*p->theta*sqrt(M_PI*M_PI*M_PI*p->Dt*p->Dt*p->Dl*(p->age_r-t)*(p->age_r-t)*(p->age_r-t)))*
-        exp(exp_x + exp_y + exp_z - p->lambda_ * (p->age_r - t) / p->R);
+    return (p->M*sqrt(p->R))/d *exp(c*(x*x+y*y+z*z) - p->lambda_/p->R * t); // lambda = k? and M = Qs,p ?
 }
 
 /**
