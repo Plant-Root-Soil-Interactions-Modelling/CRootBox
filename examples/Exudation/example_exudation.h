@@ -69,15 +69,15 @@ Vector3d pointAtAge(Root* r, double a) {
 double integrandSMPS(double t, void* param) {
     ExudationParameters* p = (ExudationParameters*) param;
 
-    Vector3d xtip = pointAtAge(p->r, p->age_r -t); // p->age_t -t
+    Vector3d xtip = pointAtAge(p->r, p->age_r -t); // p->age_r -t
     double x = p->pos.x - xtip.x;
     double y = p->pos.y - xtip.y;
     double z = p->pos.z - xtip.z;
-    double c = p->R / ( 4*p->Dl*t );
+    double c = -p->R / ( 4*p->Dl*t );
 
     double d = 8*p->theta*sqrt(M_PI*M_PI*M_PI*p->Dl*p->Dl*p->Dl*t*t*t);
 
-    return (p->M*sqrt(p->R))/d *exp(c*(x*x+y*y+z*z) - p->lambda_/p->R * t); // lambda = k? and M = Qs,p ?
+    return (p->M*sqrt(p->R))/d *exp(c*(x*x+y*y+z*z) - p->lambda_/p->R * t); // M = Qs,p, Eqn (11)
 }
 
 /**
