@@ -43,8 +43,8 @@ rootsystem.initialize()
 #
 # Simulate
 #
-simtime = 7  # or 20, 40, 60 days
-dt = 1  # try other values here
+simtime = 10  # or 20, 40, 60 days
+dt = 10  # try other values here
 N = round(simtime / dt)  # steps
 for i in range(0, int(N)):
     rootsystem.simulate(dt, False);
@@ -55,9 +55,11 @@ for i in range(0, int(N)):
 rootsystem.write(name + ".vtp")  # use ot_polylines for nicer visualization, ot_segments for animations
 
 params = rb.ExudationParameters()
-params.Dt = 8.64e-1  # cm2/d
-params.Dl = 8.64e-1  # cm2/d
-params.lambda_ = 8.64e-2  # d-1
+params.Dt = 2.43e-6*3600*24  # cm2/d
+params.Dl = 2.43e-6*3600*24   # cm2/d
+params.lambda_ = 2.60e-6*3600*24   # d-1
+params.R = 16.7   # -
+params.M = 1    # µg/d/tip
 
 nx = 30
 ny = 30
@@ -86,7 +88,7 @@ print("this is " + str(num_th * 0.125 / (15 * 15 * 30) * 100) + "% of the overal
 fig1 = plt.figure()
 ax = plt.axes()
 C_ = C[:, 10, :]
-levels = np.logspace(np.log10(np.max(C_)) - 1.5, np.log10(np.max(C_)), 100)  # -8 -6.3
+levels = np.logspace(np.log10(np.max(C_)) - 3, np.log10(np.max(C_)), 100)  # -8 -6.3
 cs = ax.contourf(X_[:, 10, :], Z_[:, 10, :], C_, levels = levels, locator = ticker.LogLocator(), cmap = 'jet')
 ax.set_xlabel('x')
 ax.set_ylabel('z')
