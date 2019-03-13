@@ -59,15 +59,15 @@ params.Dt = 2.43e-6*3600*24  # cm2/d
 params.Dl = 2.43e-6*3600*24   # cm2/d
 params.lambda_ = 2.60e-6*3600*24   # d-1
 params.R = 16.7   # -
-params.M = 1    # µg/d/tip
+params.M = 4    # µg/d/tip
 
-nx = 30
-ny = 30
+nx = 70
+ny = 70
 nz = 60
-width = 15  # cm
+width = 7  # cm
 depth = 30  # cm
 
-C = rb.getExudateConcentration(rootsystem, params, nx, ny, nz, width, depth, 1)  # 0 = mvp line, 1 = mvp segments
+C = rb.getExudateConcentration(rootsystem, params, nx, ny, nz, width, depth, 0)  # 0 = mvp line, 1 = mvp segments
 C = v2a(C);  # make a numpy array
 C = np.reshape(C, (nx, ny, nz))  # hope that works, it does not :-(, or does it?
 
@@ -87,9 +87,9 @@ print("this is " + str(num_th * 0.125 / (15 * 15 * 30) * 100) + "% of the overal
 
 fig1 = plt.figure()
 ax = plt.axes()
-C_ = C[:, 10, :]
-levels = np.logspace(np.log10(np.max(C_)) - 3, np.log10(np.max(C_)), 100)  # -8 -6.3
-cs = ax.contourf(X_[:, 10, :], Z_[:, 10, :], C_, levels = levels, locator = ticker.LogLocator(), cmap = 'jet')
+C_ = C[:, int(ny/2), :]
+levels = np.logspace(np.log10(np.max(C_)) - 5, np.log10(np.max(C_)), 100)  # -8 -6.3
+cs = ax.contourf(X_[:, int(ny/2), :], Z_[:, int(ny/2), :], C_, levels = levels, locator = ticker.LogLocator(), cmap = 'jet')
 ax.set_xlabel('x')
 ax.set_ylabel('z')
 plt.axis('equal')
@@ -97,7 +97,7 @@ cbar = fig1.colorbar(cs)
 
 fig2 = plt.figure()
 nodes = rootsystem.getNodes()
-node_tip = nodes[-3]
+node_tip = nodes[-10]
 idy = (np.abs(Y - node_tip.y)).argmin()  # y-index of soil element closest to the point on the root axis
 idz = (np.abs(Z - node_tip.z)).argmin()  # z-index of soil element closest to the point on the root axis
 C_ = C[:, idy, idz]  # 1d array
