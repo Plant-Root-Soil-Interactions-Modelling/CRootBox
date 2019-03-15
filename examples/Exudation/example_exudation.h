@@ -22,12 +22,14 @@ class ExudationParameters {
 public:
     // static
     double M=1e-5;
-    double Dt=1e-5;  //cm2/s
+    double Dt=1e-5; // cm2/s
     double Dl=Dt;
     double theta=0.3;
     double R=1;
     double lambda_=1e-6;
-    double l = 0.1;
+    double l = 0.1; // cm
+
+    size_t N = 30;
 
     // update for each root
     double age_r;
@@ -43,23 +45,23 @@ public:
  * returns an interpolated point of root r with age a
  */
 Vector3d pointAtAge(Root* r, double a) {
+    a = std::max(0.,a);
     double et = r->getNodeETime(0)+a; // age -> emergence time
     size_t i=0;
     while (i<r->getNumberOfNodes()) {
-        if (r->getNodeETime(i)>=et) { // first index bigger than emergence time, interpolate i-1, i
+        if (r->getNodeETime(i)>et) { // first index bigger than emergence time, interpolate i-1, i
             break;
         }
         i++;
     }
     if (i == r->getNumberOfNodes()) { // this happens if a root has stopped growing
-        i--;
-        // std::cout << "root " << r->id << " is younger than age " << r->getNodeETime(i) << ", " << et << "\n";
+        i--; // std::cout << "root " << r->id << " is younger than age " << r->getNodeETime(i) << ", " << et << "\n";
     }
     Vector3d n1 = r->getNode(i-1);
     Vector3d n2 = r->getNode(i);
     double t = (et - r->getNodeETime(i - 1)) / (r->getNodeETime(i) - r->getNodeETime(i - 1)); // t in (0,1]
-//    std::cout << "root " << r->id << " age between (" << r->getNodeETime(i - 1) << " and " << r->getNodeETime(i) << "], at " << et << "\n";
-//    std::cout << " pos " << (n1.times(1. - t)).plus(n2.times(t)).toString() << "\n";
+    //    std::cout << "root " << r->id << " age between (" << r->getNodeETime(i - 1) << " and " << r->getNodeETime(i) << "], at " << et << "\n";
+    //    std::cout << " pos " << (n1.times(1. - t)).plus(n2.times(t)).toString() << "\n";
     return (n1.times(1. - t)).plus(n2.times(t));
 }
 
@@ -126,7 +128,7 @@ double integrandMPS(double t, void* param) {
 }
 
 /**
- * TODO docme!
+ * TODO doc me!
  *
  * type: 0 moving point source (root is a single straight line)
  * type: 1 moving point source (root is represented by segments)
@@ -190,17 +192,15 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
             double vx = - (tips[i].x-bases[i].x)/ages[i];
             double vy = - (tips[i].y-bases[i].y)/ages[i];
             double vz = - (tips[i].z-bases[i].z)/ages[i];
-            Vector3d v = Vector3d(vx,vy,vz);
-            // v.normalize();
 
-            params.v = v;
+            params.v = Vector3d(vx,vy,vz);
             params.tip = tips[i];
             params.age_r = ages[i];
             params.r = roots[i];
 
             double r = roots[i]->param.r;
             double age = params.l/r; // days
-            std::cout << " Age " << age << "\n";
+            std::cout << "Age " << age << "\n";
 
             for (int x=0; x<X; x++) {
                 for(int y=0; y<Y; y++) {
@@ -214,10 +214,11 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
                         // int ind = z*Y*X+y*X+x; // one is c, one is Fortran ordering
 
                         if (type<3) {
-                            allc[ind] += gauss_legendre(125, integrand, &params, 0, params.age_r);
+                            allc[ind] += gauss_legendre(params.N, integrand, &params, 0, params.age_r);
                         } else {
-                            allc[ind] += gauss_legendre_2D_cube(125, integrandSMLS, &params, 0, params.age_r, 0, age);
+                            allc[ind] += gauss_legendre_2D_cube(params.N, integrandSMLS, &params, 0, params.age_r, 0, age);
                         }
+
                     }
                 }
             }
