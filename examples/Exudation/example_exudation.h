@@ -72,6 +72,10 @@ Vector3d pointAtAge(Root* r, double a) {
 double integrandSMLS(double t, double t2,  void* param) {
     ExudationParameters* p = (ExudationParameters*) param;
 
+    if (p->age_r-t-t2 < 0) { // makes sense, does it?
+        return 0.;
+    }
+
     Vector3d nl = pointAtAge(p->r, p->age_r-t-t2);
     Vector3d xtip = pointAtAge(p->r, p->age_r-t);
     Vector3d x = p->pos.minus(xtip).plus(xtip.minus(nl));
