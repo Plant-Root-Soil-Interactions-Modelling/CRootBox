@@ -61,7 +61,7 @@ params.lambda_ = 2.60e-6 * 3600 * 24  # d-1
 params.R = 16.7  # -
 params.M = 4  # µg/d/tip
 params.l = 4  # cm
-params.N = 30  # sample points
+params.N = 4  # sample points per cm
 
 nx = 30
 ny = 30

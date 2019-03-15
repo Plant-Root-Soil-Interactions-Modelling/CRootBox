@@ -29,8 +29,6 @@ public:
     double lambda_=1e-6;
     double l = 0.1; // cm
 
-    size_t N = 30;
-
     // update for each root
     double age_r;
     Vector3d tip;
@@ -39,6 +37,9 @@ public:
 
     // update for each position
     Vector3d pos;
+
+    // sample pointsp per cm
+    int N = 5;
 };
 
 /**
@@ -55,7 +56,7 @@ Vector3d pointAtAge(Root* r, double a) {
         i++;
     }
     if (i == r->getNumberOfNodes()) { // this happens if a root has stopped growing
-        i--; // std::cout << "root " << r->id << " is younger than age " << r->getNodeETime(i) << ", " << et << "\n";
+        return r->getNode(i-1);
     }
     Vector3d n1 = r->getNode(i-1);
     Vector3d n2 = r->getNode(i);
@@ -200,7 +201,9 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
 
             double r = roots[i]->param.r;
             double age = params.l/r; // days
-            std::cout << "Age " << age << "\n";
+            int n = std::ceil(params.N*roots[i]->length);
+
+            std::cout << "root " << i << " N = "<< n << "\n";
 
             for (int x=0; x<X; x++) {
                 for(int y=0; y<Y; y++) {
@@ -214,9 +217,9 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
                         // int ind = z*Y*X+y*X+x; // one is c, one is Fortran ordering
 
                         if (type<3) {
-                            allc[ind] += gauss_legendre(params.N, integrand, &params, 0, params.age_r);
+                            allc[ind] += gauss_legendre(n, integrand, &params, 0, params.age_r);
                         } else {
-                            allc[ind] += gauss_legendre_2D_cube(params.N, integrandSMLS, &params, 0, params.age_r, 0, age);
+                            allc[ind] += gauss_legendre_2D_cube(n, integrandSMLS, &params, 0, params.age_r, 0, age);
                         }
 
                     }
