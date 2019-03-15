@@ -55,19 +55,19 @@ for i in range(0, int(N)):
 rootsystem.write(name + ".vtp")  # use ot_polylines for nicer visualization, ot_segments for animations
 
 params = rb.ExudationParameters()
-params.Dt = 2.43e-6*3600*24  # cm2/d
-params.Dl = 2.43e-6*3600*24   # cm2/d
-params.lambda_ = 2.60e-6*3600*24   # d-1
-params.R = 16.7   # -
-params.M = 4    # µg/d/tip
+params.Dt = 2.43e-6 * 3600 * 24  # cm2/d
+params.Dl = 2.43e-6 * 3600 * 24  # cm2/d
+params.lambda_ = 2.60e-6 * 3600 * 24  # d-1
+params.R = 16.7  # -
+params.M = 4  # µg/d/tip
 
-nx = 70
-ny = 70
+nx = 30
+ny = 30
 nz = 60
 width = 7  # cm
 depth = 30  # cm
 
-C = rb.getExudateConcentration(rootsystem, params, nx, ny, nz, width, depth, 0)  # 0 = mvp line, 1 = mvp segments
+C = rb.getExudateConcentration(rootsystem, params, nx, ny, nz, width, depth, 3)  # 0 = mvp line, 1 = mvp segments
 C = v2a(C);  # make a numpy array
 C = np.reshape(C, (nx, ny, nz))  # hope that works, it does not :-(, or does it?
 
@@ -87,9 +87,9 @@ print("this is " + str(num_th * 0.125 / (15 * 15 * 30) * 100) + "% of the overal
 
 fig1 = plt.figure()
 ax = plt.axes()
-C_ = C[:, int(ny/2), :]
+C_ = C[:, int(ny / 2), :]
 levels = np.logspace(np.log10(np.max(C_)) - 5, np.log10(np.max(C_)), 100)  # -8 -6.3
-cs = ax.contourf(X_[:, int(ny/2), :], Z_[:, int(ny/2), :], C_, levels = levels, locator = ticker.LogLocator(), cmap = 'jet')
+cs = ax.contourf(X_[:, int(ny / 2), :], Z_[:, int(ny / 2), :], C_, levels = levels, locator = ticker.LogLocator(), cmap = 'jet')
 ax.set_xlabel('x')
 ax.set_ylabel('z')
 plt.axis('equal')

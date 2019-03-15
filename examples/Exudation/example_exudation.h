@@ -27,6 +27,7 @@ public:
     double theta=0.3;
     double R=1;
     double lambda_=1e-6;
+    double l = 0.1;
 
     // update for each root
     double age_r;
@@ -52,7 +53,7 @@ Vector3d pointAtAge(Root* r, double a) {
     }
     if (i == r->getNumberOfNodes()) { // this happens if a root has stopped growing
         i--;
-        std::cout << "root " << r->id << " is younger than age " << r->getNodeETime(i) << ", " << et << "\n";
+        // std::cout << "root " << r->id << " is younger than age " << r->getNodeETime(i) << ", " << et << "\n";
     }
     Vector3d n1 = r->getNode(i-1);
     Vector3d n2 = r->getNode(i);
@@ -63,20 +64,50 @@ Vector3d pointAtAge(Root* r, double a) {
 }
 
 /**
+ * segment moving line source, root is represented by a straight segments
+ */
+double integrandSMLS(double t, double t2,  void* param) {
+    ExudationParameters* p = (ExudationParameters*) param;
+
+    Vector3d nl = pointAtAge(p->r, p->age_r-t-t2);
+    Vector3d xtip = pointAtAge(p->r, p->age_r-t);
+    Vector3d x = p->pos.minus(xtip).plus(xtip.minus(nl));
+
+    double c = -p->R / ( 4*p->Dl*t );
+    double d = 8*p->theta*sqrt(M_PI*M_PI*M_PI*p->Dl*p->Dl*p->Dl*t*t*t);
+
+    return (p->M*sqrt(p->R))/d *exp(c*x.times(x) - p->lambda_/p->R * t); // Eqn (11)
+}
+
+
+/**
  * segment moving point source, root is represented by a straight segments
  */
 double integrandSMPS(double t, void* param) {
     ExudationParameters* p = (ExudationParameters*) param;
 
     Vector3d xtip = pointAtAge(p->r, p->age_r-t);
-    double x = p->pos.x - xtip.x;
-    double y = p->pos.y - xtip.y;
-    double z = p->pos.z - xtip.z;
-    double c = -p->R / ( 4*p->Dl*t );
+    Vector3d x = p->pos.minus(xtip);
 
+    double c = -p->R / ( 4*p->Dl*t );
     double d = 8*p->theta*sqrt(M_PI*M_PI*M_PI*p->Dl*p->Dl*p->Dl*t*t*t);
 
-    return (p->M*sqrt(p->R))/d *exp(c*(x*x+y*y+z*z) - p->lambda_/p->R * t); // Eqn (11)
+    return (p->M*sqrt(p->R))/d *exp(c*x.times(x) - p->lambda_/p->R * t); // Eqn (11)
+}
+
+/**
+ * moving point source, root is represented by a single straight line (substituted)
+ */
+double integrandMPS2(double t, void* param) {
+    ExudationParameters* p = (ExudationParameters*) param;
+
+    Vector3d xtip = p->tip.plus(p->v.times(t)); // for t=0 at tip, at t=age_r at base, as above
+    Vector3d x = p->pos.minus(xtip);
+
+    double c = -p->R / ( 4*p->Dl*t );
+    double d = 8*p->theta*sqrt(M_PI*M_PI*M_PI*p->Dl*p->Dl*p->Dl*t*t*t);
+
+    return (p->M*sqrt(p->R))/d *exp(c*x.times(x) - p->lambda_/p->R * t); // Eqn (11)
 }
 
 /**
@@ -85,19 +116,23 @@ double integrandSMPS(double t, void* param) {
 double integrandMPS(double t, void* param) {
     ExudationParameters* p = (ExudationParameters*) param;
 
-    double x = p->pos.x - ( p->tip.x + p->v.x*(p->age_r-t) );
-    double y = p->pos.y - ( p->tip.y + p->v.y*(p->age_r-t) );
-    double z = p->pos.z - ( p->tip.z + p->v.z*(p->age_r-t) );
+    Vector3d xtip = p->tip.plus(p->v.times(p->age_r-t));
+    Vector3d x = p->pos.minus(xtip);
 
     double c = -p->R / (4*p->Dl*(p->age_r-t));
-
     double d = 8*p->theta*sqrt(M_PI*M_PI*M_PI*p->Dt*p->Dt*p->Dl*(p->age_r-t)*(p->age_r-t)*(p->age_r-t));
 
-    return (p->M*sqrt(p->R)) / d * exp(c*(x*x+y*y+z*z)  - p->lambda_/p->R*(p->age_r - t)); // Eqn (11)
+    return (p->M*sqrt(p->R)) / d * exp(c*x.times(x)  - p->lambda_/p->R*(p->age_r - t)); // Eqn (11)
 }
 
 /**
- * TODO
+ * TODO docme!
+ *
+ * type: 0 moving point source (root is a single straight line)
+ * type: 1 moving point source (root is represented by segments)
+ * type: 2 moving point source (root is a single straight line), same substitution as type 0 (for debugging)
+ * type: 3 moving line source (root is represented by segments)
+ *
  */
 std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationParameters& params, int X, int Y, int Z, double width, double depth,
     int type = 0) {
@@ -114,6 +149,10 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
     if (type == 1) {
         std::cout << "getExudateConcentration() with segment wise moving point source\n";
         integrand = integrandSMPS;
+    }
+    if (type == 2) {
+        std::cout << "getExudateConcentration() with segment wise moving point source\n";
+        integrand = integrandMPS2;
     }
 
     auto tipsI = rootsystem.getRootTips();
@@ -159,6 +198,10 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
             params.age_r = ages[i];
             params.r = roots[i];
 
+            double r = roots[i]->param.r;
+            double age = params.l/r; // days
+            std::cout << " Age " << age << "\n";
+
             for (int x=0; x<X; x++) {
                 for(int y=0; y<Y; y++) {
                     for (int z=0; z<Z; z++ ) {
@@ -170,8 +213,11 @@ std::vector<double> getExudateConcentration(RootSystem& rootsystem, ExudationPar
                         int ind = x*Y*Z+y*Z+z;
                         // int ind = z*Y*X+y*X+x; // one is c, one is Fortran ordering
 
-                        allc[ind] += gauss_legendre(125, integrand, &params, 0, params.age_r);
-                        // gauss_legendre_2D_cube()
+                        if (type<3) {
+                            allc[ind] += gauss_legendre(125, integrand, &params, 0, params.age_r);
+                        } else {
+                            allc[ind] += gauss_legendre_2D_cube(125, integrandSMLS, &params, 0, params.age_r, 0, age);
+                        }
                     }
                 }
             }
