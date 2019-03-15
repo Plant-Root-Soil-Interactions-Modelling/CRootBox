@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include "mymath.h"
+#include "aabbcc/AABB.h"
 
 namespace CRootBox {
 
@@ -89,7 +90,7 @@ public:
     virtual int writePVPScript(std::ostream & cout, int c=1) const;  ///< @see SignedDistanceFunction::writePVPScript
 
 private:
-    Vector3d dim; // dimensions of the box
+    Vector3d dim; // dimensions of the boxMehrfachdefinition
 };
 
 
@@ -250,6 +251,36 @@ public:
     Vector3d p2; ///< for visualisation (plane is a simplex: o,p1,p2)
 
 };
+
+
+/**
+ * Distance to a static root system
+ *
+ * segment, nodes, and radii are copied,
+ * segment centers are put into a aabb tree, for fast distance lookup
+ *
+ */
+class SDF_RootSystem : public SignedDistanceFunction
+{
+public:
+    SDF_RootSystem(std::vector<Vector3d> nodes, const std::vector<Vector2i> segments, std::vector<double> radii, double dx = 0.5);
+
+    virtual double getDist(const Vector3d& p);
+
+    virtual std::string toString() { return "SDF_RootSystem"; }
+
+    std::vector<Vector3d> nodes_;
+    std::vector<Vector2i> segments_;
+    std::vector<double> radii_;
+    double dx_;
+
+    aabb::Tree tree = aabb::Tree();
+
+};
+
+
+
+
 
 } // end namespace CRootBox
 

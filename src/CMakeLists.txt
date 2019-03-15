@@ -10,6 +10,7 @@ add_library(CRootBox
             RootSystem.cpp
             sdf.cpp
             tropism.cpp
+            aabbcc/AABB.cc
             ../examples/Exudation/gauss_legendre.cpp)
 
 set_target_properties(CRootBox PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
@@ -37,6 +38,7 @@ if (PythonLibs_FOUND)
               RootSystem.cpp
               sdf.cpp
               tropism.cpp
+              aabbcc/AABB.cc
               ../examples/Exudation/gauss_legendre.cpp)
   target_link_libraries(py_rootbox ${Boost_LIBRARIES} )
   set_target_properties(py_rootbox PROPERTIES PREFIX "" )

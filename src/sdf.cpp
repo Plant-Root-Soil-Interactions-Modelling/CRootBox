@@ -234,7 +234,7 @@ int SDF_Intersection::writePVPScript(std::ostream & cout, int c) const
 
     // write all
     std::vector<int> goi; // group object indices
-    for (auto const& sdf : sdfs) {
+    for (const auto& sdf : sdfs) {
         c = sdf->writePVPScript(cout, c);
         goi.push_back(c-1);
         cout << "#\n";
@@ -346,5 +346,58 @@ int SDF_HalfPlane::writePVPScript(std::ostream & cout, int c) const
     c++;
     return c;
 }
+
+/**
+ * Constructor
+ */
+SDF_RootSystem::SDF_RootSystem(std::vector<Vector3d> nodes, const std::vector<Vector2i> segments, const std::vector<double> radii, double dx) : nodes_(nodes), segments_(segments), radii_(radii), dx_(dx)
+{
+    size_t c = 0;
+    for (const auto& s : segments) { // fill the tree
+        Vector3d mid = nodes_[s.x].plus(nodes_[s.y]).times(0.5);
+        std::vector<double> d = { mid.x, mid.y, mid.z };
+        tree.insertParticle(c, d, radii[c]);
+        c++;
+    }
+}
+
+
+double SDF_RootSystem::getDist(const Vector3d& p) {
+
+    std::vector<double> a = { p.x-dx_, p.y-dx_, p.z-dx_ };
+    std::vector<double> b = { p.x+dx_, p.y+dx_, p.z+dx_ };
+    aabb::AABB box = aabb::AABB(a,b);
+    double mdist = 1e100;
+    auto indices = tree.query(box);
+    for (int i : indices) {
+
+        Vector3d x1 = nodes_[segments_[i].x];
+        Vector3d x2 = nodes_[segments_[i].y];
+        Vector3d v = x2.minus(x1);
+        Vector3d w = p.minus(x1);
+
+        double c1 = v.times(w);
+        double c2 = v.times(v);
+
+        double l;
+        if (c1<=0) {
+            l = w.length();
+        } else if (c1>=c2) {
+            l = p.minus(x2).length();
+        } else {
+            l = p.minus(x1.plus(v.times(c1/c2))).length();
+        }
+        l -= radii_[i];
+
+        if (l < mdist) {
+            mdist = l;
+        }
+
+    }
+    return -mdist; // far far away
+}
+
+
+
 
 } // end namespace CRootBox

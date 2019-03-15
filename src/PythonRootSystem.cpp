@@ -238,6 +238,10 @@ BOOST_PYTHON_MODULE(py_rootbox)
                 .def_readwrite("p2", &SDF_HalfPlane::p2)
                 .def("__str__",&SDF_HalfPlane::toString)
                 ;
+    class_<SDF_RootSystem, bases<SignedDistanceFunction>>("SDF_RootSystem",init<std::vector<Vector3d>,std::vector<Vector2i>, std::vector<double>,double>())
+                .def("getDist",&SDF_RootSystem::getDist)
+                .def("__str__",&SDF_RootSystem::toString)
+                ;
     /*
      * soil.h
      */
