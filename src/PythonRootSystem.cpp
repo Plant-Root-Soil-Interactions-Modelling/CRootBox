@@ -518,6 +518,9 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def("addUserData", &SegmentAnalyser::addUserData)
         .def("clearUserData", &SegmentAnalyser::clearUserData)
         .def("write", &SegmentAnalyser::write)
+        .def_readwrite("nodes", &SegmentAnalyser::nodes)
+        .def_readwrite("segments", &SegmentAnalyser::segments)
+        .def_readwrite("ctimes", &SegmentAnalyser::ctimes)
         // .def("cut", cut2) // not working, see top definition of cut2
         ;
     class_<std::vector<SegmentAnalyser>>("std_vector_SegmentAnalyser_")
