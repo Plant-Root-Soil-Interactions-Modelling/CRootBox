@@ -537,11 +537,13 @@ BOOST_PYTHON_MODULE(py_rootbox)
             .def_readwrite("R", &ExudationParameters::R)
             .def_readwrite("lambda_", &ExudationParameters::lambda_)
             .def_readwrite("l", &ExudationParameters::l)
-            .def_readwrite("age_r", &ExudationParameters::age_r)
+            .def_readwrite("age_r", &ExudationParameters::age)
             .def_readwrite("tip", &ExudationParameters::tip)
             .def_readwrite("v", &ExudationParameters::v)
             .def_readwrite("pos", &ExudationParameters::pos)
             .def_readwrite("N", &ExudationParameters::N)
+            .def_readwrite("N3", &ExudationParameters::N3)
+            .def_readwrite("int_range", &ExudationParameters::intRange)
             ;
     def("getExudateConcentration", getExudateConcentration);
 }
