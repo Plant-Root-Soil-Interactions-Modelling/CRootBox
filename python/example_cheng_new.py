@@ -60,7 +60,7 @@ params.Dl = 2.43e-6 * 3600 * 24  # cm2/d
 params.lambda_ = 2.60e-6 * 3600 * 24  # d-1
 params.R = 16.7  # -
 params.M = 4  # µg/d/tip
-params.l = 4  # cm
+params.l = 0.1  # cm
 params.N = 3  # sample points per cm
 
 nx = 30
@@ -69,7 +69,7 @@ nz = 60
 width = 7  # cm
 depth = 30  # cm
 
-C = rb.getExudateConcentration(rootsystem, params, nx, ny, nz, width, depth, 3)  # 0 = mvp line, 1 = mvp segments
+C = rb.getExudateConcentration(rootsystem, params, nx, ny, nz, width, depth, 1)
 C = v2a(C);  # make a numpy array
 C = np.reshape(C, (nx, ny, nz))  # hope that works, it does not :-(, or does it?
 
