@@ -369,6 +369,7 @@ double SDF_RootSystem::getDist(const Vector3d& p) {
     aabb::AABB box = aabb::AABB(a,b);
     double mdist = 1e100;
     auto indices = tree.query(box);
+    // std::cout << indices.size() << " segments in range\n";
     for (int i : indices) {
 
         Vector3d x1 = nodes_[segments_[i].x];
