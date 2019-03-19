@@ -25,8 +25,8 @@ def v2a(vd):  # rb.std_vector_double_ to numpy array
 
 
 rootsystem = rb.RootSystem()
-name = "Anagallis"
-#name = "Zea"
+#name = "Anagallis"
+name = "Zea"
 
 #
 # Open plant and root parameter from a file
@@ -59,14 +59,14 @@ rootsystem.write(name + ".vtp")  # use ot_polylines for nicer visualization, ot_
 #
 # Grid parameter
 #
-nodes = vv2a(rs.getNodes())
+nodes = vv2a(rootsystem.getNodes())
 boxmin = nodes.min(axis=0); boxmax = nodes.max(axis=0);			# cm
 width = abs(max(boxmax[0],boxmax[1]) - min(boxmin[0],boxmin[1])) + 6;   # cm
 depth = abs(boxmin[2]) + 3
 xres = 0.3; yres = 0.3; zres = 0.3;
-nx = width / xres; 
-ny = width / yres; 
-nz = depth / zres; 
+nx = int(width / xres); 
+ny = int(width / yres); 
+nz = int(depth / zres); 
 
 model = rb.ExudationModel(width, width, depth, nx, ny, nz, rootsystem)
 
