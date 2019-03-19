@@ -9,7 +9,7 @@
 #
 
 import py_rootbox as rb
-from pyevtk.hl import gridToVTK
+# from pyevtk.hl import gridToVTK
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import ticker
@@ -26,7 +26,7 @@ def v2a(vd):  # rb.std_vector_double_ to numpy array
 
 rootsystem = rb.RootSystem()
 #name = "Anagallis"
-name = "Zea"
+name = "Anagallis_femina_Leitner_2010"
 
 #
 # Open plant and root parameter from a file
@@ -45,8 +45,8 @@ rootsystem.initialize()
 #
 # Simulate
 #
-simtime = 10  # or 20, 40, 60 days
-dt = 10  # try other values here
+simtime = 3  # or 20, 40, 60 days
+dt = 2  # try other values here
 N = round(simtime / dt)  # steps
 for i in range(0, int(N)):
     rootsystem.simulate(dt, True);
@@ -84,7 +84,7 @@ model.l = 4  # cm (for line source only)
 # Numerical parameter
 #
 model.type = rb.IntegrationType.mps;  # mps, mps_straight, mls
-model.n0 = 5  # integration points per cm
+model.n0 = 10  # integration points per cm
 model.calc13 = True;  # turns Eqn 13  on and off
 
 C = model.calculate()
@@ -105,7 +105,7 @@ num_th = (C > 0).sum()  # number of points for which concentration is larger tha
 print("volume of concentration above threshold: " + str(num_th * 0.125))  # volume for which concentration is larger than threshold (cm3)
 print("this is " + str(num_th / (nx * ny * nz) * 100) + "% of the overall volume")
 
-gridToVTK("./Exudates", X, Y, Z, pointData = {"Exudates":C})
+# gridToVTK("./Exudates", X, Y, Z, pointData = {"Exudates":C})
 
 fig1 = plt.figure()
 ax = plt.axes()
