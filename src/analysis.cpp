@@ -597,7 +597,7 @@ void SegmentAnalyser::writeVTP(std::ostream & os, std::vector<int> types) const
     for (auto i : types) {
         std::vector<double> data = getScalar(i);
         os << "<DataArray type=\"Float32\" Name=\"" << RootSystem::scalarTypeNames.at(i) << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-        for (auto const& t : data) {
+        for (const auto& t : data) {
             os << t << " ";
         }
         os << "\n</DataArray>\n";
@@ -607,7 +607,7 @@ void SegmentAnalyser::writeVTP(std::ostream & os, std::vector<int> types) const
         const auto& data = userData.at(i);
         std::string name = userDataNames.at(i);
         os << "<DataArray type=\"Float32\" Name=\"" << name << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-        for (auto const& t : data) {
+        for (const auto& t : data) {
             os << t << " ";
         }
         os << "\n</DataArray>\n";
@@ -615,13 +615,13 @@ void SegmentAnalyser::writeVTP(std::ostream & os, std::vector<int> types) const
     os << "\n</CellData>\n";
     // nodes (Points)
     os << "<Points>\n"<<"<DataArray type=\"Float32\" Name=\"Coordinates\" NumberOfComponents=\"3\" format=\"ascii\" >\n";
-    for (auto const& n:nodes) {
+    for (const auto& n : nodes) {
         os << n.x << " "<< n.y <<" "<< n.z<< " ";
     }
     os << "\n</DataArray>\n"<< "</Points>\n";
     // segments (Lines)
     os << "<Lines>\n"<<"<DataArray type=\"Int32\" Name=\"connectivity\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-    for (auto const& s:segments) {
+    for (const auto& s : segments) {
         os << s.x << " " << s.y << " ";
     }
     os << "\n</DataArray>\n"<<"<DataArray type=\"Int32\" Name=\"offsets\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
@@ -644,29 +644,29 @@ void SegmentAnalyser::writeVTP(std::ostream & os, std::vector<int> types) const
 void SegmentAnalyser::writeRBSegments(std::ostream & os) const
 {
     os << "node1ID node2ID branchID x1 y1 z1 x2 y2 z2 radius length R G B time type \n";
-	int nid1 = 0;
-	int nid2 = 1;
-	for (size_t i=0; i<segments.size(); i++) {
-		Vector2i s = segments.at(i);
-		Vector3d n1 = nodes.at(s.x);
-		Vector3d n2 = nodes.at(s.y);
-		Root* r = segO.at(i);
-		int branchnumber = r->id;
-		double radius = r->param.a;
-		double length = sqrt((n1.x-n2.x)*(n1.x-n2.x)+(n1.y-n2.y)*(n1.y-n2.y)+(n1.z-n2.z)*(n1.z-n2.z));
-		double red = r->getRootTypeParameter()->colorR;
-		double green = r->getRootTypeParameter()->colorG;
-		double blue = r->getRootTypeParameter()->colorB;
-		double time = ctimes.at(i);
-		double type = r->param.type;
-		os << std::fixed << std::setprecision(4) << nid1 << " " << nid2 << " " << branchnumber << " " << n1.x << " " << n1.y << " " << 
-				n1.z << " " << n2.x << " " << n2.y << " " << n2.z << " " <<
-				radius << " " << length << " " << red << " " << green << " " << blue << " " << time<< " " << type << " \n";
-		nid1 = nid1+1;
-		nid2 = nid2+1;
-	}
-    
-    
+    int nid1 = 0;
+    int nid2 = 1;
+    for (size_t i=0; i<segments.size(); i++) {
+        Vector2i s = segments.at(i);
+        Vector3d n1 = nodes.at(s.x);
+        Vector3d n2 = nodes.at(s.y);
+        Root* r = segO.at(i);
+        int branchnumber = r->id;
+        double radius = r->param.a;
+        double length = sqrt((n1.x-n2.x)*(n1.x-n2.x)+(n1.y-n2.y)*(n1.y-n2.y)+(n1.z-n2.z)*(n1.z-n2.z));
+        double red = r->getRootTypeParameter()->colorR;
+        double green = r->getRootTypeParameter()->colorG;
+        double blue = r->getRootTypeParameter()->colorB;
+        double time = ctimes.at(i);
+        double type = r->param.type;
+        os << std::fixed << std::setprecision(4) << nid1 << " " << nid2 << " " << branchnumber << " " << n1.x << " " << n1.y << " " <<
+            n1.z << " " << n2.x << " " << n2.y << " " << n2.z << " " <<
+            radius << " " << length << " " << red << " " << green << " " << blue << " " << time<< " " << type << " \n";
+        nid1 = nid1+1;
+        nid2 = nid2+1;
+    }
+
+
 }
 
 /**

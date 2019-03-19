@@ -43,11 +43,11 @@ rootsystem.initialize()
 #
 # Simulate
 #
-simtime = 10  # or 20, 40, 60 days
+simtime = 20  # or 20, 40, 60 days
 dt = 10  # try other values here
 N = round(simtime / dt)  # steps
 for i in range(0, int(N)):
-    rootsystem.simulate(dt, False);
+    rootsystem.simulate(dt, True);
 
 #
 # Export final result (as vtp)
@@ -78,9 +78,9 @@ model.l = 0.1  # cm (for line source only)
 #
 # Numerical parameter
 #
-model.type = rb.IntegrationType.mls;  # mps, mps_straight, mls
+model.type = rb.IntegrationType.mps;  # mps, mps_straight, mls
 model.n0 = 5  # integration points per cm
-model.calc13 = False;  # turns Eqn 13  on and off
+model.calc13 = True;  # turns Eqn 13  on and off
 
 C = model.calculate()
 
