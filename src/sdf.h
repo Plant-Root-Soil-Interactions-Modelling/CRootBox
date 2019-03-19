@@ -259,6 +259,7 @@ public:
  * segment, nodes, and radii are copied,
  * segment centers are put into a aabb tree, for fast distance lookup
  *
+ * dx is the rectangular observation radius
  */
 class SDF_RootSystem : public SignedDistanceFunction
 {

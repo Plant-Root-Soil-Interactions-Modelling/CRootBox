@@ -54,37 +54,54 @@ for i in range(0, int(N)):
 #
 rootsystem.write(name + ".vtp")  # use ot_polylines for nicer visualization, ot_segments for animations
 
-params = rb.ExudationParameters()
-params.Dt = 2.43e-6 * 3600 * 24  # cm2/d
-params.Dl = 2.43e-6 * 3600 * 24  # cm2/d
-params.lambda_ = 2.60e-6 * 3600 * 24  # d-1
-params.R = 16.7  # -
-params.M = 4  # µg/d/tip
-params.l = 0.1  # cm
-params.N = 3  # sample points per cm
-
+#
+# Grid parameter
+#
 nx = 30
 ny = 30
 nz = 60
-width = 7  # cm
+width = 10  # cm
 depth = 30  # cm
 
-C = rb.getExudateConcentration(rootsystem, params, nx, ny, nz, width, depth, 1)
+model = rb.ExudationModel(width, width, depth, nx, ny, nz, rootsystem)
+
+#
+# Model parameter
+#
+model.Q = 4  # µg/d/tip
+model.Dl = 2.43e-6 * 3600 * 24  # cm2/d
+model.theta = 0.3
+model.R = 1  # 16.7  # -
+model.k = 2.60e-6 * 3600 * 24  # d-1
+model.l = 0.1  # cm (for line source only)
+
+#
+# Numerical parameter
+#
+model.type = rb.IntegrationType.mls;  # mps, mps_straight, mls
+model.n0 = 5  # integration points per cm
+model.n3 = 5  # integration points on R^3
+model.range = 5  # domain in R^3 around root tip range^3 [cm^3]
+model.calc13 = False;  # turns Eqn 13  on and off
+
+C = model.calculate()
+
+#
+# post processing...
+#
 C = v2a(C);  # make a numpy array
 C = np.reshape(C, (nx, ny, nz))  # hope that works, it does not :-(, or does it?
 
 X = np.linspace(-width / 2, width / 2, nx)
 Y = np.linspace(-width / 2, width / 2, ny)
-Z = np.linspace(0, -depth, nz)
+Z = np.linspace(-depth, 0, nz)
 
 X_, Y_, Z_ = np.meshgrid(X, Y, Z, indexing = "ij")  # stupid matlab default
 
-# print(X_.shape)
-# print(Y_.shape)
-# print(Z_.shape)
 num_th = (C > 0).sum()  # number of points for which concentration is larger than threshold
 print("volume of concentration above threshold: " + str(num_th * 0.125))  # volume for which concentration is larger than threshold (cm3)
 print("this is " + str(num_th * 0.125 / (15 * 15 * 30) * 100) + "% of the overall volume")
+
 # gridToVTK("./Exudates", X, Y, Z, pointData = {"Exudates":C})
 
 fig1 = plt.figure()

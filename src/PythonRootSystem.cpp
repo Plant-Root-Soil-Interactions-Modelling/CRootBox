@@ -526,26 +526,33 @@ BOOST_PYTHON_MODULE(py_rootbox)
     class_<std::vector<SegmentAnalyser>>("std_vector_SegmentAnalyser_")
             .def(vector_indexing_suite<std::vector<SegmentAnalyser>>() )
             ;
+
     /*
-     * example_exudation.h (rather specific for Cheng)
+     * analysis.h
      */
-    class_<ExudationParameters>("ExudationParameters")
-            .def_readwrite("M", &ExudationParameters::M)
-            .def_readwrite("Dt", &ExudationParameters::Dt)
-            .def_readwrite("Dl", &ExudationParameters::Dl)
-            .def_readwrite("theta", &ExudationParameters::theta)
-            .def_readwrite("R", &ExudationParameters::R)
-            .def_readwrite("lambda_", &ExudationParameters::lambda_)
-            .def_readwrite("l", &ExudationParameters::l)
-            .def_readwrite("age_r", &ExudationParameters::age)
-            .def_readwrite("tip", &ExudationParameters::tip)
-            .def_readwrite("v", &ExudationParameters::v)
-            .def_readwrite("pos", &ExudationParameters::pos)
-            .def_readwrite("N", &ExudationParameters::N)
-            .def_readwrite("N3", &ExudationParameters::N3)
-            .def_readwrite("int_range", &ExudationParameters::intRange)
+    class_<ExudationModel, ExudationModel*>("ExudationModel", init<double, double, int, RootSystem&>())
+                .def(init<double, double, double, int, int, int, RootSystem&>())
+		        .def("calculate", &ExudationModel::calculate)
+		        .def_readwrite("Q", &ExudationModel::Q)
+		        .def_readwrite("Dl", &ExudationModel::Dl)
+		        .def_readwrite("theta", &ExudationModel::theta)
+		        .def_readwrite("R", &ExudationModel::R)
+		        .def_readwrite("k", &ExudationModel::k)
+		        .def_readwrite("l", &ExudationModel::l)
+		        .def_readwrite("type", &ExudationModel::type)
+		        .def_readwrite("n0", &ExudationModel::n0)
+		        .def_readwrite("n3", &ExudationModel::n3)
+		        .def_readwrite("range", &ExudationModel::range)
+		        .def_readwrite("calc13", &ExudationModel::calc13)
+				;
+    enum_<ExudationModel::IntegrationType>("IntegrationType")
+            .value("mps_straight", ExudationModel::IntegrationType::mps_straight)
+            .value("mps", ExudationModel::IntegrationType::mps)
+            .value("mls", ExudationModel::IntegrationType::mls)
             ;
-    def("getExudateConcentration", getExudateConcentration);
+
+
+
 }
 
 /*
