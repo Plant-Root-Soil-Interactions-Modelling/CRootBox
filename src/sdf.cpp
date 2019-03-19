@@ -350,15 +350,9 @@ int SDF_HalfPlane::writePVPScript(std::ostream & cout, int c) const
 /**
  * Constructor
  */
-SDF_RootSystem::SDF_RootSystem(std::vector<Vector3d> nodes, const std::vector<Vector2i> segments, const std::vector<double> radii, double dx) : nodes_(nodes), segments_(segments), radii_(radii), dx_(dx)
-{
-    size_t c = 0;
-    for (const auto& s : segments) { // fill the tree
-        Vector3d mid = nodes_[s.x].plus(nodes_[s.y]).times(0.5);
-        std::vector<double> d = { mid.x, mid.y, mid.z };
-        tree.insertParticle(c, d, radii[c]);
-        c++;
-    }
+SDF_RootSystem::SDF_RootSystem(std::vector<Vector3d> nodes, const std::vector<Vector2i> segments, const std::vector<double> radii, double dx)
+	:nodes_(nodes), segments_(segments), radii_(radii), dx_(dx) {
+	buildTree();
 }
 
 
@@ -398,6 +392,30 @@ double SDF_RootSystem::getDist(const Vector3d& p) {
     return -mdist; // far far away
 }
 
+//SDF_RootSystem::SDF_RootSystem(Root* r, double dx): dx_(dx) {
+//
+//	size_t n = r->getNumberOfNodes();
+//	nodes_.resize(n);
+//	segments_.resize(n-1);
+//	radii_.resize(n-1);
+//
+//	for (size_t i=0; i<n; i++) {
+//		nodes_[i] = r->getNode(i);
+//	}
+//
+//	buildTree();
+//
+//}
+
+void SDF_RootSystem::buildTree() {
+    size_t c = 0;
+    for (const auto& s : segments_) { // fill the tree
+        Vector3d mid = nodes_[s.x].plus(nodes_[s.y]).times(0.5);
+        std::vector<double> d = { mid.x, mid.y, mid.z };
+        tree.insertParticle(c, d, radii_[c]);
+        c++;
+    }
+}
 
 
 

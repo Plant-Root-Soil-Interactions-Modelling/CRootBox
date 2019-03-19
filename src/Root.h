@@ -99,8 +99,6 @@ protected:
 
 };
 
-
-
 /**
  * Stores a state of the root that can be restored at a later point
  * (for RootSystem::push and RootSystem::pop)

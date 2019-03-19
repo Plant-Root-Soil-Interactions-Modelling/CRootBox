@@ -16,7 +16,7 @@ public:
 	 * Model parameters (same for all roots)
 	 */
 	double Q = 1e-5;
-	double Dl = 1e-5; // cm2/s
+	double Dl = 1e-5; // cm2 / day
 	double theta = 0.3;
 	double R = 1;
 	double k = 1e-6;
@@ -28,8 +28,7 @@ public:
 	EquidistantGrid3D grid;
 	int type = mps;
 	int n0 = 5; // integration points per cm
-	int n3 = 5; // integration points on R^3
-	double range = 5; // domain in R^3 around root tip range^3 [cm^3]
+	double thresh13 = 1e-15; // threshold for Eqn 13
 	bool calc13 = true;
 
 	ExudationModel(double width, double depth, int n, RootSystem& rs) :ExudationModel(width, width, depth, n, n, n, rs) {
@@ -37,6 +36,7 @@ public:
 
 	ExudationModel(double length, double width, double depth, int nx, int ny, int nz, RootSystem& rs) :grid(EquidistantGrid3D(length, width, depth, nx, ny, nz)) {
 
+		dx3 = (length/nx)*(width/ny)*(depth/nz); // for integration of eqn 13
 		simtime = rs.getSimTime();
 		roots = rs.getRoots();
 
@@ -53,10 +53,10 @@ public:
 					stopTime.push_back(sTime);
 				}
 				// root tip
-				auto t = r->getNode(0);
+				auto t = r->getNode(r->getNumberOfNodes()-1);
 				tip.push_back(t);
 				// direction towards root base
-				auto base = r->getNode(r->getNumberOfNodes()-1);
+				auto base = r->getNode(0);
 				v.push_back(base.minus(t).times(1./a));
 			}
 		}
@@ -71,7 +71,7 @@ public:
 	std::vector<double> calculate() {
 
 		std::fill(grid.data.begin(), grid.data.end(), 0); // set data to zero
-		g_.resize(n3*n3*n3);
+		g_.resize(grid.data.size()); // saves last root contribution
 
 		for (size_t ri = 0; ri< roots.size(); ri++) {
 
@@ -88,48 +88,61 @@ public:
 
 				st_ = stopTime[ri]; // eq 13
 				st_ *= calc13;
-				if (st_>0) { // calculate g per root for Eqn 13
-					std::cout << "eqn 13 is alive ...\n" << std::flush;
-					double w = range/2;
-					for (int i=0; i<n3; i++) {
-						for (int j=0; i<n3; j++) {
-							for (int k=0; i<n3; k++) {
-								x_ = Vector3d(tip_.x-w+i*2*w, tip_.y-w+j*2*w, tip_.z-w+k*2*w);
-								size_t lind = i*n3*n3+j*n3+k;
-								g_[lind] = eqn11(0, age_, 0, l);
-							}
-						}
-					}
-				}
 
+				// EQN 11
 				for (size_t i = 0; i<grid.nx; i++) {
 					for(size_t j = 0; j<grid.ny; j++) {
 						for (size_t k = 0; k<grid.nz; k++) {
 
+							x_ = grid.getGridPoint(i,j,k); // integration point
+
 							// if (sdfRS.getDist(x)<intRange) { // todo
 
-							x_ = grid.getGridPoint(i,j,k); // integration point
 							size_t lind = i*(grid.ny*grid.nz)+j*grid.nz+k;
 
 							// different flavors of Eqn (11)
 							double c = eqn11(0, age_, 0, l);
 							grid.data[lind] += c;
+							g_[lind] = c;
 
-							// Eqn (13)
-							if (st_>0) { // root stopped growing
-								std::cout << "13!\n";
-								grid.data[lind] += integrate13();
-							}
 
 							// } // todo
+
+
 
 						}
 					}
 				}
 
+				// EQN 13
+				if (st_>0) { // has stopped growing
+					std::cout << "13!\n";
+					for (size_t i = 0; i<grid.nx; i++) {
+						for(size_t j = 0; j<grid.ny; j++) {
+							for (size_t k = 0; k<grid.nz; k++) {
+
+								size_t lind = i*(grid.ny*grid.nz)+j*grid.nz+k;
+								if (g_[lind] > thresh13) {
+
+									x_ = grid.getGridPoint(i,j,k);
+									// if (sdfRS.getDist(x)<intRange) { // todo
+
+									// Eqn (13)
+									grid.data[lind] += integrate13();
+
+									// } // todo
+
+								}
+							}
+						}
+					}
+				}
+
+
 			} // if ages.at(i)>0
 
 		}
+
 		return grid.data;
 	}
 
@@ -151,14 +164,12 @@ public:
 
 	// simplistic integration in 3d
 	double integrate13() {
-		double w = range/2;
-		double dx3 = (range/n3)*(range/n3)*(range/n3);
 		double c = 0;
-		for (int i=0; i<n3; i++) {
-			for (int j=0; i<n3; j++) {
-				for (int k=0; i<n3; k++) {
-					Vector3d y = Vector3d(tip_.x-w+i*2*w, tip_.y-w+j*2*w, tip_.z-w+k*2*w);
-					size_t lind = i*n3*n3+j*n3+k;
+		for (size_t i = 0; i<grid.nx; i++) {
+			for(size_t j = 0; j<grid.ny; j++) {
+				for (size_t k = 0; k<grid.nz; k++) {
+					Vector3d y = grid.getGridPoint(i,j,k);
+					size_t lind = i*(grid.ny*grid.nz)+j*grid.nz+k;
 					c += integrand13(y,lind, simtime)*dx3;
 				}
 			}
@@ -205,7 +216,7 @@ public:
 		double c = -p->R / ( 4*p->Dl*t );
 		double d = 8*(p->theta)*ExudationModel::to32(M_PI*p->Dl*t);
 
-		Vector3d xtip = p->tip_.minus(p->v_.times(t)); // for t=0 at tip, at t=age at base, as above
+		Vector3d xtip = p->tip_.plus(p->v_.times(t)); // for t=0 at tip, at t=age at base, as above
 		Vector3d z = p->x_.minus(xtip);
 
 		return ((p->Q)*sqrt(p->R))/d *exp(c*z.times(z) - p->k/p->R * t); // Eqn (11)
@@ -248,6 +259,7 @@ public:
 	std::vector<Vector3d> tip;
 	std::vector<Vector3d> v; // direction from tip towards root base
 	double simtime;
+	double dx3 = 1;
 
 	// Set before integrating
 	Vector3d x_ = Vector3d(); // integration point

@@ -80,8 +80,6 @@ model.l = 0.1  # cm (for line source only)
 #
 model.type = rb.IntegrationType.mls;  # mps, mps_straight, mls
 model.n0 = 5  # integration points per cm
-model.n3 = 5  # integration points on R^3
-model.range = 5  # domain in R^3 around root tip range^3 [cm^3]
 model.calc13 = False;  # turns Eqn 13  on and off
 
 C = model.calculate()

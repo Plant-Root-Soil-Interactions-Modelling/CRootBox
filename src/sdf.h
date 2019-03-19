@@ -252,7 +252,6 @@ public:
 
 };
 
-
 /**
  * Distance to a static root system
  *
@@ -264,7 +263,10 @@ public:
 class SDF_RootSystem : public SignedDistanceFunction
 {
 public:
-    SDF_RootSystem(std::vector<Vector3d> nodes, const std::vector<Vector2i> segments, std::vector<double> radii, double dx = 0.5);
+
+	// SDF_RootSystem(Root* r, double dx = 0.5);
+
+	SDF_RootSystem(std::vector<Vector3d> nodes, const std::vector<Vector2i> segments, std::vector<double> radii, double dx = 0.5);
 
     virtual double getDist(const Vector3d& p);
 
@@ -275,9 +277,15 @@ public:
     std::vector<double> radii_;
     double dx_;
 
+protected:
+
+    void buildTree();
+
     aabb::Tree tree = aabb::Tree();
 
 };
+
+
 
 
 
