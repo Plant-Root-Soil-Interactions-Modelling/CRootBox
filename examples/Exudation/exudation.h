@@ -1,0 +1,266 @@
+#include <functional>
+
+#include "gauss_legendre.h"
+
+#include "soil.h"
+
+
+namespace CRootBox {
+
+class ExudationModel {
+public:
+
+	enum IntegrationType { mps_straight = 0, mps = 1, mls = 2 };
+
+	/*
+	 * Model parameters (same for all roots)
+	 */
+	double Q = 1e-5;
+	double Dl = 1e-5; // cm2/s
+	double theta = 0.3;
+	double R = 1;
+	double k = 1e-6;
+	double l = 0.1; // cm
+
+	/*
+	 *  Numerical parameters
+	 */
+	EquidistantGrid3D grid;
+	int type = mps;
+	int n0 = 5; // integration points per cm
+	int n3 = 5; // integration points on R^3
+	double range = 5; // domain in R^3 around root tip range^3 [cm^3]
+	bool calc13 = true;
+
+	ExudationModel(double width, double depth, int n, RootSystem& rs) :ExudationModel(width, width, depth, n, n, n, rs) {
+	}
+
+	ExudationModel(double length, double width, double depth, int nx, int ny, int nz, RootSystem& rs) :grid(EquidistantGrid3D(length, width, depth, nx, ny, nz)) {
+
+		simtime = rs.getSimTime();
+		roots = rs.getRoots();
+
+		for (const auto& r : roots) {
+			if (r->getNumberOfNodes()>1) {
+				// root age (until root stopped growing)
+				double a = r->getNodeETime(r->getNumberOfNodes()-1) - r->getNodeETime(0);
+				age.push_back(a);
+				// time when the root stopped growing
+				double sTime = r->getNodeETime(r->getNumberOfNodes()-1);
+				if (r->active) {
+					stopTime.push_back(0);
+				} else {
+					stopTime.push_back(sTime);
+				}
+				// root tip
+				auto t = r->getNode(0);
+				tip.push_back(t);
+				// direction towards root base
+				auto base = r->getNode(r->getNumberOfNodes()-1);
+				v.push_back(base.minus(t).times(1./a));
+			}
+		}
+
+		// sdf per root todo (and where)
+
+	}
+
+	/**
+	 * For each root for each grid point
+	 */
+	std::vector<double> calculate() {
+
+		std::fill(grid.data.begin(), grid.data.end(), 0); // set data to zero
+		g_.resize(n3*n3*n3);
+
+		for (size_t ri = 0; ri< roots.size(); ri++) {
+
+			std::cout << "Root #" << ri << "/" << roots.size() << ", age "<< age[ri] << "\n";
+
+			if (age[ri]>0) {
+
+				// per root (passed to integrands)
+				r_ = roots[ri]; // eq 11
+				n_ = int(n0*r_->length); // number of integration points eq 11
+				age_ = age[ri]; // eq 11
+				v_ = v[ri]; // for mps_straight, eq 11
+				tip_ = tip[ri]; // for mps_straight, eq 11
+
+				st_ = stopTime[ri]; // eq 13
+				st_ *= calc13;
+				if (st_>0) { // calculate g per root for Eqn 13
+					std::cout << "eqn 13 is alive ...\n" << std::flush;
+					double w = range/2;
+					for (int i=0; i<n3; i++) {
+						for (int j=0; i<n3; j++) {
+							for (int k=0; i<n3; k++) {
+								x_ = Vector3d(tip_.x-w+i*2*w, tip_.y-w+j*2*w, tip_.z-w+k*2*w);
+								size_t lind = i*n3*n3+j*n3+k;
+								g_[lind] = eqn11(0, age_, 0, l);
+							}
+						}
+					}
+				}
+
+				for (size_t i = 0; i<grid.nx; i++) {
+					for(size_t j = 0; j<grid.ny; j++) {
+						for (size_t k = 0; k<grid.nz; k++) {
+
+							// if (sdfRS.getDist(x)<intRange) { // todo
+
+							x_ = grid.getGridPoint(i,j,k); // integration point
+							size_t lind = i*(grid.ny*grid.nz)+j*grid.nz+k;
+
+							// different flavors of Eqn (11)
+							double c = eqn11(0, age_, 0, l);
+							grid.data[lind] += c;
+
+							// Eqn (13)
+							if (st_>0) { // root stopped growing
+								std::cout << "13!\n";
+								grid.data[lind] += integrate13();
+							}
+
+							// } // todo
+
+						}
+					}
+				}
+
+			} // if ages.at(i)>0
+
+		}
+		return grid.data;
+	}
+
+	double eqn11(double x0, double xend, double y0, double yend) {
+		switch (type) {
+		case mps_straight: {
+			return gauss_legendre(n_, integrandMPS_straight, this, x0, xend);
+		}
+		case mps: {
+			return gauss_legendre(n_, integrandMPS, this, x0, xend);
+		}
+		case mls: {
+			return gauss_legendre_2D_cube(n_, integrandMLS, this, x0, xend, y0, yend);
+		}
+		}
+		std::cout << "Unknown integration type \n";
+		return 0.;
+	}
+
+	// simplistic integration in 3d
+	double integrate13() {
+		double w = range/2;
+		double dx3 = (range/n3)*(range/n3)*(range/n3);
+		double c = 0;
+		for (int i=0; i<n3; i++) {
+			for (int j=0; i<n3; j++) {
+				for (int k=0; i<n3; k++) {
+					Vector3d y = Vector3d(tip_.x-w+i*2*w, tip_.y-w+j*2*w, tip_.z-w+k*2*w);
+					size_t lind = i*n3*n3+j*n3+k;
+					c += integrand13(y,lind, simtime)*dx3;
+				}
+			}
+		}
+		return c;
+	}
+
+	// integrand Eqn 13
+	double integrand13(Vector3d& y, size_t lind, double t) {
+		double dt = t-st_;
+		double c = to32(R)*g_[lind] / to32(4*Dl*M_PI*dt);
+		Vector3d z = x_.minus(y);
+		return c*exp(-R/(4*Dl*dt) * z.times(z) - k*dt/R);
+	}
+
+	// Returns the linearly interpolated position along the root r at age a
+	static Vector3d pointAtAge(Root* r, double a) {
+		a = std::max(0.,a);
+		double et = r->getNodeETime(0)+a; // age -> emergence time
+		size_t i=0;
+		while (i<r->getNumberOfNodes()) {
+			if (r->getNodeETime(i)>et) { // first index bigger than emergence time, interpolate i-1, i
+				break;
+			}
+			i++;
+		}
+		if (i == r->getNumberOfNodes()) { // this happens if a root has stopped growing
+			std::cout << "pointAtAge(): warning age is older than the root \n";
+			return r->getNode(i-1);
+		}
+		Vector3d n1 = r->getNode(i-1);
+		Vector3d n2 = r->getNode(i);
+		double t = (et - r->getNodeETime(i - 1)) / (r->getNodeETime(i) - r->getNodeETime(i - 1)); // t in (0,1]
+		return (n1.times(1. - t)).plus(n2.times(t));
+	}
+
+	static double to32(double x) { return sqrt(x*x*x); }
+
+	static double to3(double x) { return x*x*x; }
+
+	// point source, root is represented by a single straight line (substituted)
+	static double integrandMPS_straight(double t, void* param) {
+		ExudationModel* p = (ExudationModel*) param;
+		double c = -p->R / ( 4*p->Dl*t );
+		double d = 8*(p->theta)*ExudationModel::to32(M_PI*p->Dl*t);
+
+		Vector3d xtip = p->tip_.minus(p->v_.times(t)); // for t=0 at tip, at t=age at base, as above
+		Vector3d z = p->x_.minus(xtip);
+
+		return ((p->Q)*sqrt(p->R))/d *exp(c*z.times(z) - p->k/p->R * t); // Eqn (11)
+	}
+
+	// moving line source, root is represented by a straight segments
+	static double integrandMLS(double t, double l, void* param) {
+		ExudationModel* p = (ExudationModel*) param;
+		double c = -(p->R) / ( 4*(p->Dl)*t );
+		double d = 8*(p->theta)*ExudationModel::to32(M_PI*p->Dl*t);
+
+		Vector3d xtip = ExudationModel::pointAtAge(p->r_, p->age_-t);
+		double tl = p->r_->getLength( p->age_-t ); // tip
+		if (tl-l<0) { // if root smaller l
+			return 0.;
+		}
+		double agel = p->r_->getAge(tl-l);
+		Vector3d nl = p->ExudationModel::pointAtAge(p->r_, agel); // todo ???
+		Vector3d z = p->x_.minus(xtip).plus(xtip.minus(nl));
+
+		return ((p->Q)*sqrt(p->R))/d *exp(c*z.times(z) - p->k/p->R * t); // Eqn (11)
+	}
+
+	// moving point source, root is represented by a straight segments
+	static double integrandMPS(double t, void* param) {
+		ExudationModel* p = (ExudationModel*) param;
+		double c = -p->R / ( 4*p->Dl*t );
+		double d = 8*(p->theta)*ExudationModel::to32(M_PI*p->Dl*t);
+
+		Vector3d xtip = ExudationModel::pointAtAge(p->r_, p->age_-t);
+		Vector3d z = p->x_.minus(xtip);
+
+		return ((p->Q)*sqrt(p->R))/d *exp(c*z.times(z) - p->k/p->R * t); // Eqn (11)
+	}
+
+	// Root system
+	std::vector<Root*> roots;
+	std::vector<double> age; // age of root, until it stopped growing
+	std::vector<double> stopTime; // time when root stopped growing, 0 if it has not
+	std::vector<Vector3d> tip;
+	std::vector<Vector3d> v; // direction from tip towards root base
+	double simtime;
+
+	// Set before integrating
+	Vector3d x_ = Vector3d(); // integration point
+	int n_ = 0;
+	Root* r_ = nullptr; // current root
+	double age_ = 0;
+	Vector3d tip_ = Vector3d();
+	Vector3d v_ = Vector3d();
+	double st_ = 0; // stop time (eqn 13)
+	std::vector<double> g_;
+
+};
+
+
+}
+
