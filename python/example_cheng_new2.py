@@ -25,8 +25,8 @@ def v2a(vd):  # rb.std_vector_double_ to numpy array
 
 
 rootsystem = rb.RootSystem()
-#name = "Anagallis"
-name = "Zea"
+name = "Anagallis_straight_simple"
+#name = "Zea"
 
 #
 # Open plant and root parameter from a file
@@ -83,7 +83,7 @@ model.l = 4  # cm (for line source only)
 #
 # Numerical parameter
 #
-model.type = rb.IntegrationType.mps;  # mps, mps_straight, mls
+model.type = rb.IntegrationType.mls;  # mps, mps_straight, mls
 model.n0 = 5  # integration points per cm
 model.calc13 = True;  # turns Eqn 13  on and off
 
@@ -97,7 +97,7 @@ C = np.reshape(C, (nx, ny, nz))  # hope that works, it does not :-(, or does it?
 
 X = np.linspace(-width / 2, width / 2, nx)
 Y = np.linspace(-width / 2, width / 2, ny)
-Z = np.linspace(0, -depth, nz)
+Z = np.linspace(-depth,0, nz)
 
 X_, Y_, Z_ = np.meshgrid(X, Y, Z, indexing = "ij")  # stupid matlab default
 
@@ -125,6 +125,16 @@ idz = (np.abs(Z - node_tip.z)).argmin()  # z-index of soil element closest to th
 C_ = C[:, idy, idz]  # 1d array
 plt.plot(X, C_, 'k-')
 plt.xlabel('x')
-plt.ylabel('z')
+plt.ylabel('c')
+
+fig3 = plt.figure()
+nodes = rootsystem.getNodes()
+node_tip = nodes[-1]
+idy = (np.abs(Y - node_tip.y)).argmin()  # y-index of soil element closest to the point on the root axis
+idx = (np.abs(X - node_tip.x)).argmin()  # x-index of soil element closest to the point on the root axis
+C_ = C[idx, idy, :]  # 1d array
+plt.plot(Z, C_, 'k-')
+plt.xlabel('z')
+plt.ylabel('c')
 
 plt.show()
