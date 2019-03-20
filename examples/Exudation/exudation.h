@@ -3,6 +3,8 @@
 #include "gauss_legendre.h"
 
 #include "soil.h"
+#include "sdf_rs.h"
+
 
 
 namespace CRootBox {
@@ -30,6 +32,7 @@ public:
     int n0 = 5; // integration points per cm
     double thresh13 = 1e-15; // threshold for Eqn 13
     bool calc13 = true;
+    double observationRadius = 5;
 
     ExudationModel(double width, double depth, int n, RootSystem& rs) :ExudationModel(width, width, depth, n, n, n, rs) {
     }
@@ -59,9 +62,10 @@ public:
                 auto base = r->getNode(0);
                 v.push_back(base.minus(t).times(1./a));
             }
-        }
 
-        // sdf per root todo (and where)
+            sdfs.push_back(SDF_RootSystem(*r, observationRadius));
+
+        }
 
     }
 
@@ -96,19 +100,16 @@ public:
 
                             x_ = grid.getGridPoint(i,j,k); // integration point
 
-                            // if (sdfRS.getDist(x)<intRange) { // todo
+                            if (-sdfs[ri].getDist(x_)<observationRadius) {
 
-                            size_t lind = i*(grid.ny*grid.nz)+j*grid.nz+k;
+                                size_t lind = i*(grid.ny*grid.nz)+j*grid.nz+k;
 
-                            // different flavors of Eqn (11)
-                            double c = eqn11(0, age_, 0, l);
-                            grid.data[lind] += c;
-                            g_[lind] = c;
+                                // different flavors of Eqn (11)
+                                double c = eqn11(0, age_, 0, l);
+                                grid.data[lind] += c;
+                                g_[lind] = c;
 
-
-                            // } // todo
-
-
+                            }
 
                         }
                     }
@@ -116,7 +117,7 @@ public:
 
                 // EQN 13
                 if (st_>0) { // has stopped growing
-                    std::cout << "13!\n";
+                    std::cout << "13!";
                     for (size_t i = 0; i<grid.nx; i++) {
                         std::cout << "*";
                         for(size_t j = 0; j<grid.ny; j++) {
@@ -126,17 +127,18 @@ public:
                                 if (g_[lind] > thresh13) {
 
                                     x_ = grid.getGridPoint(i,j,k);
-                                    // if (sdfRS.getDist(x)<intRange) { // todo
+                                    if (-sdfs[ri].getDist(x_)<observationRadius) {
 
-                                    // Eqn (13)
-                                    grid.data[lind] += integrate13();
+                                        // Eqn (13)
+                                        grid.data[lind] += integrate13();
 
-                                    // } // todo
+                                    }
 
                                 }
                             }
                         }
                     }
+                    std::cout << "13\n";
                 }
 
 
@@ -261,6 +263,8 @@ public:
     std::vector<Vector3d> v; // direction from tip towards root base
     double simtime;
     double dx3 = 1;
+    std::vector<SDF_RootSystem> sdfs; // direction from tip towards root base
+
 
     // Set before integrating
     Vector3d x_ = Vector3d(); // integration point
