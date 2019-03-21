@@ -29,22 +29,24 @@ public:
      */
     EquidistantGrid3D grid;
     int type = mps;
-    int n0 = 5; // integration points per cm
-    double thresh13 = 1e-15; // threshold for Eqn 13
-    bool calc13 = true;
-    double observationRadius = 5;
+    int n0 = 5; // integration points per [cm]
+    double thresh13 = 1.e-15; // threshold for Eqn 13
+    bool calc13 = true; // turns Eqn 13 on and off
+    double observationRadius = 5; //  limits computational domain around roots [cm]
 
+    /**
+     * Constructors
+     */
     ExudationModel(double width, double depth, int n, RootSystem& rs) :ExudationModel(width, width, depth, n, n, n, rs) {
     }
 
     ExudationModel(double length, double width, double depth, int nx, int ny, int nz, RootSystem& rs) :grid(EquidistantGrid3D(length, width, depth, nx, ny, nz)) {
 
         dx3 = (length/nx)*(width/ny)*(depth/nz); // for integration of eqn 13
-        simtime = rs.getSimTime();
         roots = rs.getRoots();
 
         for (const auto& r : roots) {
-            if (r->getNumberOfNodes()>1) {
+            if (r->getNumberOfNodes()>1) { // started growing
                 // root age (until root stopped growing)
                 double a = r->getNodeETime(r->getNumberOfNodes()-1) - r->getNodeETime(0);
                 age.push_back(a);
@@ -56,10 +58,10 @@ public:
                     stopTime.push_back(sTime);
                 }
                 // root tip
-                auto t = r->getNode(r->getNumberOfNodes()-1);
+                Vector3d t = r->getNode(r->getNumberOfNodes()-1);
                 tip.push_back(t);
                 // direction towards root base
-                auto base = r->getNode(0);
+                Vector3d base = r->getNode(0);
                 v.push_back(base.minus(t).times(1./a));
             }
 
@@ -72,14 +74,14 @@ public:
     /**
      * For each root for each grid point
      */
-    std::vector<double> calculate() {
+    std::vector<double> calculate(double t0, double tend) {
+
+        limitDomain = observationRadius>0;
 
         std::fill(grid.data.begin(), grid.data.end(), 0); // set data to zero
         g_.resize(grid.data.size()); // saves last root contribution
 
         for (size_t ri = 0; ri< roots.size(); ri++) {
-
-            std::cout << "Root #" << ri << "/" << roots.size() << ", age "<< age[ri] << "\n";
 
             if (age[ri]>0) {
 
@@ -89,9 +91,11 @@ public:
                 age_ = age[ri]; // eq 11
                 v_ = v[ri]; // for mps_straight, eq 11
                 tip_ = tip[ri]; // for mps_straight, eq 11
-
                 st_ = stopTime[ri]; // eq 13
                 st_ *= calc13;
+
+                std::cout << "Root #" << ri << "/" << roots.size() << ", age "<< age[ri] << ", stopped "<< st_ <<
+                    ", res "<< n_ << " \n"; // for debugging
 
                 // EQN 11
                 for (size_t i = 0; i<grid.nx; i++) {
@@ -100,12 +104,12 @@ public:
 
                             x_ = grid.getGridPoint(i,j,k); // integration point
 
-                            if (-sdfs[ri].getDist(x_)<observationRadius) {
+                            if ((!limitDomain) || (-sdfs[ri].getDist(x_)<observationRadius)) {
 
                                 size_t lind = i*(grid.ny*grid.nz)+j*grid.nz+k;
 
                                 // different flavors of Eqn (11)
-                                double c = eqn11(0, age_, 0, l);
+                                double c = eqn11(t0, std::min(age_, tend), 0, l);
                                 grid.data[lind] += c;
                                 g_[lind] = c;
 
@@ -116,7 +120,7 @@ public:
                 }
 
                 // EQN 13
-                if (st_>0) { // has stopped growing
+                if ((st_>0) && (st_<tend)) { // has stopped growing
                     std::cout << "13!";
                     for (size_t i = 0; i<grid.nx; i++) {
                         std::cout << "*";
@@ -127,10 +131,10 @@ public:
                                 if (g_[lind] > thresh13) {
 
                                     x_ = grid.getGridPoint(i,j,k);
-                                    if (-sdfs[ri].getDist(x_)<observationRadius) {
+                                    if ((!limitDomain) || (-sdfs[ri].getDist(x_)<observationRadius)) {
 
                                         // Eqn (13)
-                                        grid.data[lind] += integrate13();
+                                        grid.data[lind] += integrate13(tend);
 
                                     }
 
@@ -166,14 +170,14 @@ public:
     }
 
     // simplistic integration in 3d
-    double integrate13() {
+    double integrate13(double t) {
         double c = 0;
         for (size_t i = 0; i<grid.nx; i++) {
             for(size_t j = 0; j<grid.ny; j++) {
                 for (size_t k = 0; k<grid.nz; k++) {
                     Vector3d y = grid.getGridPoint(i,j,k);
                     size_t lind = i*(grid.ny*grid.nz)+j*grid.nz+k;
-                    c += integrand13(y,lind, simtime)*dx3;
+                    c += integrand13(y,lind, t)*dx3;
                 }
             }
         }
@@ -261,10 +265,9 @@ public:
     std::vector<double> stopTime; // time when root stopped growing, 0 if it has not
     std::vector<Vector3d> tip;
     std::vector<Vector3d> v; // direction from tip towards root base
-    double simtime;
     double dx3 = 1;
     std::vector<SDF_RootSystem> sdfs; // direction from tip towards root base
-
+    bool limitDomain = (observationRadius>0);
 
     // Set before integrating
     Vector3d x_ = Vector3d(); // integration point
@@ -274,7 +277,7 @@ public:
     Vector3d tip_ = Vector3d();
     Vector3d v_ = Vector3d();
     double st_ = 0; // stop time (eqn 13)
-    std::vector<double> g_;
+    std::vector<double> g_;  // eqn 13
 
 };
 
