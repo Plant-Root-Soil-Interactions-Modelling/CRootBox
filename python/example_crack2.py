@@ -76,17 +76,15 @@ for i in range(0,10):
 rs.initialize()
 
 # Simulate
-simtime = 100  # e.g. 30 or 60 days
+simtime = 14  # e.g. 30 or 60 days
 dt = 1
 N = round(simtime / dt)
 
 for i in range(0, N):
     
     # time-dependent and depth-dependent scaling function    
-    scales = np.zeros(len(scale_elongation.grid))+i/N #  todo: replace this by reading in ith column from CSV file 
-    scale_elongation.data = a2v(scales) # set proportionality factors    
-    # should be enoug to set the data, don't reset the scale elongation functions
-      
+    scales = np.loadtxt('CSV data.csv', delimiter='\t', usecols=i)   # reading in ith column from CSV file
+    scale_elongation.data = a2v(scales) # set the data of scale elongation 
     rs.simulate(dt)
 
 # Export results (as vtp)
@@ -96,9 +94,18 @@ rs.write("../results/crack.vtp")
 rs.setGeometry(cracks)  # just for vizualisation
 rs.write("../results/crack.py")
 
-# Make a root length distribution
-# ana = rb.SegmentAnalyser(rs)
-# rl_ = ana.distribution(rb.ScalarType.length, 0, depth, layers, True)
-# np.set_printoptions(precision = 4)
-# np.savetxt("c_" + str(cc) + ".txt", rl_, fmt = "%.2f")
+#
+# Compute vertical RLD in layers
+#
+x = np.linspace(0,100,101);    # one layer is 1 cm deep
+nl = len(x)
+depth = max(x)
+analysis = rb.SegmentAnalyser(rs)
+RLD = analysis.distribution(rb.ScalarType.length,0,depth,nl,False)
+RLD = np.array(RLD)/(depth/nl)/(75.0*15.0);   # divide by surface area per plant (inter-row spacing times inter-plant spacing)
+#
+plt.plot(RLD,x*(-1),'r-',linewidth=2)
+plt.xlabel('RLD (cm/cm³)')
+plt.ylabel('Depth (cm)')
+plt.show()
 
