@@ -144,6 +144,39 @@ public:
 };
 
 
+class MultiplySoilLookUps : public SoilLookUp
+{
+public:
+
+    MultiplySoilLookUps(SoilLookUp* s1, SoilLookUp* s2) {
+        soils = { s1, s2 };
+    }
+
+    MultiplySoilLookUps(std::vector<SoilLookUp*> soils)
+        :soils(soils) { }
+
+    virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
+        double v = 1.;
+        for (size_t i=0; i<soils.size(); i++) {
+            v *= soils[i]->getValue(pos,root);
+        }
+        return v;
+    }
+
+    virtual std::string toString() const override {
+        std::string str = "";
+        for (size_t i=0; i<soils.size(); i++) {
+            str += soils[i]->toString();
+            str += "; ";
+        }
+        return "MultiplySoilLookUps: "+ str;
+    } ///< Quick info about the object for debugging
+
+protected:
+    std::vector<SoilLookUp*> soils;
+};
+
+
 
 /**
  * Scales the root elongation with fixed value same for each root

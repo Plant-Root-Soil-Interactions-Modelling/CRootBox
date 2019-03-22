@@ -265,6 +265,11 @@ BOOST_PYTHON_MODULE(py_rootbox)
                 .def_readwrite("slope", &SoilLookUpSDF::slope)
                 .def("__str__",&SoilLookUpSDF::toString)
                 ;
+    class_<MultiplySoilLookUps, MultiplySoilLookUps*, bases<SoilLookUp>>("MultiplySoilLookUps",init<SoilLookUp*, SoilLookUp*>())
+                .def(init<std::vector<SoilLookUp*>>())
+                .def("getValue", &MultiplySoilLookUps::getValue, getValue_overloads())
+                .def("__str__",&MultiplySoilLookUps::toString)
+                ;
     class_<ProportionalElongation, ProportionalElongation*, bases<SoilLookUp>>("ProportionalElongation",init<>())
                 .def("getValue", &ProportionalElongation::getValue, getValue_overloads())
                 .def("setScale", &ProportionalElongation::setScale)
