@@ -24,6 +24,7 @@
 #include "mymath.h"
 #include "sdf.h"
 #include "RootSystem.h"
+#include "sdf_rs.h"
 #include "analysis.h"
 #include "../examples/Exudation/example_exudation.h"
 
@@ -123,67 +124,68 @@ BOOST_PYTHON_MODULE(py_rootbox)
      * general
      */
     class_<std::vector<double>>("std_vector_double_")
-            .def(vector_indexing_suite<std::vector<double>>() )
-            ;
+        .def(vector_indexing_suite<std::vector<double>>() )
+        ;
+
     class_<std::vector<int>>("std_vector_int_")
-            .def(vector_indexing_suite<std::vector<int>>() )
-            ;
+        .def(vector_indexing_suite<std::vector<int>>() )
+        ;
     /*
      * mymath.h
      */
     class_<Vector2i>("Vector2i", init<>())
-                .def(init<int,int>())
-                .def(init<Vector2i&>())
-                .def_readwrite("x",&Vector2i::x)
-                .def_readwrite("y",&Vector2i::y)
-                .def("__str__",&Vector2i::toString)
-                ;
+        .def(init<int,int>())
+        .def(init<Vector2i&>())
+        .def_readwrite("x",&Vector2i::x)
+        .def_readwrite("y",&Vector2i::y)
+        .def("__str__",&Vector2i::toString)
+    ;
     class_<std::vector<Vector2i>>("std_vector_Vector2i_")
-            .def(vector_indexing_suite<std::vector<Vector2i>>() )
-            ;
+        .def(vector_indexing_suite<std::vector<Vector2i>>() )
+    ;
     class_<Vector3d>("Vector3d", init<>())
-                .def(init<double,double,double>())
-                .def(init<Vector3d&>())
-                .def_readwrite("x",&Vector3d::x)
-                .def_readwrite("y",&Vector3d::y)
-                .def_readwrite("z",&Vector3d::z)
-                .def("normalize",&Vector3d::normalize)
-                .def("times",times1)
-                .def("times",times2)
-                .def("length",&Vector3d::length)
-                .def("plus",&Vector3d::plus)
-                .def("minus",&Vector3d::minus)
-                .def("cross",&Vector3d::cross)
-                .def("__str__",&Vector3d::toString)
-                .def("__rep__",&Vector3d::toString)
-                ;
+        .def(init<double,double,double>())
+        .def(init<Vector3d&>())
+        .def_readwrite("x",&Vector3d::x)
+        .def_readwrite("y",&Vector3d::y)
+        .def_readwrite("z",&Vector3d::z)
+        .def("normalize",&Vector3d::normalize)
+        .def("times",times1)
+        .def("times",times2)
+        .def("length",&Vector3d::length)
+        .def("plus",&Vector3d::plus)
+        .def("minus",&Vector3d::minus)
+        .def("cross",&Vector3d::cross)
+        .def("__str__",&Vector3d::toString)
+        .def("__rep__",&Vector3d::toString)
+    ;
     class_<std::vector<Vector3d>>("std_vector_Vector3d_")
-            .def(vector_indexing_suite<std::vector<Vector3d>>() )
-            ;
+        .def(vector_indexing_suite<std::vector<Vector3d>>() )
+    ;
     class_<Matrix3d>("Matrix3d", init<>())
-                .def(init<double,double,double,double,double,double,double,double,double>())
-                .def(init<Vector3d&, Vector3d&, Vector3d&>())
-                .def(init<Matrix3d&>())
-                .def_readwrite("r0",&Matrix3d::r0)
-                .def_readwrite("r1",&Matrix3d::r1)
-                .def_readwrite("r2",&Matrix3d::r2)
-                .def("rotX",&Matrix3d::rotX)
-                .def("rotY",&Matrix3d::rotY)
-                .def("rotZ",&Matrix3d::rotZ)
-                .def("ons",&Matrix3d::ons)
-                .def("det",&Matrix3d::det)
-                .def("inverse",&Matrix3d::inverse)
-                .def("column",&Matrix3d::column)
-                .def("row",&Matrix3d::row)
-                .def("times",times3)
-                .def("times",times4)
-                .def("__str__",&Matrix3d::toString)
-                .def("__rep__",&Matrix3d::toString)
-                ;
+        .def(init<double,double,double,double,double,double,double,double,double>())
+        .def(init<Vector3d&, Vector3d&, Vector3d&>())
+        .def(init<Matrix3d&>())
+        .def_readwrite("r0",&Matrix3d::r0)
+        .def_readwrite("r1",&Matrix3d::r1)
+        .def_readwrite("r2",&Matrix3d::r2)
+        .def("rotX",&Matrix3d::rotX)
+        .def("rotY",&Matrix3d::rotY)
+        .def("rotZ",&Matrix3d::rotZ)
+        .def("ons",&Matrix3d::ons)
+        .def("det",&Matrix3d::det)
+        .def("inverse",&Matrix3d::inverse)
+        .def("column",&Matrix3d::column)
+        .def("row",&Matrix3d::row)
+        .def("times",times3)
+        .def("times",times4)
+        .def("__str__",&Matrix3d::toString)
+        .def("__rep__",&Matrix3d::toString)
+    ;
     /*
      * sdf.h
      */
-    class_<SignedDistanceFunction>("SignedDistanceFunction")
+    class_<SignedDistanceFunction, SignedDistanceFunction*>("SignedDistanceFunction")
                 .def("getDist",&SignedDistanceFunction::getDist)
                 .def("writePVPScript", writePVPScript)
                 .def("__str__",&SignedDistanceFunction::toString)
@@ -221,27 +223,33 @@ BOOST_PYTHON_MODULE(py_rootbox)
                 .def("__str__",&SDF_Union::toString)
                 ;
     class_<SDF_Difference, bases<SDF_Intersection>>("SDF_Difference",init<std::vector<SignedDistanceFunction*>>())
-                .def(init<SignedDistanceFunction*,SignedDistanceFunction*>())
-                .def("getDist",&SDF_Difference::getDist)
-                .def("__str__",&SDF_Difference::toString)
-                ;
+        .def(init<SignedDistanceFunction*,SignedDistanceFunction*>())
+        .def("getDist",&SDF_Difference::getDist)
+        .def("__str__",&SDF_Difference::toString)
+    ;
     class_<SDF_Complement, bases<SignedDistanceFunction>>("SDF_Complement",init<SignedDistanceFunction*>())
-                .def("getDist",&SDF_Complement::getDist)
-                .def("__str__",&SDF_Complement::toString)
-                ;
+        .def("getDist",&SDF_Complement::getDist)
+        .def("__str__",&SDF_Complement::toString)
+    ;
     class_<SDF_HalfPlane, bases<SignedDistanceFunction>>("SDF_HalfPlane",init<Vector3d&,Vector3d&>())
-                .def(init<Vector3d&,Vector3d&,Vector3d&>())
-                .def("getDist",&SDF_HalfPlane::getDist)
-                .def_readwrite("o", &SDF_HalfPlane::o)
-                .def_readwrite("n", &SDF_HalfPlane::n)
-                .def_readwrite("p1", &SDF_HalfPlane::p1)
-                .def_readwrite("p2", &SDF_HalfPlane::p2)
-                .def("__str__",&SDF_HalfPlane::toString)
-                ;
-    class_<SDF_RootSystem, bases<SignedDistanceFunction>>("SDF_RootSystem",init<std::vector<Vector3d>,std::vector<Vector2i>, std::vector<double>,double>())
-                .def("getDist",&SDF_RootSystem::getDist)
-                .def("__str__",&SDF_RootSystem::toString)
-                ;
+        .def(init<Vector3d&,Vector3d&,Vector3d&>())
+        .def("getDist",&SDF_HalfPlane::getDist)
+        .def_readwrite("o", &SDF_HalfPlane::o)
+        .def_readwrite("n", &SDF_HalfPlane::n)
+        .def_readwrite("p1", &SDF_HalfPlane::p1)
+        .def_readwrite("p2", &SDF_HalfPlane::p2)
+        .def("__str__",&SDF_HalfPlane::toString)
+    ;
+    /*
+     * sdf_rs.h
+     */
+    class_<SDF_RootSystem,SDF_RootSystem*, bases<SignedDistanceFunction>>("SDF_RootSystem", init<std::vector<Vector3d>, std::vector<Vector2i>, std::vector<double>, double>())
+        .def(init<Root&, double>())
+        .def(init<RootSystem&, double>())
+        .def("getDist",&SDF_RootSystem::getDist)
+        .def("__str__",&SDF_RootSystem::toString)
+    ;
+
     /*
      * soil.h
      */
@@ -547,7 +555,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		        .def_readwrite("type", &ExudationModel::type)
 		        .def_readwrite("n0", &ExudationModel::n0)
 		        .def_readwrite("thresh13", &ExudationModel::thresh13)
-		        .def_readwrite("calc13", &ExudationModel::calc13)
+                .def_readwrite("calc13", &ExudationModel::calc13)
+                .def_readwrite("observationRadius", &ExudationModel::observationRadius)
 				;
     enum_<ExudationModel::IntegrationType>("IntegrationType")
             .value("mps_straight", ExudationModel::IntegrationType::mps_straight)

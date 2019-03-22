@@ -33,9 +33,9 @@ public:
 
     SDF_RootSystem(std::vector<Vector3d> nodes, const std::vector<Vector2i> segments, std::vector<double> radii, double dx = 0.5);
 
-    virtual double getDist(const Vector3d& p);
+    virtual double getDist(const Vector3d& p) const override;
 
-    virtual std::string toString() { return "SDF_RootSystem"; }
+    virtual std::string toString() const override { return "SDF_RootSystem"; }
 
     std::vector<Vector3d> nodes_;
     std::vector<Vector2i> segments_;
@@ -46,7 +46,7 @@ protected:
 
     void buildTree();
 
-    aabb::Tree tree = aabb::Tree();
+    mutable aabb::Tree tree = aabb::Tree();
 
 };
 
@@ -97,12 +97,12 @@ void SDF_RootSystem::buildTree() {
 }
 
 
-double SDF_RootSystem::getDist(const Vector3d& p) {
+double SDF_RootSystem::getDist(const Vector3d& p) const {
 
     std::vector<double> a = { p.x-dx_, p.y-dx_, p.z-dx_ };
     std::vector<double> b = { p.x+dx_, p.y+dx_, p.z+dx_ };
     aabb::AABB box = aabb::AABB(a,b);
-    double mdist = 1e100;
+    double mdist = 1e100; // far far away
     auto indices = tree.query(box);
     // std::cout << indices.size() << " segments in range\n";
     for (int i : indices) {
@@ -130,7 +130,7 @@ double SDF_RootSystem::getDist(const Vector3d& p) {
         }
 
     }
-    return -mdist; // far far away
+    return -mdist;
 }
 
 } // namespace

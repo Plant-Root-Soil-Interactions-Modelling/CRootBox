@@ -33,7 +33,7 @@ public:
     /**
      * Returns a string representation of the object (for debugging)
      */
-    virtual std::string toString()  { return "SignedDistanceFunction"; }
+    virtual std::string toString() const { return "SignedDistanceFunction"; }
 
     /**
      * Writes a ParaView Phython script explicitly representing the implicit geometry
@@ -48,12 +48,12 @@ public:
     virtual std::string writePVPScript() const; ///< Writes the ParaView Phython script into a string
 
     /**
-     * Returns the gradient of the sdf
+     * Returns the (numerical) gradient of the sdf, overwrite with analytical (where appropriate)
      *
      * @param p     spatial position [cm]
      * @param eps   central differences epsilon
      */
-    Vector3d getGradient(const Vector3d& p, double eps = 5.e-4) {
+    virtual Vector3d getGradient(const Vector3d& p, double eps = 5.e-4) const {
         auto epsX = Vector3d(eps, 0, 0);
         auto epsY = Vector3d(0, eps, 0);
         auto epsZ = Vector3d(0, 0, eps);
@@ -82,11 +82,11 @@ public:
      */
     SDF_PlantBox(double x, double y, double z) { dim = Vector3d(x/2.,y/2.,z/2.); } ///< creates a rectangular box
 
-    virtual double getDist(const Vector3d& v) const; ///< @see SignedDistanceFunction::getDist
+    virtual double getDist(const Vector3d& v) const override; ///< @see SignedDistanceFunction::getDist
 
-    virtual std::string toString()  { return "SDF_PlantBox"; } ///< @see SignedDistanceFunction::toString
+    virtual std::string toString() const override { return "SDF_PlantBox"; } ///< @see SignedDistanceFunction::toString
 
-    virtual int writePVPScript(std::ostream & cout, int c=1) const;  ///< @see SignedDistanceFunction::writePVPScript
+    virtual int writePVPScript(std::ostream & cout, int c=1) const override;  ///< @see SignedDistanceFunction::writePVPScript
 
 private:
     Vector3d dim; // dimensions of the boxMehrfachdefinition
@@ -105,11 +105,11 @@ public:
     SDF_PlantContainer() { r1=5; r2=5; h=100; square = false; } ///< Default is a cylindrical rhizotron with radius 10 cm and 100 cm depth
     SDF_PlantContainer(double r1_, double r2_, double h_, double sq=false); ///< Creates a cylindrical or square container
 
-    virtual double getDist(const Vector3d& v) const; ///< @see SignedDistanceFunction::getDist
+    virtual double getDist(const Vector3d& v) const override; ///< @see SignedDistanceFunction::getDist
 
-    virtual std::string toString()  { return "SDF_PlantContainer"; } ///< @see SignedDistanceFunction::toString
+    virtual std::string toString() const override { return "SDF_PlantContainer"; } ///< @see SignedDistanceFunction::toString
 
-    virtual int writePVPScript(std::ostream & cout, int c=1) const; ///< @see SignedDistanceFunction::writePVPScript
+    virtual int writePVPScript(std::ostream & cout, int c=1) const override; ///< @see SignedDistanceFunction::writePVPScript
 
 private:
     double r1;
@@ -133,11 +133,11 @@ public:
     SDF_RotateTranslate(SignedDistanceFunction* sdf, double angle=0, int axis=xaxis, const Vector3d& pos = Vector3d(0,0,0)); ///< Constructor
     SDF_RotateTranslate(SignedDistanceFunction* sdf, Vector3d pos): SDF_RotateTranslate(sdf, 0., xaxis, pos) { } ///< Translate only
 
-    virtual double getDist(const Vector3d& v) const; ///< @see SignedDistanceFunction::getDist
+    virtual double getDist(const Vector3d& v) const override; ///< @see SignedDistanceFunction::getDist
 
-    virtual std::string toString()  { return "SDF_RotateTranslate"; } ///< @see SignedDistanceFunction::toString
+    virtual std::string toString() const override { return "SDF_RotateTranslate"; } ///< @see SignedDistanceFunction::toString
 
-    virtual int writePVPScript(std::ostream & cout, int c=1)  const; ///< @see SignedDistanceFunction::writePVPScript
+    virtual int writePVPScript(std::ostream & cout, int c=1)  const override; ///< @see SignedDistanceFunction::writePVPScript
 
 private:
     SignedDistanceFunction* sdf; // base geometry
@@ -161,11 +161,11 @@ public:
     SDF_Intersection(SignedDistanceFunction* sdf1, SignedDistanceFunction* sdf2) { sdfs.push_back(sdf1); sdfs.push_back(sdf2); }
     ///< Constructs (sdf1 ∩ sdf2)
 
-    virtual double getDist(const Vector3d& v) const;  ///< @see SignedDistanceFunction::getDist
+    virtual double getDist(const Vector3d& v) const override;  ///< @see SignedDistanceFunction::getDist
 
-    virtual std::string toString()  { return "SDF_Intersection"; } ///< @see SignedDistanceFunction::toString
+    virtual std::string toString() const override { return "SDF_Intersection"; } ///< @see SignedDistanceFunction::toString
 
-    virtual int writePVPScript(std::ostream & cout, int c=1) const; ///< @see SignedDistanceFunction::writePVPScript
+    virtual int writePVPScript(std::ostream & cout, int c=1) const override; ///< @see SignedDistanceFunction::writePVPScript
 
 protected:
     std::vector<SignedDistanceFunction*> sdfs; ///< the set of signed distance functions
@@ -183,9 +183,9 @@ public:
     SDF_Union(std::vector<SignedDistanceFunction*> sdfs): SDF_Intersection(sdfs) { } ///< Constructs (sdfs_[0] U sdfs_[1] U sdfs_[2] U ... )
     SDF_Union(SignedDistanceFunction* sdf1, SignedDistanceFunction* sdf2): SDF_Intersection(sdf1,sdf2) { } ///< Constructs sdf1 U sdf2
 
-    virtual double getDist(const Vector3d& v) const;  ///< @see SignedDistanceFunction::getDist
+    virtual double getDist(const Vector3d& v) const override;  ///< @see SignedDistanceFunction::getDist
 
-    virtual std::string toString()  { return "SDF_Union"; } ///< @see SignedDistanceFunction::toString
+    virtual std::string toString() const override { return "SDF_Union"; } ///< @see SignedDistanceFunction::toString
 };
 
 
@@ -200,9 +200,9 @@ public:
     SDF_Difference(std::vector<SignedDistanceFunction*> sdfs) :SDF_Intersection(sdfs) { } ///< Constructs (...((sdfs_[0] \ sdfs_[1]) \ sdfs_[2])...)
     SDF_Difference(SignedDistanceFunction* sdf1, SignedDistanceFunction* sdf2) :SDF_Intersection(sdf1,sdf2) { } ///< Constructs sdf1 \ sdf2
 
-    virtual double getDist(const Vector3d& v) const;  ///< @see SignedDistanceFunction::getDist
+    virtual double getDist(const Vector3d& v) const override;  ///< @see SignedDistanceFunction::getDist
 
-    virtual std::string toString()  { return "SDF_Difference"; } ///< @see SignedDistanceFunction::toString
+    virtual std::string toString() const override { return "SDF_Difference"; } ///< @see SignedDistanceFunction::toString
 };
 
 
@@ -216,11 +216,11 @@ class SDF_Complement : public SignedDistanceFunction
 public:
     SDF_Complement(SignedDistanceFunction* sdf_) { sdf=sdf_; } ///< Constructs the complement (sdf_)^c
 
-    virtual double getDist(const Vector3d& v) const { return -sdf->getDist(v); } ///< @see SignedDistanceFunction::getDist
+    virtual double getDist(const Vector3d& v) const override { return -sdf->getDist(v); } ///< @see SignedDistanceFunction::getDist
 
-    virtual int writePVPScript(std::ostream & cout, int c=1) const { return sdf->writePVPScript(cout,c); } ///< same as original geometry
+    virtual int writePVPScript(std::ostream & cout, int c=1) const override { return sdf->writePVPScript(cout,c); } ///< same as original geometry
 
-    virtual std::string toString()  { return "SDF_Complement"; } ///< @see SignedDistanceFunction::toString
+    virtual std::string toString() const override { return "SDF_Complement"; } ///< @see SignedDistanceFunction::toString
 
 private:
     SignedDistanceFunction* sdf;
@@ -238,11 +238,11 @@ public:
     SDF_HalfPlane(const Vector3d& o, const Vector3d& n_); ///< half plane by origin and normal vector
     SDF_HalfPlane(const Vector3d& o, const Vector3d& p1, const Vector3d& p2);  ///< half plane by origin and two linear independent vectors
 
-    virtual double getDist(const Vector3d& v) const { return n.times(v.minus(o)); } ///< @see SignedDistanceFunction::getDist
+    virtual double getDist(const Vector3d& v) const override { return n.times(v.minus(o)); } ///< @see SignedDistanceFunction::getDist
 
-    virtual int writePVPScript(std::ostream & cout, int c=1) const; ///< @see SignedDistanceFunction::writePVPScript
+    virtual int writePVPScript(std::ostream & cout, int c=1) const override; ///< @see SignedDistanceFunction::writePVPScript
 
-    virtual std::string toString() { return "SDF_HalfPlane"; } ///< @see SignedDistanceFunction::toString
+    virtual std::string toString() const override { return "SDF_HalfPlane"; } ///< @see SignedDistanceFunction::toString
 
     Vector3d o; ///< origin of the plane
     Vector3d n; ///< normal of the plane p1xp2

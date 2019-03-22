@@ -12,6 +12,7 @@ std::string SignedDistanceFunction::writePVPScript() const
 
 
 
+
 /**
  * Returns the signed distance to the next boundary of the box
  *
@@ -213,7 +214,7 @@ int SDF_RotateTranslate::writePVPScript(std::ostream & cout, int c) const
 double SDF_Intersection::getDist(const Vector3d& v) const {
     double d = sdfs[0]->getDist(v);
     for (size_t i=1; i<sdfs.size(); i++) {
-        d = std::max(d, -sdfs[i]->getDist(v));
+        d = std::max(d, sdfs[i]->getDist(v));
     }
     return d;
 }
