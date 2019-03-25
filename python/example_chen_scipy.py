@@ -10,11 +10,11 @@ import matplotlib.pyplot as plt
 # Model parameter
 #
 Q = 4  # µg/d/tip
-Dl = 10 * 2.43e-6 * 3600 * 24  # cm2/d
+Dl = 2.43e-6 * 3600 * 24  # cm2/d
 theta = 0.3
 R = 16.7  # 16.7  # -
-k = 0. *2.60e-6 * 3600 * 24  # d-1
-l = 4  # cm (for line source only)
+k = 2.60e-6 * 3600 * 24  # d-1
+L = 4  # cm (for line source only)
 
 r = 2  # initial growth speed (linear growth)
 simtime = 10  # days
@@ -28,20 +28,27 @@ def to32(x):
 def fun11a(x, t):
     c = -R / (4 * Dl * t)
     d = 8 * theta * to32(math.pi * Dl * t)
-    xtip = -r * t - 3
+    xtip = (-3) - (r * (simtime - t))
     z = x - xtip
-    return  (Q * math.sqrt(R)) / d * np.exp(c * z * z - k / R * t)
+    return  (Q * math.sqrt(R)) / d * np.exp(c * (z * z) - k / R * t)
 
 
 def fun11b(x, t, l):
     c = -R / (4 * Dl * t)
     d = 8 * theta * to32(math.pi * Dl * t);
-    xtip = -r * t - 3
-    z = x - xtip - l;
-    return (Q * math.sqrt(R)) / d * math.exp(c * z * z - k / R * t)
+    xtip = (-3) - (r * (simtime - t))
+    if xtip + l < 0:
+        z = x - (xtip + l);
+        return (Q * math.sqrt(R)) / d * math.exp(c * z * z - k / R * t)
+    else:
+        return 0
+
+# print(fun11a(-3, 1e-99))
+# print(fun11a(-3, 1))
+# print(fun11a(-23, 10))
 
 
-N = 200
+N = 100
 
 # t_ = np.arange(1, 11)
 # z_ = np.linspace(0, -depth, N)
@@ -53,7 +60,7 @@ N = 200
 #     plt.plot(z_, cz[:, j], "g:")
 # plt.ylabel("µg /d")
 # plt.xlabel("z (cm)")
-# plt.title("Integrand for t = 1,2,...,11 days")
+# plt.title("Integrand for t = 1,2,...,11 days (rootage = 10 days)")
 # plt.show()
 #
 # t_ = np.linspace(1, 10, N)
@@ -67,18 +74,31 @@ N = 200
 # plt.ylabel("µg /d")
 # plt.xlabel("time (d)")
 # plt.legend(["-1", "-3", "-5", "-7", "-9"])
-# plt.title("Integrand at z = -1,-3,...,-29 cm")
+# plt.title("Integrand at z = -1,-3,...,-29 cm (rootage = 10 days)")
 # plt.show()
 
-z_ = np.arange(1, 30, 2);
+# # Moving Point Source
+# z_ = np.linspace(-30, 0, N);
+# c = np.zeros((len(z_),))
+# for i, z in enumerate(z_):
+#     f = lambda t: fun11a(z, t)
+#     res = integrate.quad(f, 0.2, 10)  # <- t0 determines peak hight
+#     c[i] = res[0]
+#
+# plt.plot(np.abs(z_), c, 'r')
+# plt.plot([23], [0], 'k*') # tip
+# plt.plot([3], [0], 'r*') # base
+# plt.show()
+
+# Moving Line Source
+z_ = np.linspace(-30, 0, N);
 c = np.zeros((len(z_),))
 for i, z in enumerate(z_):
-    x = -z
-    f = lambda t: fun11a(-x, t)
-    res = integrate.quad(f, 1, 10, epsabs = 1e-14, epsrel = 1e-16)
-    c[i] = res[-1]
+    f = lambda l, t : fun11b(z, t, l)  # care: dblquad f(y,x)
+    res = integrate.dblquad(f, 0.2, 10, lambda x: 0, lambda x: L)
+    c[i] = res[0]
 
-plt.plot(-z_, c, 'k*')
-
+plt.plot(np.abs(z_), c, 'r')
+plt.plot([23], [0], 'k*')  # tip
+plt.plot([3], [0], 'g*')  # base
 plt.show()
-
