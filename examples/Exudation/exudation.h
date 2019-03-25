@@ -36,6 +36,7 @@ public:
 
     /**
      * Constructors
+     *
      */
     ExudationModel(double width, double depth, int n, RootSystem& rs) :ExudationModel(width, width, depth, n, n, n, rs) {
     }
@@ -47,9 +48,6 @@ public:
 
         for (const auto& r : roots) {
             if (r->getNumberOfNodes()>1) { // started growing
-                // root age (until root stopped growing)
-                double a = r->getNodeETime(r->getNumberOfNodes()-1) - r->getNodeETime(0);
-                age.push_back(a);
                 // time when the root stopped growing
                 double sTime = r->getNodeETime(r->getNumberOfNodes()-1);
                 if (r->active) {
@@ -62,6 +60,7 @@ public:
                 tip.push_back(t);
                 // direction towards root base
                 Vector3d base = r->getNode(0);
+                double a = r->getNodeETime(r->getNumberOfNodes()-1) - r->getNodeETime(0);
                 v.push_back(base.minus(t).times(1./a));
             }
 
@@ -74,7 +73,7 @@ public:
     /**
      * For each root for each grid point
      */
-    std::vector<double> calculate(double t0, double tend) {
+    std::vector<double> calculate(double tend) {
 
         limitDomain = observationRadius>0;
 
@@ -83,18 +82,21 @@ public:
 
         for (size_t ri = 0; ri< roots.size(); ri++) {
 
-            if (age[ri]>0) {
+            //
+            // per root (passed to integrands)
+            r_ = roots[ri]; // eq 11
+            age_ = std::min(r_->getNodeETime(r_->getNumberOfNodes()-1),tend) - r_->getNodeETime(0);
+
+            if (age_>0) {
 
                 // per root (passed to integrands)
-                r_ = roots[ri]; // eq 11
                 n_ = int(n0*r_->length); // number of integration points eq 11
-                age_ = age[ri]; // eq 11
                 v_ = v[ri]; // for mps_straight, eq 11
                 tip_ = tip[ri]; // for mps_straight, eq 11
                 st_ = stopTime[ri]; // eq 13
                 st_ *= calc13;
 
-                std::cout << "Root #" << ri << "/" << roots.size() << ", age "<< age[ri] << ", stopped "<< st_ <<
+                std::cout << "Root #" << ri << "/" << roots.size() << ", age "<< age_ << ", stopped "<< st_ <<
                     ", res "<< n_ << " \n"; // for debugging
 
                 // EQN 11
@@ -109,10 +111,13 @@ public:
                                 size_t lind = i*(grid.ny*grid.nz)+j*grid.nz+k;
 
                                 // different flavors of Eqn (11)
-                                double c = eqn11(t0, std::min(age_, tend), 0, l);
+                                double c = eqn11(0, age_, 0, l);
                                 grid.data[lind] += c;
                                 g_[lind] = c;
 
+                            } else {
+                                size_t lind = i*(grid.ny*grid.nz)+j*grid.nz+k;
+                                g_[lind] = 0.;
                             }
 
                         }
@@ -235,14 +240,14 @@ public:
         double c = -(p->R) / ( 4*(p->Dl)*t );
         double d = 8*(p->theta)*ExudationModel::to32(M_PI*p->Dl*t);
 
-        Vector3d xtip = ExudationModel::pointAtAge(p->r_, p->age_-t);
+
         double tl = p->r_->getLength( p->age_-t ); // tip
-        if (tl-l<0) { // if root smaller l
+        if (tl<l) { // if root smaller l
             return 0.;
         }
         double agel = p->r_->getAge(tl-l);
-        Vector3d nl = p->ExudationModel::pointAtAge(p->r_, agel); // todo ???
-        Vector3d z = p->x_.minus(xtip).plus(xtip.minus(nl));
+        Vector3d tipLS = p->ExudationModel::pointAtAge(p->r_, agel);
+        Vector3d z = p->x_.minus(tipLS);
 
         return ((p->Q)*sqrt(p->R))/d *exp(c*z.times(z) - p->k/p->R * t); // Eqn (11)
     }
@@ -261,7 +266,6 @@ public:
 
     // Root system
     std::vector<Root*> roots;
-    std::vector<double> age; // age of root, until it stopped growing
     std::vector<double> stopTime; // time when root stopped growing, 0 if it has not
     std::vector<Vector3d> tip;
     std::vector<Vector3d> v; // direction from tip towards root base

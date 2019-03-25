@@ -67,7 +67,7 @@ model.calc13 = True;  # turns Eqn 13  on (True) and off (False)
 model.observationRadius = 5;  # limits computational domain around roots [cm]
 
 t = time.time()
-C = model.calculate(0, simtime)
+C = model.calculate(simtime)
 elapsed = time.time() - t
 print("Computation took", elapsed, "s")
 

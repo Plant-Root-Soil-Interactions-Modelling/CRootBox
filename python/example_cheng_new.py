@@ -82,7 +82,7 @@ model.type = rb.IntegrationType.mps;  # mps, mps_straight, mls
 model.n0 = 5  # integration points per cm
 model.calc13 = True;  # turns Eqn 13  on and off
 
-C = model.calculate()
+C = model.calculate(simtime)
 
 #
 # post processing...

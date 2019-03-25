@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 # Model parameter
 #
 Q = 4  # µg/d/tip
-Dl = 10*2.43e-6 * 3600 * 24  # cm2/d
+Dl = 10 * 2.43e-6 * 3600 * 24  # cm2/d
 theta = 0.3
 R = 16.7  # 16.7  # -
 k = 0. *2.60e-6 * 3600 * 24  # d-1
@@ -41,43 +41,44 @@ def fun11b(x, t, l):
     return (Q * math.sqrt(R)) / d * math.exp(c * z * z - k / R * t)
 
 
-# N = 200
-# cz = np.zeros((N,11))
-# ct = np.zeros((N,30))
-# 
-# t_ = np.arange(1,11)
+N = 200
+
+# t_ = np.arange(1, 11)
 # z_ = np.linspace(0, -depth, N)
+# cz = np.zeros((N, 11))
 # for j in t_:
 #     for i, z in enumerate(z_):
 #         f = lambda t: fun11a(z, t)
-#         cz[i,j] = f(j) # res[-1]
-#     plt.plot(z_, cz[:,j], "g:")
+#         cz[i, j] = f(j)  # res[-1]
+#     plt.plot(z_, cz[:, j], "g:")
 # plt.ylabel("µg /d")
 # plt.xlabel("z (cm)")
 # plt.title("Integrand for t = 1,2,...,11 days")
 # plt.show()
-#  
-# t_ = np.linspace(1,10,N)
-# z_ = np.arange(1,30,2);
+#
+# t_ = np.linspace(1, 10, N)
+# z_ = np.arange(1, 30, 2);
+# ct = np.zeros((N, 30))
 # for j in z_:
-#     for i, t in enumerate(t_):        
+#     for i, t in enumerate(t_):
 #         f = lambda z: fun11a(z, t)
-#         ct[i,j] = f(-j) # res[-1]
-#     plt.plot(t_, ct[:,j])
+#         ct[i, j] = f(-j)  # res[-1]
+#     plt.plot(t_, ct[:, j])
 # plt.ylabel("µg /d")
 # plt.xlabel("time (d)")
-# plt.legend(["-1","-3","-5","-7","-9"])
+# plt.legend(["-1", "-3", "-5", "-7", "-9"])
 # plt.title("Integrand at z = -1,-3,...,-29 cm")
 # plt.show()
-#  
 
-z_ = np.arange(1,30,2); 
+z_ = np.arange(1, 30, 2);
 c = np.zeros((len(z_),))
 for i, z in enumerate(z_):
-    f = lambda t: fun11a(-z, t)
-    res = integrate.quad(f, 0.1, 0.2, epsabs = 1e-14, epsrel = 1e-16)
+    x = -z
+    f = lambda t: fun11a(-x, t)
+    res = integrate.quad(f, 1, 10, epsabs = 1e-14, epsrel = 1e-16)
     c[i] = res[-1]
- 
+
 plt.plot(-z_, c, 'k*')
 
 plt.show()
+
