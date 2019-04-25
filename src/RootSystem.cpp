@@ -848,7 +848,7 @@ std::vector<double> RootSystem::getNewSegmentsTimes() const
     for (const auto& r : roots) {
         int onon = std::abs(r->old_non);
         for (size_t i=onon-1; i<r->getNumberOfNodes()-1; i++) {
-            setimes.at(c) = r->getNodeETime(i+1);
+            setimes.at(c) = r->getNodeETime(i);
             c++;
         }
     }
