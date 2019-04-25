@@ -155,7 +155,7 @@ int RootSystem::readParameters(std::istream& cin)
 void RootSystem::writeParameters(std::ostream& os) const
 {
     int t = 0;
-    for (auto const& rp:rtparam) {
+    for (const auto& rp : rtparam) {
         t++;
         if (rp.type>0) {
             assert(rp.type==t); // check if index is really type-1
@@ -187,7 +187,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 
     // Create root system from the root system parameter
     const double maxT = 365.; // maximal simulation time
-    RootSystemParameter const &rs = rsparam; // rename
+    const RootSystemParameter &rs = rsparam; // rename
     Vector3d iheading(0,0,-1);
 
     // Taproot
@@ -299,7 +299,7 @@ void RootSystem::simulate(double dt, bool silence)
     }
     old_non = getNumberOfNodes();
     old_nor = getRoots().size();
-    for (auto const& r: baseRoots) {
+    for (const auto& r : baseRoots) {
         r->simulate(dt, silence);
     }
     simtime+=dt;
@@ -449,7 +449,7 @@ GrowthFunction* RootSystem::createGrowthFunction(int gft) {
 std::vector<Root*> RootSystem::getRoots() const
 {
     if (roots.empty()) { // create buffer
-        for (auto const& br:this->baseRoots) {
+        for (const auto& br : this->baseRoots) {
             br->getRoots(roots);
         }
         return roots;
@@ -494,16 +494,16 @@ std::vector<Vector3d> RootSystem::getNodes() const
     int non = getNumberOfNodes();
     std::vector<Vector3d> nv = std::vector<Vector3d>(non); // reserve big enough vector
     // copy initial nodes (roots might not have developed)
-    for (auto const& r: baseRoots) {
+    for (const auto& r : baseRoots) {
         nv.at(r->getNodeId(0)) = r->getNode(0);
     }
     // copy root nodes
-    for (auto const& r: roots) {
+    for (const auto& r : roots) {
         for (size_t i=0; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
             nv.at(r->getNodeId(i)) = r->getNode(i); // pray that ids are correct
         }
     }
-    nv.at(0) = Vector3d(0.,0.,3.); // add artificial shoot
+    nv.at(0) = Vector3d(0.,0.,0.); // add artificial shoot
     return nv;
 }
 
@@ -533,7 +533,7 @@ std::vector<Vector2i> RootSystem::getSegments() const
     int nos=getNumberOfSegments();
     std::vector<Vector2i> s(nos);
     int c=0;
-    for (auto const& r:roots) {
+    for (const auto& r : roots) {
         for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
             Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
             s.at(c) = v;
@@ -580,7 +580,7 @@ std::vector<Root*> RootSystem::getSegmentsOrigin() const
     int nos=getNumberOfSegments();
     std::vector<Root*> s(nos);
     int c=0;
-    for (auto const& r:roots) {
+    for (const auto& r : roots) {
         for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
             s.at(c) = r;
             c++;
@@ -600,7 +600,7 @@ std::vector<double> RootSystem::getNETimes(bool persegment) const
         int nos = getNumberOfSegments();
         std::vector<double> netv = std::vector<double>(nos); // reserve big enough vector
         int c = 0;
-        for (auto const& r : roots) {
+        for (const auto& r : roots) {
             for (size_t i = 1; i < r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
                 netv.at(c) = r->getNodeETime(i); // pray that ids are correct
                 c++;
@@ -612,11 +612,11 @@ std::vector<double> RootSystem::getNETimes(bool persegment) const
         int non = getNumberOfNodes();
         std::vector<double> nv = std::vector<double>(non); // reserve big enough vector
         // copy initial nodes (roots might not have developed)
-        for (auto const& r : baseRoots) {
+        for (const auto& r : baseRoots) {
             nv.at(r->getNodeId(0)) = r->getNodeETime(0);
         }
         // copy root nodes
-        for (auto const& r : roots) {
+        for (const auto& r : roots) {
             for (size_t i = 0; i < r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
                 nv.at(r->getNodeId(i)) = r->getNodeETime(i); // pray that ids are correct
             }
@@ -740,7 +740,7 @@ std::vector<int> RootSystem::getUpdatedNodeIndices() const
 {
     this->getRoots(); // update roots (if necessary)
     std::vector<int> ni = std::vector<int>(0);
-    for (auto const& r: roots) {
+    for (const auto& r : roots) {
         if (r->old_non>0){
             ni.push_back(r->getNodeId(r->old_non-1));
         }
@@ -755,7 +755,7 @@ std::vector<Vector3d> RootSystem::getUpdatedNodes() const
 {
     this->getRoots(); // update roots (if necessary)
     std::vector<Vector3d> nv = std::vector<Vector3d>(0);
-    for (auto const& r: roots) {
+    for (const auto& r : roots) {
         if (r->old_non>0){
             nv.push_back(r->getNode(r->old_non-1));
         }
@@ -772,7 +772,7 @@ std::vector<Vector3d> RootSystem::getNewNodes() const
     roots.clear();
     this->getRoots(); // update roots (if necessary)
     std::vector<Vector3d> nv(this->getNumberOfNewNodes());
-    for (auto const& r: roots) {
+    for (const auto& r : roots) {
         int onon = std::abs(r->old_non);
         for (size_t i=onon; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
             nv.at(r->getNodeId(i)-this->old_non) = r->getNode(i); // pray that ids are correct
@@ -790,7 +790,7 @@ std::vector<int> RootSystem::getNewNodeIndices() const
     roots.clear();
     this->getRoots(); // update roots (if necessary)
     std::vector<int> nv(this->getNumberOfNewNodes());
-    for (auto const& r: roots) {
+    for (const auto& r : roots) {
         int onon = std::abs(r->old_non);
         for (size_t i=onon; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
             nv.at(r->getNodeId(i)-this->old_non) = r->getNodeId(i); // pray that ids are correct
@@ -808,7 +808,7 @@ std::vector<Vector2i> RootSystem::getNewSegments() const
     this->getRoots(); // update roots (if necessary)
     std::vector<Vector2i> si(this->getNumberOfNewNodes());
     int c=0;
-    for (auto const& r:roots) {
+    for (const auto& r : roots) {
         int onon = std::abs(r->old_non);
         for (size_t i=onon-1; i<r->getNumberOfNodes()-1; i++) {
             Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
@@ -820,7 +820,7 @@ std::vector<Vector2i> RootSystem::getNewSegments() const
 }
 
 /**
- *
+ * Returns a vector of pointers to the root class containing the segments, for each newly created segment
  */
 std::vector<Root*> RootSystem::getNewSegmentsOrigin() const
 {
@@ -838,22 +838,22 @@ std::vector<Root*> RootSystem::getNewSegmentsOrigin() const
 }
 
 /**
- * Returns a vector of newly created node ermegence times since the last call of RootSystem::simulate(dt),
- * to dynamically add to the old node vector, see also RootSystem::getNodes
+ * Returns a vector of emergence times of newly created segmeents since the last call of RootSystem::simulate(dt)
  */
-std::vector<double> RootSystem::getNewNETimes() const
+std::vector<double> RootSystem::getNewSegmentsTimes() const
 {
     this->getRoots(); // update roots (if necessary)
-    std::vector<double> netimes(this->getNumberOfNewNodes());
-    for (auto const& r: roots) {
+    std::vector<double> setimes(this->getNumberOfNewNodes());
+    int c=0;
+    for (const auto& r : roots) {
         int onon = std::abs(r->old_non);
-        for (size_t i=onon; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
-            netimes.at(r->getNodeId(i)-this->old_non) = r->getNodeETime(i); // pray that ids are correct
+        for (size_t i=onon-1; i<r->getNumberOfNodes()-1; i++) {
+            setimes.at(c) = r->getNodeETime(i+1);
+            c++;
         }
     }
-    return netimes;
+    return setimes;
 }
-
 
 void RootSystem::push()
 {
@@ -948,7 +948,7 @@ void RootSystem::writeRSMLMeta(std::ostream & os) const
 void RootSystem::writeRSMLPlant(std::ostream & os) const
 {
     os << "<plant>\n";
-    for (auto const& root :baseRoots) {
+    for (const auto& root : baseRoots) {
         root->writeRSML(os,"");
     }
     os << "</plant>\n";
@@ -973,7 +973,7 @@ void RootSystem::writeVTP(std::ostream & os) const
     os << "<VTKFile type=\"PolyData\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
     os << "<PolyData>\n";
     int non = 0; // number of nodes
-    for (auto const& r : roots) {
+    for (const auto& r : roots) {
         non += r->getNumberOfNodes();
     }
     int nol=roots.size(); // number of lines
@@ -1004,8 +1004,8 @@ void RootSystem::writeVTP(std::ostream & os) const
 
     // POINTS (=nodes)
     os << "<Points>\n"<<"<DataArray type=\"Float32\" Name=\"Coordinates\" NumberOfComponents=\"3\" format=\"ascii\" >\n";
-    for (auto const& r:nodes) {
-        for (auto const& n : r) {
+    for (const auto& r : nodes) {
+        for (const auto& n : r) {
             os << n.x << " "<< n.y <<" "<< n.z<< " ";
         }
     }
@@ -1014,7 +1014,7 @@ void RootSystem::writeVTP(std::ostream & os) const
     // LINES (polylines)
     os << "<Lines>\n"<<"<DataArray type=\"Int32\" Name=\"connectivity\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
     int c=0;
-    for (auto const& r:roots) {
+    for (const auto& r : roots) {
         for (size_t i=0; i<r->getNumberOfNodes(); i++) {
             os << c << " ";
             c++;
@@ -1022,7 +1022,7 @@ void RootSystem::writeVTP(std::ostream & os) const
     }
     os << "\n</DataArray>\n"<<"<DataArray type=\"Int32\" Name=\"offsets\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
     c = 0;
-    for (auto const& r:roots) {
+    for (const auto& r : roots) {
         c += r->getNumberOfNodes();
         os << c << " ";
     }
