@@ -202,7 +202,7 @@ double Root::getCreationTime(double length)
         assert(page>=0);
         return rootage+page;
     } else {
-        return rootage;
+        return rootage+netimes[0];
     }
 }
 
@@ -395,7 +395,7 @@ void Root::getRoots(std::vector<Root*>& v)
     if (this->nodes.size()>1) {
         v.push_back(this);
     }
-    for (auto const& l:this->laterals) {
+    for (const auto& l : this->laterals) {
         l->getRoots(v);
     }
 }
