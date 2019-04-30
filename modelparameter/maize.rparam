@@ -4,8 +4,8 @@ name	primaryroot
 lb	0.1	0.1
 la	18	1.8
 ln	0.6	0.06
-lmax	80	60
-r	2.6	0.6
+lmax	180	20
+r	3.6	0.6
 a	0.04	0.004
 color	0.431373	0.392157	0.196078
 tropism	1	1	0.6
@@ -21,7 +21,7 @@ name	1storderlaterals
 lb	0.2	0.04
 la	0.4	0.04
 ln	0.4	0.03
-lmax	2.6	1.6
+lmax	3.6	1.6
 r	2	0.2
 a	0.03	0.003
 color	0.54902	0.490196	0.156863

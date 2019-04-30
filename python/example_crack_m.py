@@ -8,7 +8,6 @@ import csv
 def call(cc):
 
 	rs = rb.RootSystem()
-	#name = "Triticum_aestivum_a_Bingham_2011" # is this the same as your wheat, Shehan?
 	name = "maize"
 	rs.openFile(name)
 
@@ -46,15 +45,15 @@ def call(cc):
 		p.se = soil_prop
 
 	# Pore Local Axes
-	v1 = rb.Vector3d(0.67, 0, 0)
-	v2 = rb.Vector3d(0, 0.67, 0)
-	v3 = rb.Vector3d(0, 0, 0.67)
+	v1 = rb.Vector3d(0, 0, -1)
+	v2 = rb.Vector3d(1, 0, 0)
+	v3 = rb.Vector3d(0, 1, 0)
 	rs.setPoreLocalAxes(rb.Matrix3d(v1, v2, v3));
 
 	# Pore Conductivity Tensor
-	t1 = rb.Vector3d(1.33, 0, 0)
-	t2 = rb.Vector3d(0, 50.33, 0)
-	t3 = rb.Vector3d(0, 0, 50.33)
+	t1 = rb.Vector3d(2.33, 0, 0)
+	t2 = rb.Vector3d(0, 1.33, 0)
+	t3 = rb.Vector3d(0, 0, 1.33)
 	rs.setPoreConductivity(rb.Matrix3d(t1, t2, t3));
 
 	# Set up depth dependent elongation scaling function
@@ -78,7 +77,7 @@ def call(cc):
 	rs.initialize()
 
 	# Simulate
-	simtime = 30*4 # e.g. 30 or 60 days
+	simtime = 115 # e.g. 30 or 60 days
 	dt =1#0.5 * 1./24.
 	N = round(simtime / dt)
 
@@ -90,38 +89,30 @@ def call(cc):
 		rs.simulate(dt)
 
 	# Export results (as vtp)
-	#rs.write("../results/crack.vtp")
+	rs.write("../results/crack.vtp")
 
 	# Export cracks
-	#rs.setGeometry(cracks)  # just for vizualisation
-	#rs.write("../results/crack.py")
+	rs.setGeometry(cracks)  # just for vizualisation
+	rs.write("../results/crack.py")
 
 
-	z_=np.linspace(0,-1*160,160)
+	z_=np.linspace(0,-1*160,16)
 
 	# Make a root length distribution
 	ana = rb.SegmentAnalyser(rs)
-	rl_ = ana.distribution(rb.ScalarType.length,0,160,160,True)
+	rl_ = ana.distribution(rb.ScalarType.length,0,160,16,True)
 	np.set_printoptions(precision=4)
 	np.savetxt("cm_"+str(cc)+".txt",rl_, fmt="%.2f")
+	plt.plot(rl_/(z_[0]-z_[1])/(75*12.5),z_,'r-',linewidth=2)
+	plt.xlabel('RLD (cm/cm³)')
+	plt.ylabel('Depth (cm)')
+	plt.show()
 
 def main():
-	for cc in range(0,101):
+	for cc in range(0,1):
 		call(cc)	
 
 main()	
-#
-# Compute vertical RLD in layers
-#
-#x = np.linspace(0,160,161);    # one layer is 1 cm deep
-#nl = len(x)
-#depth = max(x)
-#analysis = rb.SegmentAnalyser(rs)
-#RLD = analysis.distribution(rb.ScalarType.length,0,depth,nl,False)
-#RLD = np.array(RLD)/(depth/nl)/(75.0*13.0);   # divide by surface area per plant (inter-row spacing times inter-plant spacing)
-#
-#plt.plot(RLD,x*(-1),'r-',linewidth=2)
-#plt.xlabel('RLD (cm/cm³)')
-#plt.ylabel('Depth (cm)')
-#plt.show()
+
+
 
