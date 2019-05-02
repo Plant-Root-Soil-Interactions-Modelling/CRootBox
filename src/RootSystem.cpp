@@ -838,6 +838,25 @@ std::vector<Root*> RootSystem::getNewSegmentsOrigin() const
 }
 
 /**
+ * Returns a vector of newly created node ermegence times since the last call of RootSystem::simulate(dt),
+ * to dynamically add to the old node vector, see also RootSystem::getNodes
+ */
+std::vector<double> RootSystem::getNewNETimes() const
+{
+    this->getRoots(); // update roots (if necessary)
+    std::vector<double> netimes(this->getNumberOfNewNodes());
+    for (const auto& r : roots) {
+        int onon = std::abs(r->old_non);
+        for (size_t i=onon; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
+            netimes.at(r->getNodeId(i)-this->old_non) = r->getNodeETime(i); // pray that ids are correct
+
+        }
+    }
+    return netimes;
+}
+
+
+/**
  * Returns a vector of emergence times of newly created segmeents since the last call of RootSystem::simulate(dt)
  */
 std::vector<double> RootSystem::getNewSegmentsTimes() const
