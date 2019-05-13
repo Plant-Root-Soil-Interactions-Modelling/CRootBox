@@ -20,8 +20,8 @@ set_target_properties(CRootBox PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BIN
 #
 
 # Find necessary packages for py_rootbox
-find_package(PythonLibs 3.7)
-find_package(PythonInterp 3.7) # creates PYTHON_VERSION_MAJOR, PYTHON_VERSION_MINOR
+find_package(PythonLibs 3)
+find_package(PythonInterp 3) # creates PYTHON_VERSION_MAJOR, PYTHON_VERSION_MINOR
 
 # Only build the library if Python 3 was found
 if (PythonLibs_FOUND)
