@@ -5,6 +5,17 @@
 import py_rootbox as rb
 from rb_tools import *
 import matplotlib.pyplot as plt
+import math
+
+a = 0.1
+l = 100
+v = a * a * math.pi * l
+V = 90
+print("a cylinder with  a = 0.1 cm has a volume of ", v)
+print("the the root system volume has ", round(V / v), "cylinders")
+print("this means ", (V / v) / (15 * 7.5), " roots per cm^2 ")
+
+d
 
 
 def simulate(name, simtime):
@@ -39,7 +50,7 @@ def analyse(rs, name, simtime, tv0):
     tl_bot = ana.getSummed(rb.ScalarType.length, bot)
     print("Lcomp (top) ", round(tl_top), "(", round(100 * (tl_top / tl)), "%)")
     print("Lcomp (bot) ", round(tl_bot), "(", round(100 * (tl_bot / tl)), "%)")
-    a = rb.SegmentAnalyser(rs)  # copy
+    a = rb.SegmentAnalyser(rs)  # copyFor the record, I had already simulated the RSWMS scenarios with a single root and a large domain (see attached) but I think our parameterization is different as the results loo pretty dissimilar (did you really use 1.8e-5 for kr? Not 1.8e-4? the RS conductance is very small then:  0.0023cm3/hPa/d which explain the stress)
     a.filter(rb.ScalarType.order, 0)
     l0 = a.getSummed(rb.ScalarType.length)
     a = rb.SegmentAnalyser(rs)  # copy

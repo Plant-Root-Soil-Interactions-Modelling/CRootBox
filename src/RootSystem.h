@@ -145,7 +145,8 @@ public:
     std::vector<int> getNewNodeIndices() const; ///< Node indices that were created in the previous time step
     std::vector<Vector2i> getNewSegments() const; ///< Segments created in the previous time step
     std::vector<Root*> getNewSegmentsOrigin() const; ///< Copies a pointer to the root containing the new segments
-    std::vector<double> getNewNETimes() const; ///< node ermergence times of segments created in the previous time step
+    std::vector<double> getNewNETimes() const;  ///< Node emergence times created, created in the previous time step
+    std::vector<double> getNewSegmentsTimes() const; ///< Segment emergence times, of segments created in the previous time step
     void push();
     void pop();
 
