@@ -2,8 +2,8 @@
 
 #include "gauss_legendre.h"
 
-#include "soil.h"
-#include "sdf_rs.h"
+#include "../../src/soil.h"
+#include "../../src/sdf_rs.h"
 
 
 
