@@ -14,7 +14,7 @@ public:
 
     SegmentAnalyser() { }; ///< creates an empty object (use AnalysisSDF::addSegments)
     SegmentAnalyser(const RootSystem& rs); ///< creates an analyser object containing the segments from the root system
-    SegmentAnalyser(const SegmentAnalyser& a) : nodes(a.nodes), segments(a.segments), ctimes(a.ctimes), segO(a.segO) { } ///< copy constructor, does not copy user data
+    SegmentAnalyser(const SegmentAnalyser& a) : nodes(a.nodes), segments(a.segments), ctimes(a.ctimes), segO(a.segO), lengthFromOrigin(a.lengthFromOrigin) { } ///< copy constructor, does not copy user data
     virtual ~SegmentAnalyser() { }; ///< nothing to do here
 
     // merge segments
@@ -60,15 +60,16 @@ public:
 
     std::vector<Vector3d> nodes; ///< nodes
     std::vector<Vector2i> segments; ///< connectivity of the nodes
+    std::vector<Vector3d> nodesDGF; ///< nodes
+    std::vector<Vector2i> segmentsDGF; ///< connectivity of the nodes
     std::vector<double> ctimes; ///< creation times of the segments
+    std::vector<double> lengthFromOrigin; ///< distance of segment from the branch's origin
     std::vector<Root*> segO; ///< to look up things
 
 protected:
 
     std::vector<std::vector<double>> userData; ///< user data attached to the segments (for vtp file), e.g. flux, pressure, etc.
     std::vector<std::string> userDataNames; ///< names of the data added, e.g. "Flux", "Pressure", etc.
-
-    const RootSystem* rs = nullptr;
 
 };
 

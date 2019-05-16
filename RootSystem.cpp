@@ -1,50 +1,8 @@
 #include "RootSystem.h"
 
-const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","volume","1","userdata 1", "userdata 2", "userdata 3", "parent type",
-		"basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance"};
-
-/**
- * Constructor
- */
-RootSystem::RootSystem() :gen(std::mt19937(std::chrono::system_clock::now().time_since_epoch().count())),
-		UD(std::uniform_real_distribution<double>(0,1)), UID(std::uniform_int_distribution<unsigned int>()), ND(std::normal_distribution<double>(0,1))
-{
-	initRTP();
-};
-
-/**
- * Copy Constructor
- *
- * deep copies the root system
- * does not deep copy geometry, elongation functions, and soil (all not owned by rootsystem)
- * empties buffer
- */
-RootSystem::RootSystem(const RootSystem& rs) : rsmlReduction(rs.rsmlReduction), rsparam(rs.rsparam), rtparam(rs.rtparam), gf(rs.gf), tf(rs.tf), geometry(rs.geometry), soil(rs.soil),
-		simtime(rs.simtime), rid(rs.rid), nid(rs.nid), old_non(rs.old_non), old_nor(rs.old_nor), maxtypes(rs.maxtypes), gen(rs.gen), UD(rs.UD), ND(rs.ND)
-{
-	// std::cout << "Copying root system ("<<rs.baseRoots.size()<< " base roots) \n";
-
-	// copy base Roots
-	baseRoots = std::vector<Root*>(rs.baseRoots.size());
-	for (size_t i=0; i<rs.baseRoots.size(); i++) {
-		baseRoots[i] = new Root(*rs.baseRoots[i], *this); // deep copy root tree
-	}
-
-	roots = std::vector<Root*>(0); // new empty buffer
-
-	// deep copy tropisms
-	tf = std::vector<Tropism*>(rs.tf.size());
-	for (size_t i=0; i<rs.tf.size(); i++) {
-		tf[i]= rs.tf[i]->copy();
-	}
-
-	// deep copy growth
-	gf = std::vector<GrowthFunction*>(rs.gf.size());
-	for (size_t i=0; i<rs.gf.size(); i++) {
-		gf[i]= rs.gf[i]->copy();
-	}
-
-}
+const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","1","userdata 1", "userdata 2", "userdata 3", "parent type",
+	"basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance", "volume","cumulative uptake",
+	 "branch ID"};
 
 /**
  * Destructor
@@ -172,25 +130,23 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 	//cout << "Root system initialize\n";
 	reset(); // just in case
 
-	// fix randomness of root type parameters if the seed was set manually
-	if (manualSeed) {
-		for (auto& rtp : rtparam) {
-			rtp.setSeed(UID(gen));
-		}
-	}
-
-	// introduce an extra node at nodes[0]
-	getNodeIndex();
-
-	// Create root system from the root system parameter
+	// Create root system
 	const double maxT = 365.; // maximal simulation time
+	const double dzB = 0; // distance of basal roots up the mesocotyl [cm] (hardcoded in the orginal version, hardcoded here)
 	RootSystemParameter const &rs = rsparam; // rename
 	Vector3d iheading(0,0,-1);
 
 	// Taproot
 	Root* taproot = new Root(this, 1, iheading ,0, nullptr, 0, 0); // tap root has root type 1
+	Vector3d rootCollar(0,0,0);
+	taproot->addNode(rootCollar,0);
 	taproot->addNode(rs.seedPos,0);
 	baseRoots.push_back(taproot);
+	//if (rs.maxB==0)
+	//{
+	//	taproot->addNode(rs.seedPos,0);
+	//	baseRoots.push_back(taproot);
+	//}
 
 	// Basal roots
 	if (rs.maxB>0) {
@@ -201,17 +157,18 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 			setRootTypeParameter(brtp);
 		}
 		int maxB = rs.maxB;
-		if (rs.delayB>0) { // limit if possible
+		if (rs.delayB>0) {
 			maxB = std::min(maxB,int(ceil((maxT-rs.firstB)/rs.delayB))); // maximal for simtime maxT
 		}
 		double delay = rs.firstB;
 		for (int i=0; i<maxB; i++) {
 			Root* basalroot = new Root(this, basaltype, iheading ,delay, nullptr, 0, 0);
-			basalroot->nodes.push_back(taproot->getNode(0));
-			basalroot->nodeIds.push_back(taproot->getNodeId(0));
-			basalroot->netimes.push_back(delay);
+			Vector3d node = rs.seedPos.plus(Vector3d(0.,0.,dzB));
+			basalroot->addNode(node,delay);
+			//basalroot->addExistingNode(rs.seedPos,0,0);
 			baseRoots.push_back(basalroot);
-			delay += rs.delayB;
+			//delay += rs.delayB;
+			delay = std::log(1-((1-std::exp(rs.growingRateB/rs.maxB*rs.simtime))*(i+1)/rs.maxB))/(rs.growingRateB/rs.maxB); //rs.maxB*(1-std::exp())
 		}
 	}
 
@@ -225,28 +182,19 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		}
 		Vector3d sbpos = rs.seedPos;
 		sbpos.z=sbpos.z/2.; // half way up the mesocotyl
-		numberOfCrowns = ceil((maxT-rs.firstSB)/rs.delayRC); // maximal number of root crowns
+		int maxSB = ceil((maxT-rs.firstSB)/rs.delayRC); // maximal number of root crowns
 		double delay = rs.firstSB;
-		for (int i=0; i<numberOfCrowns; i++) {
-			Root* shootborne0 = new Root(this, shootbornetype, iheading ,delay, nullptr, 0, 0);
-			// TODO fix the initial radial heading
-			shootborne0->addNode(sbpos,delay);
-			baseRoots.push_back(shootborne0);
-			delay += rs.delaySB;
-			for (int j=1; j<rs.nC; j++) {
+		for (int i=0; i<maxSB; i++) {
+			for (int j=0; j<rs.nC; j++) {
 				Root* shootborne = new Root(this, shootbornetype, iheading ,delay, nullptr, 0, 0);
 				// TODO fix the initial radial heading
-				shootborne->nodes.push_back(shootborne0->getNode(0));
-				shootborne->nodeIds.push_back(shootborne0->getNodeId(0));
-				shootborne->netimes.push_back(delay);
+				shootborne->addNode(sbpos,delay);
 				baseRoots.push_back(shootborne);
 				delay += rs.delaySB;
 			}
 			sbpos.z+=rs.nz;  // move up, for next root crown
 			delay = rs.firstSB + i*rs.delayRC; // reset age
 		}
-	} else {
-		numberOfCrowns=0;
 	}
 
 	// Create tropisms and growth functions per root type
@@ -254,33 +202,15 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 		int type = rtparam.at(i).tropismT;
 		double N = rtparam.at(i).tropismN;
 		double sigma = rtparam.at(i).tropismS;
-		Tropism* tropism = this->createTropismFunction(type,N,sigma);
-		tropism->setSeed(UID(gen)); // fix randomness
-		tropism->setGeometry(geometry);
+		TropismFunction* tropism = this->createTropismFunction(type,N,sigma);
 		// std::cout << "#" << i << ": type " << type << ", N " << N << ", sigma " << sigma << "\n";
-		tf.push_back(tropism); // wrap confinedTropism around baseTropism
+		tf.push_back(new ConfinedTropism(tropism, geometry)); // wrap confinedTropism around baseTropism
 		int gft = rtparam.at(i).gf;
 		GrowthFunction* gf_ = this->createGrowthFunction(gft);
-		gf_->getAge(1,1,1,nullptr);  // check if getAge is implemented (otherwise an exception is thrown)
+		gf_->getAge(1,1,1,nullptr);  // check if getAge is implemented (ohterwise an exception is thrown)
 		gf.push_back(gf_);
 	}
 
-	old_non = baseRoots.size();
-}
-
-/**
- * Manually sets a tropism function for a specific or for all root types.
- * Must be called after RootSystem::initialize()
- */
-void RootSystem::setTropism(Tropism* tf_, int rt)
-{
-	if (rt>-1) { // set for a specific root type
-		tf.at(rt-1) = tf_;
-	} else { // set for all root types (default)
-		for (size_t i=0; i<tf.size(); i++) {
-			tf.at(i) = tf_;
-		}
-	}
 }
 
 /**
@@ -312,80 +242,22 @@ void RootSystem::simulate()
 }
 
 /**
- * Simulates root system growth for the time span dt [days],
- * elongates a maximum of maxinc total length [cm/day]
- * using the proportional elongation se
- */
-void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se, bool silence)
-{
-	const double accuracy = 1.e-3;
-	const int maxiter = 20;
-
-	double maxinc = dt*maxinc_;
-	auto v_ = this->getScalar(RootSystem::st_length);
-	double ol = std::accumulate(v_.begin(), v_.end(), 0.0);
-
-	int i = 0;
-
-	push();
-	se->setScale(1.);
-	simulate(dt, silence);
-	v_ = getScalar(RootSystem::st_length);
-	double l = std::accumulate(v_.begin(), v_.end(), 0.0);
-	double inc_ = l - ol;
-	if (!silence) {
-		std::cout << "expected increase is " << inc_ << "\n";
-	}
-	pop();
-
-	if ((inc_>maxinc) && (std::abs(inc_-maxinc)>accuracy)) { // check if we have to perform a binary search
-
-		double sl = 0.; // left
-		double sr = 1.; // right
-
-		while ( ((std::abs(inc_-maxinc)) > accuracy) && (i<maxiter) )  { // binary search
-
-			double m = (sl+sr)/2.; // mid
-			push();
-			se->setScale(m);
-			simulate(dt, silence);
-			v_ = getScalar(RootSystem::st_length);
-			l = std::accumulate(v_.begin(), v_.end(), 0.0);
-			inc_ = l - ol;
-			pop();
-			if (!silence) {
-				std::cout << "\t(sl, mid, sr) = (" << sl << ", " <<  m << ", " <<  sr << "), inc " <<  inc_ << ", err: " << std::abs(inc_-maxinc) << " > " << accuracy << "\n";
-			}
-
-			if (inc_>maxinc) { // concatenate
-				sr = m;
-			} else {
-				sl = m;
-			}
-			i++;
-
-		}
-	}
-	this->simulate(dt, silence);
-}
-
-/**
  * Sets the seed of the root systems random number generator,
  * and all subclasses using random number generators:
  * @see TropismFunction, @see RootParameter
- * To obtain two exact same root system call before initialize().
  *
  * @param seed      random number generator seed
  */
-void RootSystem::setSeed(unsigned int seed) {
-	manualSeed = true;
-	this->gen = std::mt19937(seed);
-	// set UD UID ND?
-	for (auto& t : tf) {
-		t->setSeed(UID(gen));
+void RootSystem::setSeed(double seed) {
+	std::cout << "Setting random seed "<< seed <<"\n";
+	gen.seed(1./seed);
+	for (auto t : tf) {
+		double s  = rand();
+		t->setSeed(1./s);
 	}
-	for (auto& rp : rtparam) {
-		rp.setSeed(UID(gen));
+	for (auto rp : rtparam) {
+		double s  = rand();
+		rp.setSeed(1./s);
 	}
 }
 
@@ -409,15 +281,15 @@ Root* RootSystem::createRoot(int lt, Vector3d  h, double delay, Root* parent, do
  * Creates a specific tropsim,
  * the function must be extended or overwritten to add more tropisms
  */
-Tropism* RootSystem::createTropismFunction(int tt, double N, double sigma) {
+TropismFunction* RootSystem::createTropismFunction(int tt, double N, double sigma) {
 	switch (tt) {
 	case tt_plagio: return new Plagiotropism(N,sigma);
 	case tt_gravi: return new Gravitropism(N,sigma);
 	case tt_exo: return new Exotropism(N,sigma);
 	case tt_hydro: {
-		Tropism* gt =  new Gravitropism(N,sigma);
-		Tropism* ht= new Hydrotropism(N,sigma,soil);
-		Tropism* cht = new CombinedTropism(N,sigma,ht,10.,gt,1.); // does only use the objective functions from gravitropism and hydrotropism
+		TropismFunction* gt =  new Gravitropism(N,sigma);
+		TropismFunction* ht= new Hydrotropism(N,sigma,soil);
+		TropismFunction* cht = new CombinedTropism(N,sigma,ht,10.,gt,1.); // does only use the objective functions from gravitropism and hydrotropism
 		return cht;
 	}
 	default: throw std::invalid_argument( "RootSystem::createTropismFunction() tropism type not implemented" );
@@ -489,19 +361,101 @@ std::vector<Vector3d> RootSystem::getNodes() const
 {
 	this->getRoots(); // update roots (if necessary)
 	int non = getNumberOfNodes();
-	std::vector<Vector3d> nv = std::vector<Vector3d>(non); // reserve big enough vector
-	// copy initial nodes (roots might not have developed)
-	for (auto const& r: baseRoots) {
-		nv.at(r->getNodeId(0)) = r->getNode(0);
-	}
-	// copy root nodes
+	std::vector<Vector3d> nv = std::vector<Vector3d>(non-rsparam.maxB); // reserve big enough vector
 	for (auto const& r: roots) {
 		for (size_t i=0; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
 			nv.at(r->getNodeId(i)) = r->getNode(i); // pray that ids are correct
+			//std::cout<<i<<" getNodeId "<<r->getNodeId(i)<<" "<<r->getNode(i).x<<"\n";
 		}
 	}
-	nv.at(0) = Vector3d(0.,0.,3.); // add artificial shoot
+	//for (auto const& node: nv) {
+	//	std::cout<<node.x<<"\n";
+	//}
 	return nv;
+}
+
+/**
+ * Copies the nodes of the root systems into a sequential vector,
+ * nodes are unique (default). See also RootSystem::getSegments
+ */
+std::vector<Vector3d> RootSystem::getNodesDGF() const
+{
+	this->getRoots(); // update roots (if necessary)
+	std::cout<<"roots.size() "<<roots.size()<< "\n";
+	int non = getNumberOfNodes();
+	std::vector<Vector3d> nv = std::vector<Vector3d>(non-rsparam.maxB); // reserve big enough vector
+	//std::cout<<"roots.size() "<<roots.size()<< "\n";
+	//nv.at(0) = rs.seedPos:
+	int No_root = 0;
+	for (auto const& r: roots) {
+		for (size_t i=0; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
+			//std::cout<<"No_root "<<No_root<< "r->getNodeId(i) "<<r->getNodeId(i)<< "\n";
+			if ((i==0) and (r->getNodeId(0)==0))
+				nv.at(r->getNodeId(i)) = r->getNode(i); // pray that ids are correct
+			else
+				if ((i!=0))
+					nv.at(r->getNodeId(i)-rsparam.maxB) = r->getNode(i);
+		}
+		No_root +=1;
+	}
+	return nv;
+}
+
+
+/**
+ * Return the segments of the root system at the current simulation time
+ */
+std::vector<Vector2i> RootSystem::getSegmentsDGF() const
+{
+	this->getRoots(); // update roots (if necessary)
+	int nos=getNumberOfSegments();
+	std::vector<Vector2i> s(nos);
+	int c=0;
+	for (auto const& r:roots) {
+		for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
+			Vector2i v;
+			if (r->getNodeId(i)<=rsparam.maxB)
+			{
+				Vector2i v(0,r->getNodeId(i+1)-rsparam.maxB);
+				std::cout<<"v.y"<<" "<<v.y<<"\n";
+				s.at(c) = v;
+			}
+			else
+			{
+				Vector2i v(r->getNodeId(i)-rsparam.maxB,r->getNodeId(i+1)-rsparam.maxB);
+				std::cout<<"v.y"<<" "<<v.y<<"\n";
+				s.at(c) = v;
+			}
+			c++;
+		}
+	}
+	return s;
+}
+
+/**
+ * Return the segments of the root system at the current simulation time
+ */
+std::vector<double> RootSystem::getLengthFromOrigin() const
+{
+	this->getRoots(); // update roots (if necessary)
+	int nos=getNumberOfSegments();
+	auto nodes = RootSystem::getNodes();
+	std::vector<double> s(nos);
+	int c=0;
+	for (auto const& r:roots) {
+		double lengthFromOrigin = 0;
+		for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
+			Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
+			Vector3d n1 = nodes.at(v.x);
+			Vector3d n2 = nodes.at(v.y);
+			double segmentLength = sqrt((n1.x-n2.x)*(n1.x-n2.x)+(n1.y-n2.y)*(n1.y-n2.y)+(n1.z-n2.z)*(n1.z-n2.z));
+			lengthFromOrigin += segmentLength;
+			//std::cout<<i<<" getNode "<<v.x<<" "<<v.y<<"\n";
+			s.at(c) = lengthFromOrigin;
+			c++;
+		}
+	}
+	return s;
 }
 
 /**
@@ -533,42 +487,13 @@ std::vector<Vector2i> RootSystem::getSegments() const
 	for (auto const& r:roots) {
 		for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
 			Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
+			//std::cout<<i<<" getNode "<<v.x<<" "<<v.y<<"\n";
 			s.at(c) = v;
 			c++;
 		}
 	}
 	return s;
 }
-
-/**
- * Return the segments connecting tap root, basal roots, and shoot borne roots.
- *
- * The upper node represents the oldest emerged shoot-borne root, or if none, the node where
- * all basal roots emerge.
- */
-std::vector<Vector2i> RootSystem::getShootSegments() const
-{
-	std::vector<Vector2i> seg = std::vector<Vector2i>(0);
-
-	// connect  basal roots node (seed) to artificial shoot
-	seg.push_back(Vector2i(0,baseRoots.at(0)->getNodeId(0)));
-
-	int n1=0, n2=0;
-	for (int i=0; i<numberOfCrowns-1; i++) { // connecting root crowns
-		int brn = baseRoots.size()-1;
-		n1 = baseRoots.at(brn-i*rsparam.nC)->getNodeId(0);
-		n2 = baseRoots.at(brn-(i+1)*rsparam.nC)->getNodeId(0);
-		seg.push_back(Vector2i(n1,n2));
-	}
-	if (numberOfCrowns>0) { // connect to basal roots node (seed)
-		int ti = baseRoots.at(0)->getNodeId(0);
-		seg.push_back(Vector2i(n2,ti));
-	}
-
-	return seg;
-}
-
-
 
 /**
  * Returns pointers of the roots corresponding to each segment
@@ -652,6 +577,10 @@ std::vector<double> RootSystem::getScalar(int stype) const
 			}
 			break;
 		}
+		case st_rootID: { // root order (calculate)
+			value = roots[i]->id;
+			break;
+		}
 		case st_time: // emergence time of the root
 			value = roots[i]->getNodeETime(0);
 			break;
@@ -662,7 +591,7 @@ std::vector<double> RootSystem::getScalar(int stype) const
 			value =  roots[i]->length*2.*M_PI*roots[i]->param.a;
 			break;
 		case st_volume:
-			value =  roots[i]->length*M_PI*(roots[i]->param.a)*(roots[i]->param.a);
+			value =  roots[i]->length*M_PI*roots[i]->param.a*roots[i]->param.a;
 			break;
 		case st_one:
 			value =  1;
@@ -699,7 +628,7 @@ std::vector<double> RootSystem::getScalar(int stype) const
 			value = std::accumulate(v_.begin(), v_.end(), 0.0) / v_.size();
 			break;
 		}
-		case st_sdln: {
+		case st_stdln: {
 			const std::vector<double>& v_ = roots[i]->param.ln;
 			double mean = std::accumulate(v_.begin(), v_.end(), 0.0) / v_.size();
 			double sq_sum = std::inner_product(v_.begin(), v_.end(), v_.begin(), 0.0);
@@ -715,66 +644,46 @@ std::vector<double> RootSystem::getScalar(int stype) const
 }
 
 /**
- * The indices of the nodes that were updated in the last time step
+ * todo test comment
  */
-std::vector<int> RootSystem::getUpdatedNodeIndices() const
+std::vector<int> RootSystem::getNodeUpdateIndices()
 {
 	this->getRoots(); // update roots (if necessary)
-	std::vector<int> ni = std::vector<int>(0);
+	std::vector<int> ni = std::vector<int> (old_nor);
+	int c =0;
 	for (auto const& r: roots) {
 		if (r->old_non>0){
-			ni.push_back(r->getNodeId(r->old_non-1));
+			ni.at(r->getNodeId(r->old_non));
+			c++;
 		}
 	}
 	return ni;
 }
 
 /**
- * The values of the nodes that were updated in the last time step
+ *
  */
-std::vector<Vector3d> RootSystem::getUpdatedNodes() const
+std::vector<Vector3d> RootSystem::getUpdatedNodes()
 {
 	this->getRoots(); // update roots (if necessary)
-	std::vector<Vector3d> nv = std::vector<Vector3d>(0);
-	for (auto const& r: roots) {
-		if (r->old_non>0){
-			nv.push_back(r->getNode(r->old_non-1));
-		}
-	}
-	return nv;
+	int non = getNumberOfNodes();
+	std::vector<Vector3d> un(non-old_non); // reserve big enough vector
+
+	return un;
 }
 
 /**
  * Returns a vector of newly created nodes since the last call of RootSystem::simulate(dt),
  * to dynamically add to the old node vector, see also RootSystem::getNodes
  */
-std::vector<Vector3d> RootSystem::getNewNodes() const
+std::vector<Vector3d> RootSystem::getNewNodes()
 {
-	roots.clear();
 	this->getRoots(); // update roots (if necessary)
-	std::vector<Vector3d> nv(this->getNumberOfNewNodes());
+	int non = getNumberOfNodes();
+	std::vector<Vector3d> nv(non-old_non); // reserve big enough vector
 	for (auto const& r: roots) {
-		int onon = std::abs(r->old_non);
-		for (size_t i=onon; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
-			nv.at(r->getNodeId(i)-this->old_non) = r->getNode(i); // pray that ids are correct
-		}
-	}
-	return nv;
-}
-
-/**
- * Returns a vector of newly created node indices since the last call of RootSystem::simulate(dt),
- * to dynamically add to the old node vector, see also RootSystem::getNodes
- */
-std::vector<int> RootSystem::getNewNodeIndices() const
-{
-	roots.clear();
-	this->getRoots(); // update roots (if necessary)
-	std::vector<int> nv(this->getNumberOfNewNodes());
-	for (auto const& r: roots) {
-		int onon = std::abs(r->old_non);
-		for (size_t i=onon; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
-			nv.at(r->getNodeId(i)-this->old_non) = r->getNodeId(i); // pray that ids are correct
+		for (size_t i=r->old_non+1; i<r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
+			nv.at(r->getNodeId(i)-old_non) = r->getNode(i); // pray that ids are correct
 		}
 	}
 	return nv;
@@ -784,14 +693,14 @@ std::vector<int> RootSystem::getNewNodeIndices() const
  * Returns a vector of newly created segments since the last call of RootSystem::simulate(dt),
  * to dynamically add to the old segment index vector, see also RootSystem::getSegments
  */
-std::vector<Vector2i> RootSystem::getNewSegments() const
+std::vector<Vector2i> RootSystem::getNewSegments()
 {
 	this->getRoots(); // update roots (if necessary)
-	std::vector<Vector2i> si(this->getNumberOfNewNodes());
+	int non=getNumberOfNodes()-1;
+	std::vector<Vector2i> si(non);
 	int c=0;
 	for (auto const& r:roots) {
-		int onon = std::abs(r->old_non);
-		for (size_t i=onon-1; i<r->getNumberOfNodes()-1; i++) {
+		for (size_t i=r->old_non; i<r->getNumberOfNodes()-1; i++) {
 			Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
 			si.at(c) = v;
 			c++;
@@ -799,38 +708,6 @@ std::vector<Vector2i> RootSystem::getNewSegments() const
 	}
 	return si;
 }
-
-/**
- *
- */
-std::vector<Root*> RootSystem::getNewSegmentsOrigin() const
-{
-	this->getRoots(); // update roots (if necessary)
-	std::vector<Root*> si(this->getNumberOfNewNodes());
-	int c=0;
-	for (auto& r:roots) {
-		int onon = std::abs(r->old_non);
-		for (size_t i=onon-1; i<r->getNumberOfNodes()-1; i++) {
-			si.at(c) = r;
-			c++;
-		}
-	}
-	return si;
-}
-
-
-void RootSystem::push()
-{
-	stateStack.push(RootSystemState(*this));
-}
-
-void RootSystem::pop()
-{
-	RootSystemState& rss = stateStack.top();
-	rss.restore(*this);
-	stateStack.pop();
-}
-
 
 /**
  * todo
@@ -861,6 +738,9 @@ void RootSystem::write(std::string name) const
 	} else if (ext.compare(".py")==0)  {
 		std::cout << "writing Geometry ... "<< name.c_str() <<"\n";
 		writeGeometry(fos);
+	} else if (ext.compare("dgf")==0)  {
+		std::cout << "writing DGF ... "<< name.c_str() <<"\n";
+		writeDGF(fos);
 	} else {
 		throw std::invalid_argument("RootSystem::write(): Unkwown file type");
 	}
@@ -954,8 +834,8 @@ void RootSystem::writeVTP(std::ostream & os) const
 
 	// CELLDATA (live on the polylines)
 	os << "<CellData Scalars=\" CellData\">\n";
-	const size_t N = 3; // SCALARS
-	int types[N] = { st_type, st_order, st_radius };
+	const size_t N = 4; // SCALARS
+	int types[N] = { st_type, st_order, st_radius, st_rootID };
 	for (size_t i=0; i<N; i++) {
 		os << "<DataArray type=\"Float32\" Name=\"" << scalarTypeNames[types[i]] <<"\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
 		auto scalars = getScalar(types[i]);
@@ -1011,53 +891,42 @@ void RootSystem::writeGeometry(std::ostream & os) const
 	geometry->writePVPScript(os);
 }
 
-
-RootSystemState::RootSystemState(const RootSystem& rs) :rtparam(rs.rtparam), simtime(rs.simtime), rid(rs.rid),nid(rs.nid), old_non(rs.old_non), old_nor(rs.old_nor),
-		numberOfCrowns(rs.numberOfCrowns), manualSeed(rs.manualSeed), gen(rs.gen), UD(rs.UD), ND(rs.ND)
+void RootSystem::writeDGF(std::ostream & os) const
 {
-	tf = std::vector<Tropism*>(rs.tf.size()); // deep copy tropisms
-	for (size_t i=0; i<rs.tf.size(); i++) {
-		tf[i]= rs.tf[i]->copy();
+	auto nodes = RootSystem::getNodes();
+	auto segments = RootSystem::getSegments();
+	auto segO = RootSystem::getSegmentsOrigin();
+	auto ctimes = RootSystem::getNETimes();
+	os << "DGF \n";
+	os << "Vertex \n";
+	for (auto& n : nodes) {
+		os << n.x/100 << " " << n.y/100 << " " << n.z/100 << " \n";
+		//std::cout << n.x/100 << " " << n.y/100 << " " << n.z/100 << " \n";
 	}
-	gf = std::vector<GrowthFunction*>(rs.gf.size()); // deep copy growth
-	for (size_t i=0; i<rs.gf.size(); i++) {
-		gf[i]= rs.gf[i]->copy();
+
+	os << "# \n";
+	os << "SIMPLEX \n";
+	os << "parameters 5 \n";
+	// node1ID, node2ID, type, branchID, surfaceIdx,  massIdx, creationTimeId
+	for (size_t i=0; i<segments.size(); i++) {
+		Vector2i s = segments.at(i);
+		//std::cout<<"s "<< s.x <<" "<<s.y;
+		Vector3d n1 = nodes.at(s.x);
+		Vector3d n2 = nodes.at(s.y);
+		Root* r = segO.at(i);
+		int branchnumber = r->id;
+		double radius = r->param.a;
+		double length = sqrt((n1.x-n2.x)*(n1.x-n2.x)+(n1.y-n2.y)*(n1.y-n2.y)+(n1.z-n2.z)*(n1.z-n2.z));
+		double surface = 2*radius*M_PI*length;
+		double time = ctimes.at(i);
+		double type = r->param.type;
+		os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 <<" 0.00 " << time*3600*24 << "\n";
+		//std::cout << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
+
 	}
-	baseRoots = std::vector<RootState>(rs.baseRoots.size()); // store base roots
-	for (size_t i=0; i<baseRoots.size(); i++) {
-		baseRoots[i] = RootState(*(rs.baseRoots[i]));
-	}
+
+	os << "# \n";
+	os << "BOUNDARYDOMAIN \n";
+	os << "default 1 \n";
+	os << "# \n";
 }
-
-
-void RootSystemState::restore(RootSystem& rs)
-{
-	rs.roots.clear(); // clear buffer
-	rs.rtparam  = rtparam;
-	rs.simtime = simtime; // copy back everything
-	rs.rid = rid;
-	rs.nid = nid;
-	rs.old_non = old_non;
-	rs.old_nor = old_nor;
-	rs.numberOfCrowns = numberOfCrowns;
-	rs.manualSeed = manualSeed;
-	rs.gen = gen;
-	rs.UD = UD;
-	rs.ND = ND;
-	for (size_t i=0; i<rs.tf.size(); i++) { // restore tropism functions
-		delete rs.tf[i];
-	}
-	for (size_t i=0; i<rs.tf.size(); i++) {
-		rs.tf[i] = tf[i];
-	}
-	for (size_t i=0; i<rs.gf.size(); i++) { // restore growth functions
-		delete rs.gf[i];
-	}
-	for (size_t i=0; i<rs.gf.size(); i++) {
-		rs.gf[i]= gf[i];
-	}
-	for (size_t i=0; i<baseRoots.size(); i++) { // restore base roots
-		baseRoots[i].restore(*(rs.baseRoots[i]));
-	}
-}
-

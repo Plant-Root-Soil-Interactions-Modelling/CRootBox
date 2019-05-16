@@ -13,6 +13,15 @@ RootTypeParameter::RootTypeParameter() {
 			successor, successorP, 1.22, 0., 1.e9, 0., 1, "undefined");
 }
 
+/**
+ * Copy constructor
+ */
+RootTypeParameter::RootTypeParameter(const RootTypeParameter& rp) :type(rp.type), lb(rp.lb), lbs(rp.lbs), la(rp.la), las(rp.las),
+		ln(rp.ln), lns(rp.lns), nob(rp.nob), nobs(rp.nobs), r(rp.r), rs(rp.rs), a(rp.a), as(rp.as), colorR(rp.colorR), colorG(rp.colorG),
+		colorB(rp.colorB), tropismT(rp.tropismT), tropismN(rp.tropismN), tropismS(rp.tropismS), dx(rp.dx), theta(rp.theta), thetas(rp.thetas),
+		rlt(rp.rlt), rlts(rp.rlts), gf(rp.gf), name(rp.name), successor(rp.successor),
+		successorP(rp.successorP) { }
+
 void RootTypeParameter::set(int type, double lb, double lbs, double la, double las, double ln, double lns, double nob, double nobs,
 		double r, double rs, double a, double as,  double colorR, double colorG, double colorB, double tropismT, double tropismN, double tropismS,
 		double dx, const std::vector<int>& successor, const std::vector<double>& successorP, double theta, double thetas, double rlt, double rlts,
@@ -51,12 +60,12 @@ void RootTypeParameter::set(int type, double lb, double lbs, double la, double l
  */
 RootParameter RootTypeParameter::realize() {
 	// type does not change
-	double lb_ = std::max(lb + randn()*lbs,double(1.e-5)); // length of basal zone
-	double la_ = std::max(la + randn()*las,double(1.e-5)); // length of apical zone
+	double lb_ = std::max(lb + randn()*lbs,double(0)); // length of basal zone
+	double la_ = std::max(la + randn()*las,double(0)); // length of apical zone
 	std::vector<double> ln_; // stores the inter-distances
 	int nob_ = std::max(round(nob + randn()*nobs),double(0)); // maximal number of branches
 	for (int i = 0; i<nob_-1; i++) { // create inter-root distances
-		double d = std::max(ln + randn()*lns,1.e-5);
+		double d = std::max(ln + randn()*lns,1e-9);
 		ln_.push_back(d);
 	}
 	double r_ = std::max(r + randn()*rs,double(0)); // initial elongation
@@ -209,8 +218,8 @@ void RootParameter::write(std::ostream & cout) const {
  * Default constructor: No basal roots, not shoot borne roots, planting depth 3 [cm]
  */
 RootSystemParameter::RootSystemParameter() {
-	set(3.,1.e9,0.,0, //pd, fB, dB, mB,
-			0,1.e9,1.e9,0.,0.,30.);  // nC, fSB, dSB, dRC, nz
+	set(3.,1.e9,0., 0.001, 0, //pd, fB, dB, growingrateB, mB,
+			0,1.e9,1.e9,0.,0.,30.,1,1,0,1,0.5); // nC, fSB, dSB, dRC, nz
 }
 
 
@@ -222,16 +231,29 @@ void RootSystemParameter::read(std::istream & cin) {
 	double plantingdepth;
 	std::string s; // dummy
 	cin  >>  s >> plantingdepth;
-	cin >> s >> firstB >> s >> delayB >> s >> maxB >> s >> nC >> s >> firstSB >> s >> delaySB >> s >> delayRC >> s >> nz >> s >> simtime;
+	cin >> s >> firstB >> s >> delayB >> s >> growingRateB>> s >> maxB >> s >> nC >> s >> firstSB >> s >> delaySB >> s >> delayRC >> s >> nz >> s >> simtime
+		 >> s >> interBranchDistanceScaleFactor >> s  >> interBranchDistanceSlope >> s  >> interBranchDistanceTransitionDepth
+		 >> s  >> laterTypeSlope >> s  >> laterTypeTransitionDepth;
+	//std::cout<<"maxB\t" <<maxB<<  "interBranchDistanceScaleFactor\t" << interBranchDistanceScaleFactor
+	//		<< "interBranchDistanceSlope\t" << interBranchDistanceSlope
+	//		<< "interBranchDistanceTransitionDepth\t" << interBranchDistanceTransitionDepth
+	//		<< "laterTypeSlope\t" << laterTypeSlope
+	//		<< "laterTypeTransitionDepth\t" << laterTypeTransitionDepth <<"\n";
+	//std::cin.ignore();
 	seedPos = Vector3d(0,0,-plantingdepth);
 }
 
 
 void RootSystemParameter::write(std::ostream & cout) const {
 	double pd = -seedPos.z;
-	cout <<  "plantingdepth\t" << pd << "\n" <<  "firstB\t" << firstB << "\n" <<  "delayB\t" << delayB << "\n"
+	cout <<  "plantingdepth\t" << pd << "\n" <<  "firstB\t" << firstB << "\n" <<  "delayB\t" << delayB << "\n"<<  "growingRateB\t" << growingRateB << "\n"
 			<<  "maxB\t" << maxB << "\n" <<  "nC\t" << nC << "\n" <<  "firstSB\t" << firstSB << "\n"
-			<<  "delaySB\t" << delaySB << "\n" <<  "delayRC\t" << delayRC << "\n" <<  "nz\t" << nz << "\n" << "simulationTime\t" << simtime << "\n";
+			<<  "delaySB\t" << delaySB << "\n" <<  "delayRC\t" << delayRC << "\n" <<  "nz\t" << nz << "\n" << "simulationTime\t" << simtime << "\n"
+			<<  "interBranchDistanceScaleFactor\t" << interBranchDistanceScaleFactor
+			<< "interBranchDistanceSlope\t" << interBranchDistanceSlope
+			<< "interBranchDistanceTransitionDepth\t" << interBranchDistanceTransitionDepth
+			<< "laterTypeSlope\t" << laterTypeSlope
+			<< "laterTypeTransitionDepth\t" << laterTypeTransitionDepth <<"\n";
 }
 
 /**
@@ -248,10 +270,14 @@ void RootSystemParameter::write(std::ostream & cout) const {
  * @param nz          Distance between the root crowns along the shoot [cm]
  * @param simtime 	  Recommended final simulation time (e.g. used in the web interface)
  */
-void RootSystemParameter::set(double pd, double fB, double dB, int mB, int nC, double fSB, double dSB, double dRC, double nz, double simtime) {
+void RootSystemParameter::set(double pd, double fB, double dB, double growrateB, int mB, int nC, double fSB, double dSB, double dRC, double nz, double simtime,
+								double interBranchDistanceScaleFactor, double interBranchDistanceSlope, double interBranchDistanceTransitionDepth,
+								double laterTypeSlope, double laterTypeTransitionDeptht) {
+
 	seedPos=Vector3d(0,0,-pd);
 	firstB=fB;
-	delayB=dB;
+	delayB= 1e9 ;// dB;
+	growingRateB = growrateB;
 	maxB=mB;
 	this->nC=nC;
 	firstSB=fSB;
@@ -259,4 +285,9 @@ void RootSystemParameter::set(double pd, double fB, double dB, int mB, int nC, d
 	delayRC=dRC;
 	this->nz=nz;
 	this->simtime=simtime;
+	this->interBranchDistanceScaleFactor = interBranchDistanceScaleFactor;
+	this->interBranchDistanceSlope = interBranchDistanceSlope;
+	this->interBranchDistanceTransitionDepth = interBranchDistanceTransitionDepth;
+	this->laterTypeSlope = laterTypeSlope;
+	this->laterTypeTransitionDepth = laterTypeTransitionDepth;
 }

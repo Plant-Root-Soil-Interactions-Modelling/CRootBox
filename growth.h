@@ -40,10 +40,6 @@ public:
      */
     virtual double getAge(double l, double r, double k, Root* root) const
     { throw std::runtime_error( "getAge() not implemented" ); return 0; } ///< Returns the age of a root of length l
-
-
-    virtual GrowthFunction* copy() { return new GrowthFunction(*this); }
-
 };
 
 
@@ -54,10 +50,8 @@ public:
 class LinearGrowth : public GrowthFunction
 {
 public:
-    virtual double getLength(double t, double r, double k, Root* root) const override { return std::min(k,r*t); } ///< @see GrowthFunction
-    virtual double getAge(double l, double r, double k, Root* root)  const override { return l/r; } ///< @see GrowthFunction
-
-    virtual GrowthFunction* copy() { return new LinearGrowth(*this); }
+    virtual double getLength(double t, double r, double k, Root* root) const { return std::min(k,r*t); } ///< @see GrowthFunction
+    virtual double getAge(double l, double r, double k, Root* root)  const { return l/r; } ///< @see GrowthFunction
 };
 
 
@@ -67,15 +61,13 @@ public:
 class ExponentialGrowth : public GrowthFunction
 {
 public:
-    virtual double getLength(double t, double r, double k, Root* root) const override { return k*(1-exp(-(r/k)*t)); } ///< @see GrowthFunction
-    virtual double getAge(double l, double r, double k, Root* root) const override {
+    virtual double getLength(double t, double r, double k, Root* root) const { return k*(1-exp(-(r/k)*t)); } ///< @see GrowthFunction
+    virtual double getAge(double l, double r, double k, Root* root) const {
         if (l>(0.999*k)) { // 0.999*k is reached in finite time
             l=0.999*k;
         }
         return - k/r*log(1-l/k);
     } ///< @see GrowthFunction
-
-    virtual GrowthFunction* copy() { return new ExponentialGrowth(*this); }
 };
 
 

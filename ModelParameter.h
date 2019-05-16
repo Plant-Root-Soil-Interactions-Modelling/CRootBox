@@ -31,6 +31,7 @@ class RootTypeParameter
 public:
 
 	RootTypeParameter(); ///< default constructor
+	RootTypeParameter(const RootTypeParameter& rp); ///< copy constructor
 	virtual ~RootTypeParameter() { };
 
 	void set(int type, double lb, double lbs, double la, double las, double ln, double lns, double nob, double nobs,
@@ -48,9 +49,9 @@ public:
 	std::string toString() const { std::stringstream ss; write(ss); return ss.str(); } ///< writes parameter to a string
 
 	// random numbers
-	void setSeed(unsigned int  seed) const { gen = std::mt19937(seed); } ///< Sets the seed of the random number generator
-	double rand() const { return UD(gen); } ///< Uniformly distributed random number (0,1)
-	double randn() const { return ND(gen); } ///< Normally distributed random number (0,1)
+	void setSeed(double seed) { gen.seed(seed); } ///< Sets the seed of the random number generator
+	double rand() { return UD(gen); } ///< Uniformly distributed random number (0,1)
+	double randn() { return ND(gen); } ///< Normally distributed random number (0,1)
 
 	/*
 	 * Rootbox parameters per root type
@@ -84,14 +85,14 @@ public:
 	std::vector<int> successor;			///< Lateral types [1]
 	std::vector<double> successorP; 	///< Probabiltities of lateral type to emerge (sum of values == 1) [1]
 
-	SoilLookUp* se = new SoilLookUp(); ///< scale elongation function
-	SoilLookUp* sa = new SoilLookUp(); ///< scale angle function
-	SoilLookUp* sbp = new SoilLookUp(); ///< scale branching probability function
+	SoilProperty* se = new SoilProperty(); ///< scale elongation function
+	SoilProperty* sa = new SoilProperty(); ///< scale angle function
+	SoilProperty* sbp = new SoilProperty(); ///< scale branching probability function
 
 private:
-	mutable std::mt19937 gen = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());  // random stuff
-	mutable std::uniform_real_distribution<double> UD = std::uniform_real_distribution<double>(0,1);
-	mutable std::normal_distribution<double> ND = std::normal_distribution<double>(0,1);
+	std::mt19937 gen = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());  // random stuff
+	std::uniform_real_distribution<double> UD = std::uniform_real_distribution<double>(0,1);
+	std::normal_distribution<double> ND = std::normal_distribution<double>(0,1);
 
 };
 
@@ -149,7 +150,14 @@ public:
 	RootSystemParameter(); ///< Default constructor
 	virtual ~RootSystemParameter();
 
-	virtual void set(double pd, double fB, double dB, int mB, int nC, double fSB, double dSB, double dRC, double nz, double simtime); ///< Sets all the parameters
+	virtual void set(double pd, double fB, double dB, double growrateB, int mB, int nC, double fSB, double dSB, double dRC, double nz, double simtime,
+								double interBranchDistanceScaleFactor, double interBranchDistanceSlope, double interBranchDistanceTransitionDepth,
+								double laterTypeSlope, double laterTypeTransitionDepth); ///< Sets all the parameters
+//
+
+	//virtual void set(double pd, double fB, /*double dB,*/ double growrateB, int mB, int nC, double fSB, double dSB, double dRC, double nz, double simtime,
+	//							double interBranchDistanceScaleFactor, double interBranchDistanceSlope, double interBranchDistanceTransitionDepth,
+	//							double laterTypeSlope, double laterTypeTransitionDepth);
 
 	virtual void read(std::istream & cin); ///< Read plant parameters
 	virtual void write(std::ostream & cout) const; ///< Write plant parameters
@@ -161,6 +169,7 @@ public:
 	//Basal roots (nodal roots)
 	double firstB; 	///< Emergence of first basal root [day]
 	double delayB; 	///< Time delay between the basal roots [day]
+	double growingRateB;
 	int maxB; 	    ///< Maximal number of basal roots [1]
 
 	//Shoot borne roots (crown roots)
@@ -172,6 +181,12 @@ public:
 
 	//Simulation parameters
 	double simtime;    ///< recommended final simulation time
+
+	double interBranchDistanceScaleFactor;
+	double interBranchDistanceSlope;
+	double interBranchDistanceTransitionDepth;
+	double laterTypeSlope;
+	double laterTypeTransitionDepth;
 };
 
 

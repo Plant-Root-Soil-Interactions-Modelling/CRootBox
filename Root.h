@@ -12,7 +12,6 @@
 #include "RootSystem.h"
 
 class RootSystem;
-class RootState;
 
 /**
  * Root
@@ -24,13 +23,9 @@ class RootState;
 class Root
 {
 
-    friend RootSystem;
-    friend RootState;
-
 public:
 
     Root(RootSystem* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of RootSystem, or Root::createLaterals()
-    Root(const Root& r, RootSystem& rs); ///< deep copy of the tree
     virtual ~Root();
 
     void simulate(double dt, bool silence = false); ///< root growth for a time span of \param dt
@@ -52,6 +47,7 @@ public:
     int getNodeId(int i) const {return nodeIds.at(i); } ///< unique identifier of i-th node
     size_t getNumberOfNodes() const {return nodes.size(); }  ///< return the number of the nodes of the root
     void addNode(Vector3d n,double t); //< adds a node to the root
+    void addExistingNode(Vector3d n, double t, int nIdx); //< adds an existing node to the root
 
     /* IO */
     void writeRSML(std::ostream & cout, std::string indent) const; ///< writes a RSML root tag
@@ -69,15 +65,16 @@ public:
     /* parameters that are given per root that may change with time */
     bool alive = 1; ///< true: alive, false: dead
     bool active = 1; ///< true: active, false: root stopped growing
+    double bornDelay = 0; ///
     double age = 0; ///< current age [days]
     double length = 0; ///< actual length [cm] of the root. might differ from getLength(age) in case of impeded root growth
-    int old_non = 1; ///< number of old nodes, the sign is positive if the last node was updated, otherwise its negative
+    int old_non = 0; ///< index of the node that was update last time step (==0 if no update was performed)
 
     /* up and down */
     Root* parent; ///< pointer to the parent root (equals nullptr if it is a base root)
     std::vector<Root*> laterals; ///< the lateral roots of this root
 
-    const double smallDx = 1e-6; ///< threshold value, smaller segments will be skipped (otherwise root tip direction can become NaN)
+    const double smallDx = 5e-2; ///< threshold value, smaller segments will be skipped (otherwise root tip direction can become NaN)
 
 protected:
 
@@ -85,47 +82,10 @@ protected:
     void createLateral(bool silence); ///< creates a new lateral, called by Root::simulate()
 
     /* parameters that are given per node */
-    std::vector<Vector3d> nodes = std::vector<Vector3d>(0); ///< nodes of the root
-    std::vector<int> nodeIds = std::vector<int>(0); ///< unique node identifier
-    std::vector<double> netimes = std::vector<double>(0); ///< node emergence times [days]
+    std::vector<Vector3d> nodes; ///< nodes of the root
+    std::vector<int> nodeIds; ///< unique node identifier
+    std::vector<double> netimes; ///< node emergence times [days]
 
 };
-
-
-
-/**
- * Stores a state of the root that can later be restored
- */
-class RootState {
-
-public:
-
-	RootState() { };
-
-	RootState(const Root& r);
-
-	void restore(Root& r);
-
-private:
-
-    /* parameters that are given per root that maybaseRoots change with time */
-    bool alive = 1; ///< true: alive, false: dead
-    bool active = 1; ///< true: active, false: root stopped growing
-    double age = 0; ///< current age [days]
-    double length = 0; ///< actual length [cm] of the root. might differ from getLength(age) in case of impeded root growth
-    int old_non = 1; ///< number of old nodes, the sign is positive if the last node was updated, otherwise its negative
-
-    /* down the root branch*/
-    std::vector<RootState> laterals = std::vector<RootState>(0); ///< the lateral roots of this root
-
-    /* last node */
-    Vector3d lNode = Vector3d(0.,0.,0.);
-    int lNodeId = 0;
-    double lneTime = 0.;
-    size_t non = 0;
-
-};
-
-
 
 #endif /* ROOT_H_ */

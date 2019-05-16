@@ -2,10 +2,9 @@
 #define PY_ROOTBOX_H_
 
 // copy paste for daniel
-// 1.  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.5 -L/home/daniel/boost_1_62_0/stage/lib -lboost_python Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o Debug/examples/Exudation/gauss_legendre.o
-// 2.  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.5 -lboost_python-py35 Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o Debug/examples/Exudation/gauss_legendre.o
-// 3.  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.6 -lboost_python-py36 Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o Debug/examples/Exudation/gauss_legendre.o
-
+// 1. export LD_LIBRARY_PATH=~/boost_1_62_0/stage/lib
+// 2.  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.5 -L/home/daniel/boost_1_62_0/stage/lib -lboost_python Debug/ModelParameter.o Debug/Root.o Debug/RootSystem.o Debug/analysis.o Debug/sdf.o Debug/tropism.o Debug/examples/Exudation/gauss_legendre.o
+// 2b  g++ -std=c++11 -O3 -fpic -shared -o py_rootbox.so -Wl,-soname,"py_rootbox.so" PythonRootSystem.cpp -I/usr/include/python3.4 -lboost_python-py34 Debug/examples/Exudation/gauss_legendre.o
 
 /**
  *  A Python module for CRootbox based on boost.python
@@ -13,6 +12,7 @@
  *  build a shared library from this file
  *  put comment to line 16 to ignore this file
  */
+
 #define PYTHON_WRAPPER // UNCOMMENT TO BUILD SHARED LIBRARY
 
 #ifdef PYTHON_WRAPPER
@@ -29,11 +29,8 @@
 #include "sdf.h"
 #include "RootSystem.h"
 #include "analysis.h"
-#include "examples/Exudation/example_exudation.h"
 
 using namespace boost::python;
-
-
 
 /*
  * Functions overloading (by hand, there are also macros available)
@@ -55,7 +52,6 @@ std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceF
 
 void (RootSystem::*simulate1)(double dt, bool silence) = &RootSystem::simulate;
 void (RootSystem::*simulate2)() = &RootSystem::simulate;
-void (RootSystem::*simulate3)(double dt, double maxinc, ProportionalElongation* se, bool silence) = &RootSystem::simulate;
 
 void (SegmentAnalyser::*addSegments1)(const RootSystem& rs) = &SegmentAnalyser::addSegments;
 void (SegmentAnalyser::*addSegments2)(const SegmentAnalyser& a) = &SegmentAnalyser::addSegments;
@@ -72,50 +68,57 @@ SegmentAnalyser (SegmentAnalyser::*cut1)(const SDF_HalfPlane& plane) const = &Se
 
 
 /**
- * Default arguments: no idea how to do it by hand, magic everywhere...
+ * Default arguments: no idea how to do it by hand,  magic everywhere...
  */
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(initialize_overloads,initialize,0,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openFile_overloads,openFile,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate1_overloads,simulate,1,2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate3_overloads,simulate,3,4);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getValue_overloads,getValue,1,2);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(tropismObjective_overloads,tropismObjective,5,6);
-
-
 
 /**
- * Virtual functions
+ * Virtual functions (not sure if needed, or only if we derive classes from it in python?), not working...
+ *
+ * it seems a bit tricky to make polymorphism work, we have to wrap the classes
+ *
+ * Tutorial example:
+ * struct BaseWrap : Base, wrapper<Base>
+ * {
+ *    int f()
+ *    {
+ *        if (override f = this->get_override("f"))
+ *            return f(); // *note*
+ *        return Base::f();
+ *    }
+ *
+ *    int default_f() { return this->Base::f(); }
+ * };
  */
-class SoilLookUp_Wrap : public SoilLookUp, public wrapper<SoilLookUp> {
-public:
+//struct SignedDistanceFunction_Wrap : SignedDistanceFunction, wrapper<SignedDistanceFunction>
+//{
+//	double getDist(const Vector3d& v) const {
+//		if (override getDist = this->get_override("getDist"))
+//			return getDist(v);
+//		return SignedDistanceFunction::getDist(v);
+//	}
+//	double default_getDist(const Vector3d& v) { return this->SignedDistanceFunction::getDist(v); }
+//};
+//	class_<SignedDistanceFunction_Wrap, boost::noncopyable>("SignedDistanceFunction")
+//	    .def("getDist", &SignedDistanceFunction_Wrap::getDist, &SignedDistanceFunction_Wrap::default_getDist)
+//	; // TODO how does polymorphism work... (everything works fine, dont ask why)
+// tricky booom boom (?)
 
-    virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
+
+struct SoilProperty_Wrap : SoilProperty, wrapper<SoilProperty> {
+
+    double getValue(const Vector3d& pos, const Root* root = nullptr) const {
+
     	return this->get_override("getValue")(pos, root);
     }
 
-    virtual std::string toString() const override {
+    std::string toString() const {
     	return this->get_override("toString")();
     }
 
 };
-
-class Tropism_Wrap : public Tropism, public wrapper<Tropism> {
-public:
-
-//	Tropism_Wrap(): Tropism() { }
-//	Tropism_Wrap(double n,double sigma): Tropism(n,sigma) { } // todo cant get it working with constructors other than ()
-
-    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override {
-    	return this->get_override("tropismObjective")(pos, old, a, b, dx, root);
-    }
-
-    virtual Tropism* copy() override {
-    	return this->get_override("copy")();
-    }
-
-};
-
-
 
 /**
  * Expose classes to Python module
@@ -244,79 +247,23 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	/*
 	 * soil.h
 	 */
-	class_<SoilLookUp_Wrap, SoilLookUp_Wrap*, boost::noncopyable>("SoilLookUp",init<>())
-			.def("getValue",&SoilLookUp_Wrap::getValue)
-			.def("__str__",&SoilLookUp_Wrap::toString)
+	class_<SoilProperty_Wrap,boost::noncopyable>("SoilProperty",init<>())
+			.def("getValue",pure_virtual(&SoilProperty::getValue))
+			.def("__str__",pure_virtual(&SoilProperty::toString))
 	;
-	class_<SoilLookUpSDF, SoilLookUpSDF*, bases<SoilLookUp>>("SoilLookUpSDF",init<>())
+	class_<SoilPropertySDF, bases<SoilProperty>>("SoilPropertySDF",init<>())
 			.def(init<SignedDistanceFunction*, double, double, double>())
-			.def_readwrite("sdf", &SoilLookUpSDF::sdf)
-			.def_readwrite("fmax", &SoilLookUpSDF::fmax)
-			.def_readwrite("fmin", &SoilLookUpSDF::fmin)
-			.def_readwrite("slope", &SoilLookUpSDF::slope)
-			.def("__str__",&SoilLookUpSDF::toString)
+			.def_readwrite("sdf", &SoilPropertySDF::sdf)
+			.def_readwrite("fmax", &SoilPropertySDF::fmax)
+			.def_readwrite("fmin", &SoilPropertySDF::fmin)
+			.def_readwrite("slope", &SoilPropertySDF::slope)
+			.def("__str__",&SoilPropertySDF::toString)
 	;
-	class_<ProportionalElongation, ProportionalElongation*, bases<SoilLookUp>>("ProportionalElongation",init<>())
-			.def("getValue", &ProportionalElongation::getValue, getValue_overloads())
-			.def("setScale", &ProportionalElongation::setScale)
-			.def("setBaseLookUp", &ProportionalElongation::setBaseLookUp)
-			.def("__str__",&ProportionalElongation::toString)
-	;
-	class_<Grid1D, Grid1D*, bases<SoilLookUp>>("Grid1D",init<>())
-			.def(init<size_t, std::vector<double>, std::vector<double>>())
-			.def("getValue", &Grid1D::getValue, getValue_overloads())
-			.def("__str__",&Grid1D::toString)
-			.def("map",&Grid1D::map)
-			.def_readwrite("n", &Grid1D::n)
-			.def_readwrite("grid", &Grid1D::grid)
-			.def_readwrite("data", &Grid1D::data)
-	;
-	class_<EquidistantGrid1D, EquidistantGrid1D*, bases<Grid1D>>("EquidistantGrid1D",init<double, double, size_t>())
-			.def(init<double, double, std::vector<double>>())
-			.def("getValue", &EquidistantGrid1D::getValue, getValue_overloads())
-			.def("__str__",&EquidistantGrid1D::toString)
-			.def("map",&EquidistantGrid1D::map)
-			.def_readwrite("n", &EquidistantGrid1D::n)
-			.def_readwrite("grid", &EquidistantGrid1D::grid)
-			.def_readwrite("data", &EquidistantGrid1D::data)
-	;
-	/**
-	 * tropism.h
-	 */
-	class_<Tropism_Wrap, Tropism_Wrap*, boost::noncopyable>("Tropism",init<>())
-			.def("getHeading",&Tropism_Wrap::getHeading)
-			.def("tropismObjective",&Tropism_Wrap::tropismObjective, tropismObjective_overloads())
-			.def("copy",&Tropism_Wrap::copy, return_value_policy<reference_existing_object>())
-			.def("setTropismParameter",&Tropism_Wrap::setTropismParameter)
-			.def("setSeed",&Tropism_Wrap::setSeed)
-			.def("setGeometry",&Tropism_Wrap::setGeometry)
-			.def("rand",&Tropism_Wrap::rand)
-			.def("randn",&Tropism_Wrap::randn)
-	;
-	class_<Tropism, Tropism*>("TropismBase",init<>()) // Base class for the following tropisms
-			.def("getHeading",&Tropism::getHeading)
-			.def("tropismObjective",&Tropism::tropismObjective, tropismObjective_overloads())
-			.def("copy",&Tropism::copy, return_value_policy<reference_existing_object>())
-			.def("setTropismParameter",&Tropism::setTropismParameter)
-			.def("setSeed",&Tropism::setSeed)
-			.def("setGeometry",&Tropism::setGeometry)
-			.def("rand",&Tropism::rand)
-			.def("randn",&Tropism::randn)
-	;
-	class_<Gravitropism, Gravitropism*, bases<Tropism>>("Gravitropism",init<double, double>())
-	;
-	class_<Plagiotropism, Plagiotropism*, bases<Tropism>>("Plagiotropism",init<double, double>())
-	;
-	class_<Exotropism, Exotropism*, bases<Tropism>>("Exotropism",init<double, double>())
-	;
-	class_<Hydrotropism, Hydrotropism*, bases<Tropism>>("Hydrotropism",init<double, double, SoilLookUp*>())
-	;
-//	class_<CombinedTropism, CombinedTropism*, bases<Tropism>>("CombinedTropism",init<>()) // Todo needs some extra work
-//	;
 	/*
 	 * ModelParameter.h
 	 */
 	class_<RootTypeParameter>("RootTypeParameter", init<>())
+			.def(init<RootTypeParameter&>())
 			.def("realize",&RootTypeParameter::realize)
 			.def("getLateralType",&RootTypeParameter::getLateralType)
 			.def("getK",&RootTypeParameter::getK)
@@ -369,7 +316,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def("__str__",&RootParameter::toString)
 	;
 	class_<RootSystemParameter>("RootSystemParameter", init<>())
-			.def("set",&RootSystemParameter::set)
+			//.def("set",&RootSystemParameter::set)
 			.def_readwrite("seedPos", &RootSystemParameter::seedPos)
 			.def_readwrite("firstB", &RootSystemParameter::firstB)
 			.def_readwrite("delayB", &RootSystemParameter::delayB)
@@ -380,12 +327,16 @@ BOOST_PYTHON_MODULE(py_rootbox)
 			.def_readwrite("delayRC", &RootSystemParameter::delayRC)
 			.def_readwrite("nz", &RootSystemParameter::nz)
 			.def("__str__",&RootSystemParameter::toString)
+			.def_readwrite("interBranchDistanceScaleFactor", &RootSystemParameter::interBranchDistanceScaleFactor)
+			.def_readwrite("interBranchDistanceSlope", &RootSystemParameter::interBranchDistanceSlope)
+			.def_readwrite("interBranchDistanceTransitionDepth", &RootSystemParameter::interBranchDistanceTransitionDepth)
+			.def_readwrite("laterTypeSlope", &RootSystemParameter::laterTypeSlope)
+			.def_readwrite("laterTypeTransitionDepth", &RootSystemParameter::laterTypeTransitionDepth)
 	;
 	/**
 	 * Root.h (no members, just data)
 	 */
     class_<Root, Root*>("Root", init<RootSystem*, int, Vector3d, double, Root*, double, int>())
-		.def(init<Root&>())
 		.def("__str__",&Root::toString)
 	    .def_readwrite("rootsystem", &Root::rootsystem)
 	    .def_readwrite("param", &Root::param)
@@ -411,8 +362,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	/*
 	 * RootSystem.h
 	 */
-    class_<RootSystem, RootSystem*>("RootSystem", init<>())
- 		.def(init<RootSystem&>())
+    class_<RootSystem>("RootSystem")
 		.def("setRootTypeParameter", &RootSystem::setRootTypeParameter)
 		.def("getRootTypeParameter", &RootSystem::getRootTypeParameter, return_value_policy<reference_existing_object>())
 		.def("setRootSystemParameter", &RootSystem::setRootSystemParameter)
@@ -422,10 +372,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("setSoil", &RootSystem::setSoil)
 		.def("reset", &RootSystem::reset)
 		.def("initialize", &RootSystem::initialize, initialize_overloads())
-		.def("setTropism", &RootSystem::setTropism)
 		.def("simulate",simulate1, simulate1_overloads())
 		.def("simulate",simulate2)
-		.def("simulate",simulate3, simulate3_overloads())
 		.def("getSimTime", &RootSystem::getSimTime)
 		.def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
 		.def("getNumberOfSegments", &RootSystem::getNumberOfSegments)
@@ -434,7 +382,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getNodes", &RootSystem::getNodes)
 		.def("getPolylines", &RootSystem::getPolylines)
 		.def("getSegments", &RootSystem::getSegments)
-        .def("getShootSegments", &RootSystem::getShootSegments)
 		.def("getSegmentsOrigin", &RootSystem::getSegmentsOrigin)
 		.def("getNETimes", &RootSystem::getNETimes)
 		.def("getScalar", &RootSystem::getScalar)
@@ -442,17 +389,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
 		.def("getRootBases", &RootSystem::getRootBases)
 		.def("write", &RootSystem::write)
 		.def("setSeed",&RootSystem::setSeed)
-		.def("getNumberOfNewNodes",&RootSystem::getNumberOfNewNodes)
-		.def("getNumberOfNewRoots",&RootSystem::getNumberOfNewRoots)
-		.def("getUpdatedNodeIndices",&RootSystem::getUpdatedNodeIndices)
-		.def("getUpdatedNodes",&RootSystem::getUpdatedNodes)
-		.def("getNewNodes",&RootSystem::getNewNodes)
-		.def("getNewSegments",&RootSystem::getNewSegments)
-		.def("getNewSegmentsOrigin",&RootSystem::getNewSegmentsOrigin)
-		.def("push",&RootSystem::push)
-		.def("pop",&RootSystem::pop)
-		.def("rand",&RootSystem::rand)
-		.def("randn",&RootSystem::randn)
 	;
     enum_<RootSystem::TropismTypes>("TropismType")
     	.value("plagio", RootSystem::TropismTypes::tt_plagio)
@@ -470,26 +406,18 @@ BOOST_PYTHON_MODULE(py_rootbox)
 	    .value("order", RootSystem::ScalarTypes::st_order)
 	    .value("time", RootSystem::ScalarTypes::st_time)
 	    .value("length", RootSystem::ScalarTypes::st_length)
-		.value("volume", RootSystem::ScalarTypes::st_volume)
 	    .value("surface", RootSystem::ScalarTypes::st_surface)
+		.value("volume", RootSystem::ScalarTypes::st_volume)
 		.value("one", RootSystem::ScalarTypes::st_one)
 		.value("userdata1", RootSystem::ScalarTypes::st_userdata1)
 		.value("userdata2", RootSystem::ScalarTypes::st_userdata2)
 		.value("userdata3", RootSystem::ScalarTypes::st_userdata3)
 		.value("parenttype", RootSystem::ScalarTypes::st_parenttype)
-		.value("lb", RootSystem::ScalarTypes::st_lb)
-		.value("la", RootSystem::ScalarTypes::st_la)
-		.value("nob", RootSystem::ScalarTypes::st_nob)
-		.value("r", RootSystem::ScalarTypes::st_r)
-		.value("theta", RootSystem::ScalarTypes::st_theta)
-		.value("rlt", RootSystem::ScalarTypes::st_rlt)
-		.value("meanln", RootSystem::ScalarTypes::st_meanln)
-		.value("sdln", RootSystem::ScalarTypes::st_sdln)
 	;
     /*
      * analysis.h
      */
-    class_<SegmentAnalyser, SegmentAnalyser*>("SegmentAnalyser")
+    class_<SegmentAnalyser>("SegmentAnalyser")
     .def(init<RootSystem&>())
     .def(init<SegmentAnalyser&>())
 	.def("addSegments",addSegments1)
@@ -517,22 +445,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
     class_<std::vector<SegmentAnalyser>>("std_vector_SegmentAnalyser_")
         .def(vector_indexing_suite<std::vector<SegmentAnalyser>>() )
 	;
-    /*
-     * example_exudation.h (rather specific for Cheng)
-     */
-    class_<ExudationParameters>("ExudationParameters")
-		.def_readwrite("M", &ExudationParameters::M)
-		.def_readwrite("Dt", &ExudationParameters::Dt)
-		.def_readwrite("Dl", &ExudationParameters::Dl)
-		.def_readwrite("theta", &ExudationParameters::theta)
-		.def_readwrite("R", &ExudationParameters::R)
-		.def_readwrite("lambda_", &ExudationParameters::lambda_)
-		.def_readwrite("age_r", &ExudationParameters::age_r)
-		.def_readwrite("tip", &ExudationParameters::tip)
-		.def_readwrite("v", &ExudationParameters::v)
-		.def_readwrite("pos", &ExudationParameters::pos)
-		;
-     def("getExudateConcentration", getExudateConcentration);
 }
 
 /*
@@ -550,6 +462,4 @@ BOOST_PYTHON_MODULE(py_rootbox)
 #endif /* PYTHON_WRAPPER */
 
 #endif /* PY_ROOTBOX_H_ */
-
-// feature/growth-insertion-idx-for-vertices
 

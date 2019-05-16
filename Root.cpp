@@ -1,5 +1,4 @@
 #include "Root.h"
-
 /**
  * Constructor
  *
@@ -32,6 +31,8 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
 	//
 	age = -delay; // the root starts growing when age>0
 	alive = 1; // alive per default
+	//active = 0;
+	bornDelay = delay;
 	id = rs->getRootIndex(); // root id
 	this->parent = parent;
 	parent_base_length=pbl;
@@ -44,19 +45,6 @@ Root::Root(RootSystem* rs, int type, Vector3d pheading, double delay,  Root* par
 		nodes.push_back(parent->getNode(pni));
 		nodeIds.push_back(parent->getNodeId(pni));
 		netimes.push_back(parent->getNodeETime(pni)+delay);
-	}
-}
-
-/**
- * Copies the root tree
- */
-Root::Root(const Root& r, RootSystem& rs) :rootsystem(&rs), param(r.param), iheading(r.iheading), id(r.id), parent_base_length(r.parent_base_length), parent_ni(r.parent_ni), alive(r.alive),
-		active(r.active), age(r.age), length(r.length), old_non(r.old_non), parent(r.parent), smallDx(r.smallDx), nodes(r.nodes), nodeIds(r.nodeIds), netimes(r.netimes)
-{
-	laterals = std::vector<Root*>(r.laterals.size());
-	for (size_t i=0; i< r.laterals.size(); i++) {
-		laterals[i] = new Root(*r.laterals[i], rs); // copy lateral
-		laterals[i]->parent = this; // set parent
 	}
 }
 
@@ -81,6 +69,18 @@ void Root::simulate(double dt, bool silence)
 	old_non = 0; // is set in Root:createSegments, (the zero indicates the first call to createSegments)
 
 	const RootParameter &p = param; // rename
+////	std::cout<<"age "<<age<<"\n";
+////	std::cout<<"active "<<active<<"\n";
+//	if (age+dt<0)
+//	{
+//		alive= false;
+//		active = false;
+//	}
+//	else
+//	{
+//		alive = true;
+//		active = true;
+//	}
 
 	// increase age
 	if (age+dt>p.rlt) { // root life time
@@ -113,14 +113,14 @@ void Root::simulate(double dt, bool silence)
 			if (active) {
 
 				// length increment
-				double lengthMax = getLength(std::max(age-dt,0.)); // length of the root for unimpeded growth (i.e. length_==length for unimpeded growth)
-				double lengthMin = length; // realized length
-				double length_ = (lengthMax+lengthMin)/2.; // best i could think of
+				double length_ = getLength(std::max(age-dt,0.)); // length of the root for unimpeded growth (i.e. length_==length for unimpeded growth)
 				double targetlength = getLength(age);
 				double e = targetlength-length_; //elongation in time step dt
 				double scale = rootsystem->getRootTypeParameter(param.type)->se->getValue(nodes.back(),this); // hope some of this is optimized out if not set
 				double dl = std::max(scale*e, double(0)); // length increment, dt is not used anymore
-
+				//double interBranchDistance = p.lb;
+				//interBranchDistance *= (interBranchDistanceScale);
+				//std::cout<< " --- interBranchDistance - "<<interBranchDistance<<" - " << p.lb<<"\n";
 				// create geometry
 				if (p.nob>0) { // root has laterals
 					// basal zone
@@ -140,7 +140,24 @@ void Root::simulate(double dt, bool silence)
 					if ((dl>0)&&(length>=p.lb)) {
 						double s = p.lb; // summed length
 						for (size_t i=0; ((i<p.ln.size()) && (dl>0)); i++) {
-							s+=p.ln.at(i);
+							int nn = nodes.size();
+							auto n1 = nodes.at(nn-1);
+							////double  interBranchDistanceScale= 1/(1 + n1.z /(55)); // 1 - inf
+							//double scaleFactor = 2;
+							//double  interBranchDistanceScale= (scaleFactor-1)*(n1.z +55)/(-20+55) + scaleFactor; // 1 - scaleFactor - linear interpolation
+							//if (n1.z > -20)
+							//	interBranchDistanceScale = 1;
+							auto rs = rootsystem->getRootSystemParameter();
+							double interBranchDistanceScaleFactor = rs->interBranchDistanceScaleFactor;// 1.5;
+							//std::cout<< " --- interBranchDistanceScaleFactor - "<<interBranchDistanceScaleFactor<<" - " << n1.z<<"\n";
+							double slope = rs->interBranchDistanceSlope;//= 1.5;
+							//std::cout<< " --- interBranchDistanceSlope - "<<slope<<" - " << n1.z<<"\n";
+							double z0 = rs->interBranchDistanceTransitionDepth;//-15;
+							double interBranchDistanceScale = (interBranchDistanceScaleFactor-1)/(1+std::exp(slope*(n1.z-z0))) + 1;
+							//std::cout<< " --- interBranchDistanceScale - "<<interBranchDistanceScale<<" - " << n1.z<<"\n";
+							//std::cout << "-- i : "<<i<<"\n";
+							//std::cout<< " --- interBranchDistance - "<<p.ln.at(i)*interBranchDistanceScale<<" - " << p.ln.at(i)<<"\n";
+							s+=p.ln.at(i)*interBranchDistanceScale;
 							if (length<s) {
 								if (i==laterals.size()) { // new lateral
 									createLateral(silence);
@@ -157,8 +174,10 @@ void Root::simulate(double dt, bool silence)
 								}
 							}
 						}
-						if (p.ln.size()==laterals.size()) { // new lateral (the last one)
-							createLateral(silence);
+						if (dl>0) {
+							if (p.ln.size()==laterals.size()) { // new lateral (the last one)
+								createLateral(silence);
+							}
 						}
 					}
 					// apical zone
@@ -173,14 +192,9 @@ void Root::simulate(double dt, bool silence)
 					}
 				} // if laterals
 			} // if active
-			active = length<(p.getK()-dx()/10); // become inactive, if final length is nearly reached
+			active = getLength(std::max(age,0.))<(p.getK()-dx()/10); // become inactive, if final length is nearly reached
 		}
 	} // if alive
-
-	if (old_non==0) { // if createSegments was not called
-		old_non = -nodes.size();
-	}
-
 }
 
 /**
@@ -244,11 +258,39 @@ void Root::createLateral(bool silence)
 	// std::cout << "createLateral()\n";
 	const RootParameter &p = param; // rename
 
-	int lt = rootsystem->getRootTypeParameter(p.type)->getLateralType(nodes.back());
+	//int lt = rootsystem->getRootTypeParameter(p.type)->getLateralType(nodes.back());
+	int lt;
+	auto rootTypeParameter = rootsystem->getRootTypeParameter(p.type);
+	assert(rootTypeParameter->successor.size()==rootTypeParameter->successorP.size());
+	//double scale = sbp->getValue(pos);  //the current model makes not a lot of sense, we may come up with something more clever
+	//double z = (0 - nodes.back().z)/(55); // 0-1
+	double z = nodes.back().z;
+	double slope = rootsystem->getRootSystemParameter()->laterTypeSlope;// = 1.5;
+	//std::cout<<" --- SLOPElaterTypeSlope - "<<slope<<"\n";
+	double z0 = rootsystem->getRootSystemParameter()->laterTypeTransitionDepth;//0.6;
+	//std::cout<<" --- SLOPElaterTypeTransitionDepth - "<<z0<<"\n";
+	double P= 1-1/(1+std::exp(-slope*((z-z0)))); //https://en.wikipedia.org/wiki/Logistic_function#In_ecology%3a_modeling_population_growth
+	//std::cout<<" --- SLOPE P - "<<P<<"\n";
+	if (rootTypeParameter->successorP.size()>0) { // at least 1 successor type
+		if (rootTypeParameter->successorP.size()>1) { // if there are more than one lateral we have to dice
+			double d = rootTypeParameter->rand();
+			int i=0;
+			//double p_ = rootTypeParameter->successorP.at(0);
+			while ((P<=d)and(i<1)) {
+				i++;
+				P += rootTypeParameter->successorP.at(i);
+				//std::cout<<" --- d - "<<d<<"\n";
+			}
+			lt = rootTypeParameter->successor.at(i);
+		} else {
+			lt = rootTypeParameter->successor.front();
+		}
+	} else { // no successors
+		lt = -1;
+	}
 	//std::cout << "lateral type " << lt << "\n";
 
 	if (lt>0) {
-
 		Vector3d h; // old heading
 		if (nodes.size()>1) {
 			h = nodes.back().minus(nodes.at(nodes.size()-2)); // getHeading(b-a)
@@ -308,20 +350,17 @@ void Root::createSegments(double l, bool silence)
 
 				Vector3d newnode = Vector3d(nodes.back().plus(newdx));
 				sl = sdx;
-				double et = this->getCreationTime(length+sl);
+				double et = this->getCreationTime(length+sl) + bornDelay;
 				nodes[nn-1] = newnode;
 				netimes[nn-1] = std::max(et,rootsystem->getSimTime()); // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
-				old_non = nn;
+				old_non = nn-1;
 				l -= sdx;
 				if (l<=0) { // ==0 should be enough
 					return;
 				}
-			} else {
-				old_non = -nn;
 			}
-		} else {
-			old_non = -nn;
 		}
+		old_non = nn; // CHECK
 	}
 
 	if (l<smallDx) {
@@ -363,7 +402,7 @@ void Root::createSegments(double l, bool silence)
 		ons.times(Matrix3d::rotZ(ab.x));
 		Vector3d newdx = Vector3d(ons.column(0).times(sdx));
 		Vector3d newnode = Vector3d(nodes.back().plus(newdx));
-		double et = this->getCreationTime(length+sl);
+		double et = this->getCreationTime(length+sl) + bornDelay;
 		et = std::max(et,rootsystem->getSimTime()); // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
 		addNode(newnode,et);
 
@@ -412,10 +451,26 @@ void Root::addNode(Vector3d n, double t)
 {
 	assert(t>=0.);
 	nodes.push_back(n); // node
-	nodeIds.push_back(rootsystem->getNodeIndex()); // new unique id
+	int nodeIdx=rootsystem->getNodeIndex();
+	//std::cout<<"addNode "<<nodeIdx<<"\n";
+	nodeIds.push_back(nodeIdx); // new unique id
 	netimes.push_back(t); // exact creation time
 }
-
+/**
+ * Adds an existing node to the root.
+ *
+ * Add nodes only with this function! For simplicity nodes can not be deleted, and roots can only become deactivated by dying
+ *
+ * @param n        the node index
+ * @param t        exact creation time of the node
+ */
+void Root::addExistingNode(Vector3d n, double t, int nIdx)
+{
+	assert(t>=0.);
+	nodes.push_back(n); // node
+	nodeIds.push_back(nIdx); // given id
+	netimes.push_back(t); // exact creation time
+}
 /**
  * writes RSML root tag
  *
@@ -433,16 +488,16 @@ void Root::writeRSML(std::ostream & cout, std::string indent) const
 		// polyline nodes
 		cout << indent << "\t\t\t" << "<point ";
 		Vector3d v = nodes.at(0);
-		cout << "x=\"" << v.x << "\" y=\"" << v.z << "\" z=\"" << v.y << "\"/>\n";
+		cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
 		int n = this->rootsystem->rsmlReduction;
 		for (size_t i = 1; i<nodes.size()-1; i+=n) {
 			cout << indent << "\t\t\t" << "<point ";
 			Vector3d v = nodes.at(i);
-			cout << "x=\"" << v.x << "\" y=\"" << v.z << "\" z=\"" << v.y << "\"/>\n";
+			cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
 		}
 		cout << indent << "\t\t\t" << "<point ";
 		v = nodes.at(nodes.size()-1);
-		cout << "x=\"" << v.x << "\" y=\"" << v.z << "\" z=\"" << v.y << "\"/>\n";
+		cout << "x=\"" << v.x << "\" y=\"" << v.y << "\" z=\"" << v.z << "\"/>\n";
 		cout << indent << "\t\t</polyline>\n"; // close polyline
 		cout << indent << "\t</geometry>\n"; // close geometry
 
@@ -481,46 +536,5 @@ std::string Root::toString() const
 	str << "Root #"<< id <<": type "<<param.type << ", length: "<< length << ", age: " <<age<<" with "<< laterals.size() << " laterals\n";
 	return str.str();
 }
-
-
-
-
-RootState::RootState(const Root& r): alive(r.alive), active(r.active), age(r.age), length(r.length), old_non(r.old_non)
-{
-	lNode = r.nodes.back();
-	lNodeId = r.nodeIds.back();
-	lneTime = r.netimes.back();
-	non = r.nodes.size();
-	laterals = std::vector<RootState>(r.laterals.size());
-	for (size_t i=0; i<laterals.size(); i++) {
-		laterals[i] = RootState(*(r.laterals[i]));
-	}
-}
-
-void RootState::restore(Root& r)
-{
-	r.alive = alive; // copy things that changed
-	r.active = active;
-	r.age = age;
-	r.length = length;
-	r.old_non = old_non;
-	r.nodes.resize(non); // shrink vectors
-	r.nodeIds.resize(non);
-	r.netimes.resize(non);
-	r.nodes.back() = lNode; // restore last value
-	r.nodeIds.back() = lNodeId;
-	r.netimes.back() = lneTime;
-	for (size_t i = laterals.size(); i<r.laterals.size(); i++) { // delete roots that have not been created
-		delete r.laterals[i];
-	}
-	r.laterals.resize(laterals.size()); // shrink and restore laterals
-	for (size_t i=0; i<laterals.size(); i++) {
-		laterals[i].restore(*(r.laterals[i]));
-	}
-}
-
-
-
-
 
 

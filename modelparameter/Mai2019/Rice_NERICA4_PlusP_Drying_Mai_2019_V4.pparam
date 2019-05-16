@@ -1,0 +1,16 @@
+plantingdepth	1
+firstB	2
+delayB	0.5
+growingRateB 12.5
+maxB	69
+nC	0
+firstSB	1000
+delaySB	1000
+delayRC	1000
+nz	0
+simtime	51
+interBranchDistanceScaleFactor 1.65
+interBranchDistanceSlope 1.5
+interBranchDistanceTransitionDepth -20
+laterTypeSlope 1.5
+laterTypeTransitionDepth -15

@@ -11,11 +11,13 @@ SegmentAnalyser::SegmentAnalyser(const RootSystem& rs)
 {
 	nodes = rs.getNodes();
 	segments = rs.getSegments();
+	lengthFromOrigin = rs.getLengthFromOrigin();
+	//nodesDGF = rs.getNodesDGF();
+	//segmentsDGF = rs.getSegmentsDGF();
 	ctimes = rs.getNETimes();
 	segO = rs.getSegmentsOrigin();
 	assert(segments.size()==ctimes.size());
 	assert(segments.size()==segO.size());
-	this->rs = &rs; // needed for dgf writer, only
 }
 
 /**
@@ -48,7 +50,7 @@ void SegmentAnalyser::addSegments(const SegmentAnalyser& a)
 /**
  * Returns a specific parameter per root segment
  *
- * @param st    parameter type @see RootSystem::ScalarType per segment
+ * @param st    parameter type @see RootSystem::doubleType per segment
  * \return      vector containing parameter value per segment
  */
 std::vector<double> SegmentAnalyser::getScalar(int st) const
@@ -98,8 +100,12 @@ std::vector<double> SegmentAnalyser::getScalar(int st) const
 			v = getSegmentLength(i)*2*M_PI*r->param.a;
 		}
 		break;
-		case RootSystem::st_volume: {
-			v =  getSegmentLength(i)*M_PI*(r->param.a)*(r->param.a);
+		case RootSystem::st_volume: { // compute segment volumne
+			v = getSegmentLength(i)*M_PI*r->param.a*r->param.a;
+		break;
+		}
+		case RootSystem::st_rootID: { // branch id
+			v = r->id;
 		}
 		break;
 		case RootSystem::st_one: { // e.g. for counting segments
@@ -160,7 +166,7 @@ void SegmentAnalyser::crop(SignedDistanceFunction* geometry)
 		} else if ((x_==false) && (y_==false)) { // segment is outside
 
 		} else { // one node is inside, one outside
-			// sort
+			// sortanalysis.cpp
 			Vector3d in;
 			Vector3d out;
 			int ini;
@@ -182,7 +188,6 @@ void SegmentAnalyser::crop(SignedDistanceFunction* geometry)
 			sO.push_back(segO.at(i));
 			ntimes.push_back(ctimes.at(i));
 		}
-
 	}
 	segments = seg;
 	segO  = sO;
@@ -194,7 +199,7 @@ void SegmentAnalyser::crop(SignedDistanceFunction* geometry)
  * Filters the segments to the ones, where data is within [min,max], @see AnalysisSDF::getData,
  * i.e. all other segments are deleted.
  *
- * @param st    parameter type @see RootSystem::ScalarType
+ * @param st    parameter type @see RootSystem::doubleType
  * @param min   minimal value
  * @param max   maximal value
  */
@@ -220,7 +225,7 @@ void SegmentAnalyser::filter(int st, double min, double max)
  * Filters the segments to the ones, where data equals value, @see AnalysisSDF::getData,
  * i.e. all other segments are deleted.
  *
- * @param st        parameter type @see RootSystem::ScalarType
+ * @param st        parameter type @see RootSystem::doubleType
  * @param value     parameter value of the segments that are kept
  */
 void SegmentAnalyser::filter(int st, double value)
@@ -290,7 +295,7 @@ Vector3d SegmentAnalyser::cut(Vector3d in, Vector3d out, SignedDistanceFunction*
 }
 
 /**
- * \return The summed parameter of type @param st (@see RootSystem::ScalarType)
+ * \return The summed parameter of type @param st (@see RootSystem::doubleType)
  */
 double SegmentAnalyser::getSummed(int st) const {
 	std::vector<double> v_ = getScalar(st);
@@ -298,7 +303,7 @@ double SegmentAnalyser::getSummed(int st) const {
 }
 
 /**
- * \return The summed parameter of type @param st (@see RootSystem::ScalarType),
+ * \return The summed parameter of type @param st (@see RootSystem::doubleType),
  * that is within geometry @param g based on the segment mid point (i.e. not exact).
  * To sum exactly, first crop to the geometry, then run SegmentAnalyser::getSummed(st).
  */
@@ -405,9 +410,9 @@ SegmentAnalyser SegmentAnalyser::cut(const SDF_HalfPlane& plane) const
 }
 
 /**
- *  Creates a vertical distribution of the parameter of type @param st (@see RootSystem::ScalarType)
+ *  Creates a vertical distribution of the parameter of type @param st (@see RootSystem::doubleType)
  *
- * @param st        parameter type @see RootSystem::ScalarType
+ * @param st        parameter type @see RootSystem::doubleType
  * @param top       vertical top position (cm)
  * @param bot       vertical bot position (cm)
  * @param n         number of layers (each with a height of (bot-top)/n )
@@ -459,9 +464,9 @@ std::vector<SegmentAnalyser> SegmentAnalyser::distribution(double top, double bo
 }
 
 /**
- *  Creates a two-dimensional distribution of the parameter of type @param st (@see RootSystem::ScalarType)
+ *  Creates a two-dimensional distribution of the parameter of type @param st (@see RootSystem::doubleType)
  *
- * @param st        parameter type @see RootSystem::ScalarType
+ * @param st        parameter type @see RootSystem::doubleType
  * @param top       vertical top position (cm)
  * @param bot       vertical bot position (cm)
  * @param left      left along x-axis (cm)
@@ -560,7 +565,7 @@ void SegmentAnalyser::write(std::string name)
 	std::string ext = name.substr(name.size()-3,name.size()); // pick the right writer
 	if (ext.compare("vtp")==0) {
 		std::cout << "writing VTP: " << name << "\n";
-		this->writeVTP(fos,{ RootSystem::st_radius, RootSystem::st_type, RootSystem::st_time });
+		this->writeVTP(fos,{ RootSystem::st_radius, RootSystem::st_type, RootSystem::st_time, RootSystem::st_rootID, RootSystem::st_length });
 	} else if (ext.compare("txt")==0)  {
 		std::cout << "writing text file for Matlab import: "<< name << "\n";
 		writeRBSegments(fos);
@@ -577,7 +582,7 @@ void SegmentAnalyser::write(std::string name)
  * Writes a VTP file with @param types data per segment.
  *
  * @param os        typically a file out stream
- * @param types     multiple parameter types (@see RootSystem::ScalarType) that are saved in the VTP file,
+ * @param types     multiple parameter types (@see RootSystem::doubleType) that are saved in the VTP file,
  * 					additionally, all userdata is saved per default
  */
 void SegmentAnalyser::writeVTP(std::ostream & os, std::vector<int> types) const
@@ -589,7 +594,7 @@ void SegmentAnalyser::writeVTP(std::ostream & os, std::vector<int> types) const
 	os << "<PolyData>\n";
 	os << "<Piece NumberOfLines=\""<< segments.size() << "\" NumberOfPoints=\""<< nodes.size()<< "\">\n";
 	// data (CellData)
-	os << "<CellData Scalars=\" CellData\">\n";
+	os << "<CellData doubles=\" CellData\">\n";
 	for (auto i : types) {
 		std::vector<double> data = getScalar(i);
 		os << "<DataArray type=\"Float32\" Name=\"" << RootSystem::scalarTypeNames.at(i) << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
@@ -668,14 +673,16 @@ void SegmentAnalyser::writeDGF(std::ostream & os) const
 	os << "Vertex \n";
 	for (auto& n : nodes) {
 		os << n.x/100 << " " << n.y/100 << " " << n.z/100 << " \n";
+		//std::cout << n.x/100 << " " << n.y/100 << " " << n.z/100 << " \n";
 	}
 
 	os << "# \n";
 	os << "SIMPLEX \n";
 	os << "parameters 10 \n";
-	// node1ID, node2ID, type, branchID, surfaceIdx, length, radiusIdx, massIdx, axialPermIdx, radialPermIdx, creationTimeId
+	// node1ID, node2ID, type, branchID, surfaceIdx, length, radiusIdx, massIdx, axialPermIdx, radialPermIdx, creationTimeId, lengthFromOrigin
 	for (size_t i=0; i<segments.size(); i++) {
 		Vector2i s = segments.at(i);
+		//std::cout<<"s "<< s.x <<" "<<s.y;
 		Vector3d n1 = nodes.at(s.x);
 		Vector3d n2 = nodes.at(s.y);
 		Root* r = segO.at(i);
@@ -685,26 +692,11 @@ void SegmentAnalyser::writeDGF(std::ostream & os) const
 		double surface = 2*radius*M_PI*length;
 		double time = ctimes.at(i);
 		double type = r->param.type;
-		os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
+		os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 <<	" "<<lengthFromOrigin.at(i)/100 <<" \n";
+		//std::cout << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
 	}
-	if (rs!=nullptr) {
-	    auto shoot_segs = rs->getShootSegments();
-	    for (auto& s : shoot_segs) {
-                Vector3d n1 = nodes.at(s.x);
-                Vector3d n2 = nodes.at(s.y);
-                int branchnumber = -1;
-                double radius = 1;
-                double length = sqrt((n1.x-n2.x)*(n1.x-n2.x)+(n1.y-n2.y)*(n1.y-n2.y)+(n1.z-n2.z)*(n1.z-n2.z));
-                double surface = 2*radius*M_PI*length;
-                double time = 0;
-                double type = -1;
-                os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
-	    }
-	}
-
 	os << "# \n";
 	os << "BOUNDARYDOMAIN \n";
 	os << "default 1 \n";
 	os << "# \n";
 }
-
