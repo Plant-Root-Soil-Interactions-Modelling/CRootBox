@@ -1,14 +1,11 @@
+import os, sys
+sys.path.append("python")
 import py_rootbox as rb
 from rb_tools import *
 import matplotlib.pyplot as plt
 
 rootsystem = rb.RootSystem()
 
-# Open plant and root parameter from a file
-#name = "Zea_mays_1_Leitner_2010" # "Anagallis_femina_Leitner_2010"
-#name = "Crypsis_aculeata_Clausnitzer_1994" # "Anagallis_femina_Leitner_2010"
-#name = "Juncus_squarrosus_Clausnitzer_1994"
-#name = Brassica_oleracea_Vansteenkiste_2014 #Brassica_napus_a_Leitner_2010
 name = "Mai2019/Rice_NERICA4_SubP_Drying_Mai_2019V5"
 outputname = name
 ColumnHeight = 55
