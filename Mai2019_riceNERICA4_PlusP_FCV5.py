@@ -6,6 +6,9 @@ import matplotlib.pyplot as plt
 
 rootsystem = rb.RootSystem()
 
+if (not os.path.exists("results/Mai2019")):
+  os.mkdir("results/Mai2019");
+
 name = "Mai2019/Rice_NERICA4_PlusP_FC_Mai_2019_V5"
 outputname = name
 ColumnHeight = 55

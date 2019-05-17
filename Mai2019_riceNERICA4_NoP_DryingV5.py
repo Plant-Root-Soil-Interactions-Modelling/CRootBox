@@ -1,8 +1,14 @@
 import os, sys
 sys.path.append("python")
+
+if (not os.path.exists("results/Mai2019")):
+  os.mkdir("results/Mai2019");
+
 import py_rootbox as rb
 from rb_tools import *
 import matplotlib.pyplot as plt
+if (not os.path.exists("results/Mai2019")):
+  os.mkdir("results/Mai2019");
 
 rootsystem = rb.RootSystem()
 
