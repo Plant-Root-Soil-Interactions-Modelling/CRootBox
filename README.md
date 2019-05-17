@@ -1,28 +1,26 @@
-# CRootBox
+# CRootBox for rice soil column
 
-The fastest way to try CRootBox is to read the examples. Just uncomment the example in the main.cpp file to try, compile and run it. 
+This is the work from Trung-Hieu Mai, 2019 on nutrient uptake of rice root system. One part of the study was to reconstruct the rice root system based on root information from the rice soil column experiment. The root characteristics, such as the number of the nodal root, root radius, interbranch distances, were used as the input parameters. The total root mass and the root mass fractions between soil layers were used to fit the CRootBox model. For that reason, three new feature was implemented in the CRootBox: (1) non-linear function of the emergence of the nodal root, (2) distribution of different lateral types (S-type and L-type) along soil depth using a probability function, (3) scaling function of the interbranch distance between laterals along the soil depth.
 
-The code should compile with any c++11 compiler, e.g. for g++:
+To download and compile the work
 
-    g++ *.cpp -std=c++11
-    ./a.out
+```
+git clone -b pubMai2019 https://github.com/Plant-Root-Soil-Interactions-Modelling/CRootBox.git
 
+cd CRootBox
 
-# Folder sructure
+cmake.
 
-/			CRootBox C++ codes
-/examples 		Some examples how to use the CRootBox
-/modelparameter		Some root parameter, and a plant parameter files
-/scripts 		Pyhthon scripts for visualization with Paraview, and Matlab scripts for parameter export
-/results 		Nice result images
+make
+```
 
+then run the python scripts which generate root system and compare root mass fraction visually by ploting with 1:1 line 
+```
+python3 Mai2019_riceNERICA4_NoP_DryingV5.py
+```
 
-# Documentation
+# More information about the study
 
-Create the documentation by running doxygen in the folder 
-$ doxygen doxy_config
+see here [A model-data integration study for soil rice column using multiscale modelling approach considering rhizosphere gradients](https://www.researchgate.net/publication/331773573_A_model-data_integration_study_for_soil_rice_column_using_multiscale_modelling_approach_considering_rhizosphere_gradients)
 
-The documentation should now be located in the folder /doc
-
-To build the shared library py_rootbox for coupling with Python pleaser refer to 'python building guide.txt'
 
