@@ -179,7 +179,7 @@ void shehan_ScaleElongation()
      */
     rootsystem.write(name+".vtp");
 
-    auto rl = rootsystem.getScalar(RootSystem::st_length);
+    auto rl = rootsystem.getParameter("length");
     double tl = std::accumulate(rl.begin(), rl.end(), 0);
     cout << "Finished with a total of " << rootsystem.getNumberOfNodes()<< " nodes, " << tl << " cm total length \n";
 }

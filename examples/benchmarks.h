@@ -30,12 +30,12 @@ void benchmark(const std::string& name, const std::vector<double>& times, const 
   for (auto dt : dt_) {
       rs1.simulate(dt);
       SegmentAnalyser analysis0(rs1);
-      lt[i] = analysis0.getSummed(RootSystem::st_length);
-      analysis0.filter(RootSystem::st_type,1);
-      l0[i] = analysis0.getSummed(RootSystem::st_length);
+      lt[i] = analysis0.getSummed("length");
+      analysis0.filter("sub_type",1);
+      l0[i] = analysis0.getSummed("length");
       SegmentAnalyser analysis1(rs1);
-      analysis1.filter(RootSystem::st_type,2);
-      l1[i] = analysis1.getSummed(RootSystem::st_length);
+      analysis1.filter("sub_type",2);
+      l1[i] = analysis1.getSummed("length");
       i++;
   }
   cout << bm_name <<"\ntimes              [\t";

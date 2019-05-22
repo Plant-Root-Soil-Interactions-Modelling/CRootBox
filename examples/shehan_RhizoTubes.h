@@ -22,7 +22,7 @@ SignedDistanceFunction* fieldRhizoTubes(double r)
   SDF_PlantContainer* rhizotube = new SDF_PlantContainer(r,r,l,false);
   SDF_RotateTranslate* rhizoX = new SDF_RotateTranslate(rhizotube, l, SDF_RotateTranslate::yaxis, Vector3d(l,0.,0.));
   vector<SignedDistanceFunction*> rhizotubes_;
-  const int tubeN=6;
+  const int tubeN = 6;
   double y_[tubeN] = { 35, 45, 55, 65, 75, 85 };
   double z_[tubeN] = { -10, -20, -40, -60, -80, -120 };
   for (int i=0; i<tubeN; i++) {
@@ -138,9 +138,9 @@ void shehan_RhizoTubes(const std::string& name = "wheat", bool exportVTP = false
           foto12.crop(foto);
           foto12.pack();
 
-          finalmatrixC[t][j] += double(foto12.getNumberOfRoots())/7.;
+          finalmatrixC[t][j] += double(foto12.getNumberOfOrgans())/7.;
           // number of segments is not feasible, since a root might grow around the tube
-          finalmatrixL[t][j] += double(foto12.getSummed(RootSystem::st_length))/7.;
+          finalmatrixL[t][j] += double(foto12.getSummed("length"))/7.;
 //          finalmatrixC[t][j] += 1./7.; // for debugging
 //          finalmatrixL[t][j] += 1./7.;
 

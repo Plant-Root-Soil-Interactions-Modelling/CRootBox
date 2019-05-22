@@ -42,7 +42,7 @@ void example_volume()
     rs.write(name +".vtp");
 
     auto analysis = SegmentAnalyser(rs);
-    double l = analysis.getSummed(RootSystem::st_volume);
+    double l = analysis.getSummed("volume");
     std::cout << "Root system volume " << l << " cm^3 \n";
     std::cout << "Finished with a total of " << rs.getNumberOfNodes()<< " nodes\n";
 }

@@ -12,6 +12,7 @@
 #include <stack>
 
 #include "ModelParameter.h"
+#include "PlantBase.h"
 #include "Root.h"
 #include "soil.h"
 
@@ -46,7 +47,7 @@ private:
     // copy because of random generator seeds
     std::vector<Tropism*> tf;
     std::vector<GrowthFunction*> gf;
-    std::vector<RootTypeParameter> rtparam;
+    std::vector<RootTypeParameter*> rtparam;
 
     double simtime = 0;
     int rid = -1; // unique root id counter
@@ -70,7 +71,7 @@ private:
  * and offers utility functions for post processing.
  * More post processing functions can be found in the class SegmentAnalyser
  */
-class RootSystem
+class RootSystem :public PlantBase
 {
 
     friend Root;  // obviously :-)
@@ -91,10 +92,12 @@ public:
     virtual ~RootSystem();
 
     // Parameter input output
-    void setRootTypeParameter(RootTypeParameter p) { rtparam.at(p.type-1) = p; } ///< set the root type parameter to the index type-1
-    RootTypeParameter* getRootTypeParameter(int type) { return &rtparam.at(type-1); } ///< returns the i-th root parameter set (i=1..n)
+    void setRootTypeParameter(RootTypeParameter* p) { rtparam.at(p->type-1) = p; } ///< set the root type parameter to the index type-1
+    RootTypeParameter* getRootTypeParameter(int type) const { return rtparam.at(type-1); } ///< returns the i-th root parameter set (i=1..n)
     void setRootSystemParameter(const RootSystemParameter& rsp) { rsparam = rsp; } ///< sets the root system parameters
     RootSystemParameter* getRootSystemParameter() { return &rsparam; } ///< gets the root system parameters
+
+    OrganTypeParameter* getOrganTypeParameter(int otype, int subtype) const override { return (OrganTypeParameter*) getRootTypeParameter(subtype); }
 
     void openFile(std::string filename, std::string subdir="modelparameter/"); ///< reads root paramter and plant parameter
     int readParameters(std::istream & cin); ///< reads root parameters from an input stream
@@ -104,9 +107,11 @@ public:
     void setGeometry(SignedDistanceFunction* geom) { geometry = geom; } ///< optionally, sets a confining geometry (call before RootSystem::initialize())
     void setSoil(SoilLookUp* soil_) { soil = soil_; } ///< optionally sets a soil for hydro tropism (call before RootSystem::initialize())
     void reset(); ///< resets the root class, keeps the root type parameters
-    virtual void initialize(int basal = 4, int shootborne = 5); ///< creates the base roots, call before simulation and after setting the plant and root parameters
+
+    virtual void initialize() override { initialize(4,5); };
+    void initialize(int basal, int shootborne); ///< creates the base roots, call before simulation and after setting the plant and root parameters
     void setTropism(Tropism* tf, int rt = -1);
-    void simulate(double dt, bool silence = false); ///< simulates root system growth for time span dt
+    void simulate(double dt, bool silence = false) override; ///< simulates root system growth for time span dt
     void simulate(); ///< simulates root system growth for the time defined in the root system parameters
     void simulate(double dt, double maxinc, ProportionalElongation* se, bool silence = false); // simulates the root system with a maximal overall elongation
     double getSimTime() const { return simtime; } ///< returns the current simulation time
@@ -120,7 +125,6 @@ public:
     ///< Creates the growth function per root type, overwrite or change this method to add more tropisms
 
     // Analysis of simulation results
-    int getNumberOfNodes() const { return nid+1; } ///< Number of nodes of the root system (including nodes for seed, root crowns, and artificial shoot)
     int getNumberOfSegments() const { return nid-numberOfCrowns-1; } ///< Number of segments of the root system ((nid+1)-1) - numberOfCrowns - 1 (artificial shoot)
     int getNumberOfRoots(bool all = false) const { if (all) return rid+1; else return getRoots().size(); }
     std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots and buffers the result
@@ -184,7 +188,7 @@ private:
     const int rsmlReduction = 5; ///< only each n-th node is written to the rsml file (to coarsely adjust axial resolution for output)
 
     RootSystemParameter rsparam; ///< Plant parameter
-    std::vector<RootTypeParameter> rtparam; ///< Parameter set for each root type
+    std::vector<RootTypeParameter*> rtparam; ///< Parameter set for each root type
     std::vector<Root*> baseRoots;  ///< Base roots of the root system
     std::vector<GrowthFunction*> gf; ///< Growth function per root type
     std::vector<Tropism*> tf;  ///< Tropism per root type

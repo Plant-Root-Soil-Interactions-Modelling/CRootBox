@@ -29,7 +29,7 @@ public:
 
     SDF_RootSystem(const Root& r, double dx = 0.5);
 
-    SDF_RootSystem(const RootSystem& rs, double dx = 0.5);
+    SDF_RootSystem(const PlantBase& plant, double dx = 0.5);
 
     SDF_RootSystem(std::vector<Vector3d> nodes, const std::vector<Vector2i> segments, std::vector<double> radii, double dx = 0.5);
 
@@ -65,16 +65,16 @@ SDF_RootSystem::SDF_RootSystem(const Root& r, double dx): dx_(dx) {
   }
   for (size_t i=1; i<n; i++) {
       segments_[i-1] = Vector2i(i-1,i);
-      radii_[i-1] = r.param.a;
+      radii_[i-1] = r.param->a;
   }
   buildTree();
 }
 
-SDF_RootSystem::SDF_RootSystem(const RootSystem& rs, double dx): dx_(dx) {
-    auto ana = SegmentAnalyser(rs);
+SDF_RootSystem::SDF_RootSystem(const PlantBase& plant, double dx): dx_(dx) {
+    auto ana = SegmentAnalyser(plant);
     nodes_ = ana.nodes;
     segments_ = ana.segments;
-    radii_ = ana.getScalar(RootSystem::st_radius);
+    radii_ = ana.getParameter("radius");
     buildTree();
 }
 
@@ -82,9 +82,6 @@ SDF_RootSystem::SDF_RootSystem(std::vector<Vector3d> nodes, const std::vector<Ve
     :nodes_(nodes), segments_(segments), radii_(radii), dx_(dx) {
     buildTree();
 }
-
-
-
 
 void SDF_RootSystem::buildTree() {
     size_t c = 0;

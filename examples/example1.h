@@ -66,7 +66,7 @@ void example1()
     /*
       Total length and surface
      */
-    double l = analysis.getSummed(RootSystem::st_length);
+    double l = analysis.getSummed("length");
     std::cout << "Root system length " << l << " cm \n";
 
     cout << "Finished with a total of " << rootsystem.getNumberOfNodes()<< " nodes\n";

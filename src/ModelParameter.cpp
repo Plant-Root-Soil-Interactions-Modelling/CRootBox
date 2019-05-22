@@ -11,7 +11,7 @@ namespace CRootBox {
 /**
  * Default constructor
  */
-RootTypeParameter::RootTypeParameter() {
+RootTypeParameter::RootTypeParameter(PlantBase* plant) :OrganTypeParameter(plant) {
     set(-1, 0., 0., 10., 0., 1., 0., 0., 0., 1., 0, 0.1, 0., 150./255.,150./255.,50./255., 1, 1. ,0.2, 0.1,
         successor, successorP, 1.22, 0., 1.e9, 0., 1, "undefined");
 }
@@ -53,7 +53,7 @@ void RootTypeParameter::set(int type, double lb, double lbs, double la, double l
  *
  * \return Specific root parameters derived from the root type parameters
  */
-RootParameter RootTypeParameter::realize() {
+OrganParameter* RootTypeParameter::realize() {
     // type does not change
     double lb_ = std::max(lb + randn()*lbs,double(1.e-5)); // length of basal zone
     double la_ = std::max(la + randn()*las,double(1.e-5)); // length of apical zone
@@ -67,7 +67,7 @@ RootParameter RootTypeParameter::realize() {
     double a_ = std::max(a + randn()*as,double(0)); // radius
     double theta_ = std::max(theta + randn()*thetas,double(0)); // initial elongation
     double rlt_ = std::max(rlt + randn()*rlts,double(0)); // root life time
-    RootParameter p(type,lb_,la_,ln_,nob_,r_,a_,theta_,rlt_);
+    OrganParameter* p = new RootParameter(type,lb_,la_,ln_,nob_,r_,a_,theta_,rlt_);
     return p;
 }
 
@@ -169,14 +169,14 @@ void RootTypeParameter::read(std::istream & cin) {
 /**
  * Default constructor
  */
-RootParameter:: RootParameter() {
+RootParameter::RootParameter() {
     std::vector<double> ln;
     set(-1,0.,0.,ln, 0,0.,0.,0.,0.);
 }
 
 double RootParameter::getK() const {
     double l = 0;
-    for (auto const& dl : ln) {
+    for (const auto& dl : ln) {
         l += dl;
     }
     return l+la+lb;

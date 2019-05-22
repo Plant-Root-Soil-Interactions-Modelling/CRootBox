@@ -1,11 +1,9 @@
 #ifndef GROWTH_H
 #define GROWTH_H
 
-#include "Root.h"
-
 namespace CRootBox {
 
-class Root;
+class Organ;
 
 /**
  * Abstract base class to all growth functions: currently LinearGrowth and ExponentialGrowth
@@ -27,7 +25,7 @@ public:
      *
      * \return      root length [cm]
      */
-    virtual double getLength(double t, double r, double k, Root* root) const
+    virtual double getLength(double t, double r, double k, Organ* o) const
     { throw std::runtime_error( "getLength() not implemented" ); return 0; } ///< Returns root length at root age t
 
     /**
@@ -40,7 +38,7 @@ public:
      *
      * \return      root age [day]
      */
-    virtual double getAge(double l, double r, double k, Root* root) const
+    virtual double getAge(double l, double r, double k, Organ* o) const
     { throw std::runtime_error( "getAge() not implemented" ); return 0; } ///< Returns the age of a root of length l
 
 
@@ -55,8 +53,8 @@ public:
 class LinearGrowth : public GrowthFunction
 {
 public:
-    double getLength(double t, double r, double k, Root* root) const override { return std::min(k,r*t); } ///< @see GrowthFunction
-    double getAge(double l, double r, double k, Root* root)  const override { return l/r; } ///< @see GrowthFunction
+    double getLength(double t, double r, double k, Organ* o) const override { return std::min(k,r*t); } ///< @see GrowthFunction
+    double getAge(double l, double r, double k, Organ* o)  const override { return l/r; } ///< @see GrowthFunction
 
     GrowthFunction* copy() override { return new LinearGrowth(*this); }
 };
@@ -68,8 +66,8 @@ public:
 class ExponentialGrowth : public GrowthFunction
 {
 public:
-    double getLength(double t, double r, double k, Root* root) const override { return k*(1-exp(-(r/k)*t)); } ///< @see GrowthFunction
-    double getAge(double l, double r, double k, Root* root) const override {
+    double getLength(double t, double r, double k, Organ* o) const override { return k*(1-exp(-(r/k)*t)); } ///< @see GrowthFunction
+    double getAge(double l, double r, double k, Organ* o) const override {
         double age = - k/r*log(1-l/k);
         if (std::isfinite(age)) { // the age can not be computed when root length approaches max length
             return age;

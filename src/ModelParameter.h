@@ -17,6 +17,7 @@
 #include <assert.h>
 
 #include "mymath.h"
+#include "OrganParameter.h"
 #include "soil.h"
 
 namespace CRootBox {
@@ -26,12 +27,12 @@ class RootParameter;
 /**
  * RootTypeParameter: contains a parameter set describing a root type
  */
-class RootTypeParameter
+class RootTypeParameter :public OrganTypeParameter
 {
 
 public:
 
-    RootTypeParameter(); ///< default constructor
+    RootTypeParameter(PlantBase* plant); ///< default constructor
     virtual ~RootTypeParameter() { };
 
     void set(int type, double lb, double lbs, double la, double las, double ln, double lns, double nob, double nobs,
@@ -39,7 +40,7 @@ public:
         double dx, const std::vector<int>& successor, const std::vector<double>& successorP, double theta, double thetas, double rlt, double rlts,
         int gf, const std::string& name); ///< sets all parameters
 
-    RootParameter realize(); ///< Creates a specific root from the root parameter set
+    OrganParameter* realize(); ///< Creates a specific root from the root parameter set
     int getLateralType(const Vector3d& pos); ///< Choose (dice) lateral type based on root parameter set
     double getK() const { return std::max(nob-1,double(0))*ln+la+lb; }  ///< returns the mean maximal root length [cm]
 
@@ -102,7 +103,7 @@ private:
  * IndividualRootParameter:
  * contains parameters of a single root, that are created by RootParameter:realize()
  */
-class RootParameter
+class RootParameter :public OrganParameter
 {
 
 public:
@@ -110,7 +111,7 @@ public:
     /* Constructor */
     RootParameter(); ///< Default constructor
     RootParameter(int type, double lb, double la, const std::vector<double>& ln, int nob, double r, double a, double theta, double rlt):
-        type(type), lb(lb), la(la), nob(nob), r(r), a(a), theta(theta), rlt(rlt), ln(ln) { }
+        OrganParameter(), type(type), lb(lb), la(la), nob(nob), r(r), a(a), theta(theta), rlt(rlt), ln(ln) { }
     ///< Constructor setting all parameters
 
     /* Methods */

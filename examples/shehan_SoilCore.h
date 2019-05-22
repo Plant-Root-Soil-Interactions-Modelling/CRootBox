@@ -74,7 +74,7 @@ SegmentAnalyser getResult(const std::vector<RootSystem*>& allRS, double time) {
       //cout << "Analyser " << a.segments.size()<< ", " << a.nodes.size() << "\n";
       //cout << "Root system: " << rs->getNumberOfNodes() <<"\n";
       auto news = SegmentAnalyser(*rs);
-      news.filter(RootSystem::st_time,0,time);
+      news.filter("creation_time",0,time);
       news.pack(); // delete unused nodes
       a.addSegments(news);
   }
@@ -139,7 +139,7 @@ void shehan_SoilCore(const std::string& name = "wheat", bool exportVTP = false)
             std::cout << "pack\n";
             coreanalyser.pack(); // throw unused nodes away
             std::cout << "get distribution\n";
-            vector<double> tl = coreanalyser.distribution(RootSystem::st_length,0,h,round(h/dz),true);  // vertical distribution
+            vector<double> tl = coreanalyser.distribution("length",0,h,round(h/dz),true);  // vertical distribution
             for (double& d :tl) {
                 d = d/(15*r*r*M_PI*dz); // 15 soil cores
             }

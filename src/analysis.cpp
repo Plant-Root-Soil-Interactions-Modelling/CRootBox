@@ -1,32 +1,39 @@
 // -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 #include "analysis.h"
-#include <iostream>
+
+#include "PlantBase.h"
+#include "Organ.h"
+
 #include <iomanip>
+#include <istream>
+#include <fstream>
+#include <set>
 
 namespace CRootBox {
 
 /**
  * Copies the segments of the roots system into the analysis class
  *
- * @param rs      the root system that is analysed
+ * @param plant     the root system that is analysed
  */
-SegmentAnalyser::SegmentAnalyser(const RootSystem& rs)
+SegmentAnalyser::SegmentAnalyser(const PlantBase& plant)
 {
-    nodes = rs.getNodes();
-    segments = rs.getSegments();
-    ctimes = rs.getNETimes();
-    segO = rs.getSegmentsOrigin();
-    assert(segments.size()==ctimes.size());
+    nodes = plant.getNodes();
+    segments = plant.getSegments();
+    segCTs = plant.getSegmentCTs();
+    segO = plant.getSegmentsOrigin();
+
+    assert(segments.size()==segCTs.size());
     assert(segments.size()==segO.size());
-    this->rs = &rs; // needed for dgf writer, only
+
 }
 
 /**
- * Adds all segmentes from root system @param rs to the analysis.
+ * Adds all segments from root system @param rs to the analysis.
  */
-void SegmentAnalyser::addSegments(const RootSystem& rs)
+void SegmentAnalyser::addSegments(const PlantBase& plant)
 {
-    addSegments(SegmentAnalyser(rs));
+    addSegments(SegmentAnalyser(plant));
 }
 
 /**
@@ -42,9 +49,9 @@ void SegmentAnalyser::addSegments(const SegmentAnalyser& a)
         s.y += offset;
     }
     segments.insert(segments.end(),ns.begin(),ns.end()); // copy segments
-    ctimes.insert(ctimes.end(),a.ctimes.begin(),a.ctimes.end()); // copy times
+    segCTs.insert(segCTs.end(),a.segCTs.begin(),a.segCTs.end()); // copy times
     segO.insert(segO.end(),a.segO.begin(),a.segO.end());// copy origins
-    assert(segments.size()==ctimes.size());
+    assert(segments.size()==segCTs.size());
     assert(segments.size()==segO.size());
 }
 
@@ -54,74 +61,28 @@ void SegmentAnalyser::addSegments(const SegmentAnalyser& a)
  * @param st    parameter type @see RootSystem::ScalarType per segment
  * \return      vector containing parameter value per segment
  */
-std::vector<double> SegmentAnalyser::getScalar(int st) const
+std::vector<double> SegmentAnalyser::getParameter(std::string name) const
 {
     std::vector<double> data(segO.size());
 
-    if (st==RootSystem::st_time) {
-        data = ctimes;
+    if (name == "creation_time") {
+        data = segCTs;
         return data;
     }
-    if (st==RootSystem::st_userdata1) {
+    if (name == "user_data_1") {
         data = userData.at(0);
         return data;
     }
-    if (st==RootSystem::st_userdata2) {
+    if (name == "user_data_2") {
         data = userData.at(1);
         return data;
     }
-    if (st==RootSystem::st_userdata3) {
+    if (name == "user_data_3") {
         data = userData.at(2);
         return data;
     }
-
-    double v = 0; // value
     for (size_t i=0; i<segO.size(); i++) {
-        const auto& r = segO.at(i);
-        switch (st) {
-        case RootSystem::st_type:
-            v=r->param.type;
-            break;
-        case RootSystem::st_radius:
-            v=r->param.a;
-            break;
-        case RootSystem::st_order: {
-            v = 0;
-            Root* r_ = r;
-            while (r_->parent!=nullptr) { // find root order
-                v++;
-                r_=r_->parent;
-            }
-        }
-        break;
-        case RootSystem::st_length: { // compute segment length
-            v = getSegmentLength(i);
-        }
-        break;
-        case RootSystem::st_surface: { // compute segment surface
-            v = getSegmentLength(i)*2*M_PI*r->param.a;
-        }
-        break;
-        case RootSystem::st_volume: {
-            v =  getSegmentLength(i)*M_PI*(r->param.a)*(r->param.a);
-        }
-        break;
-        case RootSystem::st_one: { // e.g. for counting segments
-            v = 1;
-        }
-        break;
-        case RootSystem::st_parenttype: {
-            if (r->parent!=nullptr) {
-                v = r->parent->param.type;
-            } else {
-                v = 0;
-            }
-            break;
-        }
-        default:
-            throw std::invalid_argument( "SegmentAnalyser::getScalar: Type not implemented" );
-        }
-        data.at(i) = v;
+        data.at(i) = segO.at(i)->getParameter(name);
     }
     return data;
 }
@@ -149,7 +110,7 @@ void SegmentAnalyser::crop(SignedDistanceFunction* geometry)
 {
     //std::cout << "cropping " << segments.size() << " segments...";
     std::vector<Vector2i> seg;
-    std::vector<Root*> sO;
+    std::vector<Organ*> sO;
     std::vector<double> ntimes;
     for (size_t i=0; i<segments.size(); i++) {
         auto s = segments.at(i);
@@ -160,7 +121,7 @@ void SegmentAnalyser::crop(SignedDistanceFunction* geometry)
         if ((x_==true) && (y_==true)) { //segment is inside
             seg.push_back(s);
             sO.push_back(segO.at(i));
-            ntimes.push_back(ctimes.at(i));
+            ntimes.push_back(segCTs.at(i));
         } else if ((x_==false) && (y_==false)) { // segment is outside
 
         } else { // one node is inside, one outside
@@ -184,13 +145,13 @@ void SegmentAnalyser::crop(SignedDistanceFunction* geometry)
             Vector2i newseg(ini,nodes.size()-1);
             seg.push_back(newseg);
             sO.push_back(segO.at(i));
-            ntimes.push_back(ctimes.at(i));
+            ntimes.push_back(segCTs.at(i));
         }
 
     }
     segments = seg;
     segO  = sO;
-    ctimes = ntimes;
+    segCTs = ntimes;
     //std::cout << " cropped to " << segments.size() << " segments " << "\n";
 }
 
@@ -198,51 +159,51 @@ void SegmentAnalyser::crop(SignedDistanceFunction* geometry)
  * Filters the segments to the ones, where data is within [min,max], @see AnalysisSDF::getData,
  * i.e. all other segments are deleted.
  *
- * @param st    parameter type @see RootSystem::ScalarType
+ * @param name  parameter type @see RootSystem::ScalarType
  * @param min   minimal value
  * @param max   maximal value
  */
-void SegmentAnalyser::filter(int st, double min, double max)
+void SegmentAnalyser::filter(std::string name, double min, double max)
 {
-    std::vector<double> data = getScalar(st);
+    std::vector<double> data = getParameter(name);
     std::vector<Vector2i> seg;
-    std::vector<Root*> sO;
+    std::vector<Organ*> sO;
     std::vector<double> ntimes;
     for (size_t i=0; i<segments.size(); i++) {
         if ((data.at(i)>=min) && (data.at(i)<=max)) {
             seg.push_back(segments.at(i));
             sO.push_back(segO.at(i));
-            ntimes.push_back(ctimes.at(i));
+            ntimes.push_back(segCTs.at(i));
         }
     }
     segments = seg;
     segO  = sO;
-    ctimes = ntimes;
+    segCTs = ntimes;
 }
 
 /**
  * Filters the segments to the ones, where data equals value, @see AnalysisSDF::getData,
  * i.e. all other segments are deleted.
  *
- * @param st        parameter type @see RootSystem::ScalarType
+ * @param name      parameter type @see RootSystem::ScalarType
  * @param value     parameter value of the segments that are kept
  */
-void SegmentAnalyser::filter(int st, double value)
+void SegmentAnalyser::filter(std::string name, double value)
 {
-    std::vector<double> data = getScalar(st);
+    std::vector<double> data = getParameter(name);
     std::vector<Vector2i> seg;
-    std::vector<Root*> sO;
+    std::vector<Organ*> sO;
     std::vector<double> ntimes;
     for (size_t i=0; i<segments.size(); i++) {
         if (data.at(i)==value) {
             seg.push_back(segments.at(i));
             sO.push_back(segO.at(i));
-            ntimes.push_back(ctimes.at(i));
+            ntimes.push_back(segCTs.at(i));
         }
     }
     segments = seg;
     segO  = sO;
-    ctimes = ntimes;
+    segCTs = ntimes;
 }
 
 /**
@@ -294,20 +255,20 @@ Vector3d SegmentAnalyser::cut(Vector3d in, Vector3d out, SignedDistanceFunction*
 }
 
 /**
- * \return The summed parameter of type @param st (@see RootSystem::ScalarType)
+ * \return The summed parameter of type @param name (@see RootSystem::ScalarType)
  */
-double SegmentAnalyser::getSummed(int st) const {
-    std::vector<double> v_ = getScalar(st);
+double SegmentAnalyser::getSummed(std::string name) const {
+    std::vector<double> v_ = getParameter(name);
     return std::accumulate(v_.begin(), v_.end(), 0.0);
 }
 
 /**
- * \return The summed parameter of type @param st (@see RootSystem::ScalarType),
+ * \return The summed parameter of type @param name (@see RootSystem::ScalarType),
  * that is within geometry @param g based on the segment mid point (i.e. not exact).
  * To sum exactly, first crop to the geometry, then run SegmentAnalyser::getSummed(st).
  */
-double SegmentAnalyser::getSummed(int st, SignedDistanceFunction* g) const {
-    std::vector<double> data = getScalar(st);
+double SegmentAnalyser::getSummed(std::string name, SignedDistanceFunction* g) const {
+    std::vector<double> data = getParameter(name);
     double v = 0;
     for (size_t i=0; i<segments.size(); i++) {
         double d = data.at(i);
@@ -322,30 +283,26 @@ double SegmentAnalyser::getSummed(int st, SignedDistanceFunction* g) const {
     return v;
 }
 
-
-
 /**
  * Return the unique origins of the segments
  */
-std::vector<Root*> SegmentAnalyser::getRoots() const
+std::vector<Organ*> SegmentAnalyser::getOrgans() const
 {
-    std::set<Root*> rootset;  // praise the stl
-    for (Root* r : segO) {
+    std::set<Organ*> rootset;  // praise the stl
+    for (Organ* r : segO) {
         rootset.insert(r);
     }
-    return std::vector<Root*>(rootset.begin(), rootset.end());
+    return std::vector<Organ*>(rootset.begin(), rootset.end());
 }
 
 /**
  * \return The number of roots
  */
-int SegmentAnalyser::getNumberOfRoots() const
+int SegmentAnalyser::getNumberOfOrgans() const
 {
-    const auto& rootset = getRoots();
+    const auto& rootset = getOrgans();
     return rootset.size();
 }
-
-
 
 /**
  * Projects the segments to an image plane (todo verify this code)
@@ -400,7 +357,7 @@ SegmentAnalyser SegmentAnalyser::cut(const SDF_HalfPlane& plane) const
         double d = plane.getDist(n1)*plane.getDist(n2);
         if (d<=0) { // one is inside, one is outside
             f.segments.push_back(s);
-            f.ctimes.push_back(ctimes.at(i));
+            f.segCTs.push_back(segCTs.at(i));
             f.segO.push_back(segO.at(i));
         }
     }
@@ -411,14 +368,14 @@ SegmentAnalyser SegmentAnalyser::cut(const SDF_HalfPlane& plane) const
 /**
  *  Creates a vertical distribution of the parameter of type @param st (@see RootSystem::ScalarType)
  *
- * @param st        parameter type @see RootSystem::ScalarType
+ * @param name      parameter type @see RootSystem::ScalarType
  * @param top       vertical top position (cm)
  * @param bot       vertical bot position (cm)
  * @param n         number of layers (each with a height of (bot-top)/n )
  * @param exact     calculates the intersection with the layer boundaries (true), only based on segment midpoints (false)
  * \return Vector of size @param n containing the summed parameter in this layer
  */
-std::vector<double> SegmentAnalyser::distribution(int st, double top, double bot, int n, bool exact) const
+std::vector<double> SegmentAnalyser::distribution(std::string name, double top, double bot, int n, bool exact) const
 {
     std::vector<double> d(n);
     double dz = (bot-top)/double(n);
@@ -429,9 +386,9 @@ std::vector<double> SegmentAnalyser::distribution(int st, double top, double bot
         if (exact) {
             SegmentAnalyser a(*this); // copy everything
             a.crop(&g); // crop exactly
-            d.at(i) = a.getSummed(st);
+            d.at(i) = a.getSummed(name);
         } else {
-            d.at(i) = this->getSummed(st, &g);
+            d.at(i) = this->getSummed(name, &g);
         }
     }
     delete layer;
@@ -465,7 +422,7 @@ std::vector<SegmentAnalyser> SegmentAnalyser::distribution(double top, double bo
 /**
  *  Creates a two-dimensional distribution of the parameter of type @param st (@see RootSystem::ScalarType)
  *
- * @param st        parameter type @see RootSystem::ScalarType
+ * @param name      parameter type @see RootSystem::ScalarType
  * @param top       vertical top position (cm)
  * @param bot       vertical bot position (cm)
  * @param left      left along x-axis (cm)
@@ -475,31 +432,25 @@ std::vector<SegmentAnalyser> SegmentAnalyser::distribution(double top, double bo
  * @param exact     calculates the intersection with the layer boundaries (true), only based on segment midpoints (false)
  * \return Vector of size @param n containing the summed parameter in this layer
  */
-std::vector<std::vector<double>> SegmentAnalyser::distribution2(int st, double top, double bot, double left, double right, int n, int m, bool exact) const
+std::vector<std::vector<double>> SegmentAnalyser::distribution2(std::string name, double top, double bot, double left, double right, int n, int m, bool exact) const
 {
     std::vector<std::vector<double>> d(n);
     double dz = (bot-top)/double(n);
     double dx = (right-left)/double(m);
     SDF_PlantBox* layer = new SDF_PlantBox(dx,1e9,dz);
-
     for (int i=0; i<n; i++) {
-
         std::vector<double> row(m); // m columns
         for (int j=0; j<m; j++) {
-
             Vector3d t(left+(j+0.5)*dx,0.,top-i*dz); // box is [-x/2,-y/2,0] - [x/2,y/2,-z]
             SDF_RotateTranslate g(layer,t);
-
             if (exact) {
                 SegmentAnalyser a(*this); // copy everything
                 a.crop(&g); // crop exactly
-                row.at(j) = a.getSummed(st);
+                row.at(j) = a.getSummed(name);
             } else {
-                row.at(j) = this->getSummed(st, &g);
+                row.at(j) = this->getSummed(name, &g);
             }
-
         }
-
         d.at(i)=row; // store the row (n rows)
     }
     delete layer;
@@ -564,7 +515,7 @@ void SegmentAnalyser::write(std::string name)
     std::string ext = name.substr(name.size()-3,name.size()); // pick the right writer
     if (ext.compare("vtp")==0) {
         std::cout << "writing VTP: " << name << "\n";
-        this->writeVTP(fos,{ RootSystem::st_radius, RootSystem::st_type, RootSystem::st_time });
+        this->writeVTP(fos,{ 0 /* todo RootSystem::st_radius, RootSystem::st_type, RootSystem::st_time*/ });
     } else if (ext.compare("txt")==0)  {
         std::cout << "writing text file for Matlab import: "<< name << "\n";
         writeRBSegments(fos);
@@ -584,19 +535,19 @@ void SegmentAnalyser::write(std::string name)
  * @param types     multiple parameter types (@see RootSystem::ScalarType) that are saved in the VTP file,
  * 					additionally, all userdata is saved per default
  */
-void SegmentAnalyser::writeVTP(std::ostream & os, std::vector<int> types) const
+void SegmentAnalyser::writeVTP(std::ostream & os, std::vector<std::string> types) const
 {
     assert(segments.size() == segO.size());
-    assert(segments.size() == ctimes.size());
+    assert(segments.size() == segCTs.size());
     os << "<?xml version=\"1.0\"?>";
     os << "<VTKFile type=\"PolyData\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
     os << "<PolyData>\n";
     os << "<Piece NumberOfLines=\""<< segments.size() << "\" NumberOfPoints=\""<< nodes.size()<< "\">\n";
     // data (CellData)
     os << "<CellData Scalars=\" CellData\">\n";
-    for (auto i : types) {
-        std::vector<double> data = getScalar(i);
-        os << "<DataArray type=\"Float32\" Name=\"" << RootSystem::scalarTypeNames.at(i) << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
+    for (auto name : types) {
+        std::vector<double> data = getParameter(name);
+        os << "<DataArray type=\"Float32\" Name=\"" << name << "\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
         for (const auto& t : data) {
             os << t << " ";
         }
@@ -643,30 +594,22 @@ void SegmentAnalyser::writeVTP(std::ostream & os, std::vector<int> types) const
  */
 void SegmentAnalyser::writeRBSegments(std::ostream & os) const
 {
-    os << "node1ID node2ID branchID x1 y1 z1 x2 y2 z2 radius length R G B time type \n";
-    int nid1 = 0;
-    int nid2 = 1;
+    os << "x1 y1 z1 x2 y2 z2 radius R G B time type organ \n";
     for (size_t i=0; i<segments.size(); i++) {
         Vector2i s = segments.at(i);
         Vector3d n1 = nodes.at(s.x);
         Vector3d n2 = nodes.at(s.y);
-        Root* r = segO.at(i);
-        int branchnumber = r->id;
-        double radius = r->param.a;
-        double length = sqrt((n1.x-n2.x)*(n1.x-n2.x)+(n1.y-n2.y)*(n1.y-n2.y)+(n1.z-n2.z)*(n1.z-n2.z));
-        double red = r->getRootTypeParameter()->colorR;
-        double green = r->getRootTypeParameter()->colorG;
-        double blue = r->getRootTypeParameter()->colorB;
-        double time = ctimes.at(i);
-        double type = r->param.type;
-        os << std::fixed << std::setprecision(4) << nid1 << " " << nid2 << " " << branchnumber << " " << n1.x << " " << n1.y << " " <<
-            n1.z << " " << n2.x << " " << n2.y << " " << n2.z << " " <<
-            radius << " " << length << " " << red << " " << green << " " << blue << " " << time<< " " << type << " \n";
-        nid1 = nid1+1;
-        nid2 = nid2+1;
+        Organ* o = segO.at(i);
+        int organ=o->organType();
+        double radius = o->getParameter("radius");
+        double red = o->getParameter("RotBeta");
+        double green = o->getParameter("BetaDev");
+        double blue = o->getParameter("InitBeta");
+        double time = segCTs.at(i);
+        int subType = o->getParameter("sub_type");
+        os << std::fixed << std::setprecision(4)<< n1.x << " " << n1.y << " " << n1.z << " " << n2.x << " " << n2.y << " " << n2.z << " " <<
+            radius << " " << red << " " << green << " " << blue << " " << time<< " " << subType << " " << organ <<" \n";
     }
-
-
 }
 
 /**
@@ -674,7 +617,6 @@ void SegmentAnalyser::writeRBSegments(std::ostream & os) const
  *
  * @param os      typically a file out stream
  */
-
 void SegmentAnalyser::writeDGF(std::ostream & os) const
 {
     os << "DGF \n";
@@ -691,28 +633,14 @@ void SegmentAnalyser::writeDGF(std::ostream & os) const
         Vector2i s = segments.at(i);
         Vector3d n1 = nodes.at(s.x);
         Vector3d n2 = nodes.at(s.y);
-        Root* r = segO.at(i);
-        int branchnumber = r->id;
-        double radius = r->param.a;
+        Organ* o = segO.at(i);
+        int branchnumber = o->getId();
+        double radius = o->getParameter("radius");
         double length = sqrt((n1.x-n2.x)*(n1.x-n2.x)+(n1.y-n2.y)*(n1.y-n2.y)+(n1.z-n2.z)*(n1.z-n2.z));
         double surface = 2*radius*M_PI*length;
-        double time = ctimes.at(i);
-        double type = r->param.type;
-        os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
-    }
-    if (rs!=nullptr) {
-        auto shoot_segs = rs->getShootSegments();
-        for (auto& s : shoot_segs) {
-            Vector3d n1 = nodes.at(s.x);
-            Vector3d n2 = nodes.at(s.y);
-            int branchnumber = -1;
-            double radius = 1;
-            double length = sqrt((n1.x-n2.x)*(n1.x-n2.x)+(n1.y-n2.y)*(n1.y-n2.y)+(n1.z-n2.z)*(n1.z-n2.z));
-            double surface = 2*radius*M_PI*length;
-            double time = 0;
-            double type = -1;
-            os << s.x << " " << s.y << " " << type << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
-        }
+        double time = segCTs.at(i);
+        int subType = o->getParameter("sub_type");
+        os << s.x << " " << s.y << " " << subType << " " << branchnumber << " " << surface/10000 << " " << length/100 <<" " << radius/100 << " " << "0.00" << " " << "0.0001" << " "<< "0.00001" << " " << time*3600*24 << " \n";
     }
 
     os << "# \n";

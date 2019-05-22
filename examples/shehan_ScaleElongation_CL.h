@@ -110,8 +110,7 @@ void shehan_ScaleElongation_CL()
 
         // compute and write RLD
         SegmentAnalyser ana = SegmentAnalyser(rootsystem);
-        vector<double> tl = ana.distribution(RootSystem::st_length, 0, h,
-            round(h / dz), true);  // vertical distribution
+        vector<double> tl = ana.distribution("length", 0, h, round(h / dz), true);  // vertical distribution
         for (size_t i = 0; i < tl.size(); i++) {
             fos << tl[i] << ", ";
         }

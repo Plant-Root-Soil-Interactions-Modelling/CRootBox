@@ -4,6 +4,9 @@
 
 # file(GLOB all_sources *.cpp) # i changed that to exclude PythonRootSystem.cpp
 add_library(CRootBox
+            Organ.cpp
+            OrganParameter.cpp
+            PlantBase.cpp
             analysis.cpp
             ModelParameter.cpp
             Root.cpp
@@ -20,8 +23,8 @@ set_target_properties(CRootBox PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BIN
 #
 
 # Find necessary packages for py_rootbox
-find_package(PythonLibs 3)
-find_package(PythonInterp 3) # creates PYTHON_VERSION_MAJOR, PYTHON_VERSION_MINOR
+find_package(PythonLibs 3.7)
+find_package(PythonInterp 3.7)    # creates PYTHON_VERSION_MAJOR, PYTHON_VERSION_MINOR
 
 # Only build the library if Python 3 was found
 if (PythonLibs_FOUND)
@@ -32,6 +35,9 @@ if (PythonLibs_FOUND)
 
   # make shared library for Pyhton binding
   add_library(py_rootbox SHARED
+              Organ.cpp
+              OrganParameter.cpp
+              PlantBase.cpp  
               PythonRootSystem.cpp
               analysis.cpp
               ModelParameter.cpp
@@ -40,7 +46,8 @@ if (PythonLibs_FOUND)
               sdf.cpp
               tropism.cpp
               aabbcc/AABB.cc
-              ../examples/Exudation/gauss_legendre.cpp)
+               ../examples/Exudation/gauss_legendre.cpp
+)
   target_link_libraries(py_rootbox ${Boost_LIBRARIES} )
   set_target_properties(py_rootbox PROPERTIES PREFIX "" )
   set_target_properties(py_rootbox PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/python)

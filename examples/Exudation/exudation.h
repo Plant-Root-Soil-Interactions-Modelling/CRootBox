@@ -49,7 +49,7 @@ public:
         for (const auto& r : roots) {
             if (r->getNumberOfNodes()>1) { // started growing
                 // time when the root stopped growing
-                double sTime = r->getNodeETime(r->getNumberOfNodes()-1);
+                double sTime = r->getNodeCT(r->getNumberOfNodes()-1);
                 if (r->active) {
                     stopTime.push_back(0);
                 } else {
@@ -60,7 +60,7 @@ public:
                 tip.push_back(t);
                 // direction towards root base
                 Vector3d base = r->getNode(0);
-                double a = r->getNodeETime(r->getNumberOfNodes()-1) - r->getNodeETime(0);
+                double a = r->getNodeCT(r->getNumberOfNodes()-1) - r->getNodeCT(0);
                 v.push_back(base.minus(t).times(1./a));
             }
 
@@ -85,7 +85,7 @@ public:
             //
             // per root (passed to integrands)
             r_ = roots[ri]; // eq 11
-            age_ = std::min(r_->getNodeETime(r_->getNumberOfNodes()-1),tend) - r_->getNodeETime(0);
+            age_ = std::min(r_->getNodeCT(r_->getNumberOfNodes()-1),tend) - r_->getNodeCT(0);
 
             if (age_>0) {
 
@@ -200,10 +200,10 @@ public:
     // Returns the linearly interpolated position along the root r at age a
     static Vector3d pointAtAge(Root* r, double a) {
         a = std::max(0.,a);
-        double et = r->getNodeETime(0)+a; // age -> emergence time
+        double et = r->getNodeCT(0)+a; // age -> emergence time
         size_t i=0;
         while (i<r->getNumberOfNodes()) {
-            if (r->getNodeETime(i)>et) { // first index bigger than emergence time, interpolate i-1, i
+            if (r->getNodeCT(i)>et) { // first index bigger than emergence time, interpolate i-1, i
                 break;
             }
             i++;
@@ -214,7 +214,7 @@ public:
         }
         Vector3d n1 = r->getNode(i-1);
         Vector3d n2 = r->getNode(i);
-        double t = (et - r->getNodeETime(i - 1)) / (r->getNodeETime(i) - r->getNodeETime(i - 1)); // t in (0,1]
+        double t = (et - r->getNodeCT(i - 1)) / (r->getNodeCT(i) - r->getNodeCT(i - 1)); // t in (0,1]
         return (n1.times(1. - t)).plus(n2.times(t));
     }
 

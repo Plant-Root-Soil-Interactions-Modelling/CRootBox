@@ -65,7 +65,7 @@ void example1_wb_dgf()
     /*
       Total length and surface
      */
-    double l = analysis.getSummed(RootSystem::st_length);
+    double l = analysis.getSummed("length");
     std::cout << "Visible Length " << l << " cm \n";
 
 

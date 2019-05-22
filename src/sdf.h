@@ -2,11 +2,11 @@
 #ifndef SDF_H
 #define SDF_H
 
+#include "mymath.h"
+
 #include <iostream>
 #include <vector>
 #include <stdexcept>
-
-#include "mymath.h"
 
 namespace CRootBox {
 
@@ -20,6 +20,7 @@ class SignedDistanceFunction
 {
 
 public:
+
     virtual ~SignedDistanceFunction() {};
 
     /**
@@ -42,13 +43,13 @@ public:
      * @param c         python object counter for the script (to avoid duplicate names)
      * \return          object counter
      */
-    virtual int writePVPScript(std::ostream & cout, int c=1) const { return c; };
+    virtual int writePVPScript(std::ostream & cout, int c = 1) const { return c; };
     ///< Writes a ParaView Phython script explicitly representing the implicit geometry
 
     virtual std::string writePVPScript() const; ///< Writes the ParaView Phython script into a string
 
     /**
-     * Returns the (numerical) gradient of the sdf, overwrite with analytical (where appropriate)
+     * Returns the (numerical) gradient of the sdf, overwrite with an analytical gradient (where appropriate)
      *
      * @param p     spatial position [cm]
      * @param eps   central differences epsilon

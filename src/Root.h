@@ -10,6 +10,7 @@
 #include "tropism.h"
 #include "growth.h"
 #include "ModelParameter.h"
+#include "Organ.h"
 #include "RootSystem.h"
 
 namespace CRootBox {
@@ -24,7 +25,7 @@ class RootState;
  * The method simulate() creates new nodes of this root, and lateral roots in the root's branching zone.
  *
  */
-class Root
+class Root :public Organ
 {
 
     friend RootSystem;
@@ -32,7 +33,7 @@ class Root
 
 public:
 
-    Root(RootSystem* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of Root::createLaterals()
+    Root(PlantBase* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of Root::createLaterals()
     Root(const Root& r, RootSystem& rs); ///< deep copy of the tree
     virtual ~Root();
 
@@ -44,10 +45,6 @@ public:
     void getRoots(std::vector<Root*>& v); ///< return the root system as sequential vector
 
     /* Nodes of the root */
-    Vector3d getNode(int i) const { return nodes.at(i); } ///< i-th node of the root
-    double getNodeETime(int i) const { return netimes.at(i); } ///< creation time of i-th node
-    int getNodeId(int i) const {return nodeIds.at(i); } ///< unique identifier of i-th node
-    size_t getNumberOfNodes() const {return nodes.size(); }  ///< return the number of the nodes of the root
     void addNode(Vector3d n,double t); //< adds a node to the root
 
     /* From analytical equations */
@@ -56,6 +53,7 @@ public:
     double getAge(double length); ///< analytical age of the root
 
     /* Abbreviations */
+    // getParameter TODO
     RootTypeParameter* getRootTypeParameter() const;  ///< returns the root type parameter of the root
     double dx() const { return getRootTypeParameter()->dx; } ///< returns the axial resolution
 
@@ -67,7 +65,7 @@ public:
     RootSystem* rootsystem; ///< the root system this root is part of
 
     /* Parameters that are given per root that are constant*/
-    RootParameter param; ///< the parameters of this root
+    RootParameter* param; ///< the parameters of this root
     Vector3d iheading; ///< the initial heading of the root, when it was created
     int id; ///< unique root id, (not used so far)
     double parent_base_length; ///< length [cm]

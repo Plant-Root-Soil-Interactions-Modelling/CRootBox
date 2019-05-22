@@ -12,7 +12,6 @@ std::string SignedDistanceFunction::writePVPScript() const
 
 
 
-
 /**
  * Returns the signed distance to the next boundary of the box
  *

@@ -131,8 +131,8 @@ void shehan_Trenches(const std::string& name = "wheat", bool exportVTP = false) 
                 for (int j=0; j<m; j++) {
                     //					finalmatrix[i][j] += anamatrix[i][j].segments.size();
                     //					finalmatrix[i][j] += anamatrix[i][j+m].segments.size();
-                    finalmatrix[i][j] += anamatrix[i][j].getSummed(RootSystem::st_length);
-                    finalmatrix[i][j] += anamatrix[i][j+m].getSummed(RootSystem::st_length);;
+                    finalmatrix[i][j] += anamatrix[i][j].getSummed("length");
+                    finalmatrix[i][j] += anamatrix[i][j+m].getSummed("length");
                 }
             }
         }
