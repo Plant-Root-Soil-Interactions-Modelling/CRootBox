@@ -23,8 +23,7 @@
 #include "shehan_WC.h"
 #include "shehan_ScaleElongation_CL.h"
 #include "example_volume.h"
-
-#include "./Exudation/example_exudation.h"
+#include "example_exudation.h"
 
 /**
  * Starts an examples (from the examples folder)

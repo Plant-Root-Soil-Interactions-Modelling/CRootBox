@@ -1,9 +1,8 @@
 #include <functional>
 
-#include "gauss_legendre.h"
-
-#include "../../src/soil.h"
-#include "../../src/sdf_rs.h"
+#include "../external/gauss_legendre/gauss_legendre.h"
+#include "../src/soil.h"
+#include "../src/sdf_rs.h"
 
 
 

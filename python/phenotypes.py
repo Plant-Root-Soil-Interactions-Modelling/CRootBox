@@ -15,8 +15,6 @@ print("a cylinder with  a = 0.1 cm has a volume of ", v)
 print("the the root system volume has ", round(V / v), "cylinders")
 print("this means ", (V / v) / (15 * 7.5), " roots per cm^2 ")
 
-d
-
 
 def simulate(name, simtime):
     rs = rb.RootSystem()

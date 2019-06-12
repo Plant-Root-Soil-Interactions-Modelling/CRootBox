@@ -1,4 +1,4 @@
-#include "gauss_legendre.h"
+#include "../external/gauss_legendre/gauss_legendre.h"
 #include "exudation.h"
 
 #include <functional>

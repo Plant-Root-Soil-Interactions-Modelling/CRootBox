@@ -172,7 +172,6 @@ void RootSystem::writeParameters(std::ostream& os) const
  */
 void RootSystem::initialize(int basaltype, int shootbornetype)
 {
-    //cout << "Root system initialize\n";
     reset(); // just in case
 
     // fix randomness of root type parameters if the seed was set manually

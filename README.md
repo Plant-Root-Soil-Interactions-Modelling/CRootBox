@@ -1,7 +1,8 @@
 # CRootBox
 
-The fastest way to try CRootBox is to read the examples. Just uncomment the desired example in the `examples/main.cpp` file and compile and run it.
+The fastest way to try CRootBox is to read the tutorial and look at the examples in C++ or Python. 
 
+For C++ just uncomment the desired example in the `examples/main.cpp` file, compile and run it.
 ```bash
 cmake .
 make
@@ -12,11 +13,16 @@ cd examples && ./test_crootbox
 
 # Folder sructure
 
-/src			CRootBox C++ codes
-/examples 		Some examples how to use the CRootBox
-/modelparameter		Some root parameter, and a plant parameter files
-/scripts 		Pyhthon scripts for visualization with Paraview, and Matlab scripts for parameter export
+/docs 			CRootbox website
+/examples 		Some C++ examples how to use the CRootBox
+/external               External libraries
+/modelparameter		Some root parameter, and plant parameter files
+/python                 Python examples
 /results 		Nice result images
+/scripts 		Pyhthon scripts for visualization with Paraview, and Matlab scripts for parameter export
+/src			CRootBox C++ codes
+/test 			Test
+/tutorial 		CRootbox tutorial
 
 
 # Documentation
