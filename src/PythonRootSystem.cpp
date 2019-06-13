@@ -48,7 +48,7 @@ void (RootSystem::*simulate3)(double dt, double maxinc, ProportionalElongation* 
 void (RootSystem::*initialize1)() = &RootSystem::initialize;
 void (RootSystem::*initialize2)(int basal, int shootborne) = &RootSystem::initialize;
 
-void (SegmentAnalyser::*addSegments1)(const PlantBase& plant) = &SegmentAnalyser::addSegments;
+void (SegmentAnalyser::*addSegments1)(const Organism& plant) = &SegmentAnalyser::addSegments;
 void (SegmentAnalyser::*addSegments2)(const SegmentAnalyser& a) = &SegmentAnalyser::addSegments;
 void (SegmentAnalyser::*filter1)(std::string name, double min, double max) = &SegmentAnalyser::filter;
 void (SegmentAnalyser::*filter2)(std::string name, double value) = &SegmentAnalyser::filter;
@@ -71,7 +71,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate3_overloads,simulate,3,4);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getValue_overloads,getValue,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(tropismObjective_overloads,tropismObjective,5,6);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNumberOfRoots_overloads,getNumberOfRoots,0,1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNETimes_overloads, getNETimes, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentCTs_overloads, getSegmentCTs, 0, 1);
 
 
 /**
@@ -240,7 +240,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
     class_<OrganParameter, OrganParameter*>("OrganParameter")
                 .def_readwrite("name",&OrganParameter::subType)
         ;
-    class_<OrganTypeParameter>("OrganTypeParameter", init<PlantBase*>())
+    class_<OrganTypeParameter>("OrganTypeParameter", init<Organism*>())
             .def("realize",&OrganTypeParameter::realize, return_value_policy<reference_existing_object>())
             .def("toString",&OrganTypeParameter::toString)
             .def_readwrite("name",&OrganTypeParameter::name)
@@ -338,7 +338,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
     /*
      * ModelParameter.h
      */
-    class_<RootTypeParameter, RootTypeParameter*, bases<OrganTypeParameter>>("RootTypeParameter", init<PlantBase*>())
+    class_<RootTypeParameter, RootTypeParameter*, bases<OrganTypeParameter>>("RootTypeParameter", init<Organism*>())
                 .def("realize",&RootTypeParameter::realize, return_value_policy<reference_existing_object>())
                 .def("getLateralType",&RootTypeParameter::getLateralType)
                 .def("getK",&RootTypeParameter::getK)
@@ -404,22 +404,16 @@ BOOST_PYTHON_MODULE(py_rootbox)
                 .def("__str__",&RootSystemParameter::toString)
                 ;
     /**
-     * Root.h (no members, just data)
+     * Root.h (no members, just data) tODO Organ ...
      */
     class_<Root, Root*>("Root", init<RootSystem*, int, Vector3d, double, Root*, double, int>())
             .def(init<Root&>())
             .def("__str__",&Root::toString)
             .def_readwrite("rootsystem", &Root::rootsystem)
-            .def_readwrite("param", &Root::param)
             .def_readwrite("id", &Root::id)
             .def_readwrite("parent_base_length", &Root::parent_base_length)
             .def_readwrite("parent_ni", &Root::parent_ni)
-            .def_readwrite("alive", &Root::alive)
-            .def_readwrite("active", &Root::active)
-            .def_readwrite("age", &Root::age)
-            .def_readwrite("length", &Root::length)
-            .def_readwrite("parent", &Root::parent)
-            .def_readwrite("laterals", &Root::laterals)
+            //.def_readwrite("getParent", &Root::getParent)
             ;
     class_<std::vector<Root*>>("std_vector_Root_")
             .def(vector_indexing_suite<std::vector<Root*>>() )
@@ -433,12 +427,12 @@ BOOST_PYTHON_MODULE(py_rootbox)
     /*
      * PlantBase.h
      */
-    class_<PlantBase, PlantBase*>("PlantBase")
+    class_<Organism, Organism*>("Organism")
         ;
     /*
      * RootSystem.h
      */
-    class_<RootSystem, RootSystem*>("RootSystem", init<>()) // bases<PlantBase>
+    class_<RootSystem, RootSystem*, bases<Organism>>("RootSystem", init<>()) // bases<PlantBase>
              .def(init<RootSystem&>())
              .def("setRootTypeParameter", &RootSystem::setRootTypeParameter)
              .def("getRootTypeParameter", &RootSystem::getRootTypeParameter, return_value_policy<reference_existing_object>())
@@ -464,8 +458,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
              .def("getPolylines", &RootSystem::getPolylines)
              .def("getSegments", &RootSystem::getSegments)
              .def("getShootSegments", &RootSystem::getShootSegments)
-             .def("getSegmentsOrigin", &RootSystem::getSegmentsOrigin)
-             .def("getNETimes",&RootSystem::getNETimes, getNETimes_overloads())
+             .def("getSegmentOrigins", &RootSystem::getSegmentOrigins)
+             .def("getNETimes",&RootSystem::getSegmentCTs, getSegmentCTs_overloads())
              .def("getScalar", &RootSystem::getScalar)
              .def("getRootTips", &RootSystem::getRootTips)
              .def("getRootBases", &RootSystem::getRootBases)
@@ -532,7 +526,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def("filter", filter1)
         .def("filter", filter2)
         .def("pack", &SegmentAnalyser::pack)
-        .def("getScalar", &SegmentAnalyser::getParameter)
+        .def("getParameter", &SegmentAnalyser::getParameter)
         .def("getSegmentLength", &SegmentAnalyser::getSegmentLength)
         .def("getSummed", getSummed1)
         .def("getSummed", getSummed2)

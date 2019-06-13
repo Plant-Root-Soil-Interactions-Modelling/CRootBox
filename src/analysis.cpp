@@ -1,43 +1,42 @@
 // -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 #include "analysis.h"
 
-#include "PlantBase.h"
 #include "Organ.h"
 
 #include <iomanip>
 #include <istream>
 #include <fstream>
 #include <set>
+#include "Organism.h"
 
 namespace CRootBox {
 
 /**
- * Copies the segments of the roots system into the analysis class
+ * Copies the line segments representing the plant to the analysis class
  *
- * @param plant     the root system that is analysed
+ * @param plant     the the organism that is analysed
  */
-SegmentAnalyser::SegmentAnalyser(const PlantBase& plant)
+SegmentAnalyser::SegmentAnalyser(const Organism& plant)
 {
     nodes = plant.getNodes();
     segments = plant.getSegments();
     segCTs = plant.getSegmentCTs();
-    segO = plant.getSegmentsOrigin();
-
+    segO = plant.getSegmentOrigins();
     assert(segments.size()==segCTs.size());
     assert(segments.size()==segO.size());
 
 }
 
 /**
- * Adds all segments from root system @param rs to the analysis.
+ * Adds all line segments from  @param plant to the analysis
  */
-void SegmentAnalyser::addSegments(const PlantBase& plant)
+void SegmentAnalyser::addSegments(const Organism& plant)
 {
     addSegments(SegmentAnalyser(plant));
 }
 
 /**
- * Adds all segments from the analyser @param a to this analysis.
+ * Adds all line segments from the analyser @param a to this analysis.
  */
 void SegmentAnalyser::addSegments(const SegmentAnalyser& a)
 {
@@ -514,13 +513,13 @@ void SegmentAnalyser::write(std::string name)
     fos.open(name.c_str());
     std::string ext = name.substr(name.size()-3,name.size()); // pick the right writer
     if (ext.compare("vtp")==0) {
-        std::cout << "writing VTP: " << name << "\n";
+        std::cout << "writing VTP: " << name << "\n" << std::flush;
         this->writeVTP(fos,{ 0 /* todo RootSystem::st_radius, RootSystem::st_type, RootSystem::st_time*/ });
     } else if (ext.compare("txt")==0)  {
-        std::cout << "writing text file for Matlab import: "<< name << "\n";
+        std::cout << "writing text file for Matlab import: "<< name << "\n"<< std::flush;
         writeRBSegments(fos);
     } else if (ext.compare("dgf")==0)  {
-        std::cout << "writing dgf file: "<< name << "\n";
+        std::cout << "writing dgf file: "<< name << "\n"<< std::flush;
         writeDGF(fos);
     } else {
         throw std::invalid_argument("SegmentAnalyser::write: Unknown file type");

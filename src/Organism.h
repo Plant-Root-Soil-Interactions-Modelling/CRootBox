@@ -14,13 +14,16 @@ class OrganTypeParameter;
 /**
  * Base class of Plant or RootSystem
  */
-class PlantBase {
+class Organism {
 
 public:
 
-    enum OrganTypes { ot_organ = 0, ot_seed = 1, ot_root = 2, ot_stem = 3, ot_leaf = 4};
+    enum OrganTypes { ot_organ = 0, ot_seed = 1, ot_root = 2, ot_stem = 3, ot_leaf = 4 };
 
-    virtual ~PlantBase() { };
+    Organism() {};
+    Organism(const Organism& o): organId(o.organId), nodeId(o.nodeId), gen(o.gen), UD(o.UD), ND(o.ND) {}; ///< copy constructor
+
+    virtual ~Organism() { };
 
     virtual OrganTypeParameter* getOrganTypeParameter(int otype, int subtype) const { return nullptr; }
 
@@ -35,13 +38,12 @@ public:
     /* geometry */
     virtual int getNumberOfNodes() const { return nodeId+1; } ///< Number of nodes of the root system (including nodes for seed, root crowns, and artificial shoot)
     virtual std::vector<Vector3d> getNodes() const { return std::vector<Vector3d>(0); };
-    virtual std::vector<Vector2i> getSegments(int otype= -1) const { return std::vector<Vector2i>(0); } ;
-    virtual std::vector<double> getSegmentCTs() const { return std::vector<double>(0); } ;
-    virtual std::vector<Organ*> getSegmentsOrigin(unsigned int otype= -1) const {
+    virtual std::vector<Vector2i> getSegments(int otype=-1) const { return std::vector<Vector2i>(0); } ;
+    virtual std::vector<double> getSegmentCTs(int otype=-1) const { return std::vector<double>(0); } ;
+    virtual std::vector<Organ*> getSegmentOrigins(int otype=-1) const {
         return std::vector<Organ*>(0);
     } ///< Copies a pointer to the root containing the segment
 
-    /* random stuff */
     /**
      * Sets the seed of the root systems random number generator.
      * To obtain two exact same root system call PlantBase::setSeed() before initialize().
@@ -49,9 +51,7 @@ public:
      * @param seed      random number generator seed
      */
     void setSeed(unsigned int seed) { this->gen = std::mt19937(seed); }; ///< help fate (sets the seed of all random generators)
-
     double rand() { return UD(gen); } ///< Uniformly distributed random number (0,1)
-
     double randn() { return ND(gen); } ///< Normally distributed random number (0,1)
 
 protected:

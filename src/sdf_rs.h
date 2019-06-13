@@ -29,7 +29,7 @@ public:
 
     SDF_RootSystem(const Root& r, double dx = 0.5);
 
-    SDF_RootSystem(const PlantBase& plant, double dx = 0.5);
+    SDF_RootSystem(const Organism& plant, double dx = 0.5);
 
     SDF_RootSystem(std::vector<Vector3d> nodes, const std::vector<Vector2i> segments, std::vector<double> radii, double dx = 0.5);
 
@@ -70,7 +70,7 @@ SDF_RootSystem::SDF_RootSystem(const Root& r, double dx): dx_(dx) {
   buildTree();
 }
 
-SDF_RootSystem::SDF_RootSystem(const PlantBase& plant, double dx): dx_(dx) {
+SDF_RootSystem::SDF_RootSystem(const Organism& plant, double dx): dx_(dx) {
     auto ana = SegmentAnalyser(plant);
     nodes_ = ana.nodes;
     segments_ = ana.segments;

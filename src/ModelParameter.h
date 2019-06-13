@@ -23,6 +23,7 @@
 namespace CRootBox {
 
 class RootParameter;
+class Organism;
 
 /**
  * RootTypeParameter: contains a parameter set describing a root type
@@ -32,7 +33,7 @@ class RootTypeParameter :public OrganTypeParameter
 
 public:
 
-    RootTypeParameter(PlantBase* plant); ///< default constructor
+    RootTypeParameter(Organism* plant); ///< default constructor
     virtual ~RootTypeParameter() { };
 
     void set(int type, double lb, double lbs, double la, double las, double ln, double lns, double nob, double nobs,

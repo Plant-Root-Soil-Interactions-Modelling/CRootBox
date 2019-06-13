@@ -11,7 +11,7 @@ namespace CRootBox {
 /**
  * Default constructor
  */
-RootTypeParameter::RootTypeParameter(PlantBase* plant) :OrganTypeParameter(plant) {
+RootTypeParameter::RootTypeParameter(Organism* plant) :OrganTypeParameter(plant) {
     set(-1, 0., 0., 10., 0., 1., 0., 0., 0., 1., 0, 0.1, 0., 150./255.,150./255.,50./255., 1, 1. ,0.2, 0.1,
         successor, successorP, 1.22, 0., 1.e9, 0., 1, "undefined");
 }

@@ -6,7 +6,7 @@
 add_library(CRootBox
             Organ.cpp
             OrganParameter.cpp
-            PlantBase.cpp
+            Organism.cpp
             analysis.cpp
             ModelParameter.cpp
             Root.cpp
@@ -37,7 +37,7 @@ if (PythonLibs_FOUND)
   add_library(py_rootbox SHARED
               Organ.cpp
               OrganParameter.cpp
-              PlantBase.cpp  
+              Organism.cpp  
               PythonRootSystem.cpp
               analysis.cpp
               ModelParameter.cpp

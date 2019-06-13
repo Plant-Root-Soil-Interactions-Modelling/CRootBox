@@ -12,7 +12,7 @@
 #include <stack>
 
 #include "ModelParameter.h"
-#include "PlantBase.h"
+#include "Organism.h"
 #include "Root.h"
 #include "soil.h"
 
@@ -71,7 +71,7 @@ private:
  * and offers utility functions for post processing.
  * More post processing functions can be found in the class SegmentAnalyser
  */
-class RootSystem :public PlantBase
+class RootSystem :public Organism
 {
 
     friend Root;  // obviously :-)
@@ -92,12 +92,12 @@ public:
     virtual ~RootSystem();
 
     // Parameter input output
+    OrganTypeParameter* getOrganTypeParameter(int otype, int subtype) const override { return (OrganTypeParameter*) getRootTypeParameter(subtype); }
+    //
     void setRootTypeParameter(RootTypeParameter* p) { rtparam.at(p->type-1) = p; } ///< set the root type parameter to the index type-1
     RootTypeParameter* getRootTypeParameter(int type) const { return rtparam.at(type-1); } ///< returns the i-th root parameter set (i=1..n)
     void setRootSystemParameter(const RootSystemParameter& rsp) { rsparam = rsp; } ///< sets the root system parameters
     RootSystemParameter* getRootSystemParameter() { return &rsparam; } ///< gets the root system parameters
-
-    OrganTypeParameter* getOrganTypeParameter(int otype, int subtype) const override { return (OrganTypeParameter*) getRootTypeParameter(subtype); }
 
     void openFile(std::string filename, std::string subdir="modelparameter/"); ///< reads root paramter and plant parameter
     int readParameters(std::istream & cin); ///< reads root parameters from an input stream
@@ -108,7 +108,7 @@ public:
     void setSoil(SoilLookUp* soil_) { soil = soil_; } ///< optionally sets a soil for hydro tropism (call before RootSystem::initialize())
     void reset(); ///< resets the root class, keeps the root type parameters
 
-    virtual void initialize() override { initialize(4,5); };
+    void initialize() override { initialize(4,5); };
     void initialize(int basal, int shootborne); ///< creates the base roots, call before simulation and after setting the plant and root parameters
     void setTropism(Tropism* tf, int rt = -1);
     void simulate(double dt, bool silence = false) override; ///< simulates root system growth for time span dt
@@ -125,20 +125,22 @@ public:
     ///< Creates the growth function per root type, overwrite or change this method to add more tropisms
 
     // Analysis of simulation results
-    int getNumberOfSegments() const { return nid-numberOfCrowns-1; } ///< Number of segments of the root system ((nid+1)-1) - numberOfCrowns - 1 (artificial shoot)
+    std::vector<Vector3d> getNodes() const override; ///< Copies all root system nodes into a vector
+    std::vector<Vector2i> getSegments(int otype=-1) const override; ///< Copies all root system segment indices into a vector
+    std::vector<double> getSegmentCTs(int otype=-1) const override; ///< Copies all node emergence times into a vector
+    std::vector<Organ*> getSegmentOrigins(int otype=-1) const override; ///< Copies a pointer to the root containing the segment
+    //
+    int getNumberOfSegments() const { return nodeId-numberOfCrowns-1; } ///< Number of segments of the root system ((nid+1)-1) - numberOfCrowns - 1 (artificial shoot)
     int getNumberOfRoots(bool all = false) const { if (all) return rid+1; else return getRoots().size(); }
     std::vector<Root*> getRoots() const; ///< Represents the root system as sequential vector of roots and buffers the result
     std::vector<Root*> getBaseRoots() const { return baseRoots; } ///< Base roots are tap root, basal roots, and shoot borne roots
-    std::vector<Vector3d> getNodes() const; ///< Copies all root system nodes into a vector
     std::vector<std::vector<Vector3d>> getPolylines() const; ///< Copies the nodes of each root into a vector return all resulting vectors
-    std::vector<Vector2i> getSegments() const; ///< Copies all root system segment indices into a vector
     std::vector<Vector2i> getShootSegments() const; ///< Copies the segments connecting tap, basal root, shootborne roots
-    std::vector<Root*> getSegmentsOrigin() const; ///< Copies a pointer to the root containing the segment
-    std::vector<double> getNETimes(bool persegment = true) const; ///< Copies all node emergence times into a vector
     std::vector<std::vector<double>> getPolylinesNET() const; ///< Copies the node emergence times of each root into a vector and returns all resulting vectors
-    std::vector<double> getScalar(int stype=RootSystem::st_length) const; ///< Copies a scalar root parameter that is constant per root to a vector
     std::vector<int> getRootTips() const; ///< Node indices of the root tips
     std::vector<int> getRootBases() const; ///< Node indices of the root bases
+
+    std::vector<double> getScalar(int stype=RootSystem::st_length) const; ///< Copies a scalar root parameter that is constant per root to a vector
 
     // Dynamic information what happened last time step
     int getNumberOfNewNodes() const { return getNumberOfNodes()-old_non; } ///< The number of new nodes created in the previous time step (ame number as new segments)
@@ -173,11 +175,6 @@ public:
         return poreLocalAxes.times(poreConductivity.times(invPoreLocalAxes.times(v))); // Landl et al. 2016, Eqn (12), K*v = [M*K'*(M^-1)]*v
     }
 
-    // random stuff
-    void setSeed(unsigned int seed); ///< help fate (sets the seed of all random generators)
-    double rand() { return UD(gen); } ///< Uniformly distributed random number (0,1)
-    double randn() { return ND(gen); } ///< Normally distributed random number (0,1)
-
 private:
 
     // todo currently everything is constant...
@@ -199,7 +196,6 @@ private:
 
     double simtime = 0;
     int rid = -1; // unique root id counter
-    int nid = -1; // unique node id counter
 
     int old_non=0;
     int old_nor=0;
@@ -217,12 +213,6 @@ private:
     void writeRSMLPlant(std::ostream & os) const;
 
     int getRootIndex() { rid++; return rid; } ///< returns next unique root id, called by the constructor of Root
-    int getNodeIndex() { nid++; return nid; } ///< returns next unique node id, called by Root::addNode()
-
-    std::mt19937 gen;
-    std::uniform_real_distribution<double> UD;
-    std::uniform_int_distribution<unsigned int> UID; // to seed other random number generators
-    std::normal_distribution<double> ND;
 
     std::stack<RootSystemState> stateStack;
 };

@@ -6,7 +6,7 @@
 
 namespace CRootBox {
 
-class PlantBase;
+class Organism;
 class Organ;
 
 /**
@@ -18,12 +18,12 @@ class SegmentAnalyser
 public:
 
     SegmentAnalyser() { }; ///< creates an empty object (use AnalysisSDF::addSegments)
-    SegmentAnalyser(const PlantBase& plant); ///< creates an analyser object containing the segments from the root system
+    SegmentAnalyser(const Organism& plant); ///< creates an analyser object containing the segments from the root system
     SegmentAnalyser(const SegmentAnalyser& a) : nodes(a.nodes), segments(a.segments), segCTs(a.segCTs), segO(a.segO) { } ///< copy constructor, does not copy user data
     virtual ~SegmentAnalyser() { }; ///< nothing to do here
 
     // merge segments
-    void addSegments(const PlantBase& plant); ///< adds the segments
+    void addSegments(const Organism& plant); ///< adds the segments
     void addSegments(const SegmentAnalyser& a); ///< adds the segments
 
     // reduce number of segments

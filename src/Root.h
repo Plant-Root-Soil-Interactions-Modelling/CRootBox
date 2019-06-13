@@ -11,7 +11,7 @@
 #include "growth.h"
 #include "ModelParameter.h"
 #include "Organ.h"
-#include "RootSystem.h"
+#include "Organism.h"
 
 namespace CRootBox {
 
@@ -33,24 +33,27 @@ class Root :public Organ
 
 public:
 
-    Root(PlantBase* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of Root::createLaterals()
+    Root(Organism* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of Root::createLaterals()
     Root(const Root& r, RootSystem& rs); ///< deep copy of the tree
     virtual ~Root();
 
+    int organType() const override { return Organism::ot_root; };
+
     /* Grow */
-    void simulate(double dt, bool silence = false); ///< root growth for a time span of \param dt
+    void simulate(double dt, bool silence = false) override; ///< root growth for a time span of \param dt
 
     /* Roots as sequential list */
     std::vector<Root*> getRoots(); ///< return the root including laterals as sequential vector
     void getRoots(std::vector<Root*>& v); ///< return the root system as sequential vector
+    double getParameter(std::string name) const override;
 
     /* Nodes of the root */
     void addNode(Vector3d n,double t); //< adds a node to the root
 
     /* From analytical equations */
-    double getCreationTime(double lenght); ///< analytical creation (=emergence) time of a node at a length
-    double getLength(double age); ///< analytical length of the root
-    double getAge(double length); ///< analytical age of the root
+    double calcCreationTime(double lenght); ///< analytical creation (=emergence) time of a node at a length
+    double calcLength(double age); ///< analytical length of the root
+    double calcAge(double length); ///< analytical age of the root
 
     /* Abbreviations */
     // getParameter TODO
@@ -72,15 +75,7 @@ public:
     int parent_ni; ///< parent node index
 
     /* Parameters that are given per root that may change with time */
-    bool alive = 1; ///< true: alive, false: dead
-    bool active = 1; ///< true: active, false: root stopped growing
-    double age = 0; ///< current age [days]
-    double length = 0; ///< actual length [cm] of the root. might differ from getLength(age) in case of impeded root growth
     int old_non = 1; ///< number of old nodes, the sign is positive if the last node was updated, otherwise its negative
-
-    /* Up and down the tree*/
-    Root* parent; ///< pointer to the parent root (equals nullptr if it is a base root)
-    std::vector<Root*> laterals; ///< the lateral roots of this root
 
     const double smallDx = 1e-6; ///< threshold value, smaller segments will be skipped (otherwise root tip direction can become NaN)
 
@@ -89,11 +84,6 @@ protected:
     void createSegments(double l, bool silence); ///< creates segments of length l, called by Root::simulate()
     virtual Vector3d getIncrement(const Vector3d& p, double sdx); ///< called by createSegments, to determine growth direction
     void createLateral(bool silence); ///< creates a new lateral, called by Root::simulate()
-
-    /* parameters that are given per node */
-    std::vector<Vector3d> nodes = std::vector<Vector3d>(0); ///< nodes of the root
-    std::vector<int> nodeIds = std::vector<int>(0); ///< unique node identifier
-    std::vector<double> netimes = std::vector<double>(0); ///< node emergence times [days]
 
 };
 

@@ -6,7 +6,7 @@ namespace CRootBox {
 /**
  *
  */
-OrganTypeParameter::OrganTypeParameter(PlantBase* plant): plant(plant)
+OrganTypeParameter::OrganTypeParameter(Organism* plant): plant(plant)
 {
     iparam["organType"] = &organType;
     iparam["subType"] = &subType;

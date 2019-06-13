@@ -1,17 +1,18 @@
 // -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 #include "Organ.h"
+
+#include "Organism.h"
 #include "OrganParameter.h"
-#include "PlantBase.h"
 
 namespace CRootBox {
 
 /**
  * Constructor
  */
-Organ::Organ(PlantBase* plant, Organ* parent, int subtype, double delay) : plant(plant), parent(parent), age(-delay)
+Organ::Organ(Organism* plant, Organ* parent, int subtype, double delay) : plant(plant), parent(parent), age(-delay)
 {
     id = plant->getOrganIndex(); // unique id from the plant
-    param = plant->getOrganTypeParameter(organType(), subtype)->realize();
+    param_ = plant->getOrganTypeParameter(organType(), subtype)->realize();
 }
 
 /**
@@ -22,12 +23,12 @@ Organ::~Organ()
     for(auto c : children) {
         delete c;
     }
-    delete param; // organ parameters
+    delete param_; // organ parameters
 }
 
 int Organ::organType() const
 {
-    return PlantBase::ot_organ;
+    return Organism::ot_organ;
 }
 
 /**
@@ -35,7 +36,7 @@ int Organ::organType() const
  */
 OrganTypeParameter* Organ::getOrganTypeParameter() const
 {
-    return plant->getOrganTypeParameter(this->organType(), param->subType);
+    return plant->getOrganTypeParameter(this->organType(), param_->subType);
 }
 
 /**
@@ -43,12 +44,14 @@ OrganTypeParameter* Organ::getOrganTypeParameter() const
  */
 void Organ::simulate(double dt, bool silence)
 {
-    age+=dt;
-    if (age>0) {
-        for (auto& c : children)  {
-            c->simulate(dt);
-        }
-    }
+//    if (alive) {
+//        age += dt;
+//        if (active && (age>0)) {
+//            for (auto& c : children)  {
+//                c->simulate(dt);
+//            }
+//        }
+//    }
 }
 
 /**
@@ -110,7 +113,7 @@ double Organ::getParameter(std::string name) const {
     if (name=="one") { r = 1; } // e.g. for counting the organs
     if (name=="id") { r = id; }
     if (name=="organ_type") { r = this->organType(); }
-    if (name=="sub_type") { r = this->param->subType; }
+    if (name=="sub_type") { r = this->param_->subType; }
     if (name=="alive") { r = alive; }
     if (name=="active") { r = active; }
     if (name=="age") { r = age; }
@@ -123,7 +126,6 @@ double Organ::getParameter(std::string name) const {
             p = p->parent; // up the organ tree
         }
     }
-    if ((name=="parent_type") && (this->parent!=nullptr)) { r = this->parent->organType(); }
     if (name=="nubmer_of_children") { r = children.size(); }
     //    if ((name=="creation_time") && (nodeCTs.size()>0)) { return nodeCTs.at(0); } // check if they make sense
     //    if ((name=="emergence_time") && (nodeCTs.size()>1)) { return nodeCTs.at(1); }
@@ -186,7 +188,7 @@ void Organ::writeRSML(std::ostream & cout, std::string indent) const
 std::string Organ::toString() const
 {
     std::stringstream str;
-    str << "Organ #"<< id <<": sub type "<< param->subType << ", length "<< length << " cm, age " << age
+    str << "Organ #"<< id <<": sub type "<< param_->subType << ", length "<< length << " cm, age " << age
         << " days, alive " << alive << ", active " << active << ", number of nodes" << this->getNumberOfNodes()
         << ", with "<< children.size() << " successors\n";
     return str.str();

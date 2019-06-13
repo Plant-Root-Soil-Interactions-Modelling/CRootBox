@@ -8,7 +8,7 @@
 
 namespace CRootBox {
 
-class PlantBase; // forward declaration
+class Organism; // forward declaration
 
 /**
  * Parameter for a specific organ
@@ -30,7 +30,7 @@ class OrganTypeParameter
 {
 public:
 
-    OrganTypeParameter(PlantBase* plant); ///< default constructor
+    OrganTypeParameter(Organism* plant); ///< default constructor
     virtual ~OrganTypeParameter() { };
 
     virtual OrganParameter* realize(); ///< Creates a specific organ from the root parameter set
@@ -45,7 +45,7 @@ public:
     int organType = 0;
     int subType = 0;
 
-    PlantBase* plant;
+    Organism* plant;
 
     std::map<std::string, double*> dparam; ///< Parameters with type double that can be read and written
     std::map<std::string, int*> iparam; ///< Parameters with type double that can be read and written

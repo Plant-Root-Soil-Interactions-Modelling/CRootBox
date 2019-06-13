@@ -11,18 +11,18 @@ namespace CRootBox {
 
 class OrganParameter;
 class OrganTypeParameter;
-class PlantBase;
+class Organism;
 
 /**
  * Organ
  *
- * Describes a plant organ. Acts as base class of seed, root, stem and leaf.
+ * Describes a plant organ. Acts as base class for seed, root, stem and leaf.
  */
 class Organ
 {
 public:
 
-    Organ(PlantBase* plant, Organ* parent, int subtype, double delay);
+    Organ(Organism* plant, Organ* parent, int subtype, double delay);
     virtual ~Organ();
 
     virtual int organType() const; ///< returns the organs type, overwrite for each organ
@@ -32,7 +32,14 @@ public:
 
     /* parameters */
     int getId() const { return id; } ///< organ id
+    OrganParameter* getParam() { return param_; } ///< organ parameters
     OrganTypeParameter* getOrganTypeParameter() const;  ///< organ type parameter
+    bool isAlive() { return alive; }
+    bool isActive() { return active; }
+    double getAge() { return age; }
+    double getLength() { return length; }
+    void setParent(Organ* p) { parent = p; } // TODO eventually remove (should be done within the constructor)
+    Organ* getParent() { return parent; }
 
     /* geometry */
     size_t getNumberOfNodes() const { return nodes.size(); } ///< number of nodes of the organ
@@ -42,24 +49,25 @@ public:
     virtual std::vector<Vector2i> getSegments(int otype = -1) const;
 
     /* for post processing */
-    std::vector<Organ*> getOrgans(int otype = -1); ///< the organ including successors in a sequential vector
-    void getOrgans(int otype, std::vector<Organ*>& v); ///< the organ including successors in a sequential vector
+    std::vector<Organ*> getOrgans(int otype = -1); ///< the organ including children in a sequential vector
+    void getOrgans(int otype, std::vector<Organ*>& v); ///< the organ including children in a sequential vector
     virtual double getParameter(std::string name) const; ///< returns a scalar organ parameter
 
     /* IO */
     virtual std::string toString() const; ///< info for debugging
     virtual void writeRSML(std::ostream & cout, std::string indent = "") const; ///< writes a RSML tag
 
+
 protected:
 
     /* up and down the organ tree */
-    PlantBase* plant; ///< the plant of which this organ is part of
-    Organ* parent; ///< pointer to the parent organ (equals nullptr if it has no parent)
+    Organism* plant; ///< the plant of which this organ is part of
     std::vector<Organ*> children; ///< the successive organs
 
     /* Parameters that are constant*/
     int id; ///< unique organ id
-    OrganParameter* param; ///< the parameter set of this organ
+    OrganParameter* param_; ///< the parameter set of this organ
+    Organ* parent; ///< pointer to the parent organ (equals nullptr if it has no parent)
 
     /* Parameters that may change with time */
     bool alive = true; ///< true: alive, false: dead

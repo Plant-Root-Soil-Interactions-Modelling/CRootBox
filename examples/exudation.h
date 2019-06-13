@@ -49,7 +49,7 @@ public:
             if (r->getNumberOfNodes()>1) { // started growing
                 // time when the root stopped growing
                 double sTime = r->getNodeCT(r->getNumberOfNodes()-1);
-                if (r->active) {
+                if (r->isActive()) {
                     stopTime.push_back(0);
                 } else {
                     stopTime.push_back(sTime);
@@ -89,7 +89,7 @@ public:
             if (age_>0) {
 
                 // per root (passed to integrands)
-                n_ = int(n0*r_->length); // number of integration points eq 11
+                n_ = int(n0*r_->getLength()); // number of integration points eq 11
                 v_ = v[ri]; // for mps_straight, eq 11
                 tip_ = tip[ri]; // for mps_straight, eq 11
                 st_ = stopTime[ri]; // eq 13
@@ -240,11 +240,11 @@ public:
         double d = 8*(p->theta)*ExudationModel::to32(M_PI*p->Dl*t);
 
 
-        double tl = p->r_->getLength( p->age_-t ); // tip
+        double tl = p->r_->calcLength( p->age_-t ); // tip
         if (tl<l) { // if root smaller l
             return 0.;
         }
-        double agel = p->r_->getAge(tl-l);
+        double agel = p->r_->calcAge(tl-l);
         Vector3d tipLS = p->ExudationModel::pointAtAge(p->r_, agel);
         Vector3d z = p->x_.minus(tipLS);
 

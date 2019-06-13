@@ -30,8 +30,7 @@ rs.simulate(60)  # days
 
 # Root system distance function
 ana = rb.SegmentAnalyser(rs)
-radii = ana.getScalar(rb.ScalarType.radius)
-
+radii = ana.getParameter("radius")
 
 print(radii[10])
 rs_sdf = rb.SDF_RootSystem(ana.nodes, ana.segments, radii, 1)
@@ -47,19 +46,19 @@ X_, Y_, Z_ = np.meshgrid(X, Y, Z, indexing = "ij")  # stupid matlab default
 D = np.zeros(X_.shape)
 print(D.shape)
 
-for i in range(0,X_.shape[0]):
-    for j in range(0,X_.shape[1]):
-        for k in range(0,X_.shape[2]):
-            D[i,j,k] = rs_sdf.getDist(rb.Vector3d(X_[i,j,k],Y_[i,j,k],Z_[i,j,k]))
-            
-D[D<-100] = -10
+for i in range(0, X_.shape[0]):
+    for j in range(0, X_.shape[1]):
+        for k in range(0, X_.shape[2]):
+            D[i, j, k] = rs_sdf.getDist(rb.Vector3d(X_[i, j, k], Y_[i, j, k], Z_[i, j, k]))
+
+D[D < -100] = -10
 
 fig1 = plt.figure()
 ax = plt.axes()
 
-D_ = D[int(nx/2), :, :]
-levels = np.linspace(-5,0.05,100)
-cs = ax.contourf(Y_[int(nx/2), :, :], Z_[int(nx/2), :, :], D_, levels = levels, cmap = 'jet') # levels = levels, locator = ticker.LogLocator(),
+D_ = D[int(nx / 2), :, :]
+levels = np.linspace(-5, 0.05, 100)
+cs = ax.contourf(Y_[int(nx / 2), :, :], Z_[int(nx / 2), :, :], D_, levels = levels, cmap = 'jet')  # levels = levels, locator = ticker.LogLocator(),
 ax.set_xlabel('x')
 ax.set_ylabel('z')
 plt.axis('equal')

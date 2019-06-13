@@ -230,35 +230,35 @@ OrganParameter.cpp.s:
 	cd /home/daniel/workspace/DUMUX/CRootBox && $(MAKE) -f src/CMakeFiles/py_rootbox.dir/build.make src/CMakeFiles/py_rootbox.dir/OrganParameter.cpp.s
 .PHONY : OrganParameter.cpp.s
 
-PlantBase.o: PlantBase.cpp.o
+Organism.o: Organism.cpp.o
 
-.PHONY : PlantBase.o
+.PHONY : Organism.o
 
 # target to build an object file
-PlantBase.cpp.o:
-	cd /home/daniel/workspace/DUMUX/CRootBox && $(MAKE) -f src/CMakeFiles/CRootBox.dir/build.make src/CMakeFiles/CRootBox.dir/PlantBase.cpp.o
-	cd /home/daniel/workspace/DUMUX/CRootBox && $(MAKE) -f src/CMakeFiles/py_rootbox.dir/build.make src/CMakeFiles/py_rootbox.dir/PlantBase.cpp.o
-.PHONY : PlantBase.cpp.o
+Organism.cpp.o:
+	cd /home/daniel/workspace/DUMUX/CRootBox && $(MAKE) -f src/CMakeFiles/CRootBox.dir/build.make src/CMakeFiles/CRootBox.dir/Organism.cpp.o
+	cd /home/daniel/workspace/DUMUX/CRootBox && $(MAKE) -f src/CMakeFiles/py_rootbox.dir/build.make src/CMakeFiles/py_rootbox.dir/Organism.cpp.o
+.PHONY : Organism.cpp.o
 
-PlantBase.i: PlantBase.cpp.i
+Organism.i: Organism.cpp.i
 
-.PHONY : PlantBase.i
+.PHONY : Organism.i
 
 # target to preprocess a source file
-PlantBase.cpp.i:
-	cd /home/daniel/workspace/DUMUX/CRootBox && $(MAKE) -f src/CMakeFiles/CRootBox.dir/build.make src/CMakeFiles/CRootBox.dir/PlantBase.cpp.i
-	cd /home/daniel/workspace/DUMUX/CRootBox && $(MAKE) -f src/CMakeFiles/py_rootbox.dir/build.make src/CMakeFiles/py_rootbox.dir/PlantBase.cpp.i
-.PHONY : PlantBase.cpp.i
+Organism.cpp.i:
+	cd /home/daniel/workspace/DUMUX/CRootBox && $(MAKE) -f src/CMakeFiles/CRootBox.dir/build.make src/CMakeFiles/CRootBox.dir/Organism.cpp.i
+	cd /home/daniel/workspace/DUMUX/CRootBox && $(MAKE) -f src/CMakeFiles/py_rootbox.dir/build.make src/CMakeFiles/py_rootbox.dir/Organism.cpp.i
+.PHONY : Organism.cpp.i
 
-PlantBase.s: PlantBase.cpp.s
+Organism.s: Organism.cpp.s
 
-.PHONY : PlantBase.s
+.PHONY : Organism.s
 
 # target to generate assembly for a file
-PlantBase.cpp.s:
-	cd /home/daniel/workspace/DUMUX/CRootBox && $(MAKE) -f src/CMakeFiles/CRootBox.dir/build.make src/CMakeFiles/CRootBox.dir/PlantBase.cpp.s
-	cd /home/daniel/workspace/DUMUX/CRootBox && $(MAKE) -f src/CMakeFiles/py_rootbox.dir/build.make src/CMakeFiles/py_rootbox.dir/PlantBase.cpp.s
-.PHONY : PlantBase.cpp.s
+Organism.cpp.s:
+	cd /home/daniel/workspace/DUMUX/CRootBox && $(MAKE) -f src/CMakeFiles/CRootBox.dir/build.make src/CMakeFiles/CRootBox.dir/Organism.cpp.s
+	cd /home/daniel/workspace/DUMUX/CRootBox && $(MAKE) -f src/CMakeFiles/py_rootbox.dir/build.make src/CMakeFiles/py_rootbox.dir/Organism.cpp.s
+.PHONY : Organism.cpp.s
 
 PythonRootSystem.o: PythonRootSystem.cpp.o
 
@@ -516,9 +516,9 @@ help:
 	@echo "... OrganParameter.o"
 	@echo "... OrganParameter.i"
 	@echo "... OrganParameter.s"
-	@echo "... PlantBase.o"
-	@echo "... PlantBase.i"
-	@echo "... PlantBase.s"
+	@echo "... Organism.o"
+	@echo "... Organism.i"
+	@echo "... Organism.s"
 	@echo "... PythonRootSystem.o"
 	@echo "... PythonRootSystem.i"
 	@echo "... PythonRootSystem.s"
