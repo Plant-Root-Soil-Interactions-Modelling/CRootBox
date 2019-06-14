@@ -1,6 +1,6 @@
 // -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
-#ifndef MODELPARAMETER_H_
-#define MODELPARAMETER_H_
+#ifndef ROOTPARAMETER_H_
+#define ROOTPARAMETER_H_
 
 /*
  * The model parameters consist of
@@ -17,8 +17,8 @@
 #include <assert.h>
 
 #include "mymath.h"
-#include "OrganParameter.h"
 #include "soil.h"
+#include "OrganParameter.h"
 
 namespace CRootBox {
 
@@ -35,6 +35,8 @@ public:
 
     RootTypeParameter(Organism* plant); ///< default constructor
     virtual ~RootTypeParameter() { };
+
+    OrganTypeParameter* copy() const override;
 
     void set(int type, double lb, double lbs, double la, double las, double ln, double lns, double nob, double nobs,
         double r, double rs, double a, double as,  double colorR, double colorG, double colorB, double tropismT, double tropismN, double tropsimS,
@@ -58,7 +60,6 @@ public:
     /*
      * Rootbox parameters per root type
      */
-    int type; 		///< Number of root type [1], this is the index within the vector +1
     double lb; 	 	///< Basal zone [cm]
     double lbs;  	///< Standard deviation basal zone [cm]
     double la;		///< Apical zone [cm];

@@ -24,7 +24,6 @@ SegmentAnalyser::SegmentAnalyser(const Organism& plant)
     segO = plant.getSegmentOrigins();
     assert(segments.size()==segCTs.size());
     assert(segments.size()==segO.size());
-
 }
 
 /**
@@ -63,23 +62,23 @@ void SegmentAnalyser::addSegments(const SegmentAnalyser& a)
 std::vector<double> SegmentAnalyser::getParameter(std::string name) const
 {
     std::vector<double> data(segO.size());
-
-    if (name == "creation_time") {
+    if (name == "creationTime") {
         data = segCTs;
         return data;
     }
-    if (name == "user_data_1") {
+    if (name == "userData1") {
         data = userData.at(0);
         return data;
     }
-    if (name == "user_data_2") {
+    if (name == "userData2") {
         data = userData.at(1);
         return data;
     }
-    if (name == "user_data_3") {
+    if (name == "userData3") {
         data = userData.at(2);
         return data;
     }
+    // else pass to Organs
     for (size_t i=0; i<segO.size(); i++) {
         data.at(i) = segO.at(i)->getParameter(name);
     }

@@ -33,6 +33,8 @@ public:
     OrganTypeParameter(Organism* plant); ///< default constructor
     virtual ~OrganTypeParameter() { };
 
+    virtual OrganTypeParameter* copy() const;
+
     virtual OrganParameter* realize(); ///< Creates a specific organ from the root parameter set
 
     virtual std::string toString(); ///< info for debugging

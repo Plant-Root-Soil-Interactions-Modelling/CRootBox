@@ -15,6 +15,18 @@ OrganTypeParameter::OrganTypeParameter(Organism* plant): plant(plant)
 /**
  *
  */
+OrganTypeParameter* OrganTypeParameter::copy() const
+{
+    OrganTypeParameter* o = new OrganTypeParameter(plant); // dparam and iparam must be handled in the constructor
+    o->name == name;
+    o->organType = organType;
+    o->subType = subType;
+    return o;
+}
+
+/**
+ *
+ */
 OrganParameter* OrganTypeParameter::realize()
 {
     OrganParameter* op = new OrganParameter();

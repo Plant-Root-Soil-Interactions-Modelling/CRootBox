@@ -55,6 +55,35 @@ void Organ::simulate(double dt, bool silence)
 }
 
 /**
+ * Adds a node to the organ.
+ *
+ * For simplicity nodes can not be deleted, organs can only become deactivated or die
+ *
+ * @param n        new node
+ * @param id       global node index
+ * @param t        exact creation time of the node
+ */
+void Organ::addNode(Vector3d n, int id, double t)
+{
+    nodes.push_back(n); // node
+    nodeIds.push_back(id); // new unique id
+    nodeCTs.push_back(t); // exact creation time
+}
+
+/**
+ * Adds the node with the next global index to the root.
+ *
+ * For simplicity nodes can not be deleted, organs can only become deactivated or die
+ *
+ * @param n        the new node
+ * @param t        exact creation time of the node
+ */
+void Organ::addNode(Vector3d n, double t)
+{
+    addNode(n,plant->getNodeIndex(),t);
+}
+
+/**
  *
  */
 std::vector<Vector2i> Organ::getSegments(int otype) const
@@ -112,8 +141,8 @@ double Organ::getParameter(std::string name) const {
     double r = std::numeric_limits<double>::quiet_NaN(); // default if name is unknown
     if (name=="one") { r = 1; } // e.g. for counting the organs
     if (name=="id") { r = id; }
-    if (name=="organ_type") { r = this->organType(); }
-    if (name=="sub_type") { r = this->param_->subType; }
+    if (name=="organType") { r = this->organType(); }
+    if (name=="subType") { r = this->param_->subType; }
     if (name=="alive") { r = alive; }
     if (name=="active") { r = active; }
     if (name=="age") { r = age; }

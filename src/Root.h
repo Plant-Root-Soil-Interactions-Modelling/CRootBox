@@ -15,7 +15,6 @@
 
 namespace CRootBox {
 
-class RootSystem;
 class RootState;
 
 /**
@@ -28,14 +27,13 @@ class RootState;
 class Root :public Organ
 {
 
-    friend RootSystem;
-    friend RootState;
+    friend RootState;  //defined below
 
 public:
 
     Root(Organism* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of Root::createLaterals()
-    Root(const Root& r, RootSystem& rs); ///< deep copy of the tree
-    virtual ~Root();
+    Root(const Root& r, Organism& rs); ///< deep copy of the tree
+    virtual ~Root() { }; ///< children are deleted in ~Organ()
 
     int organType() const override { return Organism::ot_root; };
 
@@ -47,28 +45,21 @@ public:
     void getRoots(std::vector<Root*>& v); ///< return the root system as sequential vector
     double getParameter(std::string name) const override;
 
-    /* Nodes of the root */
-    void addNode(Vector3d n,double t); //< adds a node to the root
-
     /* From analytical equations */
     double calcCreationTime(double lenght); ///< analytical creation (=emergence) time of a node at a length
     double calcLength(double age); ///< analytical length of the root
     double calcAge(double length); ///< analytical age of the root
 
     /* Abbreviations */
-    // getParameter TODO
-    RootTypeParameter* getRootTypeParameter() const;  ///< returns the root type parameter of the root
+    RootTypeParameter* getRootTypeParameter() const;  ///< root type parameter of this root
+    const RootParameter* param() const; ///< root parameter
     double dx() const { return getRootTypeParameter()->dx; } ///< returns the axial resolution
 
     /* IO */
     void writeRSML(std::ostream & cout, std::string indent) const; ///< writes a RSML root tag
     std::string toString() const;
 
-    /* Parameters */
-    RootSystem* rootsystem; ///< the root system this root is part of
-
     /* Parameters that are given per root that are constant*/
-    RootParameter* param; ///< the parameters of this root
     Vector3d iheading; ///< the initial heading of the root, when it was created
     int id; ///< unique root id, (not used so far)
     double parent_base_length; ///< length [cm]
@@ -86,6 +77,7 @@ protected:
     void createLateral(bool silence); ///< creates a new lateral, called by Root::simulate()
 
 };
+
 
 /**
  * Stores a state of the root that can be restored at a later point

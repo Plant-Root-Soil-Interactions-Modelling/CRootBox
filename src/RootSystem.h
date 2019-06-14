@@ -10,6 +10,7 @@
 #include <numeric>
 #include <cmath>
 #include <stack>
+#include <map>
 
 #include "ModelParameter.h"
 #include "Organism.h"
@@ -75,31 +76,31 @@ class RootSystem :public Organism
 {
 
     friend Root;  // obviously :-)
+    friend Organ;
     friend RootSystemState;
 
 public:
 
     enum TropismTypes { tt_plagio = 0, tt_gravi = 1, tt_exo = 2, tt_hydro = 3 };  ///< root tropism types
+
     enum GrowthFunctionTypes { gft_negexp = 1, gft_linear = 2 }; // root growth function
+
     enum ScalarTypes { st_type = 0, st_radius = 1, st_order = 2, st_time = 3, st_length = 4, st_surface = 5, st_volume = 6, st_one = 7,
         st_userdata1 = 8, st_userdata2 = 9, st_userdata3 = 10, st_parenttype = 11,
         st_lb = 12, st_la = 13, st_nob = 14, st_r = 15, st_theta = 16, st_rlt = 17,
-        st_meanln = 18, st_sdln = 19}; ///< @see RootSystem::getScalar
-    static const std::vector<std::string> scalarTypeNames; ///< the corresponding names
+        st_meanln = 18, st_sdln = 19}; ///< @see RootSystem::getScalar //DEPRICATED
+    static const std::vector<std::string> scalarTypeNames; ///< the corresponding names //DEPRICATED
 
-    RootSystem();
+    RootSystem(): Organism() { };
     RootSystem(const RootSystem& rs); //< copy constructor
     virtual ~RootSystem();
 
     // Parameter input output
-    OrganTypeParameter* getOrganTypeParameter(int otype, int subtype) const override { return (OrganTypeParameter*) getRootTypeParameter(subtype); }
-    //
-    void setRootTypeParameter(RootTypeParameter* p) { rtparam.at(p->type-1) = p; } ///< set the root type parameter to the index type-1
-    RootTypeParameter* getRootTypeParameter(int type) const { return rtparam.at(type-1); } ///< returns the i-th root parameter set (i=1..n)
-    void setRootSystemParameter(const RootSystemParameter& rsp) { rsparam = rsp; } ///< sets the root system parameters
-    RootSystemParameter* getRootSystemParameter() { return &rsparam; } ///< gets the root system parameters
+    RootTypeParameter* getRootTypeParameter(int type) const;///< returns the i-th root parameter set (i=1..n)
+    void setRootSystemParameter(const RootSystemParameter& rsp); ///< sets the root system parameters
+    RootSystemParameter* getRootSystemParameter(); ///< gets the root system parameters
 
-    void openFile(std::string filename, std::string subdir="modelparameter/"); ///< reads root paramter and plant parameter
+    void openFile(std::string filename, std::string subdir="modelparameter/"); ///< reads root parameter and plant parameter
     int readParameters(std::istream & cin); ///< reads root parameters from an input stream
     void writeParameters(std::ostream & os) const; ///< writes root parameters
 
@@ -114,7 +115,6 @@ public:
     void simulate(double dt, bool silence = false) override; ///< simulates root system growth for time span dt
     void simulate(); ///< simulates root system growth for the time defined in the root system parameters
     void simulate(double dt, double maxinc, ProportionalElongation* se, bool silence = false); // simulates the root system with a maximal overall elongation
-    double getSimTime() const { return simtime; } ///< returns the current simulation time
 
     // call back functions (todo simplify)
     virtual Root* createRoot(int lt, Vector3d  h, double delay, Root* parent, double pbl, int pni);
@@ -177,7 +177,7 @@ public:
 
 private:
 
-    // todo currently everything is constant...
+    // todo currently everything is constant... // (move to specific application)
     Matrix3d poreConductivity = Matrix3d();
     Matrix3d poreLocalAxes= Matrix3d();
     Matrix3d invPoreLocalAxes = Matrix3d();
@@ -185,29 +185,25 @@ private:
     const int rsmlReduction = 5; ///< only each n-th node is written to the rsml file (to coarsely adjust axial resolution for output)
 
     RootSystemParameter rsparam; ///< Plant parameter
-    std::vector<RootTypeParameter*> rtparam; ///< Parameter set for each root type
     std::vector<Root*> baseRoots;  ///< Base roots of the root system
-    std::vector<GrowthFunction*> gf; ///< Growth function per root type
-    std::vector<Tropism*> tf;  ///< Tropism per root type
+
+    std::map<int,GrowthFunction*> gf; ///< Growth function per root type
+    std::map<int,Tropism*> tf;  ///< Tropism per root type
+
     SignedDistanceFunction* geometry = new SignedDistanceFunction(); ///< Confining geometry (unconfined by default)
     SoilLookUp* soil = nullptr; ///< callback for hydro, or chemo tropism (needs to set before initialize()) TODO should be a part of tf, or rtparam
 
     SignedDistanceFunction* poreGeometry = nullptr;
 
-    double simtime = 0;
     int rid = -1; // unique root id counter
 
     int old_non=0;
     int old_nor=0;
     mutable std::vector<Root*> roots = std::vector<Root*>(); // buffer for getRoots()
 
-    const int maxtypes = 100;
-
     int numberOfCrowns = 0;
 
     bool manualSeed = false;
-
-    void initRTP(); // default values for rtparam vector
 
     void writeRSMLMeta(std::ostream & os) const;
     void writeRSMLPlant(std::ostream & os) const;

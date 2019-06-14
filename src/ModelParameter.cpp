@@ -16,12 +16,51 @@ RootTypeParameter::RootTypeParameter(Organism* plant) :OrganTypeParameter(plant)
         successor, successorP, 1.22, 0., 1.e9, 0., 1, "undefined");
 }
 
+OrganTypeParameter* RootTypeParameter::copy() const
+{
+    RootTypeParameter* o = new RootTypeParameter(plant); // dparam and iparam must be handled in the constructor
+    o->name == name;
+    o->organType = organType;
+    o->subType = subType;
+
+    o->lb = lb;
+    o->lbs = lbs;
+    o->la = la;
+    o->las = las;
+    o->ln = ln;
+    o->lns = lns;
+    o->nob = nob;
+    o->nobs = nobs;
+    o->r = r;
+    o->rs = rs;
+    o->a = a;
+    o->as = as;
+    o->colorR = colorR;
+    o->colorG = colorG;
+    o->colorB = colorB;
+    o->tropismT = tropismT;
+    o->tropismN = tropismN;
+    o->tropismS = tropismS;
+    o->dx=dx;
+    o->successor = successor; // vector
+    o->successorP = successorP; // vector
+    assert(successor.size()==successorP.size());
+    o->theta = theta;
+    o->thetas = thetas;
+    o->rlt = rlt;
+    o->rlts = rlts;
+    o->gf = gf;
+    return o;
+}
+
+
+
 void RootTypeParameter::set(int type, double lb, double lbs, double la, double las, double ln, double lns, double nob, double nobs,
     double r, double rs, double a, double as,  double colorR, double colorG, double colorB, double tropismT, double tropismN, double tropismS,
     double dx, const std::vector<int>& successor, const std::vector<double>& successorP, double theta, double thetas, double rlt, double rlts,
     int gf, const std::string& name) {
 
-    this->type = type;
+    this->subType = type;
     this->lb = lb;		this->lbs = lbs;
     this->la = la;		this->las = las;
     this->ln = ln;		this->lns = lns;
@@ -67,7 +106,7 @@ OrganParameter* RootTypeParameter::realize() {
     double a_ = std::max(a + randn()*as,double(0)); // radius
     double theta_ = std::max(theta + randn()*thetas,double(0)); // initial elongation
     double rlt_ = std::max(rlt + randn()*rlts,double(0)); // root life time
-    OrganParameter* p = new RootParameter(type,lb_,la_,ln_,nob_,r_,a_,theta_,rlt_);
+    OrganParameter* p = new RootParameter(subType,lb_,la_,ln_,nob_,r_,a_,theta_,rlt_);
     return p;
 }
 
@@ -101,7 +140,7 @@ int RootTypeParameter::getLateralType(const Vector3d& pos)
 
 void RootTypeParameter::write(std::ostream & cout) const {
     cout << "# Root type parameter for " << name << "\n";
-    cout << "type\t" << type << "\n" << "name\t" << name << "\n" << "lb\t"<< lb <<"\t"<< lbs << "\n" << "la\t"<< la <<"\t"<< las << "\n"
+    cout << "type\t" << subType << "\n" << "name\t" << name << "\n" << "lb\t"<< lb <<"\t"<< lbs << "\n" << "la\t"<< la <<"\t"<< las << "\n"
         << "ln\t" << ln << "\t" << lns << "\n" << "nob\t"<< nob <<"\t"<< nobs << "\n" << "r\t"<< r <<"\t"<< rs << "\n" <<
         "a\t" << a << "\t" << as << "\n" << "color\t"<< colorR <<"\t"<< colorG << "\t" << colorB << "\n"
         << "tropism\t"<< tropismT <<"\t"<< tropismN << "\t" << tropismS << "\n" << "dx\t" << dx << "\n" << "successor\t" << successor.size() << "\t";
@@ -121,7 +160,7 @@ void RootTypeParameter::read(std::istream & cin) {
     std::string s; // dummy
     double k;
     double ks;
-    cin >> s >> type >> s >> name >> s >> lb >> lbs >> s >> la >> las >> s >> ln >> lns >> s >> k >> ks;
+    cin >> s >> subType >> s >> name >> s >> lb >> lbs >> s >> la >> las >> s >> ln >> lns >> s >> k >> ks;
     cin >> s >> r >> rs >> s >> a >> as >> s >> colorR >> colorG >> colorB >> s >> tropismT >> tropismN >> tropismS >> s >> dx;
     if (ln > 0) {
         nob=  (k-la-lb)/ln+1;   //conversion, because the input file delivers the lmax value and not the nob value

@@ -65,7 +65,7 @@ SDF_RootSystem::SDF_RootSystem(const Root& r, double dx): dx_(dx) {
   }
   for (size_t i=1; i<n; i++) {
       segments_[i-1] = Vector2i(i-1,i);
-      radii_[i-1] = r.param->a;
+      radii_[i-1] = r.param()->a;
   }
   buildTree();
 }

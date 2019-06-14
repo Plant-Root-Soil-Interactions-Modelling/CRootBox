@@ -40,9 +40,7 @@ plt.savefig("../results/example_3a.png")
 plt.show()
 
 # Find root tips and bases (two approaches)
-print("?")
 rs.initialize()  # <------------
-print("?")
 rs.simulate(7, True)  # 7 days young....
 
 print(rs.getNumberOfNodes(), "nodes")

@@ -23,33 +23,33 @@ for a in axes:
 
 # Make a root length distribution
 ana = rb.SegmentAnalyser(rs)
-rl_ = ana.distribution(rb.ScalarType.length, 0., depth, layers, True)
+rl_ = ana.distribution("length", 0., depth, layers, True)
 axes[0].set_title('All roots (120 days)')
 axes[0].plot(rl_, z_)
 
 # Make a root length distribution along the soil core
 ana = rb.SegmentAnalyser(rs)
-ana.crop(geom)
+# ana.crop(geom)
 ana.pack()
-rl_ = ana.distribution(rb.ScalarType.length, 0., depth, layers, True)
+rl_ = ana.distribution("length", 0., depth, layers, True)
 axes[1].set_title('Soil core (120 days)')
 axes[1].plot(rl_, z_)
 
 # How it looked after 30 days?
 ana = rb.SegmentAnalyser(rs)
-ana.filter(rb.ScalarType.time, 0, 30)
-ana.crop(geom)
+ana.filter("creationTime", 0, 30)
+# ana.crop(geom)
 ana.pack()
-rl_ = ana.distribution(rb.ScalarType.length, 0., depth, layers, True)
+rl_ = ana.distribution("length", 0., depth, layers, True)
 axes[2].set_title('Soil core (30 days)')
 axes[2].plot(rl_, z_)
 
 # Only laterals?
 ana = rb.SegmentAnalyser(rs)
-ana.filter(rb.ScalarType.type, 2)  # assuming laterals are of type 2
-ana.crop(geom)
+ana.filter("type", 2)  # assuming laterals are of type 2
+# ana.crop(geom)
 ana.pack()
-rl_ = ana.distribution(rb.ScalarType.length, 0., depth, layers, True)
+rl_ = ana.distribution("length", 0., depth, layers, True)
 axes[3].set_title('Soil core, lateral roots (120 days)')
 axes[3].plot(rl_, z_)
 
