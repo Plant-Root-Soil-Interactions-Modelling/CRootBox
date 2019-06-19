@@ -19,10 +19,13 @@ class Organism;
  * Describes a plant organ. Acts as base class for seed, root, stem and leaf.
  *
  * Manages:
- * Organ tree (one parent, multiple children, one plant organism)
+ * Organ development (via Organ::simulate)
+ * The organ tree: one parent, multiple children, one plant organism
  * Organ parameters
- * Organ representation (by nodes, and line segments)
- * Supports RSML output (TODO)
+ * Organ representation (by nodes, global node indices, node creation times, and line segments)
+ * Post processing and RSML output
+ *
+ * todo Time managment ... reset()...
  */
 class Organ
 {
@@ -34,23 +37,25 @@ public:
 
     virtual int organType() const; ///< returns the organs type, overwrite for each organ
 
-    /* simulation */
+    /* development */
     virtual void simulate(double dt, bool verbose = false); ///< grow for a time span of \param dt
+
+    /* tree */
+    void setParent(Organ* p) { parent = p; }
+    Organ* getParent() const { return parent; }
+    void setPlant(Organism* p) { plant = p; }
+    void addChild(Organ* c) { children.push_back(c); }
 
     /* parameters */
     int getId() const { return id; } ///< unique organ id
     const OrganParameter* getParam() const { return param_; } ///< organ parameters
-
     OrganTypeParameter* getOrganTypeParameter() const;  ///< organ type parameter
     bool isAlive() const { return alive; }
     bool isActive() const { return active; }
     double getAge() const { return age; }
     double getLength() const { return length; }
-    void setParent(Organ* p) { parent = p; }
-    Organ* getParent() const { return parent; }
-    virtual double getParameter(std::string name) const; ///< returns an organ parameter
 
-    /* geometry */
+    /* representation */
     size_t getNumberOfNodes() const { return nodes.size(); } ///< number of nodes of the organ
     Vector3d getNode(int i) const { return nodes.at(i); } ///< i-th node of the organ
     int getNodeId(int i) const { return nodeIds.at(i); } ///< global node index of the i-th node
@@ -62,6 +67,7 @@ public:
     /* for post processing */
     std::vector<Organ*> getOrgans(int otype = -1); ///< the organ including children in a sequential vector
     void getOrgans(int otype, std::vector<Organ*>& v); ///< the organ including children in a sequential vector
+    virtual double getParameter(std::string name) const; ///< returns an organ parameter
 
     /* IO */
     virtual std::string toString() const; ///< info for debugging todo make pretty

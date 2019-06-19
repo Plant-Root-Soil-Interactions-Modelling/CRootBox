@@ -19,8 +19,8 @@ class OrganTypeParameter;
  *
  * Manages the OrganTypeParameters
  * Offers an interface for the simulation loop (initialize, simulate, getSimTime)
+ * Holds global node index and organ index counter*
  * Collects node and line segment geometry from the organ tree
- * Holds global node index and organ index counter
  * Holds random numbers generator for the organ classes
  */
 class Organism {

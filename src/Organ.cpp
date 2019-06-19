@@ -6,24 +6,27 @@
 
 #include <iostream>
 
-
 namespace CRootBox {
 
 /*
- * Copy constructor
+ * Deep copies the organ @param o into a new plant @param plant.
+ * All children are deep copied, plant and parent pointers are updated.
+ *
+ * @param o         the organ to be copied
+ * @param plant     the plant the copied organ will be part of
  */
 Organ::Organ(const Organ& o, Organism* plant):
-    plant(plant), // different plant then o.plant
-    parent(nullptr),
-    id(o.id),
-    param_(o.param_),
-    alive(o.alive),
-    active(o.active),
-    age(o.age),
-    length(o.length),
-    nodes(o.nodes),
-    nodeIds(o.nodeIds),
-    nodeCTs(o.nodeCTs)
+        plant(plant), // different plant then o.plant
+        parent(nullptr),
+        id(o.id),
+        param_(o.param_),
+        alive(o.alive),
+        active(o.active),
+        age(o.age),
+        length(o.length),
+        nodes(o.nodes),
+        nodeIds(o.nodeIds),
+        nodeCTs(o.nodeCTs)
 {
     children = std::vector<Organ*>(o.children.size());
     for (size_t i=0; i< o.children.size(); i++) {
@@ -33,21 +36,25 @@ Organ::Organ(const Organ& o, Organism* plant):
 }
 
 /**
- * Set from outside todo in order to start with an specific organism
+ * The constructor is used for simulation.
+ * The organ parameters are chosen from random distributions within the the OrganTypeParameter class.
+ * The next organ id is retrieved from the plant,
+ * and the organ starts growing after a delay (starts with age = -delay).
+ *
+ * @param plant     the plant the new organ will be part of
+ * @param parent    the parent organ, equals nullptr if there is no parent
+ * @param ot        organ type
+ * @param st        sub type of the organ type, e.g. different root types
+ * @param delay     time delay in days when the organ will start to grow
  */
-
-
-/**
- * In simulation
- */
-Organ::Organ(Organism* plant, Organ* parent, int organtype, int subtype, double delay): plant(plant), parent(parent),
+Organ::Organ(Organism* plant, Organ* parent, int ot, int st, double delay): plant(plant), parent(parent),
     id(plant->getOrganIndex()),  // unique id from the plant
-    param_(plant->getOrganTypeParameter(organtype, subtype)->realize()),
+    param_(plant->getOrganTypeParameter(ot, st)->realize()), // draw specific parameters from random distributions
     age(-delay)
 { }
 
 /**
- * Destructor, tell the kids (bad news)
+ * Destructor deletes all children, and its parameter class
  */
 Organ::~Organ()
 {
@@ -57,13 +64,18 @@ Organ::~Organ()
     delete param_; // organ parameters
 }
 
+/**
+ * \return The organ type, which is a coarse classification of the organs.
+ * Currently there are: ot_organ (for unspecified organs), ot_seed, ot_root, ot_stem, and ot_leaf.
+ * There can be different classes with the same organ type.
+ */
 int Organ::organType() const
 {
     return Organism::ot_organ;
 }
 
 /**
- * Asks the plant for the organ's sub type parameter
+ * \return The organ type parameter is retrieved from the plant
  */
 OrganTypeParameter* Organ::getOrganTypeParameter() const
 {
@@ -71,18 +83,21 @@ OrganTypeParameter* Organ::getOrganTypeParameter() const
 }
 
 /**
- * Calls sub organs (children)
+ * The member function should be overwritten to describe the organ development in a duration of @param dt days.
+ *
+ * desciption what has to be implemented TODO
+ *
  */
-void Organ::simulate(double dt, bool silence)
+void Organ::simulate(double dt, bool verbose)
 {
-//    if (alive) {
-//        age += dt;
-//        if (active && (age>0)) {
-//            for (auto& c : children)  {
-//                c->simulate(dt);
-//            }
-//        }
-//    }
+    //    if (alive) {
+    //        age += dt;
+    //        if (active && (age>0)) {
+    //            for (auto& c : children)  {
+    //                c->simulate(dt);
+    //            }
+    //        }
+    //    }
 }
 
 /**
@@ -115,13 +130,19 @@ void Organ::addNode(Vector3d n, double t)
 }
 
 /**
+ * By default the organ is represented by a polyline,
+ * i.e. the segments of the nodes {n1, n2, n3, n4}, are the indices { [i1,i2], [i2,i3], [i3,i4] }.
+ * For other geometries this member function must be overwritten.
  *
+ * @param ot        the expected organ type, where -1 denotes all organ types (default).
+ *
+ * \return A vector of line segments, where each line segment is described as two global node indices.
+ * If there are less than two nodes, or another organ type is expected, an empty vector is returned.
  */
-std::vector<Vector2i> Organ::getSegments(int otype) const
+std::vector<Vector2i> Organ::getSegments(int ot) const
 {
     if (this->nodes.size()>1) {
-        int ot = this->organType();
-        if ((otype<0) || (otype==ot)) {
+        if ((ot<0) || (ot==this->organType())) {
             std::vector<Vector2i> segs = std::vector<Vector2i>(nodes.size()-1);
             for (size_t i=0; i<nodes.size()-1; i++) {
                 Vector2i s(getNodeId(i),getNodeId(i+1));
@@ -134,50 +155,50 @@ std::vector<Vector2i> Organ::getSegments(int otype) const
 }
 
 /**
- * Returns the organs as sequential list,
- * copies only organs with more than 1 node.
+ * Returns the organs as sequential list, copies only organs with more than one node.
  *
- * \return sequential list of organs
+ * @param ot        the expected organ type, where -1 denotes all organ types (default).
+ *
+ * \return Sequential list of organs. If there is less than one node,
+ * or another organ type is expected, an empty vector is returned.
  */
-std::vector<Organ*> Organ::getOrgans(int otype)
+std::vector<Organ*> Organ::getOrgans(int ot)
 {
     std::vector<Organ*> v = std::vector<Organ*>();
-    this->getOrgans(otype, v);
+    this->getOrgans(ot, v);
     return v;
 }
 
 /**
- * Returns the organs as sequential list,
- * copies only organs with more than 1 node.
+ * Returns the organs as sequential list, copies only organs with more than one node.
  *
- * @param v     adds the organ sub tree to this vector
+ * @param ot        the expected organ type, where -1 denotes all organ types (default).
+ * @param v         vector of organs where the subtree is added,
+ *                  only expected organ types with more than one nodes are added.
  */
-void Organ::getOrgans(int otype, std::vector<Organ*>& v)
+void Organ::getOrgans(int ot, std::vector<Organ*>& v)
 {
     if (this->nodes.size()>1) {
-        int ot = this->organType();
-        if ((otype<0) || (otype==ot)) {
+        if ((ot<0) || (ot==this->organType())) {
             v.push_back(this);
         }
     }
     for (const auto& c : this->children) {
-        c->getOrgans(otype,v);
+        c->getOrgans(ot,v);
     }
 }
 
 /**
- * Returns the parameter called @param name
+ * Returns a single scalar parameter called @param name of the organ.
+ * This method is for post processing, since it is flexible but slow.
+ * Overwrite to add more parameters for specific organs.
+ *
+ * \return The parameter value, if unknown NaN
  */
 double Organ::getParameter(std::string name) const {
-    if (name=="one") { return 1; } // e.g. for counting the organs
-    if (name=="id") { return id; }
-    if (name=="organType") { return this->organType(); }
-    if (name=="subType") { return this->param_->subType; }
-    if (name=="alive") { return isAlive(); }
-    if (name=="active") { return isActive(); }
-    if (name=="age") { return getAge(); }
     if (name=="length") { return getLength(); }
-    if (name=="order") {
+    if (name=="age") { return getAge(); }
+    if (name=="order") { // count how often it is possible to move up
         int r = 0;
         const Organ* p = this;
         while (p->parent != nullptr) {
@@ -186,18 +207,26 @@ double Organ::getParameter(std::string name) const {
         }
         return r;
     }
+    if (name=="one") { return 1; } // e.g. for counting the organs
+    if (name=="id") { return getId(); }
+    if (name=="organType") { return this->organType(); }
+    if (name=="subType") { return this->param_->subType; }
+    if (name=="alive") { return isAlive(); }
+    if (name=="active") { return isActive(); }
     if (name=="nubmerOfChildren") { return children.size(); }
 
     // if ((name=="creationTime") && (nodeCTs.size()>0)) { return nodeCTs.at(0); }
     // if ((name=="emergence_time") && (nodeCTs.size()>1)) { return nodeCTs.at(1); }
 
     double r = std::numeric_limits<double>::quiet_NaN(); // default if name is unknown
+
     // TODO pass to organ type parameters
+
     return r;
 }
 
 /**
- * Writes RSML root tag
+ * Writes RSML root tag TODO switch to tiny xml
  *
  * @param cout      typically a file out stream
  * @param indent    we care for looks
@@ -247,14 +276,14 @@ void Organ::writeRSML(std::ostream & cout, std::string indent) const
 }
 
 /**
- * Quick info about the object for debugging
+ * \return Quick info about the object for debugging
  */
 std::string Organ::toString() const
 {
     std::stringstream str;
-    str << "Organ #"<< id <<": sub type "<< param_->subType << ", length "<< length << " cm, age " << age
-        << " days, alive " << alive << ", active " << active << ", number of nodes" << this->getNumberOfNodes()
-        << ", with "<< children.size() << " successors\n";
+    str << "Organ #"<< getId() << ": organ type "<< organType() << " sub type "<< param_->subType << ", length " <<
+        getLength() << " cm, age " << getAge() << " days, alive " << isAlive() << ", active " << isActive()
+        << ", number of nodes" << this->getNumberOfNodes() << ", with "<< children.size() << " children\n";
     return str.str();
 }
 
