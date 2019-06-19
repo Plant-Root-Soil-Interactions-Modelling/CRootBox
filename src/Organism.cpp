@@ -8,23 +8,49 @@
 
 namespace CRootBox {
 
+/**
+ * Copy constructor
+ */
 Organism::Organism(const Organism& o): organParam(o.organParam), simtime(o.simtime),
     organId(o.organId), nodeId(o.nodeId), gen(o.gen), UD(o.UD), ND(o.ND)
 { }
 
+/*
+ * Destructor: deletes all organ type parameters
+ */
 Organism::~Organism()
 {
-    // TODO delete all parameter type classes
+    for (int ot = 0; ot < numberOfOrganTypes; ot++) {
+        std::vector<OrganTypeParameter*> deleteMe = getOrganTypeParameter(ot);
+        for (int i=0; i<deleteMe.size(); i++) {
+            delete deleteMe[i];
+        }
+    }
 }
 
+/**
+ * Copies the organ type parameters of a specific organ type into a vector
+ */
+std::vector<OrganTypeParameter*> Organism::getOrganTypeParameter(int otype) const
+{
+    std::vector<OrganTypeParameter*>  otps = std::vector<OrganTypeParameter*>(0);
+    for (auto& otp : organParam[otype]) {
+        otps.push_back(otp.second);
+    }
+    return otps;
+}
 
 /**
- * Returns the organ type parameter
+ * Returns an organ type parameter of a specific organ type and sub type
  */
 OrganTypeParameter* Organism::getOrganTypeParameter(int otype, int subtype) const
 {
     try {
-        std::cout << "reading ogran type " << otype << " sub type " << subtype << "\n";
+//        std::cout << "reading organ type " << otype << " sub type " << subtype <<": ";
+//        for (auto& p : organParam[otype]) {
+//            std::cout << p.first;
+//        }
+//        std::cout << "\n" << std::flush;;
         return organParam[otype].at(subtype);
     } catch(const std::out_of_range& oor) {
         std::cout << "Organism::getOrganTypeParameter: Organ type parameter of sub type " << subtype << " wast not set \n" << std::flush;

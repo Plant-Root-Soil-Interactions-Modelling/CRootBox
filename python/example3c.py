@@ -5,11 +5,11 @@ import math
 rs = rb.RootSystem()
 
 # Root type parameter
-p0 = rb.RootTypeParameter()  # with default values,
-p1 = rb.RootTypeParameter()  # all standard deviations are 0
+p0 = rb.RootTypeParameter(rs)  # with default values,
+p1 = rb.RootTypeParameter(rs)  # all standard deviations are 0
 
 p0.name = "taproot"
-p0.type = 1
+p0.subType = 1
 p0.lb = 1
 p0.la = 10
 p0.nob = 20
@@ -24,7 +24,7 @@ p0.tropismN = 1.
 p0.tropismS = 0.2
 
 p1.name = "lateral"
-p1.type = 2
+p1.subType = 2
 p1.la = 25
 p1.las = 10  # add standard deviation
 p1.ln = 0
@@ -32,8 +32,8 @@ p1.r = 2
 p1.dx = 0.1
 p1.tropismS = 0.3
 
-rs.setRootTypeParameter(p0)
-rs.setRootTypeParameter(p1)
+rs.setOrganTypeParameter(p0)
+rs.setOrganTypeParameter(p1)
 
 # Root system parameter (neglecting shoot borne)
 maxB = 100

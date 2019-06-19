@@ -46,8 +46,8 @@ axes[2].plot(rl_, z_)
 
 # Only laterals?
 ana = rb.SegmentAnalyser(rs)
-ana.filter("type", 2)  # assuming laterals are of type 2
-# ana.crop(geom)
+ana.filter("subType", 2)  # assuming laterals are of type 2
+ana.crop(geom)
 ana.pack()
 rl_ = ana.distribution("length", 0., depth, layers, True)
 axes[3].set_title('Soil core, lateral roots (120 days)')

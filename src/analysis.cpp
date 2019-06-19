@@ -2,12 +2,12 @@
 #include "analysis.h"
 
 #include "Organ.h"
+#include "Organism.h"
 
 #include <iomanip>
 #include <istream>
 #include <fstream>
 #include <set>
-#include "Organism.h"
 
 namespace CRootBox {
 
@@ -64,6 +64,26 @@ std::vector<double> SegmentAnalyser::getParameter(std::string name) const
     std::vector<double> data(segO.size());
     if (name == "creationTime") {
         data = segCTs;
+        return data;
+    }
+    if (name == "length") {
+        for (size_t i=0; i<data.size(); i++) {
+            data.at(i) = getSegmentLength(i);
+        }
+        return data;
+    }
+    if (name == "surface") {
+        for (size_t i=0; i<data.size(); i++) {
+            double a = segO.at(i)-> getParameter("radius");
+            data.at(i) = 2*a*M_PI*getSegmentLength(i);
+        }
+        return data;
+    }
+    if (name == "volume") {
+        for (size_t i=0; i<data.size(); i++) {
+            double a = segO.at(i)-> getParameter("radius");
+            data.at(i) = a*a*M_PI*getSegmentLength(i);
+        }
         return data;
     }
     if (name == "userData1") {
@@ -481,18 +501,18 @@ std::vector<std::vector<SegmentAnalyser>> SegmentAnalyser::distribution2(double 
             a.crop(&g); // crop exactly
             d.at(i).push_back(a);
 
-            if (i==0) {
-                std::stringstream ss;
-                ss << "(" << i << ":" << j << ").py";
-                std::string name = "test"+ss.str();
-                std::ofstream fos;
-                fos.open(name.c_str());
-                fos << "from paraview.simple import *\n";
-                fos << "paraview.simple._DisableFirstRenderCameraReset()\n";
-                fos << "renderView1 = GetActiveViewOrCreate('RenderView')\n\n";
-                g.writePVPScript(fos);
-                fos.close();
-            }
+//            if (i==0) { // ????? TODO
+//                std::stringstream ss;
+//                ss << "(" << i << ":" << j << ").py";
+//                std::string name = "test"+ss.str();
+//                std::ofstream fos;
+//                fos.open(name.c_str());
+//                fos << "from paraview.simple import *\n";
+//                fos << "paraview.simple._DisableFirstRenderCameraReset()\n";
+//                fos << "renderView1 = GetActiveViewOrCreate('RenderView')\n\n";
+//                g.writePVPScript(fos);
+//                fos.close();
+//            }
         }
     }
     delete layer;
@@ -513,7 +533,7 @@ void SegmentAnalyser::write(std::string name)
     std::string ext = name.substr(name.size()-3,name.size()); // pick the right writer
     if (ext.compare("vtp")==0) {
         std::cout << "writing VTP: " << name << "\n" << std::flush;
-        this->writeVTP(fos,{ 0 /* todo RootSystem::st_radius, RootSystem::st_type, RootSystem::st_time*/ });
+        this->writeVTP(fos,{ "radius", "subType", "creationTime" });
     } else if (ext.compare("txt")==0)  {
         std::cout << "writing text file for Matlab import: "<< name << "\n"<< std::flush;
         writeRBSegments(fos);

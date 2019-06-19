@@ -56,12 +56,13 @@ def simOnce(name, simtime, lbins, lrange, zbins, zrange, dx, dt):
     # simulation
     rs = rb.RootSystem()
     rs.openFile(name, "modelparameter/")
-    for i in range(0, 10):
-        rs.getRootTypeParameter(i + 1).dx = dx
-
-    rs.getRootTypeParameter(4).theta = 80. / 180.*math.pi  # fix insertion angle of the basal roots
+    for p in rs.getRootTypeParameter():
+        p.dx = dx
 
     rs.initialize()
+    rs.getRootTypeParameter(4).theta = 80. / 180.*math.pi  # fix insertion angle of the basal roots
+    rs.initialize()
+
     N = round(simtime / dt)
     print("simOnce")
     for i in range(0, N):

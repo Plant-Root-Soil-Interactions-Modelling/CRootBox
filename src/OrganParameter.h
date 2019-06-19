@@ -15,8 +15,8 @@ class Organism; // forward declaration
  */
 class OrganParameter {
 public:
-
-    OrganParameter() { };
+//
+//    OrganParameter() { };
 
     int subType = -1; // sub type of the organ
 
@@ -48,6 +48,8 @@ public:
     int subType = 0;
 
     Organism* plant;
+
+protected:
 
     std::map<std::string, double*> dparam; ///< Parameters with type double that can be read and written
     std::map<std::string, int*> iparam; ///< Parameters with type double that can be read and written

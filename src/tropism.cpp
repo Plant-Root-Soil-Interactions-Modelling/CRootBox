@@ -1,6 +1,11 @@
 // -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 #include "tropism.h"
 
+#include "soil.h"
+#include "sdf.h"
+#include "Organ.h"
+#include "Root.h"
+
 namespace CRootBox {
 
 /**
@@ -29,7 +34,7 @@ Vector3d Tropism::getPosition(const Vector3d& pos, Matrix3d old, double a, doubl
  *
  * \return             angle alpha and beta
  */
-Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,const Root* root)
+Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,const Organ* o)
 {
     double a = sigma*randn()*sqrt(dx);
     double b = rand()*2*M_PI;
@@ -45,11 +50,11 @@ Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,cons
         }
         double bestA = a;
         double bestB = b;
-        double bestV = this->tropismObjective(pos,old,a,b,dx,root);
+        double bestV = this->tropismObjective(pos,old,a,b,dx,o);
         for (int i=0; i<n_; i++) {
             b = rand()*2*M_PI;
             a = sigma*randn()*sqrt(dx);
-            v = this->tropismObjective(pos,old,a,b,dx,root);
+            v = this->tropismObjective(pos,old,a,b,dx,o);
             if (v<bestV) {
                 bestV=v;
                 bestA=a;
@@ -74,9 +79,9 @@ Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,cons
  *
  * \return           the rotations alpha and beta
  */
-Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const Root* root)
+Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const Organ* o)
 {
-    Vector2d h = this->getUCHeading(pos, old, dx, root);
+    Vector2d h = this->getUCHeading(pos, old, dx, o);
     double a = h.x;
     double b = h.y;
 
@@ -126,9 +131,9 @@ Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const
 /**
  * getHeading() minimizes this function, @see TropismFunction::tropismObjective
  */
-double Exotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root)
+double Exotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Organ* o)
 {
-    Vector3d iheading = root->iheading;
+    Vector3d iheading = ((Root*)o)->iheading;
     double s = iheading.times(old.times(Vector3d::rotAB(a,b)));
     s*=(1./iheading.length()); // iheading should be normed anyway?
     s*=(1./old.column(0).length());
@@ -140,11 +145,11 @@ double Exotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a,
 /**
  * getHeading() minimizes this function, @see TropismFunction::tropismObjective
  */
-double Hydrotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root)
+double Hydrotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Organ* o)
 {
     assert(soil!=nullptr);
     Vector3d newpos = this->getPosition(pos,old,a,b,dx);
-    double v = soil->getValue(newpos,root);
+    double v = soil->getValue(newpos,o);
     // std::cout << "\n" << newpos.getString() << ", = "<< v;
     return -v; ///< (-1) because we want to maximize the soil property
 }
@@ -173,12 +178,12 @@ CombinedTropism::CombinedTropism(double n, double sigma,Tropism* t1, double w1, 
 /**
  * getHeading() minimizes this function, @see TropismFunction::tropismObjective
  */
-double CombinedTropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root)
+double CombinedTropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Organ* o)
 {
     //std::cout << "CombinedTropsim::tropismObjective\n";
-    double v = tropisms[0]->tropismObjective(pos,old,a,b,dx,root)*weights[0];
+    double v = tropisms[0]->tropismObjective(pos,old,a,b,dx,o)*weights[0];
     for (size_t i = 1; i< tropisms.size(); i++) {
-        v += tropisms[i]->tropismObjective(pos,old,a,b,dx,root)*weights[i];
+        v += tropisms[i]->tropismObjective(pos,old,a,b,dx,o)*weights[i];
     }
     return v;
 }

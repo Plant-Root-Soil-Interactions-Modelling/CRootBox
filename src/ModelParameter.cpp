@@ -1,5 +1,6 @@
 // -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 #include "ModelParameter.h"
+
 #include <cmath>
 
 namespace CRootBox {
@@ -12,6 +13,7 @@ namespace CRootBox {
  * Default constructor
  */
 RootTypeParameter::RootTypeParameter(Organism* plant) :OrganTypeParameter(plant) {
+    organType = Organism::ot_root;
     set(-1, 0., 0., 10., 0., 1., 0., 0., 0., 1., 0, 0.1, 0., 150./255.,150./255.,50./255., 1, 1. ,0.2, 0.1,
         successor, successorP, 1.22, 0., 1.e9, 0., 1, "undefined");
 }
@@ -44,12 +46,12 @@ OrganTypeParameter* RootTypeParameter::copy() const
     o->dx=dx;
     o->successor = successor; // vector
     o->successorP = successorP; // vector
-    assert(successor.size()==successorP.size());
     o->theta = theta;
     o->thetas = thetas;
     o->rlt = rlt;
     o->rlts = rlts;
     o->gf = gf;
+
     return o;
 }
 
@@ -61,11 +63,16 @@ void RootTypeParameter::set(int type, double lb, double lbs, double la, double l
     int gf, const std::string& name) {
 
     this->subType = type;
-    this->lb = lb;		this->lbs = lbs;
-    this->la = la;		this->las = las;
-    this->ln = ln;		this->lns = lns;
-    this->nob = nob;	this->nobs = nobs;
-    this->r = r;		this->rs = rs;
+    this->lb = lb;
+    this->lbs = lbs;
+    this->la = la;
+    this->las = las;
+    this->ln = ln;
+    this->lns = lns;
+    this->nob = nob;
+    this->nobs = nobs;
+    this->r = r;
+    this->rs = rs;
     this->a = a;		this->as = as;
     this->colorR = colorR;
     this->colorG = colorG;
@@ -77,8 +84,10 @@ void RootTypeParameter::set(int type, double lb, double lbs, double la, double l
     this->successor = successor; // vector
     this->successorP = successorP; // vector
     assert(successor.size()==successorP.size());
-    this->theta = theta;	this->thetas = thetas;
-    this->rlt = rlt;		this->rlts = rlts;
+    this->theta = theta;
+    this->thetas = thetas;
+    this->rlt = rlt;
+    this->rlts = rlts;
     this->gf = gf;
     this->name = name; // string
 }
@@ -205,14 +214,6 @@ void RootTypeParameter::read(std::istream & cin) {
  * class RootParameter
  */
 
-/**
- * Default constructor
- */
-RootParameter::RootParameter() {
-    std::vector<double> ln;
-    set(-1,0.,0.,ln, 0,0.,0.,0.,0.);
-}
-
 double RootParameter::getK() const {
     double l = 0;
     for (const auto& dl : ln) {
@@ -221,21 +222,10 @@ double RootParameter::getK() const {
     return l+la+lb;
 }
 
-void RootParameter::set(int type, double lb, double la, const std::vector<double>& ln, double nob, double r, double a, double theta, double rlt) {
-    this->type=type;
-    this->lb=lb;
-    this->la=la;
-    this->ln=ln;
-    this->nob=nob;
-    this->r=r;
-    this->a=a;
-    this->theta=theta;
-    this->rlt=rlt;
-}
 
 void RootParameter::write(std::ostream & cout) const {
     cout << "# Root Parameters \n";
-    cout << "type\t" << type << "\n"  << "lb\t"<< lb <<"\n" << "la\t"<< la <<"\n" << "ln\t";
+    cout << "type\t" << subType << "\n"  << "lb\t"<< lb <<"\n" << "la\t"<< la <<"\n" << "ln\t";
     for (size_t i=0; i<ln.size(); i++) {
         cout << ln[i] << "\t";
     }

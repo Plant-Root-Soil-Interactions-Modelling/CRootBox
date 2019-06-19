@@ -89,7 +89,6 @@ public:
         st_userdata1 = 8, st_userdata2 = 9, st_userdata3 = 10, st_parenttype = 11,
         st_lb = 12, st_la = 13, st_nob = 14, st_r = 15, st_theta = 16, st_rlt = 17,
         st_meanln = 18, st_sdln = 19}; ///< @see RootSystem::getScalar //DEPRICATED
-    static const std::vector<std::string> scalarTypeNames; ///< the corresponding names //DEPRICATED
 
     RootSystem(): Organism() { };
     RootSystem(const RootSystem& rs); //< copy constructor
@@ -97,6 +96,7 @@ public:
 
     // Parameter input output
     RootTypeParameter* getRootTypeParameter(int type) const;///< returns the i-th root parameter set (i=1..n)
+    std::vector<RootTypeParameter*> getRootTypeParameter() const;
     void setRootSystemParameter(const RootSystemParameter& rsp); ///< sets the root system parameters
     RootSystemParameter* getRootSystemParameter(); ///< gets the root system parameters
 

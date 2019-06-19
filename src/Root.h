@@ -32,7 +32,7 @@ class Root :public Organ
 public:
 
     Root(Organism* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of Root::createLaterals()
-    Root(const Root& r, Organism& rs); ///< deep copy of the tree
+    Root(const Root& r, Organism* rs); ///< deep copy of the tree
     virtual ~Root() { }; ///< children are deleted in ~Organ()
 
     int organType() const override { return Organism::ot_root; };
@@ -61,7 +61,6 @@ public:
 
     /* Parameters that are given per root that are constant*/
     Vector3d iheading; ///< the initial heading of the root, when it was created
-    int id; ///< unique root id, (not used so far)
     double parent_base_length; ///< length [cm]
     int parent_ni; ///< parent node index
 

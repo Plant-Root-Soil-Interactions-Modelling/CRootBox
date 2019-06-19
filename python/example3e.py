@@ -11,9 +11,8 @@ soilcore = rb.SDF_PlantContainer(5, 5, 40, False)
 rs.setGeometry(soilcore)
 
 # Modify axial resolution
-for i in range(0, 10):
-    p = rs.getRootTypeParameter(i + 1)
-    p.dx = 0.1  # adjust resolution
+for p in rs.getRootTypeParameter():
+        p.dx = 0.1  # adjust resolution
 
 # Simulate
 rs.initialize()

@@ -42,11 +42,21 @@ Vector3d (Matrix3d::*times4)(const Vector3d&) const = &Matrix3d::times;
 
 std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceFunction::writePVPScript; // because of default value
 
+OrganTypeParameter* (Organism::*getOrganTypeParameter1)(int otype, int subType) const = &Organism::getOrganTypeParameter;
+std::vector<OrganTypeParameter*> (Organism::*getOrganTypeParameter2)(int otype) const = &Organism::getOrganTypeParameter;
+
+void (Organ::*addNode1)(Vector3d n, double t) = &Organ::addNode;
+void (Organ::*addNode2)(Vector3d n, int id, double t)= &Organ::addNode;
+std::vector<Organ*> (Organ::*getOrgans1)(int otype) = &Organ::getOrgans;
+void (Organ::*getOrgans2)(int otype, std::vector<Organ*>& v) = &Organ::getOrgans;
+
 void (RootSystem::*simulate1)(double dt, bool silence) = &RootSystem::simulate;
 void (RootSystem::*simulate2)() = &RootSystem::simulate;
 void (RootSystem::*simulate3)(double dt, double maxinc, ProportionalElongation* se, bool silence) = &RootSystem::simulate;
 void (RootSystem::*initialize1)() = &RootSystem::initialize;
 void (RootSystem::*initialize2)(int basal, int shootborne) = &RootSystem::initialize;
+RootTypeParameter* (RootSystem::*getRootTypeParameter1)(int subType) const = &RootSystem::getRootTypeParameter;
+std::vector<RootTypeParameter*> (RootSystem::*getRootTypeParameter2)() const = &RootSystem::getRootTypeParameter;
 
 void (SegmentAnalyser::*addSegments1)(const Organism& plant) = &SegmentAnalyser::addSegments;
 void (SegmentAnalyser::*addSegments2)(const SegmentAnalyser& a) = &SegmentAnalyser::addSegments;
@@ -65,6 +75,7 @@ SegmentAnalyser (SegmentAnalyser::*cut1)(const SDF_HalfPlane& plane) const = &Se
 /**
  * Default arguments: no idea how to do it by hand, magic everywhere...
  */
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getOrgans_overloads, getOrgans, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openFile_overloads,openFile,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate1_overloads,simulate,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate3_overloads,simulate,3,4);
@@ -72,7 +83,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getValue_overloads,getValue,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(tropismObjective_overloads,tropismObjective,5,6);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNumberOfRoots_overloads,getNumberOfRoots,0,1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentCTs_overloads, getSegmentCTs, 0, 1);
-
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegments_overloads, getSegments, 0, 1);
 
 /**
  * Virtual functions
@@ -80,8 +91,8 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentCTs_overloads, getSegmentCTs, 0
 class SoilLookUp_Wrap : public SoilLookUp, public wrapper<SoilLookUp> {
 public:
 
-    virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
-        return this->get_override("getValue")(pos, root);
+    virtual double getValue(const Vector3d& pos, const Organ* o = nullptr) const override {
+        return this->get_override("getValue")(pos, o);
     }
 
     virtual std::string toString() const override {
@@ -96,8 +107,8 @@ public:
     //	Tropism_Wrap(): Tropism() { }
     //	Tropism_Wrap(double n,double sigma): Tropism(n,sigma) { } // todo cant get it working with constructors other than ()
 
-    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Root* root = nullptr) override {
-        return this->get_override("tropismObjective")(pos, old, a, b, dx, root);
+    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Organ* o = nullptr) override {
+        return this->get_override("tropismObjective")(pos, old, a, b, dx, o);
     }
 
     virtual Tropism* copy() override {
@@ -119,7 +130,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
     class_<std::vector<double>>("std_vector_double_")
         .def(vector_indexing_suite<std::vector<double>>() )
         ;
-
     class_<std::vector<int>>("std_vector_int_")
         .def(vector_indexing_suite<std::vector<int>>() )
         ;
@@ -132,10 +142,10 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def_readwrite("x",&Vector2i::x)
         .def_readwrite("y",&Vector2i::y)
         .def("__str__",&Vector2i::toString)
-    ;
+        ;
     class_<std::vector<Vector2i>>("std_vector_Vector2i_")
         .def(vector_indexing_suite<std::vector<Vector2i>>() )
-    ;
+        ;
     class_<Vector3d>("Vector3d", init<>())
         .def(init<double,double,double>())
         .def(init<Vector3d&>())
@@ -151,10 +161,10 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def("cross",&Vector3d::cross)
         .def("__str__",&Vector3d::toString)
         .def("__rep__",&Vector3d::toString)
-    ;
+        ;
     class_<std::vector<Vector3d>>("std_vector_Vector3d_")
         .def(vector_indexing_suite<std::vector<Vector3d>>() )
-    ;
+        ;
     class_<Matrix3d>("Matrix3d", init<>())
         .def(init<double,double,double,double,double,double,double,double,double>())
         .def(init<Vector3d&, Vector3d&, Vector3d&>())
@@ -174,56 +184,56 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def("times",times4)
         .def("__str__",&Matrix3d::toString)
         .def("__rep__",&Matrix3d::toString)
-    ;
+        ;
     /*
      * sdf.h
      */
     class_<SignedDistanceFunction, SignedDistanceFunction*>("SignedDistanceFunction")
-                .def("getDist",&SignedDistanceFunction::getDist)
-                .def("writePVPScript", writePVPScript)
-                .def("__str__",&SignedDistanceFunction::toString)
-                ;
+        .def("getDist",&SignedDistanceFunction::getDist)
+        .def("writePVPScript", writePVPScript)
+        .def("__str__",&SignedDistanceFunction::toString)
+        ;
     class_<std::vector<SignedDistanceFunction*>>("std_vector_SDF_")
-            .def(vector_indexing_suite<std::vector<SignedDistanceFunction*>>() )
-            ;
+        .def(vector_indexing_suite<std::vector<SignedDistanceFunction*>>() )
+        ;
     class_<SDF_PlantBox, bases<SignedDistanceFunction>>("SDF_PlantBox",init<double,double,double>())
-                .def("getDist",&SDF_PlantBox::getDist)
-                .def("__str__",&SDF_PlantBox::toString)
-                ;
+        .def("getDist",&SDF_PlantBox::getDist)
+        .def("__str__",&SDF_PlantBox::toString)
+        ;
     class_<SDF_PlantContainer, bases<SignedDistanceFunction>>("SDF_PlantContainer",init<>())
-                .def(init<double,double,double,double>())
-                .def("getDist",&SDF_PlantContainer::getDist)
-                .def("__str__",&SDF_PlantContainer::toString)
-                ;
+        .def(init<double,double,double,double>())
+        .def("getDist",&SDF_PlantContainer::getDist)
+        .def("__str__",&SDF_PlantContainer::toString)
+        ;
     class_<SDF_RotateTranslate, bases<SignedDistanceFunction>>("SDF_RotateTranslate",init<SignedDistanceFunction*,double,int,Vector3d&>())
-                .def(init<SignedDistanceFunction*,Vector3d&>())
-                .def("getDist",&SDF_RotateTranslate::getDist)
-                .def("__str__",&SDF_RotateTranslate::toString)
-                ;
+        .def(init<SignedDistanceFunction*,Vector3d&>())
+        .def("getDist",&SDF_RotateTranslate::getDist)
+        .def("__str__",&SDF_RotateTranslate::toString)
+        ;
     enum_<SDF_RotateTranslate::SDF_Axes>("SDF_Axis")
-            .value("xaxis", SDF_RotateTranslate::SDF_Axes::xaxis)
-            .value("yaxis", SDF_RotateTranslate::SDF_Axes::yaxis)
-            .value("zaxis", SDF_RotateTranslate::SDF_Axes::zaxis)
-            ;
+        .value("xaxis", SDF_RotateTranslate::SDF_Axes::xaxis)
+        .value("yaxis", SDF_RotateTranslate::SDF_Axes::yaxis)
+        .value("zaxis", SDF_RotateTranslate::SDF_Axes::zaxis)
+        ;
     class_<SDF_Intersection, bases<SignedDistanceFunction>>("SDF_Intersection",init<std::vector<SignedDistanceFunction*>>())
-                .def(init<SignedDistanceFunction*,SignedDistanceFunction*>())
-                .def("getDist",&SDF_Intersection::getDist)
-                .def("__str__",&SDF_Intersection::toString)
-                ;
+        .def(init<SignedDistanceFunction*,SignedDistanceFunction*>())
+        .def("getDist",&SDF_Intersection::getDist)
+        .def("__str__",&SDF_Intersection::toString)
+        ;
     class_<SDF_Union, bases<SDF_Intersection>>("SDF_Union",init<std::vector<SignedDistanceFunction*>>())
-                .def(init<SignedDistanceFunction*,SignedDistanceFunction*>())
-                .def("getDist",&SDF_Union::getDist)
-                .def("__str__",&SDF_Union::toString)
-                ;
+        .def(init<SignedDistanceFunction*,SignedDistanceFunction*>())
+        .def("getDist",&SDF_Union::getDist)
+        .def("__str__",&SDF_Union::toString)
+        ;
     class_<SDF_Difference, bases<SDF_Intersection>>("SDF_Difference",init<std::vector<SignedDistanceFunction*>>())
         .def(init<SignedDistanceFunction*,SignedDistanceFunction*>())
         .def("getDist",&SDF_Difference::getDist)
         .def("__str__",&SDF_Difference::toString)
-    ;
+        ;
     class_<SDF_Complement, bases<SignedDistanceFunction>>("SDF_Complement",init<SignedDistanceFunction*>())
         .def("getDist",&SDF_Complement::getDist)
         .def("__str__",&SDF_Complement::toString)
-    ;
+        ;
     class_<SDF_HalfPlane, bases<SignedDistanceFunction>>("SDF_HalfPlane",init<Vector3d&,Vector3d&>())
         .def(init<Vector3d&,Vector3d&,Vector3d&>())
         .def("getDist",&SDF_HalfPlane::getDist)
@@ -232,21 +242,122 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def_readwrite("p1", &SDF_HalfPlane::p1)
         .def_readwrite("p2", &SDF_HalfPlane::p2)
         .def("__str__",&SDF_HalfPlane::toString)
-    ;
-
+        ;
+    /*
+     * soil.h
+     */
+    class_<SoilLookUp_Wrap, SoilLookUp_Wrap*, boost::noncopyable>("SoilLookUp",init<>())
+        .def("getValue",&SoilLookUp_Wrap::getValue)
+        .def("__str__",&SoilLookUp_Wrap::toString)
+        ;
+    class_<SoilLookUpSDF, SoilLookUpSDF*, bases<SoilLookUp>>("SoilLookUpSDF",init<>())
+        .def(init<SignedDistanceFunction*, double, double, double>())
+        .def_readwrite("sdf", &SoilLookUpSDF::sdf)
+        .def_readwrite("fmax", &SoilLookUpSDF::fmax)
+        .def_readwrite("fmin", &SoilLookUpSDF::fmin)
+        .def_readwrite("slope", &SoilLookUpSDF::slope)
+        .def("__str__",&SoilLookUpSDF::toString)
+        ;
+    class_<MultiplySoilLookUps, MultiplySoilLookUps*, bases<SoilLookUp>>("MultiplySoilLookUps",init<SoilLookUp*, SoilLookUp*>())
+        .def(init<std::vector<SoilLookUp*>>())
+        .def("getValue", &MultiplySoilLookUps::getValue, getValue_overloads())
+        .def("__str__",&MultiplySoilLookUps::toString)
+        ;
+    class_<ProportionalElongation, ProportionalElongation*, bases<SoilLookUp>>("ProportionalElongation",init<>())
+        .def("getValue", &ProportionalElongation::getValue, getValue_overloads())
+        .def("setScale", &ProportionalElongation::setScale)
+        .def("setBaseLookUp", &ProportionalElongation::setBaseLookUp)
+        .def("__str__",&ProportionalElongation::toString)
+        ;
+    class_<Grid1D, Grid1D*, bases<SoilLookUp>>("Grid1D",init<>())
+        .def(init<size_t, std::vector<double>, std::vector<double>>())
+        .def("getValue", &Grid1D::getValue, getValue_overloads())
+        .def("__str__",&Grid1D::toString)
+        .def("map",&Grid1D::map)
+        .def_readwrite("n", &Grid1D::n)
+        .def_readwrite("grid", &Grid1D::grid)
+        .def_readwrite("data", &Grid1D::data)
+        ;
+    class_<EquidistantGrid1D, EquidistantGrid1D*, bases<Grid1D>>("EquidistantGrid1D",init<double, double, size_t>())
+        .def(init<double, double, std::vector<double>>())
+        .def("getValue", &EquidistantGrid1D::getValue, getValue_overloads())
+        .def("map",&EquidistantGrid1D::map)
+        .def_readwrite("n", &EquidistantGrid1D::n)
+        .def_readwrite("grid", &EquidistantGrid1D::grid)
+        .def_readwrite("data", &EquidistantGrid1D::data)
+        .def("__str__",&EquidistantGrid1D::toString)
+        ;
     /*
      * OrganParameter.h
      */
     class_<OrganParameter, OrganParameter*>("OrganParameter")
-                .def_readwrite("name",&OrganParameter::subType)
+        .def_readwrite("name",&OrganParameter::subType)
         ;
-    class_<OrganTypeParameter>("OrganTypeParameter", init<Organism*>())
-            .def("realize",&OrganTypeParameter::realize, return_value_policy<reference_existing_object>())
-            .def("toString",&OrganTypeParameter::toString)
-            .def_readwrite("name",&OrganTypeParameter::name)
-            .def_readwrite("organType",&OrganTypeParameter::organType)
-            .def_readwrite("subType",&OrganTypeParameter::subType)
-    ;
+    class_<OrganTypeParameter, OrganTypeParameter*>("OrganTypeParameter", init<Organism*>())
+        .def("copy",&OrganTypeParameter::copy, return_value_policy<reference_existing_object>())
+        .def("realize",&OrganTypeParameter::realize, return_value_policy<reference_existing_object>())
+        .def("realize",&OrganTypeParameter::realize, return_value_policy<reference_existing_object>())
+        .def("toString",&OrganTypeParameter::toString)
+        .def_readwrite("name",&OrganTypeParameter::name)
+        .def_readwrite("organType",&OrganTypeParameter::organType)
+        .def_readwrite("subType",&OrganTypeParameter::subType)
+        ;
+    class_<std::vector<OrganTypeParameter*>>("std_vector_OrganTypeParameter_")
+        .def(vector_indexing_suite<std::vector<OrganTypeParameter*>>() )
+        ;
+    /**
+     * Organ.h
+     */
+    class_<Organ, Organ*>("Organ", init<Organism*, Organ*, int, int, double>())
+        .def("organType",&Organ::organType)
+        .def("simulate",&Organ::simulate, simulate1_overloads())
+        .def("getId",&Organ::getId)
+        .def("getParam",&Organ::getParam, return_value_policy<reference_existing_object>())
+        .def("getOrganTypeParameter",&Organ::getOrganTypeParameter, return_value_policy<reference_existing_object>())
+        .def("isAlive",&Organ::isAlive)
+        .def("isActive",&Organ::isActive)
+        .def("getAge",&Organ::getAge)
+        .def("getLength",&Organ::getLength)
+        .def("setParent",&Organ::setParent)
+        .def("getParent",&Organ::getParent, return_value_policy<reference_existing_object>())
+        .def("getParameter",&Organ::getParameter)
+        .def("getNumberOfNodes",&Organ::getNumberOfNodes)
+        .def("getNode",&Organ::getNode)
+        .def("getNodeId",&Organ::getNodeId)
+        .def("getNodeCT",&Organ::getNodeCT)
+        .def("addNode",addNode1)
+        .def("addNode",addNode2)
+        .def("getSegments",&Organ::getSegments)
+        .def("getOrgans", getOrgans1, getOrgans_overloads())
+        .def("getOrgans", getOrgans2)
+        .def("writeRSML",&Organ::writeRSML)
+        .def("__str__",&Organ::toString)
+        ;
+    class_<std::vector<Organ*>>("std_vector_Organ_")
+        .def(vector_indexing_suite<std::vector<Organ*>>() )
+        ;
+    /*
+     * Organism.h
+     */
+    class_<Organism, Organism*>("Organism")
+        .def("getOrganTypeParameter", getOrganTypeParameter1, return_value_policy<reference_existing_object>())
+        .def("getOrganTypeParameter", getOrganTypeParameter2)
+        .def("setOrganTypeParameter", &Organism::setOrganTypeParameter)
+        .def("setSeed", &Organism::setSeed)
+        .def("rand", &Organism::rand)
+        .def("randn", &Organism::randn)
+        ;
+    enum_<Organism::OrganTypes>("OrganTypes")
+        .value("organ", Organism::OrganTypes::ot_organ)
+        .value("seed", Organism::OrganTypes::ot_seed)
+        .value("root", Organism::OrganTypes::ot_root)
+        .value("stem", Organism::OrganTypes::ot_stem)
+        .value("leaf", Organism::OrganTypes::ot_leaf)
+        ;
+
+
+
+
 
     /*
      * sdf_rs.h
@@ -257,51 +368,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def("getDist",&SDF_RootSystem::getDist)
         .def("__str__",&SDF_RootSystem::toString)
     ;
-
-    /*
-     * soil.h
-     */
-    class_<SoilLookUp_Wrap, SoilLookUp_Wrap*, boost::noncopyable>("SoilLookUp",init<>())
-                .def("getValue",&SoilLookUp_Wrap::getValue)
-                .def("__str__",&SoilLookUp_Wrap::toString)
-                ;
-    class_<SoilLookUpSDF, SoilLookUpSDF*, bases<SoilLookUp>>("SoilLookUpSDF",init<>())
-                .def(init<SignedDistanceFunction*, double, double, double>())
-                .def_readwrite("sdf", &SoilLookUpSDF::sdf)
-                .def_readwrite("fmax", &SoilLookUpSDF::fmax)
-                .def_readwrite("fmin", &SoilLookUpSDF::fmin)
-                .def_readwrite("slope", &SoilLookUpSDF::slope)
-                .def("__str__",&SoilLookUpSDF::toString)
-                ;
-    class_<MultiplySoilLookUps, MultiplySoilLookUps*, bases<SoilLookUp>>("MultiplySoilLookUps",init<SoilLookUp*, SoilLookUp*>())
-                .def(init<std::vector<SoilLookUp*>>())
-                .def("getValue", &MultiplySoilLookUps::getValue, getValue_overloads())
-                .def("__str__",&MultiplySoilLookUps::toString)
-                ;
-    class_<ProportionalElongation, ProportionalElongation*, bases<SoilLookUp>>("ProportionalElongation",init<>())
-                .def("getValue", &ProportionalElongation::getValue, getValue_overloads())
-                .def("setScale", &ProportionalElongation::setScale)
-                .def("setBaseLookUp", &ProportionalElongation::setBaseLookUp)
-                .def("__str__",&ProportionalElongation::toString)
-                ;
-    class_<Grid1D, Grid1D*, bases<SoilLookUp>>("Grid1D",init<>())
-                .def(init<size_t, std::vector<double>, std::vector<double>>())
-                .def("getValue", &Grid1D::getValue, getValue_overloads())
-                .def("__str__",&Grid1D::toString)
-                .def("map",&Grid1D::map)
-                .def_readwrite("n", &Grid1D::n)
-                .def_readwrite("grid", &Grid1D::grid)
-                .def_readwrite("data", &Grid1D::data)
-                ;
-    class_<EquidistantGrid1D, EquidistantGrid1D*, bases<Grid1D>>("EquidistantGrid1D",init<double, double, size_t>())
-                .def(init<double, double, std::vector<double>>())
-                .def("getValue", &EquidistantGrid1D::getValue, getValue_overloads())
-                .def("__str__",&EquidistantGrid1D::toString)
-                .def("map",&EquidistantGrid1D::map)
-                .def_readwrite("n", &EquidistantGrid1D::n)
-                .def_readwrite("grid", &EquidistantGrid1D::grid)
-                .def_readwrite("data", &EquidistantGrid1D::data)
-                ;
     /**
      * tropism.h
      */
@@ -335,6 +401,45 @@ BOOST_PYTHON_MODULE(py_rootbox)
         ;
     //	class_<CombinedTropism, CombinedTropism*, bases<Tropism>>("CombinedTropism",init<>()) // Todo needs some extra work
     //	;
+    /*
+     * analysis.h
+     */
+    class_<SegmentAnalyser, SegmentAnalyser*>("SegmentAnalyser")
+        .def(init<RootSystem&>())
+        .def(init<SegmentAnalyser&>())
+        .def("addSegments",addSegments1)
+        .def("addSegments",addSegments2)
+        .def("crop", &SegmentAnalyser::crop)
+        .def("filter", filter1)
+        .def("filter", filter2)
+        .def("pack", &SegmentAnalyser::pack)
+        .def("getParameter", &SegmentAnalyser::getParameter)
+        .def("getSegmentLength", &SegmentAnalyser::getSegmentLength)
+        .def("getSummed", getSummed1)
+        .def("getSummed", getSummed2)
+        .def("distribution", distribution_1)
+        .def("distribution", distribution_2)
+        .def("distribution2", distribution2_1)
+        .def("distribution2", distribution2_2)
+        .def("getOrgans", &SegmentAnalyser::getOrgans)
+        .def("getNumberOfOrgans", &SegmentAnalyser::getNumberOfOrgans)
+        .def("cut", cut1)
+        .def("addUserData", &SegmentAnalyser::addUserData)
+        .def("clearUserData", &SegmentAnalyser::clearUserData)
+        .def("write", &SegmentAnalyser::write)
+        .def_readwrite("nodes", &SegmentAnalyser::nodes)
+        .def_readwrite("segments", &SegmentAnalyser::segments)
+        .def_readwrite("segCTs", &SegmentAnalyser::segCTs)
+        // .def("cut", cut2) // not working, see top definition of cut2
+        ;
+    class_<std::vector<SegmentAnalyser>>("std_vector_SegmentAnalyser_")
+            .def(vector_indexing_suite<std::vector<SegmentAnalyser>>() )
+            ;
+
+
+
+
+
     /*
      * ModelParameter.h
      */
@@ -375,10 +480,12 @@ BOOST_PYTHON_MODULE(py_rootbox)
                 .def_readwrite("sbp", &RootTypeParameter::sbp)
                 .def("__str__",&RootTypeParameter::toString)
                 ;
+    class_<std::vector<RootTypeParameter*>>("std_vector_RootTypeParameter_")
+        .def(vector_indexing_suite<std::vector<RootTypeParameter*>>() )
+        ;
     class_<RootParameter, RootParameter*, bases<OrganParameter> >("RootParameter", init<>())
                 .def(init<int , double, double, const std::vector<double>&, int, double, double, double, double>())
-                .def("set",&RootParameter::set)
-                .def_readwrite("type", &RootParameter::type)
+                .def_readwrite("subType", &RootParameter::subType)
                 .def_readwrite("lb", &RootParameter::lb)
                 .def_readwrite("la", &RootParameter::la)
                 .def_readwrite("ln", &RootParameter::ln)
@@ -404,15 +511,14 @@ BOOST_PYTHON_MODULE(py_rootbox)
                 .def("__str__",&RootSystemParameter::toString)
                 ;
     /**
-     * Root.h (no members, just data) tODO Organ ...
+     * Root.h (no members, just data)
      */
-    class_<Root, Root*>("Root", init<RootSystem*, int, Vector3d, double, Root*, double, int>())
+    class_<Root, Root*, bases<Organ>>("Root", init<RootSystem*, int, Vector3d, double, Root*, double, int>())
             .def(init<Root&>())
             .def("__str__",&Root::toString)
-            .def_readwrite("id", &Root::id)
             .def_readwrite("parent_base_length", &Root::parent_base_length)
             .def_readwrite("parent_ni", &Root::parent_ni)
-            //.def_readwrite("getParent", &Root::getParent)
+            .def("param", &Root::param, return_value_policy<reference_existing_object>())
             ;
     class_<std::vector<Root*>>("std_vector_Root_")
             .def(vector_indexing_suite<std::vector<Root*>>() )
@@ -424,16 +530,12 @@ BOOST_PYTHON_MODULE(py_rootbox)
             .def(vector_indexing_suite<std::vector<std::vector<double>>>() )
             ;
     /*
-     * PlantBase.h
-     */
-    class_<Organism, Organism*>("Organism")
-        ;
-    /*
      * RootSystem.h
      */
     class_<RootSystem, RootSystem*, bases<Organism>>("RootSystem", init<>()) // bases<PlantBase>
              .def(init<RootSystem&>())
-             .def("getRootTypeParameter", &RootSystem::getRootTypeParameter, return_value_policy<reference_existing_object>())
+             .def("getRootTypeParameter", getRootTypeParameter1, return_value_policy<reference_existing_object>())
+             .def("getRootTypeParameter", getRootTypeParameter2)
              .def("setRootSystemParameter", &RootSystem::setRootSystemParameter)
              .def("getRootSystemParameter", &RootSystem::getRootSystemParameter, return_value_policy<reference_existing_object>()) // tutorial: "naive (dangerous) approach"
              .def("openFile", &RootSystem::openFile, openFile_overloads())
@@ -454,7 +556,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
              .def("getBaseRoots", &RootSystem::getBaseRoots)
              .def("getNodes", &RootSystem::getNodes)
              .def("getPolylines", &RootSystem::getPolylines)
-             .def("getSegments", &RootSystem::getSegments)
+             .def("getSegments", &RootSystem::getSegments, getSegments_overloads())
              .def("getShootSegments", &RootSystem::getShootSegments)
              .def("getSegmentOrigins", &RootSystem::getSegmentOrigins)
              .def("getNETimes",&RootSystem::getSegmentCTs, getSegmentCTs_overloads())
@@ -511,40 +613,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
             .value("rlt", RootSystem::ScalarTypes::st_rlt)
             .value("meanln", RootSystem::ScalarTypes::st_meanln)
             .value("sdln", RootSystem::ScalarTypes::st_sdln)
-            ;
-    /*
-     * analysis.h
-     */
-    class_<SegmentAnalyser, SegmentAnalyser*>("SegmentAnalyser")
-        .def(init<RootSystem&>())
-        .def(init<SegmentAnalyser&>())
-        .def("addSegments",addSegments1)
-        .def("addSegments",addSegments2)
-        .def("crop", &SegmentAnalyser::crop)
-        .def("filter", filter1)
-        .def("filter", filter2)
-        .def("pack", &SegmentAnalyser::pack)
-        .def("getParameter", &SegmentAnalyser::getParameter)
-        .def("getSegmentLength", &SegmentAnalyser::getSegmentLength)
-        .def("getSummed", getSummed1)
-        .def("getSummed", getSummed2)
-        .def("distribution", distribution_1)
-        .def("distribution", distribution_2)
-        .def("distribution2", distribution2_1)
-        .def("distribution2", distribution2_2)
-        .def("getOrgans", &SegmentAnalyser::getOrgans)
-        .def("getNumberOfOrgans", &SegmentAnalyser::getNumberOfOrgans)
-        .def("cut", cut1)
-        .def("addUserData", &SegmentAnalyser::addUserData)
-        .def("clearUserData", &SegmentAnalyser::clearUserData)
-        .def("write", &SegmentAnalyser::write)
-        .def_readwrite("nodes", &SegmentAnalyser::nodes)
-        .def_readwrite("segments", &SegmentAnalyser::segments)
-        .def_readwrite("segCTs", &SegmentAnalyser::segCTs)
-        // .def("cut", cut2) // not working, see top definition of cut2
-        ;
-    class_<std::vector<SegmentAnalyser>>("std_vector_SegmentAnalyser_")
-            .def(vector_indexing_suite<std::vector<SegmentAnalyser>>() )
             ;
     /*
      * exudation.h

@@ -2,11 +2,11 @@
 #include "RootSystem.h"
 
 #include "OrganParameter.h"
+#include "Organism.h"
+
+
 
 namespace CRootBox {
-
-const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","order","time","length","surface","volume","1","userdata 1", "userdata 2", "userdata 3", "parent type",
-    "basal length", "apical length", "number of branches", "initial growth rate", "insertion angle", "root life time", "mean inter nodal distance", "standard deviation of inter nodal distance"};
 
 /**
  * Copy Constructor
@@ -18,24 +18,23 @@ const std::vector<std::string> RootSystem::scalarTypeNames = {"type","radius","o
 RootSystem::RootSystem(const RootSystem& rs): Organism(rs), rsmlReduction(rs.rsmlReduction), rsparam(rs.rsparam),
     gf(rs.gf), tf(rs.tf), geometry(rs.geometry), soil(rs.soil), rid(rs.rid), old_non(rs.old_non), old_nor(rs.old_nor)
 {
-    // std::cout << "Copying root system ("<<rs.baseRoots.size()<< " base roots) \n";
+    std::cout << "Copying root system ("<<rs.baseRoots.size()<< " base roots) \n";
 
     // copy base Roots
     baseRoots = std::vector<Root*>(rs.baseRoots.size());
     for (size_t i=0; i<rs.baseRoots.size(); i++) {
-        baseRoots[i] = new Root(*rs.baseRoots[i], *this); // deep copy root tree
+        baseRoots[i] = new Root(*rs.baseRoots[i], this); // deep copy root tree
     }
-
     roots = std::vector<Root*>(0); // new empty buffer
 
-    // deep copy tropisms (todo test)
+    // deep copy tropisms
     auto it = rs.tf.begin();
     while(it != rs.tf.end()) {
         tf[it->first] = (it->second)->copy();
         ++it;
     }
 
-    // deep copy growth (todo test)
+    // deep copy growth
     auto it2 = rs.gf.begin();
     while(it2 != rs.gf.end()) {
         gf[it2->first] = (it2->second)->copy();
@@ -47,7 +46,19 @@ RootSystem::RootSystem(const RootSystem& rs): Organism(rs), rsmlReduction(rs.rsm
 RootTypeParameter* RootSystem::getRootTypeParameter(int type) const
 {
     return (RootTypeParameter*) getOrganTypeParameter(Organism::ot_root, type);
-} ///< returns the i-th root parameter set (i=1..n)
+} ///< returns the i-th root parameter
+
+
+std::vector<RootTypeParameter*> RootSystem::getRootTypeParameter() const
+{
+    std::vector<RootTypeParameter*>  otps = std::vector<RootTypeParameter*>(0);
+    for (auto& otp : organParam[Organism::ot_root]) {
+        otps.push_back((RootTypeParameter*)otp.second);
+    }
+    return otps;
+} ///< returns all root parameters
+
+
 
 void RootSystem::setRootSystemParameter(const RootSystemParameter& rsp)
 {
@@ -74,14 +85,14 @@ void RootSystem::reset()
     for(auto b :baseRoots) {
         delete b;
     }
+    baseRoots.clear();
     for(auto f:gf) {
         delete f.second;
     }
+    gf.clear();
     for(auto f:tf) {
         delete f.second;
     }
-    baseRoots.clear();
-    gf.clear();
     tf.clear();
     simtime=0;
     rid = -1;
@@ -184,8 +195,8 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
     // Basal roots
     if (rs.maxB>0) {
         if (pmap.find(basaltype)==pmap.end()) { // if the type is not defined, copy tap root
-            std::cout << "Basal root type #" << basaltype << " was not defined, using tap root parameters instead\n";
-            RootTypeParameter* brtp = new RootTypeParameter(*getRootTypeParameter(1)); // copy constructor not working!!!
+            std::cout << "Basal root type #" << basaltype << " was not defined, using tap root parameters instead\n" << std::flush;
+            RootTypeParameter* brtp = (RootTypeParameter*)getRootTypeParameter(1)->copy();
             brtp->subType = basaltype;
             setOrganTypeParameter(brtp);
         }
@@ -205,7 +216,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
     if ((rs.nC>0) && (rs.delaySB<maxT)) { // if the type is not defined, copy basal root
         if (pmap.find(shootbornetype)==pmap.end()) {
             std::cout << "Shootborne root type #" << shootbornetype << " was not defined, using tap root parameters instead\n";
-            RootTypeParameter* srtp = new RootTypeParameter(*getRootTypeParameter(1));
+            RootTypeParameter* srtp = (RootTypeParameter*)getRootTypeParameter(1)->copy();
             srtp->subType = shootbornetype;
             setOrganTypeParameter(srtp);
         }
@@ -977,8 +988,9 @@ void RootSystem::writeVTP(std::ostream & os) const
     os << "<CellData Scalars=\" CellData\">\n";
     const size_t N = 3; // SCALARS
     int types[N] = { st_type, st_order, st_radius };
+    std::string scalarTypeNames[N] = {"type", "order", "radius" };
     for (size_t i=0; i<N; i++) {
-        os << "<DataArray type=\"Float32\" Name=\"" << scalarTypeNames[types[i]] <<"\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
+        os << "<DataArray type=\"Float32\" Name=\"" << scalarTypeNames[i] <<"\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
         auto scalars = getScalar(types[i]);
         for (auto s : scalars) {
             os << s<< " ";

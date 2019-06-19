@@ -42,23 +42,23 @@ def analyse(rs, name, simtime, tv0):
     print("Segments  " , ns)
 
     print("\nLength (cm) --------------------------")
-    tl = ana.getSummed(rb.ScalarType.length)
+    tl = ana.getSummed("length")
     print("L0          ", round(tl))
-    tl_top = ana.getSummed(rb.ScalarType.length, top)
-    tl_bot = ana.getSummed(rb.ScalarType.length, bot)
+    tl_top = ana.getSummed("length", top)
+    tl_bot = ana.getSummed("length", bot)
     print("Lcomp (top) ", round(tl_top), "(", round(100 * (tl_top / tl)), "%)")
     print("Lcomp (bot) ", round(tl_bot), "(", round(100 * (tl_bot / tl)), "%)")
     a = rb.SegmentAnalyser(rs)  # copyFor the record, I had already simulated the RSWMS scenarios with a single root and a large domain (see attached) but I think our parameterization is different as the results loo pretty dissimilar (did you really use 1.8e-5 for kr? Not 1.8e-4? the RS conductance is very small then:  0.0023cm3/hPa/d which explain the stress)
-    a.filter(rb.ScalarType.order, 0)
-    l0 = a.getSummed(rb.ScalarType.length)
+    a.filter("order", 0)
+    l0 = a.getSummed("length")
     a = rb.SegmentAnalyser(rs)  # copy
-    a.filter(rb.ScalarType.order, 1)
-    l1 = a.getSummed(rb.ScalarType.length)
+    a.filter("order", 1)
+    l1 = a.getSummed("length")
     print("Lord (zero) ", round(l0), "(", round(100 * (l0 / tl)), "%)")
     print("Lord (first)", round(l1), "(", round(100 * (l1 / tl)), "%)")
 
     print("\nVolume -------------------------------")
-    tv = ana.getSummed(rb.ScalarType.volume)
+    tv = ana.getSummed("volume")
     print("V0 (cm^3)   ", tv)
     print("rVol        ", tv / tv0)
     print()
@@ -73,7 +73,7 @@ def figure8d(rs, N):
     for j in range(0, N):
         for i in range(0, 3):
             ana = rb.SegmentAnalyser(rs[i + j * 3])
-            rld[i + j * 3, :] = np.transpose(v2a(ana.distribution(rb.ScalarType.length, 0, 140, int(140 / zz), True))) / (zz * 75.*15.)  # cm /cm^3
+            rld[i + j * 3, :] = np.transpose(v2a(ana.distribution("length", 0, 140, int(140 / zz), True))) / (zz * 75.*15.)  # cm /cm^3
     # mean
     rld_mean = np.zeros((3, int(140 / zz)))
     for j in range(0, N):
@@ -110,7 +110,7 @@ tv0 = 1
 for i in range(0, 3):
     if i == 0:  # reference volume (P1)
         ana = rb.SegmentAnalyser(rs[0])
-        tv0 = ana.getSummed(rb.ScalarType.volume)
+        tv0 = ana.getSummed("volume")
     analyse(rs[i], names[i], ages[i], tv0)
 
 figure8d(rs, N)

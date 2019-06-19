@@ -19,6 +19,7 @@
 #include "mymath.h"
 #include "soil.h"
 #include "OrganParameter.h"
+#include "Organism.h"
 
 namespace CRootBox {
 
@@ -52,10 +53,9 @@ public:
     void write(std::ostream & cout) const; ///< writes a single root parameter set
     std::string toString() const { std::stringstream ss; write(ss); return ss.str(); } ///< writes parameter to a string
 
-    // random numbers
-    void setSeed(unsigned int  seed) const { gen = std::mt19937(seed); } ///< Sets the seed of the random number generator
-    double rand() const { return UD(gen); } ///< Uniformly distributed random number (0,1)
-    double randn() const { return ND(gen); } ///< Normally distributed random number (0,1)
+    // abbreviations
+    double rand() const { return plant->rand(); } ///< Uniformly distributed random number (0,1)
+    double randn() const { return plant->randn(); } ///< Normally distributed random number (0,1)
 
     /*
      * Rootbox parameters per root type
@@ -92,11 +92,6 @@ public:
     SoilLookUp* sa = new SoilLookUp(); ///< scale angle function
     SoilLookUp* sbp = new SoilLookUp(); ///< scale branching probability function
 
-private:
-    mutable std::mt19937 gen = std::mt19937(std::chrono::system_clock::now().time_since_epoch().count());  // random stuff
-    mutable std::uniform_real_distribution<double> UD = std::uniform_real_distribution<double>(0,1);
-    mutable std::normal_distribution<double> ND = std::normal_distribution<double>(0,1);
-
 };
 
 
@@ -111,14 +106,9 @@ class RootParameter :public OrganParameter
 public:
 
     /* Constructor */
-    RootParameter(); ///< Default constructor
+    RootParameter(): RootParameter(-1,0.,0.,std::vector<double>(0),0,0.,0.,0.,0.) { } ///< Default constructor
     RootParameter(int type, double lb, double la, const std::vector<double>& ln, int nob, double r, double a, double theta, double rlt):
-        OrganParameter(), type(type), lb(lb), la(la), nob(nob), r(r), a(a), theta(theta), rlt(rlt), ln(ln) { }
-    ///< Constructor setting all parameters
-
-    /* Methods */
-    void set(int type, double lb, double la, const std::vector<double>& ln, double nob, double r, double a, double theta, double rlt);
-    ///< Sets all the parameters
+        OrganParameter(),  lb(lb), la(la), nob(nob), r(r), a(a), theta(theta), rlt(rlt), ln(ln) { subType = type; } ///< Constructor setting all parameters
 
     double getK() const; ///< Returns the exact maximal root length of this realization [cm]
 
@@ -126,7 +116,6 @@ public:
     std::string toString() const { std::stringstream ss; write(ss); return ss.str(); } ///< String representation using RootParameter::write
 
     /* Rootbox parameters per root */
-    int type; 			///< Index of root type [1]
     double lb; 			///< Basal zone [cm]
     double la;			///< Apical zone [cm];
     int nob; 			///< Number of branches [1]

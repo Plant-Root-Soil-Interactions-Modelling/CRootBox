@@ -36,6 +36,7 @@ public:
 
     /* organ parameter management */
     OrganTypeParameter* getOrganTypeParameter(int otype, int subType) const;
+    std::vector<OrganTypeParameter*> getOrganTypeParameter(int otype) const;
     void setOrganTypeParameter(OrganTypeParameter* p);
 
     /* for the simulation loop */

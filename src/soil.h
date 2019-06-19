@@ -4,13 +4,15 @@
 
 #include "mymath.h"
 #include "sdf.h"
+
 #include <cmath>
 #include <limits>
 
 
+
 namespace CRootBox  {
 
-class Root;
+class Organ;
 
 /**
  * Base class to look up for a scalar soil property
@@ -32,7 +34,7 @@ public:
      *                  in some situation this might be usefull (e.g. could increase look up speed from a unstructured mesh)
      * \return          scalar soil property
      */
-    virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const { return 1.; } ///< Returns a scalar property of the soil, 1. per default
+    virtual double getValue(const Vector3d& pos, const Organ* o = nullptr) const { return 1.; } ///< Returns a scalar property of the soil, 1. per default
 
     virtual std::string toString() const { return "SoilLookUp base class"; } ///< Quick info about the object for debugging
 
@@ -128,7 +130,7 @@ public:
         slope = slope_;
     } ///< Creates the soil property from a signed distance function
 
-    virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
+    virtual double getValue(const Vector3d& pos, const Organ* o = nullptr) const override {
         Vector3d p = periodic(pos);
         double c = -sdf->getDist(p)/slope*2.; ///< *(-1), because inside the geometry the value is largest
         c += (fmax-fmin)/2.; // thats the value at the boundary
@@ -155,10 +157,10 @@ public:
     MultiplySoilLookUps(std::vector<SoilLookUp*> soils)
     :soils(soils) { }
 
-    virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
+    virtual double getValue(const Vector3d& pos, const Organ* o = nullptr) const override {
         double v = 1.;
         for (size_t i=0; i<soils.size(); i++) {
-            v *= soils[i]->getValue(pos,root);
+            v *= soils[i]->getValue(pos,o);
         }
         return v;
     }
@@ -200,12 +202,12 @@ public:
 
     void setBaseLookUp(SoilLookUp* baseLookUp) { this->baseLookUp=baseLookUp; } ///< proportionally scales a base soil look up
 
-    virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
+    virtual double getValue(const Vector3d& pos, const Organ* o = nullptr) const override {
         if (baseLookUp==nullptr) {
             return scale;
         } else {
             Vector3d p = this->periodic(pos);
-            return baseLookUp->getValue(p,root)*scale;  // superimpose scaling on a base soil look up function
+            return baseLookUp->getValue(p,o)*scale;  // superimpose scaling on a base soil look up function
         }
     }
 
@@ -252,7 +254,7 @@ public:
         return jl;
     } ///< Generic way to perform look up in an ordered table, overwrite by faster method if appropriate, todo currently floor
 
-    virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
+    virtual double getValue(const Vector3d& pos, const Organ* o = nullptr) const override {
         Vector3d p = this->periodic(pos);
         return data[map(p.z)];
     } ///< Returns the data of the 1d table, repeats first or last entry if out of bound
@@ -334,7 +336,7 @@ public:
         return data.at(map(i,j,k));
     }
 
-    virtual double getValue(const Vector3d& pos, const Root* root = nullptr) const override {
+    virtual double getValue(const Vector3d& pos, const Organ* o = nullptr) const override {
         Vector3d p = periodic(pos);
         return data[map(p.x,p.y,p.z)];
     } ///< Returns the data of the 1d table, repeats first or last entry if out of bound

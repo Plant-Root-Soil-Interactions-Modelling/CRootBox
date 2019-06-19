@@ -18,8 +18,7 @@ scale_elongation.data = a2v(scales)  # set proportionality factors
 print("value at -3 cm", scale_elongation.getValue(rb.Vector3d(0, 0, -3)))
 
 # Manually set scale elongation function
-for i in range(0, 10):
-    p = rs.getRootTypeParameter(i + 1)
+for p in rs.getRootTypeParameter():
     p.se = scale_elongation
 
 # Simulation

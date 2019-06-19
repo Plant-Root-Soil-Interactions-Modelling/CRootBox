@@ -56,3 +56,5 @@ rs.write("../results/example_2a.vtp")
 # Export container geometry as Paraview Python script
 rs.write("../results/example_2a.py")
 
+print("done.")
+

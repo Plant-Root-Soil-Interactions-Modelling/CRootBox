@@ -4,16 +4,47 @@
 #include "Organism.h"
 #include "OrganParameter.h"
 
+#include <iostream>
+
+
 namespace CRootBox {
 
-/**
- * Constructor
+/*
+ * Copy constructor
  */
-Organ::Organ(Organism* plant, Organ* parent, int subtype, double delay) : plant(plant), parent(parent), age(-delay)
+Organ::Organ(const Organ& o, Organism* plant):
+    plant(plant), // different plant then o.plant
+    parent(nullptr),
+    id(o.id),
+    param_(o.param_),
+    alive(o.alive),
+    active(o.active),
+    age(o.age),
+    length(o.length),
+    nodes(o.nodes),
+    nodeIds(o.nodeIds),
+    nodeCTs(o.nodeCTs)
 {
-    id = plant->getOrganIndex(); // unique id from the plant
-    param_ = plant->getOrganTypeParameter(organType(), subtype)->realize();
+    children = std::vector<Organ*>(o.children.size());
+    for (size_t i=0; i< o.children.size(); i++) {
+        children[i] = new Organ(*o.children[i], plant); // copy lateral
+        children[i]->setParent(this);
+    }
 }
+
+/**
+ * Set from outside todo in order to start with an specific organism
+ */
+
+
+/**
+ * In simulation
+ */
+Organ::Organ(Organism* plant, Organ* parent, int organtype, int subtype, double delay): plant(plant), parent(parent),
+    id(plant->getOrganIndex()),  // unique id from the plant
+    param_(plant->getOrganTypeParameter(organtype, subtype)->realize()),
+    age(-delay)
+{ }
 
 /**
  * Destructor, tell the kids (bad news)
@@ -138,26 +169,30 @@ void Organ::getOrgans(int otype, std::vector<Organ*>& v)
  * Returns the parameter called @param name
  */
 double Organ::getParameter(std::string name) const {
-    double r = std::numeric_limits<double>::quiet_NaN(); // default if name is unknown
-    if (name=="one") { r = 1; } // e.g. for counting the organs
-    if (name=="id") { r = id; }
-    if (name=="organType") { r = this->organType(); }
-    if (name=="subType") { r = this->param_->subType; }
-    if (name=="alive") { r = alive; }
-    if (name=="active") { r = active; }
-    if (name=="age") { r = age; }
-    if (name=="length") { r = length; }
+    if (name=="one") { return 1; } // e.g. for counting the organs
+    if (name=="id") { return id; }
+    if (name=="organType") { return this->organType(); }
+    if (name=="subType") { return this->param_->subType; }
+    if (name=="alive") { return isAlive(); }
+    if (name=="active") { return isActive(); }
+    if (name=="age") { return getAge(); }
+    if (name=="length") { return getLength(); }
     if (name=="order") {
-        r = 0;
+        int r = 0;
         const Organ* p = this;
         while (p->parent != nullptr) {
             r++;
             p = p->parent; // up the organ tree
         }
+        return r;
     }
-    if (name=="nubmer_of_children") { r = children.size(); }
-    //    if ((name=="creation_time") && (nodeCTs.size()>0)) { return nodeCTs.at(0); } // check if they make sense
-    //    if ((name=="emergence_time") && (nodeCTs.size()>1)) { return nodeCTs.at(1); }
+    if (name=="nubmerOfChildren") { return children.size(); }
+
+    // if ((name=="creationTime") && (nodeCTs.size()>0)) { return nodeCTs.at(0); }
+    // if ((name=="emergence_time") && (nodeCTs.size()>1)) { return nodeCTs.at(1); }
+
+    double r = std::numeric_limits<double>::quiet_NaN(); // default if name is unknown
+    // TODO pass to organ type parameters
     return r;
 }
 

@@ -10,7 +10,7 @@ class My_Info_Tropism(rb.Tropism):
         print("Test for angle alpha = \t", a)
         print("Test for angle beta = \t", b)
         print("Eesolution of next segment \t", dx)
-        print("Root id", root.id)
+        print("Root id", root.getId())
         print()
         return 0.
 
@@ -26,7 +26,7 @@ class My_Age_Tropism(rb.Tropism):
         self.age = age
 
     def tropismObjective(self, pos, old, a, b, dx, root):
-        age = root.age
+        age = root.getAge()
         if age < self.age:
             d = self.plagio.tropismObjective(pos, old, a, b, dx, root)
             return d

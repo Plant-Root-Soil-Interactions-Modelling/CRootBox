@@ -7,8 +7,7 @@ import matplotlib.pyplot as plt
 
 # sets all standard deviation to value*s
 def set_all_sd(rs, s):
-    for i in range(0, 10):
-        p = rs.getRootTypeParameter(i + 1)
+    for p in rs.getRootTypeParameter():
         p.lbs = p.lb * s
         p.las = p.la * s
         p.lns = p.ln * s
@@ -30,6 +29,7 @@ def simulate(i):
     rs = rb.RootSystem()
     rs.openFile(name)
     set_all_sd(rs, 0.)  # set all sd to zero
+    rs.initialize()  # copy to tap to basal root parameters
 
     # vary parameter
     p1 = rs.getRootTypeParameter(1)  # tap root
@@ -38,7 +38,7 @@ def simulate(i):
     p4.theta = theta0_[i]
 
     # simulation
-    rs.initialize()
+    rs.initialize()  # build again with theta0
     rs.simulate(simtime, True)
 
     # target

@@ -28,7 +28,8 @@ class Organ
 {
 public:
 
-    Organ(Organism* plant, Organ* parent, int subtype, double delay);
+    Organ(const Organ& o, Organism* plant);
+    Organ(Organism* plant, Organ* parent, int organtype, int subtype, double delay);
     virtual ~Organ();
 
     virtual int organType() const; ///< returns the organs type, overwrite for each organ
@@ -38,14 +39,15 @@ public:
 
     /* parameters */
     int getId() const { return id; } ///< unique organ id
-    OrganParameter* getParam() { return param_; } ///< organ parameters
+    const OrganParameter* getParam() const { return param_; } ///< organ parameters
+
     OrganTypeParameter* getOrganTypeParameter() const;  ///< organ type parameter
-    bool isAlive() { return alive; }
-    bool isActive() { return active; }
-    double getAge() { return age; }
-    double getLength() { return length; }
+    bool isAlive() const { return alive; }
+    bool isActive() const { return active; }
+    double getAge() const { return age; }
+    double getLength() const { return length; }
     void setParent(Organ* p) { parent = p; }
-    Organ* getParent() { return parent; }
+    Organ* getParent() const { return parent; }
     virtual double getParameter(std::string name) const; ///< returns an organ parameter
 
     /* geometry */
@@ -69,12 +71,12 @@ protected:
 
     /* up and down the organ tree */
     Organism* plant; ///< the plant of which this organ is part of
-    Organ* parent; ///< pointer to the parent organ (equals nullptr if it has no parent)
+    Organ* parent; ///< pointer to the parent organ (nullptr if it has no parent)
     std::vector<Organ*> children; ///< the successive organs
 
-    /* Parameters that are constant over the organ life time*/
-    int id; ///< unique organ id
-    OrganParameter* param_; ///< the parameter set of this organ
+    /* Parameters that are constant over the organ life time */
+    const int id; ///< unique organ id
+    const OrganParameter* param_; ///< the parameter set of this organ
 
     /* Parameters are changing over time */
     bool alive = true; ///< true: alive, false: dead
@@ -84,7 +86,7 @@ protected:
 
     /* node data */
     std::vector<Vector3d> nodes; ///< nodes of the organ [cm]
-    std::vector<int> nodeIds; ///< unique node index
+    std::vector<int> nodeIds; ///< global node indices
     std::vector<double> nodeCTs; ///< node creation times [days]
 
 };
