@@ -4,7 +4,7 @@ from rb_tools import *
 rootsystem = rb.RootSystem()
 
 # Open plant and root parameter from a file
-name = "Zea_mays_1_Leitner_2010"  # "Anagallis_femina_Leitner_2010"  # "Zea_mays_1_Leitner_2010"  # "Anagallis_femina_Leitner_2010"
+name = "Zea_mays_1_Leitner_2010"  # "Anagallis_femina_Leitner_2010"
 rootsystem.openFile(name)
 
 # Initialize
