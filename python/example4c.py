@@ -89,3 +89,5 @@ rs.write("results/example_4c1.vtp")  # root system
 #         return 1.
 # mysoil = MySoil(leftC, maxS, minS, slope)
 
+print("done.")
+

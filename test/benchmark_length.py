@@ -105,10 +105,9 @@ delayB = 3.
 rsp = rb.RootSystemParameter()
 rsp.set(-3., firstB, delayB, maxB, 0, 1.e9, 1.e9, 1.e9, 0., 0.)
 
-times = np.array([7., 15., 30., 60.])
-dt = np.zeros(len(times) + 1)
-dt[1:] = times
-dt = np.diff(dt)  # how do i put that in 1 line?
+times = np.array([0., 7., 15., 30., 60.])
+dt = np.diff(times)
+times = times[1:]
 
 #
 # Benchmark 1: single root, no laterals
@@ -122,12 +121,13 @@ l = rootLength(times, p0.r, p0.k)
 
 # Numerical
 rs.setOrganTypeParameter(p0)
+rs.setOrganTypeParameter(p1)
 rs.initialize()
 c = 0
 nl = np.zeros(len(times))
 non = np.zeros(len(times))
 for t in dt:
-    rs.simulate(t, True)
+    rs.simulate(t, False)
     d = v2a(rs.getScalar(rb.ScalarType.length))
     nl[c] = d[0]
     non[c] = rs.getNumberOfNodes()
@@ -141,7 +141,7 @@ non2 = np.zeros(len(times))
 for t in dt:
     dt_ = t / 1000.
     for i in range(0, 1000):
-        rs.simulate(dt_, True)
+        rs.simulate(dt_, False)
     d = v2a(rs.getScalar(rb.ScalarType.length))
     nl2[c] = d[0]
     non2[c] = rs.getNumberOfNodes()
@@ -180,16 +180,13 @@ for t in times :
 # Numerical
 p0.successor = a2i([2])  # add successors
 p0.successorP = a2v([1])
-rs = rb.RootSystem()
-rs.setOrganTypeParameter(p0)
-rs.setOrganTypeParameter(p1)
 rs.initialize()
 c = 0
 nl = np.zeros(len(times))
 nl0 = np.zeros(len(times))
 non = np.zeros(len(times))
 for t in dt:
-    rs.simulate(t, True)
+    rs.simulate(t, False)
     d = v2a(rs.getScalar(rb.ScalarType.length))
     nl[c] = sum(d)
     nl0[c] = d[0]  # first entry is the tap root
@@ -205,7 +202,7 @@ non2 = np.zeros(len(times))
 for t in dt:
     dt_ = t / 1000.
     for i in range(0, 1000):
-        rs.simulate(dt_, True)
+        rs.simulate(dt_, False)
     d = v2a(rs.getScalar(rb.ScalarType.length))
     nl2[c] = sum(d)
     nl02[c] = d[0]  # first entry is the tap root
@@ -245,9 +242,7 @@ for t in times:
 # Numerical
 p0.successor = a2i([])  # remove successors
 p0.successorP = a2v([])
-rs = rb.RootSystem()
 rs.setRootSystemParameter(rsp)
-rs.setOrganTypeParameter(p0)
 rs.initialize()
 c = 0
 nl = np.zeros(len(times))
@@ -255,7 +250,7 @@ non = np.zeros(len(times))
 nl_tap = np.zeros(len(times))
 nl_basal = np.zeros(len(times))
 for t in dt:
-    rs.simulate(t, True)
+    rs.simulate(t, False)
     d = v2a(rs.getScalar(rb.ScalarType.length))
     nl[c] = sum(d)
     non[c] = rs.getNumberOfNodes()
@@ -305,27 +300,30 @@ for t in times:
 # Numerical
 p0.successor = a2i([2])  # add successors
 p0.successorP = a2v([1])
-rs = rb.RootSystem()
-rs.setRootSystemParameter(rsp)
-rs.setOrganTypeParameter(p0)
-rs.setOrganTypeParameter(p1)
 rs.initialize()
-c = 0
+
 nl = np.zeros(len(times))
 non = np.zeros(len(times))
 nl_tap = np.zeros(len(times))
 nl_taplateral = np.zeros(len(times))
 nl_basal = np.zeros(len(times))
 nl_basallateral = np.zeros(len(times))
-for t in dt:
-    rs.simulate(t, True)
+for c, t in enumerate(dt):
+    rs.simulate(t, False)
     d = v2a(rs.getScalar(rb.ScalarType.length))
     nl[c] = sum(d)
     non[c] = rs.getNumberOfNodes()
 
+    print("Base root sub type ", rs.getBaseRoots()[1].param().subType)
     ana = rb.SegmentAnalyser(rs)
+    pp = ana.getParameter("subType")
+#     for p in pp:
+#         print(p)
+
+    print("one: ", ana.getSummed("one"))
     ana.filter("subType", 1.)  # 1 is the type number of the tap root
     nl_tap[c] = ana.getSummed("length")
+    print("subType1: ", ana.getSummed("one"))
 
     ana = rb.SegmentAnalyser(rs)
     ana.filter("parentType", 1.)  # 1 is the type number of the tap root
@@ -338,8 +336,6 @@ for t in dt:
     ana = rb.SegmentAnalyser(rs)
     ana.filter("parentType", 4.)  # 4 is the default type number of basal roots
     nl_basallateral[c] = ana.getSummed("length")
-
-    c += 1
 
 print("times \t\t\t\t", times)
 print("analytical tap root lenght \t", l + l1, " (...all including their laterals) ")

@@ -40,4 +40,4 @@ for i in range(0, round(N)):
 
 rs.write("../results/example_4c_2.vtp")
 
-print("fin")
+print("done.")

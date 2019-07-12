@@ -28,3 +28,5 @@ rootsystem.write("../results/example_1b.vtp")
 
 # Export container geometry as Paraview Python script
 rootsystem.write("../results/example_1b.py")
+
+print("done.")

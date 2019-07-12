@@ -42,7 +42,7 @@ public:
     { throw std::runtime_error( "getAge() not implemented" ); return 0; } ///< Returns the age of a root of length l
 
 
-    virtual GrowthFunction* copy() { return new GrowthFunction(*this); }
+    virtual GrowthFunction* copy() { return new GrowthFunction(*this); } ///< Copy the object
 };
 
 
@@ -53,10 +53,9 @@ public:
 class LinearGrowth : public GrowthFunction
 {
 public:
-    double getLength(double t, double r, double k, Organ* o) const override { return std::min(k,r*t); } ///< @see GrowthFunction
-    double getAge(double l, double r, double k, Organ* o)  const override { return l/r; } ///< @see GrowthFunction
-
-    GrowthFunction* copy() override { return new LinearGrowth(*this); }
+    double getLength(double t, double r, double k, Organ* o) const override { return std::min(k,r*t); } ///< @copydoc GrowthFunction::getLegngth
+    double getAge(double l, double r, double k, Organ* o)  const override { return l/r; } ///< @copydoc GrowthFunction::getAge
+    GrowthFunction* copy() override { return new LinearGrowth(*this); } ///< @copydoc GrowthFunction::copy
 };
 
 
@@ -66,13 +65,13 @@ public:
 class ExponentialGrowth : public GrowthFunction
 {
 public:
-    double getLength(double t, double r, double k, Organ* o) const override { return k*(1-exp(-(r/k)*t)); } ///< @see GrowthFunction
-    double getAge(double l, double r, double k, Organ* o) const override {
+    double getLength(double t, double r, double k, Organ* o) const override { return k*(1-exp(-(r/k)*t)); } ///< @copydoc GrowthFunction::getLegngth
+    double getAge(double l, double r, double k, Organ* o) const override { ///< @copydoc GrowthFunction::getAge
         double age = - k/r*log(1-l/k);
         if (std::isfinite(age)) { // the age can not be computed when root length approaches max length
             return age;
         } else {
-            return 1.e3; // very old
+            return 1.e9; // very old
         }
     } ///< @see GrowthFunction
 

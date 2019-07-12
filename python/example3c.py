@@ -45,6 +45,8 @@ rsp.set(-3., firstB, delayB, maxB, 0, 1.e9, 1.e9, 1.e9, 0., 0.)
 rs.setRootSystemParameter(rsp)
 
 rs.initialize()
-rs.simulate(40, True)
+rs.simulate(40, False)
 
 rs.write("../results/example_3c.vtp")
+
+print("done.")

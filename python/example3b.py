@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 rs = rb.RootSystem()
 rs.openFile("Brassica_oleracea_Vansteenkiste_2014")
 rs.initialize()
-rs.simulate(120, True)
+rs.simulate(120)
 
 # Soil core analysis
 r, depth, layers = 10, 100., 100
@@ -56,3 +56,5 @@ axes[3].plot(rl_, z_)
 fig.subplots_adjust()
 plt.savefig("../results/example_3b.png")
 plt.show()
+
+print("done.")

@@ -8,11 +8,13 @@ add_library(CRootBox
             OrganParameter.cpp
             Organism.cpp
             analysis.cpp
-            ModelParameter.cpp
+            RootParameter.cpp
+			RootSystemParameter.cpp            
             Root.cpp
             RootSystem.cpp
             sdf.cpp
             tropism.cpp
+			../external/tinyxml2/tinyxml2.cpp            
             ../external/aabbcc/AABB.cc
             ../external/gauss_legendre/gauss_legendre.cpp)
 
@@ -40,11 +42,13 @@ if (PythonLibs_FOUND)
               Organism.cpp  
               PythonRootSystem.cpp
               analysis.cpp
-              ModelParameter.cpp
+              RootParameter.cpp
+			  RootSystemParameter.cpp              
               Root.cpp
               RootSystem.cpp
               sdf.cpp
               tropism.cpp
+			../external/tinyxml2/tinyxml2.cpp                 
             ../external/aabbcc/AABB.cc
             ../external/gauss_legendre/gauss_legendre.cpp
 )

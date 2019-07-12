@@ -4,9 +4,20 @@
 #include "soil.h"
 #include "sdf.h"
 #include "Organ.h"
+#include "Organism.h"
 #include "Root.h"
 
 namespace CRootBox {
+
+/**
+ * todo
+ */
+Tropism* Tropism::copy(Organism* plant)
+{
+    Tropism* nt = new Tropism(*this); // default copy constructor
+    nt->plant = plant;
+    return nt;
+}
 
 /**
  * Applies angles a and b and goes dx [cm] into the new direction and returns the new position
@@ -36,7 +47,7 @@ Vector3d Tropism::getPosition(const Vector3d& pos, Matrix3d old, double a, doubl
  */
 Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,const Organ* o)
 {
-    double a = sigma*randn()*sqrt(dx);
+    double a = sigma*plant->randn()*sqrt(dx);
     double b = rand()*2*M_PI;
     double v;
 
@@ -53,7 +64,7 @@ Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,cons
         double bestV = this->tropismObjective(pos,old,a,b,dx,o);
         for (int i=0; i<n_; i++) {
             b = rand()*2*M_PI;
-            a = sigma*randn()*sqrt(dx);
+            a = sigma*plant->randn()*sqrt(dx);
             v = this->tropismObjective(pos,old,a,b,dx,o);
             if (v<bestV) {
                 bestV=v;
@@ -69,10 +80,10 @@ Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,cons
 }
 
 /**
- * Inside the geometric domaint baseTropism::getHeading() is returned.
+ * Inside the geometric domain baseTropism::getHeading() is returned.
  * In case geometric boundaries are hit, the rotations are modified, so that growth stays inside the domain.
  *
- * @param pos        root tip postion
+ * @param pos        root tip position
  * @param old        rotation matrix, heading is old(:,1)
  * @param dx         distance to look ahead (e.g in case of hydrotropism)
  * @param root       points to the root that called getHeading(), just in case something else is needed (i.e. iheading for exotropism)
@@ -133,7 +144,7 @@ Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const
  */
 double Exotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Organ* o)
 {
-    Vector3d iheading = ((Root*)o)->iheading;
+    Vector3d iheading = ((Root*)o)->iHeading;
     double s = iheading.times(old.times(Vector3d::rotAB(a,b)));
     s*=(1./iheading.length()); // iheading should be normed anyway?
     s*=(1./old.column(0).length());
@@ -167,7 +178,8 @@ double Hydrotropism::tropismObjective(const Vector3d& pos, Matrix3d old, double 
  * @param t2            first tropism
  * @param w2            first weight
  */
-CombinedTropism::CombinedTropism(double n, double sigma,Tropism* t1, double w1, Tropism* t2, double w2): Tropism(n,sigma)
+CombinedTropism::CombinedTropism(Organism* plant, double n, double sigma,Tropism* t1, double w1, Tropism* t2, double w2)
+    :Tropism(plant,n,sigma)
 {
     tropisms.push_back(t1);
     tropisms.push_back(t2);

@@ -31,7 +31,7 @@ void example_volume()
         rs.simulate(dt);
         t += dt;
         // calculate root system volume
-        std::vector<double> vols = rs.getScalar(RootSystem::st_volume);
+        std::vector<double> vols = rs.getParameters("volume");
         vol = std::accumulate(vols.begin(), vols.end(), 0.);
     }
     std::cout << "\nfinished with " << vol << " cm^3 after "<< t << " days for " << name  << "\n\n";

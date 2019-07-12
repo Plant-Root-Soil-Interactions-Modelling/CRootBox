@@ -2,16 +2,10 @@
 #ifndef ROOT_H_
 #define ROOT_H_
 
-#include <iostream>
-#include <assert.h>
-
 #include "mymath.h"
-#include "sdf.h"
-#include "tropism.h"
-#include "growth.h"
-#include "ModelParameter.h"
 #include "Organ.h"
 #include "Organism.h"
+#include "RootParameter.h"
 
 namespace CRootBox {
 
@@ -31,19 +25,20 @@ class Root :public Organ
 
 public:
 
-    Root(Organism* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< typically called by constructor of Root::createLaterals()
-    Root(const Root& r, Organism* rs); ///< deep copy of the tree
-    virtual ~Root() { }; ///< children are deleted in ~Organ()
+    Root(int id, const OrganParameter* param, bool alive, bool active, double age, double length,
+        Vector3d iheading, double pbl, int pni, bool moved= false, int oldNON = 0); // ///< creates everything from scratch
+    Root(Organism* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< used within simulation
+    virtual ~Root() { }; ///< no need to do anything, children are deleted in ~Organ()
 
-    int organType() const override { return Organism::ot_root; };
+    Organ* copy(Organism* rs) override;  ///< deep copies the root tree
+
+    int organType() const override { return Organism::ot_root; }; ///< returns the organs type
 
     /* Grow */
-    void simulate(double dt, bool silence = false) override; ///< root growth for a time span of \param dt
+    void simulate(double dt, bool silence = false) override; ///< root growth for a time span of @param dt
 
     /* Roots as sequential list */
-    std::vector<Root*> getRoots(); ///< return the root including laterals as sequential vector
-    void getRoots(std::vector<Root*>& v); ///< return the root system as sequential vector
-    double getParameter(std::string name) const override;
+    double getParameter(std::string name) const override; ///< returns an organ parameter
 
     /* From analytical equations */
     double calcCreationTime(double lenght); ///< analytical creation (=emergence) time of a node at a length
@@ -56,26 +51,26 @@ public:
     double dx() const { return getRootTypeParameter()->dx; } ///< returns the axial resolution
 
     /* IO */
-    void writeRSML(std::ostream & cout, std::string indent) const; ///< writes a RSML root tag
-    std::string toString() const;
+    std::string toString() const override;
 
     /* Parameters that are given per root that are constant*/
-    Vector3d iheading; ///< the initial heading of the root, when it was created
-    double parent_base_length; ///< length [cm]
-    int parent_ni; ///< parent node index
-
-    /* Parameters that are given per root that may change with time */
-    int old_non = 1; ///< number of old nodes, the sign is positive if the last node was updated, otherwise its negative
-
-    const double smallDx = 1e-6; ///< threshold value, smaller segments will be skipped (otherwise root tip direction can become NaN)
+    Vector3d iHeading; ///< the initial heading of the root, when it was created
+    double parentBaseLength; ///< length [cm]
+    int parentNI; ///< parent node index
 
 protected:
 
+    bool firstCall = true; ///< firstCall of createSegments in simulate
+
     void createSegments(double l, bool silence); ///< creates segments of length l, called by Root::simulate()
     virtual Vector3d getIncrement(const Vector3d& p, double sdx); ///< called by createSegments, to determine growth direction
-    void createLateral(bool silence); ///< creates a new lateral, called by Root::simulate()
+    virtual void createLateral(bool silence); ///< creates a new lateral, called by Root::simulate()
+    Vector3d heading(); ///< current growth direction of the root
+
+    const double smallDx = 1e-6; ///< threshold value, smaller segments will be skipped (otherwise root tip direction can become NaN)
 
 };
+
 
 
 /**

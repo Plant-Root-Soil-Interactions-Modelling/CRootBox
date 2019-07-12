@@ -76,7 +76,7 @@ void shehan_ScaleElongation_CL()
 
     // "manually" set the scale elongation function
     for (int i = 1; i < 7; i++) {
-        rootsystem.getRootTypeParameter(i)->se = &pe;
+        rootsystem.getRootTypeParameter(i)->f_se = &pe;
     }
 
     /**
@@ -125,8 +125,7 @@ void shehan_ScaleElongation_CL()
      */
     rootsystem.write(name+".vtp");
 
-    auto rl = rootsystem.getScalar(RootSystem::st_length);
-    double tl = std::accumulate(rl.begin(), rl.end(), 0);
+    double tl = rootsystem.getSummed("length");
     cout << "Finished with a total of " << rootsystem.getNumberOfNodes()<< " nodes, " << tl << " cm total length \n";
 }
 

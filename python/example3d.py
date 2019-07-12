@@ -84,3 +84,5 @@ fig.subplots_adjust()
 plt.savefig("../results/example_3d.png")
 plt.show()
 
+print("done.")
+

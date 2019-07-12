@@ -16,4 +16,4 @@ rootsystem.simulate(30, True)
 # Export final result (as vtp)
 rootsystem.write("../results/example_1a.vtp")
 
-print("done!")
+print("done.")

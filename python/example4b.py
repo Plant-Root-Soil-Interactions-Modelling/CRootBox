@@ -55,3 +55,5 @@ for _ in range(0, N):
 
 # Export results (as vtp)
 rs.write("../results/example_4b.vtp")
+
+print("done.")

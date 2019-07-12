@@ -82,3 +82,5 @@ rs_ana.addUserData(a2v(radial_flux[sseg.shape[0]:]), "radial_flux")
 rs_ana.addUserData(a2v(net_flux[sseg.shape[0]:]), "net_flux")
 
 rs_ana.write("results/example_5a.vtp")
+
+print("done.")

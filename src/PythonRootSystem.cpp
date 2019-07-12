@@ -44,6 +44,8 @@ std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceF
 
 OrganTypeParameter* (Organism::*getOrganTypeParameter1)(int otype, int subType) const = &Organism::getOrganTypeParameter;
 std::vector<OrganTypeParameter*> (Organism::*getOrganTypeParameter2)(int otype) const = &Organism::getOrganTypeParameter;
+void (OrganTypeParameter::*readXML1)(std::string name) = &OrganTypeParameter::readXML;
+void (OrganTypeParameter::*writeXML1)(std::string name) const = &OrganTypeParameter::writeXML;
 
 void (Organ::*addNode1)(Vector3d n, double t) = &Organ::addNode;
 void (Organ::*addNode2)(Vector3d n, int id, double t)= &Organ::addNode;
@@ -52,9 +54,10 @@ void (Organ::*getOrgans2)(int otype, std::vector<Organ*>& v) = &Organ::getOrgans
 
 void (RootSystem::*simulate1)(double dt, bool silence) = &RootSystem::simulate;
 void (RootSystem::*simulate2)() = &RootSystem::simulate;
-void (RootSystem::*simulate3)(double dt, double maxinc, ProportionalElongation* se, bool silence) = &RootSystem::simulate;
+void (RootSystem::*simulate3)(double dt, double maxinc, ProportionalElongation* f_se, bool silence) = &RootSystem::simulate;
 void (RootSystem::*initialize1)() = &RootSystem::initialize;
 void (RootSystem::*initialize2)(int basal, int shootborne) = &RootSystem::initialize;
+
 RootTypeParameter* (RootSystem::*getRootTypeParameter1)(int subType) const = &RootSystem::getRootTypeParameter;
 std::vector<RootTypeParameter*> (RootSystem::*getRootTypeParameter2)() const = &RootSystem::getRootTypeParameter;
 
@@ -70,12 +73,15 @@ std::vector<std::vector<double>> (SegmentAnalyser::*distribution2_1)(std::string
 std::vector<std::vector<SegmentAnalyser>> (SegmentAnalyser::*distribution2_2)(double top, double bot, double left, double right, int n, int m) const = &SegmentAnalyser::distribution2;
 SegmentAnalyser (SegmentAnalyser::*cut1)(const SDF_HalfPlane& plane) const = &SegmentAnalyser::cut;
 
-
-
 /**
  * Default arguments: no idea how to do it by hand, magic everywhere...
  */
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getOrgans_overloads, getOrgans, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getParameters_overloads, getParameters, 1, 3);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSummed_overloads, getSummed, 1, 2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getPolylines_overloads, getPolylines, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getPolylinesIds_overloads, getPolylinesIds, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getPolylinesCTs_overloads, getPolylinesCTs, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openFile_overloads,openFile,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate1_overloads,simulate,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate3_overloads,simulate,3,4);
@@ -84,6 +90,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(tropismObjective_overloads,tropismObjecti
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNumberOfRoots_overloads,getNumberOfRoots,0,1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentCTs_overloads, getSegmentCTs, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegments_overloads, getSegments, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(toString_overloads, toString, 0, 1);
 
 /**
  * Virtual functions
@@ -101,21 +108,18 @@ public:
 
 };
 
-class Tropism_Wrap : public Tropism, public wrapper<Tropism> {
-public:
-
-    //	Tropism_Wrap(): Tropism() { }
-    //	Tropism_Wrap(double n,double sigma): Tropism(n,sigma) { } // todo cant get it working with constructors other than ()
-
-    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Organ* o = nullptr) override {
-        return this->get_override("tropismObjective")(pos, old, a, b, dx, o);
-    }
-
-    virtual Tropism* copy() override {
-        return this->get_override("copy")();
-    }
-
-};
+//class Tropism_Wrap : public Tropism, public wrapper<Tropism> {
+//public:
+//
+//    virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Organ* o = nullptr) override {
+//        return this->get_override("tropismObjective")(pos, old, a, b, dx, o);
+//    }
+//
+//    virtual Tropism* copy() override {
+//        return this->get_override("copy")();
+//    }
+//
+//}; // dont know how that works...
 
 
 
@@ -291,16 +295,19 @@ BOOST_PYTHON_MODULE(py_rootbox)
      * OrganParameter.h
      */
     class_<OrganParameter, OrganParameter*>("OrganParameter")
-        .def_readwrite("name",&OrganParameter::subType)
+        .def_readwrite("subType",&OrganParameter::subType)
+        .def("__str__",&OrganParameter::toString)
         ;
     class_<OrganTypeParameter, OrganTypeParameter*>("OrganTypeParameter", init<Organism*>())
         .def("copy",&OrganTypeParameter::copy, return_value_policy<reference_existing_object>())
         .def("realize",&OrganTypeParameter::realize, return_value_policy<reference_existing_object>())
-        .def("realize",&OrganTypeParameter::realize, return_value_policy<reference_existing_object>())
-        .def("toString",&OrganTypeParameter::toString)
+        .def("getParameter",&OrganTypeParameter::getParameter)
+        .def("writeXML",writeXML1)
+        .def("readXML",readXML1)
         .def_readwrite("name",&OrganTypeParameter::name)
         .def_readwrite("organType",&OrganTypeParameter::organType)
         .def_readwrite("subType",&OrganTypeParameter::subType)
+        .def("__str__",&OrganTypeParameter::toString, toString_overloads())
         ;
     class_<std::vector<OrganTypeParameter*>>("std_vector_OrganTypeParameter_")
         .def(vector_indexing_suite<std::vector<OrganTypeParameter*>>() )
@@ -309,8 +316,14 @@ BOOST_PYTHON_MODULE(py_rootbox)
      * Organ.h
      */
     class_<Organ, Organ*>("Organ", init<Organism*, Organ*, int, int, double>())
+        .def(init<int, OrganParameter*, bool, bool, double, double, bool, int>())
+        .def("copy",&Organ::copy, return_value_policy<reference_existing_object>())
         .def("organType",&Organ::organType)
         .def("simulate",&Organ::simulate, simulate1_overloads())
+        .def("setParent",&Organ::setParent)
+        .def("getParent",&Organ::getParent, return_value_policy<reference_existing_object>())
+        .def("setOrganism",&Organ::setOrganism)
+        .def("addChild",&Organ::addChild)
         .def("getId",&Organ::getId)
         .def("getParam",&Organ::getParam, return_value_policy<reference_existing_object>())
         .def("getOrganTypeParameter",&Organ::getOrganTypeParameter, return_value_policy<reference_existing_object>())
@@ -318,9 +331,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def("isActive",&Organ::isActive)
         .def("getAge",&Organ::getAge)
         .def("getLength",&Organ::getLength)
-        .def("setParent",&Organ::setParent)
-        .def("getParent",&Organ::getParent, return_value_policy<reference_existing_object>())
-        .def("getParameter",&Organ::getParameter)
         .def("getNumberOfNodes",&Organ::getNumberOfNodes)
         .def("getNode",&Organ::getNode)
         .def("getNodeId",&Organ::getNodeId)
@@ -328,9 +338,13 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def("addNode",addNode1)
         .def("addNode",addNode2)
         .def("getSegments",&Organ::getSegments)
+        .def("hasMoved",&Organ::hasMoved)
+        .def("getMovedNodeIds",&Organ::getMovedNodeIds)
+        .def("getMovedNodes",&Organ::getMovedNodes)
+        .def("getOldNumberOfNodes",&Organ::getOldNumberOfNodes)
         .def("getOrgans", getOrgans1, getOrgans_overloads())
         .def("getOrgans", getOrgans2)
-        .def("writeRSML",&Organ::writeRSML)
+        .def("getParameter",&Organ::getParameter)
         .def("__str__",&Organ::toString)
         ;
     class_<std::vector<Organ*>>("std_vector_Organ_")
@@ -339,13 +353,35 @@ BOOST_PYTHON_MODULE(py_rootbox)
     /*
      * Organism.h
      */
-    class_<Organism, Organism*>("Organism")
+    class_<Organism, Organism*>("Organism", init<>())
+        .def(init<Organism&>())
         .def("getOrganTypeParameter", getOrganTypeParameter1, return_value_policy<reference_existing_object>())
         .def("getOrganTypeParameter", getOrganTypeParameter2)
         .def("setOrganTypeParameter", &Organism::setOrganTypeParameter)
+        .def("addOrgan", &Organism::addOrgan)
+        .def("initialize", &Organism::initialize)
+        .def("simulate", &Organism::simulate, simulate1_overloads())
+        .def("getSimTime", &Organism::getSimTime)
+        .def("getOrgans", &Organism::getOrgans, getOrgans_overloads())
+        .def("getParameters", &Organism::getParameters, getParameters_overloads())
+        .def("getSummed", &Organism::getSummed, getSummed_overloads())
+        .def("getPolylines", &Organism::getPolylines, getPolylines_overloads())
+        .def("getPolylinesIds", &Organism::getPolylinesIds, getPolylinesIds_overloads())
+        .def("getPolylinesCTs", &Organism::getPolylinesCTs, getPolylinesCTs_overloads())
+        .def("getNumberOfOrgans", &Organism::getNumberOfOrgans)
+        .def("getNumberOfNodes", &Organism::getNumberOfNodes)
+        .def("getNodes", &Organism::getNodes)
+        .def("getNodesCTs", &Organism::getNodeCTs)
+        .def("getSegments", &Organism::getSegments)
+        .def("getSegmentCTs", &Organism::getSegmentCTs)
+        .def("getSegmentOrigins", &Organism::getSegmentOrigins)
+        .def("writeRSML", &Organism::writeRSML)
+        .def("getOrganIndex", &Organism::getOrganIndex)
+        .def("getNodeIndex", &Organism::getNodeIndex)
         .def("setSeed", &Organism::setSeed)
         .def("rand", &Organism::rand)
         .def("randn", &Organism::randn)
+        .def("__str__",&Organism::toString)
         ;
     enum_<Organism::OrganTypes>("OrganTypes")
         .value("organ", Organism::OrganTypes::ot_organ)
@@ -354,11 +390,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .value("stem", Organism::OrganTypes::ot_stem)
         .value("leaf", Organism::OrganTypes::ot_leaf)
         ;
-
-
-
-
-
     /*
      * sdf_rs.h
      */
@@ -371,33 +402,29 @@ BOOST_PYTHON_MODULE(py_rootbox)
     /**
      * tropism.h
      */
-    class_<Tropism_Wrap, Tropism_Wrap*, boost::noncopyable>("Tropism",init<>())
-                .def("getHeading",&Tropism_Wrap::getHeading)
-                .def("tropismObjective",&Tropism_Wrap::tropismObjective, tropismObjective_overloads())
-                .def("copy",&Tropism_Wrap::copy, return_value_policy<reference_existing_object>())
-                .def("setTropismParameter",&Tropism_Wrap::setTropismParameter)
-                .def("setSeed",&Tropism_Wrap::setSeed)
-                .def("setGeometry",&Tropism_Wrap::setGeometry)
-                .def("rand",&Tropism_Wrap::rand)
-                .def("randn",&Tropism_Wrap::randn)
+//    class_<Tropism_Wrap, Tropism_Wrap*, boost::noncopyable>("Tropism",init<>())
+//                .def("getHeading",&Tropism_Wrap::getHeading)
+//                .def("tropismObjective",&Tropism_Wrap::tropismObjective, tropismObjective_overloads())
+//                .def("copy",&Tropism_Wrap::copy, return_value_policy<reference_existing_object>())
+//                .def("setTropismParameter",&Tropism_Wrap::setTropismParameter)
+//                .def("setGeometry",&Tropism_Wrap::setGeometry) // todo dont know how that works
                 ;
-    class_<Tropism, Tropism*>("TropismBase",init<>()) // Base class for the following tropisms
+    class_<Tropism, Tropism*>("TropismBase",init<Organism*>()) // Base class for the following tropisms
+                .def(init<Organism*, double, double>())
                 .def("getHeading",&Tropism::getHeading)
                 .def("tropismObjective",&Tropism::tropismObjective, tropismObjective_overloads())
                 .def("copy",&Tropism::copy, return_value_policy<reference_existing_object>())
                 .def("setTropismParameter",&Tropism::setTropismParameter)
-                .def("setSeed",&Tropism::setSeed)
                 .def("setGeometry",&Tropism::setGeometry)
-                .def("rand",&Tropism::rand)
-                .def("randn",&Tropism::randn)
+
                 ;
-    class_<Gravitropism, Gravitropism*, bases<Tropism>>("Gravitropism",init<double, double>())
+    class_<Gravitropism, Gravitropism*, bases<Tropism>>("Gravitropism",init<Organism*, double, double>())
         ;
-    class_<Plagiotropism, Plagiotropism*, bases<Tropism>>("Plagiotropism",init<double, double>())
+    class_<Plagiotropism, Plagiotropism*, bases<Tropism>>("Plagiotropism",init<Organism*,double, double>())
         ;
-    class_<Exotropism, Exotropism*, bases<Tropism>>("Exotropism",init<double, double>())
+    class_<Exotropism, Exotropism*, bases<Tropism>>("Exotropism",init<Organism*,double, double>())
         ;
-    class_<Hydrotropism, Hydrotropism*, bases<Tropism>>("Hydrotropism",init<double, double, SoilLookUp*>())
+    class_<Hydrotropism, Hydrotropism*, bases<Tropism>>("Hydrotropism",init<Organism*,double, double, SoilLookUp*>())
         ;
     //	class_<CombinedTropism, CombinedTropism*, bases<Tropism>>("CombinedTropism",init<>()) // Todo needs some extra work
     //	;
@@ -435,13 +462,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
     class_<std::vector<SegmentAnalyser>>("std_vector_SegmentAnalyser_")
             .def(vector_indexing_suite<std::vector<SegmentAnalyser>>() )
             ;
-
-
-
-
-
     /*
-     * ModelParameter.h
+     * RootParameter.h
      */
     class_<RootTypeParameter, RootTypeParameter*, bases<OrganTypeParameter>>("RootTypeParameter", init<Organism*>())
                 .def("realize",&RootTypeParameter::realize, return_value_policy<reference_existing_object>())
@@ -475,10 +497,12 @@ BOOST_PYTHON_MODULE(py_rootbox)
                 .def_readwrite("name", &RootTypeParameter::name)
                 .def_readwrite("successor", &RootTypeParameter::successor)
                 .def_readwrite("successorP", &RootTypeParameter::successorP)
-                .def_readwrite("se", &RootTypeParameter::se)
-                .def_readwrite("sa", &RootTypeParameter::sa)
-                .def_readwrite("sbp", &RootTypeParameter::sbp)
-                .def("__str__",&RootTypeParameter::toString)
+                .def_readwrite("f_tf", &RootTypeParameter::f_tf)
+                .def_readwrite("f_gf", &RootTypeParameter::f_gf)
+                .def_readwrite("f_se", &RootTypeParameter::f_se)
+                .def_readwrite("f_sa", &RootTypeParameter::f_sa)
+                .def_readwrite("f_sbp", &RootTypeParameter::f_sbp)
+                .def("__str__",&RootTypeParameter::toString, toString_overloads())
                 ;
     class_<std::vector<RootTypeParameter*>>("std_vector_RootTypeParameter_")
         .def(vector_indexing_suite<std::vector<RootTypeParameter*>>() )
@@ -494,10 +518,13 @@ BOOST_PYTHON_MODULE(py_rootbox)
                 .def_readwrite("a", &RootParameter::a)
                 .def_readwrite("theta", &RootParameter::theta)
                 .def_readwrite("rlt", &RootParameter::rlt)
-                .def("getK",&RootParameter::toString)
+                .def("getK",&RootParameter::getK)
                 .def("__str__",&RootParameter::toString)
                 ;
-    class_<RootSystemParameter>("RootSystemParameter", init<>())
+    /*
+     * RootSystemParameter.h
+     */
+    class_<RootSystemParameter, RootSystemParameter*, bases<OrganParameter>>("RootSystemParameter", init<>())
                 .def("set",&RootSystemParameter::set)
                 .def_readwrite("seedPos", &RootSystemParameter::seedPos)
                 .def_readwrite("firstB", &RootSystemParameter::firstB)
@@ -511,14 +538,19 @@ BOOST_PYTHON_MODULE(py_rootbox)
                 .def("__str__",&RootSystemParameter::toString)
                 ;
     /**
-     * Root.h (no members, just data)
+     * Root.h
      */
-    class_<Root, Root*, bases<Organ>>("Root", init<RootSystem*, int, Vector3d, double, Root*, double, int>())
-            .def(init<Root&>())
-            .def("__str__",&Root::toString)
-            .def_readwrite("parent_base_length", &Root::parent_base_length)
-            .def_readwrite("parent_ni", &Root::parent_ni)
+    class_<Root, Root*, bases<Organ>>("Root", init<Organism*, int, Vector3d, double, Root*, double, int>())
+            .def(init<int, OrganParameter*, bool, bool, double, double, Vector3d, double, int, bool, int >())
+            .def("calcCreationTime", &Root::calcCreationTime)
+            .def("calcLength", &Root::calcLength)
+            .def("calcAge", &Root::calcAge)
+            .def("getRootTypeParameter", &Root::getRootTypeParameter, return_value_policy<reference_existing_object>())
             .def("param", &Root::param, return_value_policy<reference_existing_object>())
+            .def("dx", &Root::dx)
+            .def_readwrite("parent_base_length", &Root::parentBaseLength)
+            .def_readwrite("parent_ni", &Root::parentNI)
+            .def("__str__",&Root::toString)
             ;
     class_<std::vector<Root*>>("std_vector_Root_")
             .def(vector_indexing_suite<std::vector<Root*>>() )
@@ -555,16 +587,13 @@ BOOST_PYTHON_MODULE(py_rootbox)
              .def("getRoots", &RootSystem::getRoots)
              .def("getBaseRoots", &RootSystem::getBaseRoots)
              .def("getNodes", &RootSystem::getNodes)
-             .def("getPolylines", &RootSystem::getPolylines)
              .def("getSegments", &RootSystem::getSegments, getSegments_overloads())
              .def("getShootSegments", &RootSystem::getShootSegments)
              .def("getSegmentOrigins", &RootSystem::getSegmentOrigins)
              .def("getNETimes",&RootSystem::getSegmentCTs, getSegmentCTs_overloads())
-             .def("getScalar", &RootSystem::getScalar)
              .def("getRootTips", &RootSystem::getRootTips)
              .def("getRootBases", &RootSystem::getRootBases)
              .def("write", &RootSystem::write)
-             .def("setSeed",&RootSystem::setSeed)
              .def("getNumberOfNewNodes",&RootSystem::getNumberOfNewNodes)
              .def("getNumberOfNewRoots",&RootSystem::getNumberOfNewRoots)
              .def("getUpdatedNodeIndices",&RootSystem::getUpdatedNodeIndices)
@@ -575,12 +604,13 @@ BOOST_PYTHON_MODULE(py_rootbox)
              .def("getNewSegmentsTimes",&RootSystem::getNewSegmentsTimes)
              .def("push",&RootSystem::push)
              .def("pop",&RootSystem::pop)
+             .def("setSeed",&RootSystem::setSeed)
              .def("rand",&RootSystem::rand)
              .def("randn",&RootSystem::randn)
-             .def("setPoreGeometry",&RootSystem::setPoreGeometry)
-             .def("setPoreConductivity",&RootSystem::setPoreConductivity)
-             .def("setPoreLocalAxes",&RootSystem::setPoreLocalAxes)
-             .def("applyPoreConductivities",&RootSystem::applyPoreConductivities)
+//             .def("setPoreGeometry",&RootSystem::setPoreGeometry)
+//             .def("setPoreConductivity",&RootSystem::setPoreConductivity)
+//             .def("setPoreLocalAxes",&RootSystem::setPoreLocalAxes)
+//             .def("applyPoreConductivities",&RootSystem::applyPoreConductivities)
              ;
     enum_<RootSystem::TropismTypes>("TropismType")
             .value("plagio", RootSystem::TropismTypes::tt_plagio)
@@ -591,28 +621,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
     enum_<RootSystem::GrowthFunctionTypes>("GrowthFunctionType")
             .value("negexp", RootSystem::GrowthFunctionTypes::gft_negexp)
             .value("linear", RootSystem::GrowthFunctionTypes::gft_linear)
-            ;
-    enum_<RootSystem::ScalarTypes>("ScalarType")
-            .value("type", RootSystem::ScalarTypes::st_type)
-            .value("radius", RootSystem::ScalarTypes::st_radius)
-            .value("order", RootSystem::ScalarTypes::st_order)
-            .value("time", RootSystem::ScalarTypes::st_time)
-            .value("length", RootSystem::ScalarTypes::st_length)
-            .value("volume", RootSystem::ScalarTypes::st_volume)
-            .value("surface", RootSystem::ScalarTypes::st_surface)
-            .value("one", RootSystem::ScalarTypes::st_one)
-            .value("userdata1", RootSystem::ScalarTypes::st_userdata1)
-            .value("userdata2", RootSystem::ScalarTypes::st_userdata2)
-            .value("userdata3", RootSystem::ScalarTypes::st_userdata3)
-            .value("parenttype", RootSystem::ScalarTypes::st_parenttype)
-            .value("lb", RootSystem::ScalarTypes::st_lb)
-            .value("la", RootSystem::ScalarTypes::st_la)
-            .value("nob", RootSystem::ScalarTypes::st_nob)
-            .value("r", RootSystem::ScalarTypes::st_r)
-            .value("theta", RootSystem::ScalarTypes::st_theta)
-            .value("rlt", RootSystem::ScalarTypes::st_rlt)
-            .value("meanln", RootSystem::ScalarTypes::st_meanln)
-            .value("sdln", RootSystem::ScalarTypes::st_sdln)
             ;
     /*
      * exudation.h

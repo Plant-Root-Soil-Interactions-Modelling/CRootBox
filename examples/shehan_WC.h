@@ -145,7 +145,7 @@ void shehan_WC()
     Grid1D temperature = Grid1D(n, z_, temp );
     ScaleElongation se = ScaleElongation(&water_content, &temperature);
     for (int i = 1; i < 7; i++) {  // "manually" set the scale elongation function
-        rootsystem.getRootTypeParameter(i)->se = &se;
+        rootsystem.getRootTypeParameter(i)->f_se = &se;
     }
 
     /**
@@ -181,8 +181,7 @@ void shehan_WC()
      */
     rootsystem.write(name+".vtp");
 
-    auto rl = rootsystem.getScalar(RootSystem::st_length);
-    double tl = std::accumulate(rl.begin(), rl.end(), 0);
+    double tl = rootsystem.getSummed("length");
     cout << "Finished with a total of " << rootsystem.getNumberOfNodes()<< " nodes, " << tl << " cm total length \n";
 }
 

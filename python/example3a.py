@@ -13,16 +13,16 @@ dt = 1.
 N = round(simtime / dt)  # steps
 
 # Plot some scalar value over time
-stype = rb.ScalarType.length
+stype = "length"
 stype_str = "length (cm)"
 v_ = np.zeros(N)
 v1_ = np.zeros(N)
 v2_ = np.zeros(N)
 v3_ = np.zeros(N)
 for i in range(0, N):
-    rs.simulate(dt, True)
-    t = v2a(rs.getScalar(rb.ScalarType.type))
-    v = v2a(rs.getScalar(stype))
+    rs.simulate(dt)
+    t = v2a(rs.getParameters("type"))
+    v = v2a(rs.getParameters(stype))
     v_[i] = np.sum(v)
     v1_[i] = np.sum(v[t == 1])
     v2_[i] = np.sum(v[t == 2])
@@ -41,7 +41,7 @@ plt.show()
 
 # Find root tips and bases (two approaches)
 rs.initialize()  # <------------
-rs.simulate(7, True)  # 7 days young....
+rs.simulate(7)  # 7 days young....
 
 print(rs.getNumberOfNodes(), "nodes")
 print(rs.getNumberOfSegments(), "segments")
@@ -71,3 +71,5 @@ plt.show()
  # check if the two approaches yield the same result
 uneq = np.sum(nodes[baseI, :] != bases) + np.sum(nodes[tipI, :] != tips)
 print("Unequal tips and basals:", uneq)
+
+print("done.")

@@ -28,3 +28,5 @@ for i, rs in enumerate(allRS):
 
 # Write all into single file (segments)
 ana.write("../results/example_2b_all.vtp")
+
+print("done.")

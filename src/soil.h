@@ -8,8 +8,6 @@
 #include <cmath>
 #include <limits>
 
-
-
 namespace CRootBox  {
 
 class Organ;
@@ -25,6 +23,8 @@ public:
 
     SoilLookUp() { }
     virtual ~SoilLookUp() { }
+
+    virtual SoilLookUp* copy() { return new SoilLookUp(*this); }
 
     /**
      * Returns a scalar property of the soil scaled from 0..1.
@@ -111,11 +111,12 @@ class SoilLookUpSDF : public SoilLookUp
 {
 public:
 
-    SoilLookUpSDF(): SoilLookUpSDF(nullptr) {  ///< Default constructor
-    }
+    SoilLookUpSDF(): SoilLookUpSDF(nullptr) { } ///< Default constructor
+
+    SoilLookUp* copy() override { return new SoilLookUpSDF(*this); }  // todo?: now its a shallow copy
 
     /**
-     * Creaets the soil property from a signed distance function,
+     * Creates the soil property from a signed distance function,
      * inside the geometry the value is largest
      *
      * @param sdf_      the signed distance function representing the geometry
@@ -128,16 +129,19 @@ public:
         fmax = max_;
         fmin = min_;
         slope = slope_;
-    } ///< Creates the soil property from a signed distance function
+    }
 
+    /**
+     * returns fmin outside of the domain and fmax inside, and a linear ascend according slope
+     */
     virtual double getValue(const Vector3d& pos, const Organ* o = nullptr) const override {
         Vector3d p = periodic(pos);
         double c = -sdf->getDist(p)/slope*2.; ///< *(-1), because inside the geometry the value is largest
         c += (fmax-fmin)/2.; // thats the value at the boundary
         return std::max(std::min(c,fmax),fmin);
-    } ///< returns fmin outside of the domain and fmax inside, and a linear ascend according slope
+    }
 
-    virtual std::string toString() const override { return "SoilLookUpSDF"; } ///< Quick info about the object for debugging
+    std::string toString() const override { return "SoilLookUpSDF"; } ///< Quick info about the object for debugging
 
     SignedDistanceFunction* sdf; ///< signed distance function representing the geometry
     double fmax; ///< maximum is reached within the geometry at the distance slope
@@ -146,16 +150,19 @@ public:
 };
 
 
+
+/**
+ * todo docme
+ */
 class MultiplySoilLookUps : public SoilLookUp
 {
 public:
 
-    MultiplySoilLookUps(SoilLookUp* s1, SoilLookUp* s2) {
-        soils = { s1, s2 };
-    }
+    MultiplySoilLookUps(SoilLookUp* s1, SoilLookUp* s2) { soils = { s1, s2 }; }
 
-    MultiplySoilLookUps(std::vector<SoilLookUp*> soils)
-    :soils(soils) { }
+    MultiplySoilLookUps(std::vector<SoilLookUp*> soils) :soils(soils) { }
+
+    SoilLookUp* copy() override { return new MultiplySoilLookUps(*this); } // todo? now its a shallow copy
 
     virtual double getValue(const Vector3d& pos, const Organ* o = nullptr) const override {
         double v = 1.;
@@ -198,6 +205,8 @@ public:
     :scale(scale), baseLookUp(baseLookUp) {
     }
 
+    SoilLookUp* copy() override { return new ProportionalElongation(*this); } // todo? now its a shallow copy
+
     void setScale(double s) { scale = s; }
 
     void setBaseLookUp(SoilLookUp* baseLookUp) { this->baseLookUp=baseLookUp; } ///< proportionally scales a base soil look up
@@ -238,7 +247,10 @@ public:
     Grid1D(size_t n, std::vector<double> grid, std::vector<double> data): n(n), grid(grid), data(data) {
         assert(grid.size()==n);
         assert(data.size()==n);
-    };
+    }
+
+
+    SoilLookUp* copy() override { return new Grid1D(*this); }
 
     virtual size_t map(double x) const {
         unsigned int jr,jm,jl;
@@ -290,6 +302,8 @@ public:
         this->data = data;
     }
 
+    SoilLookUp* copy() override { return new EquidistantGrid1D(*this); }
+
     void makeGrid(double a, double b, size_t n) {
         this->grid = std::vector<double>(n);
         for (size_t i=0; i<n; i++) {
@@ -325,6 +339,8 @@ public:
 
     virtual ~RectilinearGrid3D() { };
 
+    SoilLookUp* copy() override { return new RectilinearGrid3D(*this); }
+
     virtual size_t map(double x, double y, double z) const {
         size_t i = xgrid->map(x);
         size_t j = ygrid->map(y);
@@ -336,7 +352,7 @@ public:
         return data.at(map(i,j,k));
     }
 
-    virtual double getValue(const Vector3d& pos, const Organ* o = nullptr) const override {
+    double getValue(const Vector3d& pos, const Organ* o = nullptr) const override {
         Vector3d p = periodic(pos);
         return data[map(p.x,p.y,p.z)];
     } ///< Returns the data of the 1d table, repeats first or last entry if out of bound
@@ -356,6 +372,8 @@ public:
     size_t nx,ny,nz;
     std::vector<double> data;
 };
+
+
 
 /**
  *  Even more fantastic
@@ -381,6 +399,7 @@ public:
         delete zgrid;
     }
 
+    SoilLookUp* copy() override { return new EquidistantGrid3D(*this); }
 };
 
 } // end namespace CRootBox
