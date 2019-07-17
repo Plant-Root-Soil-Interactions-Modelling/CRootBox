@@ -55,7 +55,7 @@ public:
     RootTypeParameter(Organism* plant); ///< default constructor
     virtual ~RootTypeParameter();
 
-    OrganTypeParameter* copy(Organism* plant) override;
+    OrganTypeParameter* copy(Organism* plant_) override;
 
     OrganParameter* realize() override; ///< Creates a specific root from the root parameter set
     int getLateralType(const Vector3d& pos); ///< Choose (dice) lateral type based on root parameter set
@@ -104,10 +104,14 @@ public:
      * Callback functions for the Root (set up by the class RootSystem)
      */
     Tropism* f_tf;  ///< tropism function ( = new Tropism(plant) )
-    GrowthFunction* f_gf = new ExponentialGrowth();; ///< growth function
+    GrowthFunction* f_gf = new ExponentialGrowth(); ///< growth function
     SoilLookUp* f_se = new SoilLookUp(); ///< scale elongation function
     SoilLookUp* f_sa = new SoilLookUp(); ///< scale angle function
     SoilLookUp* f_sbp = new SoilLookUp(); ///< scale branching probability function
+
+protected:
+
+    void bindParmaters(); ///<sets up class introspection
 
 };
 

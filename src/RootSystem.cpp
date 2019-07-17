@@ -12,25 +12,17 @@ namespace CRootBox {
  * deep copies the root system
  * does not deep copy geometry, elongation functions, and soil (all not owned by rootsystem)
  * empties buffer
+ *
+ * @param rs        root system that is copied
  */
-RootSystem::RootSystem(const RootSystem& rs):Organism(rs), rsparam(rs.rsparam), geometry(rs.geometry), soil(rs.soil),
-    old_non(rs.old_non), old_nor(rs.old_nor)
+RootSystem::RootSystem(const RootSystem& rs): Organism(rs), rsparam(rs.rsparam), geometry(rs.geometry), soil(rs.soil)
 {
-    std::cout << "Copying root system ("<<rs.baseOrgans.size()<< " base roots) \n";
-    roots = std::vector<Root*>(0); // new empty buffer
+    std::cout << "Copying root system with "<<rs.baseOrgans.size()<< " base roots \n";
+    roots.clear();
 }
 
 /**
- * Destructor
- */
-RootSystem::~RootSystem()
-{
-    reset();
-}
-
-
-/**
- * Returns the i-th root parameter of sub type @param type.
+ * @return the i-th root parameter of sub type @param type.
  */
 RootTypeParameter* RootSystem::getRootTypeParameter(int type) const
 {
@@ -38,7 +30,7 @@ RootTypeParameter* RootSystem::getRootTypeParameter(int type) const
 }
 
 /**
- *
+ * @return all root type parameters in a vector
  */
 std::vector<RootTypeParameter*> RootSystem::getRootTypeParameter() const
 {
@@ -50,7 +42,7 @@ std::vector<RootTypeParameter*> RootSystem::getRootTypeParameter() const
 }
 
 /**
- * sets the root system parameters
+ * Sets the root system parameters @param rsp
  */
 void RootSystem::setRootSystemParameter(const RootSystemParameter& rsp)
 {
@@ -58,14 +50,14 @@ void RootSystem::setRootSystemParameter(const RootSystemParameter& rsp)
 }
 
 /**
- * gets the root system paramete
+ * @return the root system parameter
  */
 RootSystemParameter* RootSystem::getRootSystemParameter() {
     return &rsparam;
 }
 
 /**
- * Resets the root system: deletes all roots, sets simulation time to 0
+ * Resets the root system: deletes all roots, sets simulation time to 0.
  */
 void RootSystem::reset()
 {
@@ -73,7 +65,7 @@ void RootSystem::reset()
         delete b;
     }
     baseOrgans.clear();
-    simtime=0;
+    simtime = 0;
     organId = -1;
     nodeId = -1;
 }
@@ -93,15 +85,14 @@ void RootSystem::openFile(std::string name, std::string subdir)
     rp_name.append(name);
     rp_name.append(".rparam");
     fis.open(rp_name.c_str());
-    int c = 0;
     if (fis.good()) { // did it work?
-        c = readParameters(fis);
+        readParameters(fis);
         fis.close();
     } else {
         std::string s = "RootSystem::openFile() could not open root parameter file ";
         throw std::invalid_argument(s.append(rp_name));
     }
-    std::cout << "Read " << c << " root type parameters \n"; // debug
+    // std::cout << "Read " << c << " root type parameters \n"; // debug
 
     // open plant parameter
     std::string pp_name = subdir;
@@ -118,16 +109,17 @@ void RootSystem::openFile(std::string name, std::string subdir)
 }
 
 /**
- * Reads parameter from input stream (there is a Matlab script exporting these, @see writeParams.m)
+ * Reads root type parameter from an input stream @param is
+ * (there is a Matlab script exporting these, @see writeParams.m)
  *
  * @param cin  in stream
  */
-int RootSystem::readParameters(std::istream& cin)
+int RootSystem::readParameters(std::istream& is)
 {
     int c = 0;
-    while (cin.good()) {
+    while (is.good()) {
         RootTypeParameter* p = new RootTypeParameter(this);
-        p->read(cin);
+        p->read(is);
         p->organType = Organism::ot_root;
         setOrganTypeParameter(p);
         c++;
@@ -136,7 +128,7 @@ int RootSystem::readParameters(std::istream& cin)
 }
 
 /**
- * Writes root parameters (for debugging)
+ * Writes root type parameters to an output stream @param os
  *
  * @param os  out stream
  */
@@ -152,6 +144,9 @@ void RootSystem::writeParameters(std::ostream& os) const
  * a confining geometry, the tropism functions, and the growth functions.
  *
  * Call this method before simulation and after setting geometry, plant and root parameters
+ *
+ * @parm basaltype      the type of the basal roots (default = 4)
+ * @parm basaltype      the type of the shootborne roots (default = 5)
  */
 void RootSystem::initialize(int basaltype, int shootbornetype)
 {
@@ -222,14 +217,15 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
     } else {
         numberOfCrowns=0;
     }
-    old_non = baseOrgans.size();
+    oldNumberOfNodes = baseOrgans.size();
 
     initCallbacks(); //
 }
 
 /**
- * Called by RootSystem::initialize, sets up tropism and growth functions call backs
- * using RootSystem::createTropismFunction and RootSystem::createGrowthFunction
+ * Called by RootSystem::initialize.
+ * Sets up tropism and growth functions call backs using
+ * RootSystem::createTropismFunction and RootSystem::createGrowthFunction
  */
 void RootSystem::initCallbacks()
 {
@@ -249,7 +245,10 @@ void RootSystem::initCallbacks()
 
 /**
  * Manually sets a tropism function for a specific or for all root types.
- * Must be called after RootSystem::initialize()
+ * Must be called after RootSystem::initialize(), otherwise its overwritten.
+ *
+ * @param tf_           a tropism
+ * @param rt            root type, if rt = -1 all types are set to this tropism (default).
  */
 void RootSystem::setTropism(Tropism* tf_, int rt)
 {
@@ -267,18 +266,16 @@ void RootSystem::setTropism(Tropism* tf_, int rt)
  * Simulates root system growth for time span dt
  *
  * @param dt    	time step [day]
- * @param silence 	indicates if status is written to the console (cout) (default = false)
+ * @param verbose 	indicates if status is written to the console (cout) (default = false)
  */
 void RootSystem::simulate(double dt, bool verbose)
 {
-    old_non = getNumberOfNodes();
-    old_nor = getRoots().size();
     Organism::simulate(dt,verbose);
     roots.clear(); // empty buffer
 }
 
 /**
- * Simulates root system growth for the time span defined in the parameter set
+ * Simulates root system growth for the time span defined in the root system parameters
  */
 void RootSystem::simulate()
 {
@@ -286,26 +283,28 @@ void RootSystem::simulate()
 }
 
 /**
- * Simulates root system growth for the time span dt [days],
- * elongates a maximum of maxinc total length [cm/day]
- * using the proportional elongation se to impede overall growth
+ * Simulates root system growth for a time span, elongates a maximum of @param maxinc total length [cm/day]
+ * using the proportional elongation @param se to impede overall growth.
+ *
+ * @param dt        time step [day]
+ * @param maxinc_   maximal total length [cm/day] the root system is allowed to grow in this time step
+ * @param se        The class ProportionalElongation is used to scale overall root growth
+ * @param verbose   indicates if status is written to the console (cout) (default = false)
  */
-void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se, bool silence)
+void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se, bool verbose)
 {
     const double accuracy = 1.e-3;
-
     const int maxiter = 20;
-    double maxinc = dt*maxinc_;
-
+    double maxinc = dt*maxinc_; // [cm]
     double ol = getSummed("length");
     int i = 0;
 
     push();
     se->setScale(1.);
-    simulate(dt, silence);
+    simulate(dt, verbose);
     double l = getSummed("length");
     double inc_ = l - ol;
-    if (!silence) {
+    if (verbose) {
         std::cout << "expected increase is " << inc_ << " maximum is " << maxinc
             << "\n";
     }
@@ -321,21 +320,13 @@ void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se,
             double m = (sl+sr)/2.; // mid
             push();
             se->setScale(m);
-            simulate(dt, silence);
+            simulate(dt, verbose);
             l = getSummed("length");
             inc_ = l - ol;
             pop();
-            if (!silence) {/**
-             * Sets the seed of the root systems random number generator,
-             * and all subclasses using random number generators:
-             * @see TropismFunction, @see RootParameter
-             * To obtain two exact same root system call before initialize().
-             *
-             * @param seed      random number generator seed
-             */
+            if (verbose) {
                 std::cout << "\t(sl, mid, sr) = (" << sl << ", " <<  m << ", " <<  sr << "), inc " <<  inc_ << ", err: " << std::abs(inc_-maxinc) << " > " << accuracy << "\n";
             }
-
             if (inc_>maxinc) { // concatenate
                 sr = m;
             } else {
@@ -345,12 +336,17 @@ void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se,
 
         }
     }
-    this->simulate(dt, silence);
+    this->simulate(dt, verbose);
 }
 
 /**
- * Creates a specific tropsim,
- * the function must be extended or overwritten to add more tropisms
+ * Creates a specific tropism from the tropism type index.
+ * the function must be extended or overwritten to add more tropisms.
+ *
+ * @param tt        the tropism type index, given in the root type parameters
+ * @param N         tropism parameter (passsed to the tropism class)
+ * @param sigma     tropism parameter (passsed to the tropism class)
+ * @return          the tropism class containing with the callback functions
  */
 Tropism* RootSystem::createTropismFunction(int tt, double N, double sigma) {
     switch (tt) {
@@ -368,8 +364,11 @@ Tropism* RootSystem::createTropismFunction(int tt, double N, double sigma) {
 }
 
 /**
- * Creates the possible growth functions
- * the function must bee extended or overwritten to add more growth function
+ * Creates a growth functions from the growth function index.
+ * This function must bee extended or overwritten to add more growth functions
+ *
+ * @param gft       the growth function index, given in the root type parameters
+ * @return          the growth function class containing with the callback functions
  */
 GrowthFunction* RootSystem::createGrowthFunction(int gft) {
     switch (gft) {
@@ -380,9 +379,8 @@ GrowthFunction* RootSystem::createGrowthFunction(int gft) {
 }
 
 /**
- * Represents the root system as sequential vector of roots,
- * copies the root only, if it has more than 1 node.
- * buffers the result, until next call of simulate(dt)
+ * Represents the root system as sequential vector of roots, copies the root only, if it has more than 1 node.
+ * buffers the result, until next call of simulate(dt), a bit redundant to @see Organsim::getOrgans().
  *
  * \return sequential vector of roots with more than 1 node
  */
@@ -390,6 +388,7 @@ std::vector<Root*> RootSystem::getRoots() const
 {
     if (roots.empty()) { // create buffer
         std::vector<Organ*> organs;
+        organs.reserve(getNumberOfOrgans()); // for speed up
         for (const auto& br : this->baseOrgans) {
             ((Root*)br)->getOrgans(ot_root, organs);
         }
@@ -403,7 +402,20 @@ std::vector<Root*> RootSystem::getRoots() const
 }
 
 /**
- * Returns the node indices of the root tips
+ * @copydoc Organism::getNodes
+ *
+ * adds an artificial shoot node
+ */
+std::vector<Vector3d> RootSystem::getNodes() const
+{
+    auto v = Organism::getNodes();
+    v.at(0) = Vector3d(0.,0.,0.); // add artificial shoot
+    return v;
+}
+
+
+/**
+ * @return the node indices of the root tips
  */
 std::vector<int> RootSystem::getRootTips() const
 {
@@ -416,7 +428,7 @@ std::vector<int> RootSystem::getRootTips() const
 }
 
 /**
- * Returns the positions of the root bases
+ * @return the node indices of the root bases
  */
 std::vector<int> RootSystem::getRootBases() const
 {
@@ -429,36 +441,6 @@ std::vector<int> RootSystem::getRootBases() const
 }
 
 /**
- * Copies the nodes of the root systems into a sequential vector,
- * nodes are unique (default). See also RootSystem::getSegments
- */
-std::vector<Vector3d> RootSystem::getNodes() const
-{
-    auto v = Organism::getNodes();
-    v.at(0) = Vector3d(0.,0.,0.); // add artificial shoot
-    return v;
-}
-
-/**
- * Return the segments of the root system at the current simulation time
- */
-std::vector<Vector2i> RootSystem::getSegments(int otype) const
-{
-    this->getRoots(); // update roots (if necessary)
-    int nos=getNumberOfSegments();
-    std::vector<Vector2i> s(nos);
-    int c=0;
-    for (const auto& r : roots) {
-        for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
-            Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
-            s.at(c) = v;
-            c++;
-        }
-    }
-    return s;
-}
-
-/**
  * Return the segments connecting tap root, basal roots, and shoot borne roots.
  *
  * The upper node represents the oldest emerged shoot-borne root, or if none, the node where
@@ -467,10 +449,7 @@ std::vector<Vector2i> RootSystem::getSegments(int otype) const
 std::vector<Vector2i> RootSystem::getShootSegments() const
 {
     std::vector<Vector2i> seg = std::vector<Vector2i>(0);
-
-    // connect  basal roots node (seed) to artificial shoot
-    seg.push_back(Vector2i(0,baseOrgans.at(0)->getNodeId(0)));
-
+    seg.push_back(Vector2i(0,baseOrgans.at(0)->getNodeId(0))); // connect  basal roots node (seed) to artificial shoot
     int n1=0, n2=0;
     for (int i=0; i<numberOfCrowns-1; i++) { // connecting root crowns
         int brn = baseOrgans.size()-1;
@@ -482,208 +461,11 @@ std::vector<Vector2i> RootSystem::getShootSegments() const
         int ti = baseOrgans.at(0)->getNodeId(0);
         seg.push_back(Vector2i(n2,ti));
     }
-
     return seg;
 }
 
 /**
- * Returns pointers of the roots corresponding to each segment
- */
-std::vector<Organ*> RootSystem::getSegmentOrigins(int otype) const
-{
-    this->getRoots(); // update roots (if necessary)
-    int nos=getNumberOfSegments();
-    std::vector<Organ*> s(nos);
-    int c=0;
-    for (const auto& r : roots) {
-        for (size_t i=0; i<r->getNumberOfNodes()-1; i++) {
-            s.at(c) = r;
-            c++;
-        }
-    }
-    return s;
-}
-
-/**
- * Copies the node emergence times of the root system per segment or per node into a sequential vector,
- * see RootSystem::getNodes(), RootSystem::getSegments()
- */
-std::vector<double> RootSystem::getSegmentCTs(int otype) const
-{
-    this->getRoots(); // update roots (if necessary)
-
-    int nos = getNumberOfSegments();
-    std::vector<double> netv = std::vector<double>(nos); // reserve big enough vector
-    int c = 0;
-    for (const auto& r : roots) {
-        for (size_t i = 1; i < r->getNumberOfNodes(); i++) { // loop over all nodes of all roots
-            netv.at(c) = r->getNodeCT(i); // pray that ids are correct
-            c++;
-        }
-    }
-    return netv;
-
-}
-
-/**
- *  Returns the node emergence times to the corresponding polylines, see also RootSystem::getPolylines
- */
-std::vector<std::vector<double>> RootSystem::getPolylinesNET() const
-{
-    this->getRoots(); // update roots (if necessary)
-    std::vector<std::vector<double>> times = std::vector<std::vector<double>>(roots.size()); // reserve big enough vector
-    for (size_t j=0; j<roots.size(); j++) {
-        std::vector<double>  rt = std::vector<double>(roots[j]->getNumberOfNodes());
-        for (size_t i=0; i<roots[j]->getNumberOfNodes(); i++) {
-            rt[i] = roots[j]->getNodeCT(i);
-        }
-        times[j] = rt;
-    }
-    return times;
-}
-
-/**
- * The indices of the nodes that were updated in the last time step
- */
-std::vector<int> RootSystem::getUpdatedNodeIndices() const
-{
-    this->getRoots(); // update roots (if necessary)
-    std::vector<int> ni = std::vector<int>(0);
-    for (const auto& r : roots) {
-        if (r->getOldNumberOfNodes()>0){
-            ni.push_back(r->getNodeId(r->getOldNumberOfNodes()-1));
-        }
-    }
-    return ni;
-}
-
-/**
- * The values of the nodes that were updated in the last time step
- */
-std::vector<Vector3d> RootSystem::getUpdatedNodes() const
-{
-    this->getRoots(); // update roots (if necessary)
-    std::vector<Vector3d> nv = std::vector<Vector3d>(0);
-    for (const auto& r : roots) {
-        if (r->getOldNumberOfNodes()>0){
-            nv.push_back(r->getNode(r->getOldNumberOfNodes()-1));
-        }
-    }
-    return nv;
-}
-
-/**
- * Returns a vector of newly created nodes since the last call of RootSystem::simulate(dt),
- * to dynamically add to the old node vector, see also RootSystem::getNodes
- */
-std::vector<Vector3d> RootSystem::getNewNodes() const
-{
-    roots.clear();
-    this->getRoots(); // update roots (if necessary)
-    std::vector<Vector3d> nv(this->getNumberOfNewNodes());
-    for (const auto& r : roots) {
-        int onon = std::abs(r->getOldNumberOfNodes());
-        for (size_t i=onon; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
-            nv.at(r->getNodeId(i)-this->old_non) = r->getNode(i); // pray that ids are correct
-        }
-    }
-    return nv;
-}
-
-/**
- * Returns a vector of newly created node indices since the last call of RootSystem::simulate(dt),
- * to dynamically add to the old node vector, see also RootSystem::getNodes
- */
-std::vector<int> RootSystem::getNewNodeIndices() const
-{
-    roots.clear();
-    this->getRoots(); // update roots (if necessary)   v.at(0) = Vector3d(0.,0.,0.)
-    std::vector<int> nv(this->getNumberOfNewNodes());
-    for (const auto& r : roots) {
-        int onon = std::abs(r->getOldNumberOfNodes());
-        for (size_t i=onon; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
-            nv.at(r->getNodeId(i)-this->old_non) = r->getNodeId(i); // pray that ids are correct
-        }
-    }
-    return nv;
-}
-
-/**
- * Returns a vector of newly created segments since the last call of RootSystem::simulate(dt),
- * to dynamically add to the old segment index vector, see also RootSystem::getSegments
- */
-std::vector<Vector2i> RootSystem::getNewSegments() const
-{
-    this->getRoots(); // update roots (if necessary)
-    std::vector<Vector2i> si(this->getNumberOfNewNodes());
-    int c=0;
-    for (const auto& r : roots) {
-        int onon = std::abs(r->getOldNumberOfNodes());
-        for (size_t i=onon-1; i<r->getNumberOfNodes()-1; i++) {
-            Vector2i v(r->getNodeId(i),r->getNodeId(i+1));
-            si.at(c) = v;
-            c++;
-        }
-    }
-    return si;
-}
-
-/**
- * Returns a vector of pointers to the root class containing the segments, for each newly created segment
- */
-std::vector<Root*> RootSystem::getNewSegmentsOrigin() const
-{
-    this->getRoots(); // update roots (if necessary)
-    std::vector<Root*> si(this->getNumberOfNewNodes());
-    int c=0;
-    for (auto& r:roots) {
-        int onon = std::abs(r->getOldNumberOfNodes());
-        for (size_t i=onon-1; i<r->getNumberOfNodes()-1; i++) {
-            si.at(c) = r;
-            c++;
-        }
-    }
-    return si;
-}
-
-/**
- * Returns a vector of newly created node ermegence times since the last call of RootSystem::simulate(dt),
- * to dynamically add to the old node vector, see also RootSystem::getNodes
- */
-std::vector<double> RootSystem::getNewNETimes() const
-{
-    this->getRoots(); // update roots (if necessary)
-    std::vector<double> nodeCTs(this->getNumberOfNewNodes());
-    for (const auto& r : roots) {
-        int onon = std::abs(r->getOldNumberOfNodes());
-        for (size_t i=onon; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
-            nodeCTs.at(r->getNodeId(i)-this->old_non) = r->getNodeCT(i); // pray that ids are correct
-
-        }
-    }
-    return nodeCTs;
-}
-
-/**
- * Returns a vector of emergence times of newly created segments since the last call of RootSystem::simulate(dt)
- */
-std::vector<double> RootSystem::getNewSegmentsTimes() const
-{
-    this->getRoots(); // update roots (if necessary)
-    std::vector<double> setimes(this->getNumberOfNewNodes());
-    int c=0;
-    for (const auto& r : roots) {
-        int onon = std::abs(r->getOldNumberOfNodes());
-        for (size_t i=onon-1; i<r->getNumberOfNodes()-1; i++) {
-            setimes.at(c) = r->getNodeCT(i);
-            c++;
-        }
-    }
-    return setimes;
-}
-
-/**
- *
+ * Pushes current root system state to the stack
  */
 void RootSystem::push()
 {
@@ -691,7 +473,7 @@ void RootSystem::push()
 }
 
 /**
- *
+ * Retrieves previous root system state from the stack
  */
 void RootSystem::pop()
 {
@@ -701,11 +483,14 @@ void RootSystem::pop()
 }
 
 /**
- * todo
+ * @return quick info about the root system for debugging
  */
 std::string RootSystem::toString() const
 {
-    return Organism::toString();
+    std::stringstream str;
+    str << "Rootsystem with "<< baseOrgans.size() <<" base roots, " << getNumberOfNodes()
+                            << " nodes, and a total of " << getNumberOfOrgans() << " roots, after " << getSimTime() << " days";
+    return str.str();
 }
 
 /**
@@ -749,7 +534,7 @@ void RootSystem::writeVTP(std::ostream & os) const
 {
     this->getRoots(); // update roots (if necessary)
     const auto& nodes = getPolylines();
-    const auto& times = getPolylinesNET();
+    const auto& times = getPolylinesCTs();
 
     os << "<?xml version=\"1.0\"?>";
     os << "<VTKFile type=\"PolyData\" version=\"0.1\" byte_order=\"LittleEndian\">\n";
@@ -760,7 +545,6 @@ void RootSystem::writeVTP(std::ostream & os) const
     }
     int nol=roots.size(); // number of lines
     os << "<Piece NumberOfLines=\""<< nol << "\" NumberOfPoints=\""<<non<<"\">\n";
-
     // POINTDATA
     os << "<PointData Scalars=\" PointData\">\n" << "<DataArray type=\"Float32\" Name=\"time\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
     for (const auto& r: times) {
@@ -769,21 +553,19 @@ void RootSystem::writeVTP(std::ostream & os) const
         }
     }
     os << "\n</DataArray>\n" << "\n</PointData>\n";
-
     // CELLDATA (live on the polylines)
     os << "<CellData Scalars=\" CellData\">\n";
     const size_t N = 3; // SCALARS
     std::string scalarTypeNames[N] = {"type", "order", "radius" };
     for (size_t i=0; i<N; i++) {
         os << "<DataArray type=\"Float32\" Name=\"" << scalarTypeNames[i] <<"\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
-        auto scalars = getParameters(scalarTypeNames[i]);
+        auto scalars = getParameter(scalarTypeNames[i]);
         for (auto s : scalars) {
             os << s<< " ";
         }
         os << "\n</DataArray>\n";
     }
     os << "\n</CellData>\n";
-
     // POINTS (=nodes)
     os << "<Points>\n"<<"<DataArray type=\"Float32\" Name=\"Coordinates\" NumberOfComponents=\"3\" format=\"ascii\" >\n";
     for (const auto& r : nodes) {
@@ -792,7 +574,6 @@ void RootSystem::writeVTP(std::ostream & os) const
         }
     }
     os << "\n</DataArray>\n"<< "</Points>\n";
-
     // LINES (polylines)
     os << "<Lines>\n"<<"<DataArray type=\"Int32\" Name=\"connectivity\" NumberOfComponents=\"1\" format=\"ascii\" >\n";
     int c=0;
@@ -832,9 +613,11 @@ void RootSystem::writeGeometry(std::ostream & os) const
 
 
 /**
- * todo docme
+ * Create a root system state object from a rootsystem, use RootSystemState::restore to go back to that state.
+ *
+ * @param rs        the root system to be stored
  */
-RootSystemState::RootSystemState(const RootSystem& rs) : simtime(rs.simtime), rid(rs.organId), old_non(rs.old_non), old_nor(rs.old_nor),
+RootSystemState::RootSystemState(const RootSystem& rs) : simtime(rs.simtime), rid(rs.organId), old_non(rs.oldNumberOfNodes), old_nor(rs.oldNumberOfOrgans),
     numberOfCrowns(rs.numberOfCrowns), gen(rs.gen), UD(rs.UD), ND(rs.ND)
 {
     baseRoots = std::vector<RootState>(rs.baseOrgans.size()); // store base roots
@@ -844,23 +627,68 @@ RootSystemState::RootSystemState(const RootSystem& rs) : simtime(rs.simtime), ri
 }
 
 /**
- * todo docme
+ * Restore evolved rootsystem back to its previous state
+ *
+ * @param rs    the root system to be restored
  */
 void RootSystemState::restore(RootSystem& rs)
 {
     rs.roots.clear(); // clear buffer
-    // rs.rtparam  = rtparam; // TODO parameters are not restored !!! this might not work right now...
     rs.simtime = simtime; // copy back everything
     rs.organId = rid;
     rs.nodeId = nid;
-    rs.old_non = old_non;
-    rs.old_nor = old_nor;
+    rs.oldNumberOfNodes = old_non;
+    rs.oldNumberOfOrgans = old_nor;
     rs.numberOfCrowns = numberOfCrowns;
     rs.gen = gen;
     rs.UD = UD;
     rs.ND = ND;
     for (size_t i=0; i<baseRoots.size(); i++) { // restore base roots
         baseRoots[i].restore(*((Root*)rs.baseOrgans[i]));
+    }
+}
+
+/**
+ * Create a root state object from a root, use RootState::restore to go back to that state.
+ *
+ * @param r        the root to be stored
+ */
+RootState::RootState(const Root& r): alive(r.alive), active(r.active), age(r.age), length(r.length), old_non(r.oldNumberOfNodes)
+{
+    lNode = r.nodes.back();
+    lNodeId = r.nodeIds.back();
+    lneTime = r.nodeCTs.back();
+    non = r.nodes.size();
+    laterals = std::vector<RootState>(r.children.size());
+    for (size_t i=0; i<laterals.size(); i++) {
+        laterals[i] = RootState(*((Root*)r.children[i]));
+    }
+}
+
+/**
+ * Restore evolved root back to its previous state
+ *
+ * @param r    the root to be restored
+ */
+void RootState::restore(Root& r)
+{
+    r.alive = alive; // copy things that changed
+    r.active = active;
+    r.age = age;
+    r.length = length;
+    r.oldNumberOfNodes = old_non;
+    r.nodes.resize(non); // shrink vectors
+    r.nodeIds.resize(non);
+    r.nodeCTs.resize(non);
+    r.nodes.back() = lNode; // restore last value
+    r.nodeIds.back() = lNodeId;
+    r.nodeCTs.back() = lneTime;
+    for (size_t i = laterals.size(); i<r.children.size(); i++) { // delete roots that have not been created
+        delete r.children[i];
+    }
+    r.children.resize(laterals.size()); // shrink and restore laterals
+    for (size_t i=0; i<laterals.size(); i++) {
+        laterals[i].restore(*((Root*)r.children[i]));
     }
 }
 

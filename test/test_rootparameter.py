@@ -107,7 +107,6 @@ class TestRootParameter(unittest.TestCase):
         self.assertEqual(p.subType, 1, "realize: unexpected sub type")
         self.assertEqual(p.a, 0.1, "realize: unexpected value")
         self.assertEqual(len(p.ln) + 1, self.rtp.nob, "realize: internodal distances +1 should be  number of laterals")
-        # print(p)
 
 
 if __name__ == '__main__':

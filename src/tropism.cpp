@@ -10,7 +10,7 @@
 namespace CRootBox {
 
 /**
- * todo
+ * Copies this tropism
  */
 Tropism* Tropism::copy(Organism* plant)
 {

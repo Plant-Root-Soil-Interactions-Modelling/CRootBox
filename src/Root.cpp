@@ -57,7 +57,7 @@ Root::Root(Organism* rs, int type, Vector3d heading, double delay,  Root* parent
 }
 
 /**
- * Deep copies the organ into the new plant @param plant.
+ * Deep copies the organ into the new plant @param rs.
  * All laterals are deep copied, plant and parent pointers are updated.
  *
  * @param plant     the plant the copied organ will be part of
@@ -65,11 +65,11 @@ Root::Root(Organism* rs, int type, Vector3d heading, double delay,  Root* parent
 Organ* Root::copy(Organism* rs)
 {
     Root* r = new Root(*this); // shallow copy
-    r->param_ = new RootParameter(*param()); // copy parameters
     r->parent = nullptr;
-    r->plant = plant;
+    r->plant = rs;
+    r->param_ = new RootParameter(*param()); // copy parameters
     for (size_t i=0; i< children.size(); i++) {
-        r->children[i] = children[i]->copy(plant); // copy laterals
+        r->children[i] = children[i]->copy(rs); // copy laterals
         r->children[i]->setParent(this);
     }
     return r;
@@ -86,7 +86,6 @@ void Root::simulate(double dt, bool verbose)
     firstCall = true;
     moved = false;
     oldNumberOfNodes = nodes.size();
-
     const RootParameter& p = *param(); // rename
 
     if (alive) { // dead roots wont grow
@@ -239,6 +238,7 @@ double Root::calcAge(double length)
  */
 RootTypeParameter* Root::getRootTypeParameter() const
 {
+    // std::cout << "getRootTypeParameter " << param_->subType << "\n";
     return (RootTypeParameter*)plant->getOrganTypeParameter(Organism::ot_root, param_->subType);
 }
 
@@ -338,7 +338,6 @@ void Root::createSegments(double l, bool verbose)
             }
         }
         sl += sdx;
-
         Vector3d newdx = getIncrement(nodes.back(), sdx);
         Vector3d newnode = Vector3d(nodes.back().plus(newdx));
         double et = this->calcCreationTime(length+sl);
@@ -346,7 +345,6 @@ void Root::createSegments(double l, bool verbose)
         // in case of impeded growth the node emergence time is not exact anymore,
         // but might break down to temporal resolution
         addNode(newnode,et);
-
     }
 }
 
@@ -357,7 +355,8 @@ void Root::createSegments(double l, bool verbose)
  *  @param sdx     length of next segment [cm]
  *  @return        the vector representing the increment
  */
-Vector3d Root::getIncrement(const Vector3d& p, double sdx) {
+Vector3d Root::getIncrement(const Vector3d& p, double sdx)
+{
     Vector3d h; // current heading
     if (nodes.size() > 1) {
         h = nodes.back().minus(nodes.at(nodes.size() - 2));
@@ -369,20 +368,6 @@ Vector3d Root::getIncrement(const Vector3d& p, double sdx) {
     Vector2d ab = getRootTypeParameter()->f_tf->getHeading(p, ons, sdx, this);
     Vector3d sv = ons.times(Vector3d::rotAB(ab.x,ab.y));
     return sv.times(sdx);
-    // TODO how to we solve that?! OVERWRITE in specialisation
-    //    if (((RootSystem*)plant)->poreGeometry==nullptr) { // no pores defined
-    //        return sv.times(sdx);
-    //    } else {
-    //        if (((RootSystem*)plant)->poreGeometry->getDist(p)<0) { // inside the pore
-    //            auto sv1 = ((RootSystem*)plant)->applyPoreConductivities(sv);
-    //            // std::cout << "Length before " << sv.length() << ", length after " << sv1.length() << "\n";
-    //            sv1.normalize();
-    //            return sv1.times(sdx);
-    //        } else {
-    //            return sv.times(sdx);
-    //        }
-    //    }
-
 }
 
 /**
@@ -392,7 +377,8 @@ Vector3d Root::getIncrement(const Vector3d& p, double sdx) {
  * lnMean, and lnDev denotes the mean and standard deviation of the inter-lateral distance of this organ
  * ln_mean, and ln_dev is the mean and standard deviation from the root type parameters
  */
-double Root::getParameter(std::string name) const {
+double Root::getParameter(std::string name) const
+{
     if (name=="lb") { return param()->lb; } // basal zone [cm]
     if (name=="la") { return param()->la; } // apical zone [cm]
     if (name=="nob") { return param()->nob; } // number of branches
@@ -432,48 +418,6 @@ std::string Root::toString() const
     str << "Root #"<< id <<": type "<<param()->subType << ", length: "<< length << ", age: " <<age<<" with "
         << children.size() << " laterals" << std::endl;
     return str.str();
-}
-
-
-
-/**
- * TODO docme
- */
-RootState::RootState(const Root& r): alive(r.alive), active(r.active), age(r.age), length(r.length), old_non(r.oldNumberOfNodes)
-{
-    lNode = r.nodes.back();
-    lNodeId = r.nodeIds.back();
-    lneTime = r.nodeCTs.back();
-    non = r.nodes.size();
-    laterals = std::vector<RootState>(r.children.size());
-    for (size_t i=0; i<laterals.size(); i++) {
-        laterals[i] = RootState(*((Root*)r.children[i]));
-    }
-}
-
-/**
- * TODO docme
- */
-void RootState::restore(Root& r)
-{
-    r.alive = alive; // copy things that changed
-    r.active = active;
-    r.age = age;
-    r.length = length;
-    r.oldNumberOfNodes = old_non;
-    r.nodes.resize(non); // shrink vectors
-    r.nodeIds.resize(non);
-    r.nodeCTs.resize(non);
-    r.nodes.back() = lNode; // restore last value
-    r.nodeIds.back() = lNodeId;
-    r.nodeCTs.back() = lneTime;
-    for (size_t i = laterals.size(); i<r.children.size(); i++) { // delete roots that have not been created
-        delete r.children[i];
-    }
-    r.children.resize(laterals.size()); // shrink and restore laterals
-    for (size_t i=0; i<laterals.size(); i++) {
-        laterals[i].restore(*((Root*)r.children[i]));
-    }
 }
 
 } // end namespace CRootBox

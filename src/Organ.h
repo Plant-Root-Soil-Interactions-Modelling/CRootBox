@@ -65,7 +65,8 @@ public:
     double getNodeCT(int i) const { return nodeCTs.at(i); } ///< creation time of the i-th node
     void addNode(Vector3d n, double t); //< adds a node to the root
     void addNode(Vector3d n, int id, double t); //< adds a node to the root
-    virtual std::vector<Vector2i> getSegments() const; // /< default, the organ is represented by a polyline
+    virtual int getNumberOfSegments() { return nodes.size()-1; } ///<  per default, the organ is represented by a polyline, i.e. getNumberOfNodes()-1
+    virtual std::vector<Vector2i> getSegments() const; ///< per default, the organ is represented by a polyline
 
     /* last time step */
     bool hasMoved() { return moved; }; ///< have any nodes moved during the last simulate call

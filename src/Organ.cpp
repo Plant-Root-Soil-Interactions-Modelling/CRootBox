@@ -73,14 +73,14 @@ Organ::~Organ()
  * @param plant     the plant the copied organ will be part of
  * @return          the newly created copy (ownership is passed)
  */
-Organ* Organ::copy(Organism* plant)
+Organ* Organ::copy(Organism* p)
 {
     Organ* o = new Organ(*this); // shallow copy
     o->parent=nullptr;
-    o->plant = plant;
+    o->plant = p;
     o->param_ = new OrganParameter(*param_); // copy parameters
-    for (size_t i=0; i< o->children.size(); i++) {
-        o->children[i] = children[i]->copy(plant); // copy lateral
+    for (size_t i=0; i< children.size(); i++) {
+        o->children[i] = children[i]->copy(p); // copy lateral
         o->children[i]->setParent(this);
     }
     return o;
@@ -305,7 +305,7 @@ void Organ::writeRSML(tinyxml2::XMLDocument& doc, tinyxml2::XMLElement* parent) 
         int nn = plant->getRSMLSkip()+1;
         // organ
         // std::string name = getOrganTypeParameter()->name; // todo where to put it
-        tinyxml2::XMLElement* organ = doc.NewElement("root");
+        tinyxml2::XMLElement* organ = doc.NewElement("root"); // TODO use ot to fetch tag name?
         organ->SetAttribute("ID", id);
         // geometry
         tinyxml2::XMLElement* geometry = doc.NewElement("geometry");

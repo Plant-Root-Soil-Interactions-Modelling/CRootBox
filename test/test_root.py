@@ -23,7 +23,7 @@ def rootLateralLength(t, et, r, k):  # length of first order laterals (without s
 class TestRoot(unittest.TestCase):
 
     def root_example_rtp(self):
-        """ an example used in the tests below, a main root with laterals (85%) and lateral mains (15%) """
+        """ an example used in the tests below, a main root with laterals """
         self.plant = rb.Organism()  # Root has no dependency on RootSystem anymore
         p0 = rb.RootTypeParameter(self.plant)
         p1 = rb.RootTypeParameter(self.plant)
@@ -51,10 +51,11 @@ class TestRoot(unittest.TestCase):
         self.p1 = p1
         self.plant.setOrganTypeParameter(self.p0)  # the organism manages the type parameters
         self.plant.setOrganTypeParameter(self.p1)
-        param = self.p0.realize()  # set up root by hand (without a root system)
-        param.la = 0  # its important parent has zero length, otherwise creation times are messed up
-        param.lb = 0
-        parentroot = rb.Root(1, param, True, True, 0., 0., rb.Vector3d(0, 0, -1), 0, 0, False, 0)
+        self.param0 = self.p0.realize()  # set up root by hand (without a root system)
+        self.param0 .la = 0  # its important parent has zero length, otherwise creation times are messed up
+        self.param0 .lb = 0
+        # param0 is stored, because otherwise garbage collection deletes it, an program will crash <---
+        parentroot = rb.Root(1, self.param0, True, True, 0., 0., rb.Vector3d(0, 0, -1), 0, 0, False, 0)
         parentroot.setOrganism(self.plant)
         parentroot.addNode(rb.Vector3d(0, 0, -3), 0)  # there is no nullptr in Python
         self.root = rb.Root(self.plant, self.p0.subType, rb.Vector3d(0, 0, -1), 0, parentroot, 0, 0)
@@ -104,7 +105,7 @@ class TestRoot(unittest.TestCase):
         # TODO check if OTP were copied
 
     def test_root_length(self):
-        """ tests if numerical root length agrees with analytic solutions ate 4 points in time"""
+        """ tests if numerical root length agrees with analytic solutions at 4 points in time with two scales of dt"""
         self.root_example_rtp()
         times = np.array([0., 7., 15., 30., 60.])
         dt = np.diff(times)
@@ -112,9 +113,9 @@ class TestRoot(unittest.TestCase):
         self.assertAlmostEqual(k, 100, 12, "example root has wrong maximal length")
         l = rootLength(times[1:], self.p0.r, k)  # analytical root length
         root = self.root.copy(self.plant)
-        self.root_length_test(dt, l, 1)
+        self.root_length_test(dt, l, 1)  # large dt
         self.root = root
-        self.root_length_test(dt, l, 1000)
+        self.root_length_test(dt, l, 1000)  # very fine dt
 
     def test_root_length_including_laterals(self):
         """ tests if numerical root length agrees with analytic solution including laterals """
@@ -178,18 +179,13 @@ class TestRoot(unittest.TestCase):
         self.root_example_rtp()
         r = self.root
         r.simulate(.5, True)
-        # print(r.getNumberOfNodes() - r.getOldNumberOfNodes(), "nodes created at resolution", r.dx(), "cm")
         self.assertEqual(r.hasMoved(), False, "dynamics: node movement during first step")
         r.simulate(1e-1, True)
-        # print(r.getNumberOfNodes() - r.getOldNumberOfNodes(), "nodes created at resolution", r.dx(), "cm")
-        self.assertEqual(r.hasMoved(), False, "dynamics: movement, but node at grid point")
+        self.assertEqual(r.hasMoved(), False, "dynamics: movement, but previous node at axial resolution")
         r.simulate(1e-1, True)
-        self.assertEqual(r.hasMoved(), True, "dynamics: node movement during first step")
-        # print(r.getNumberOfNodes() - r.getOldNumberOfNodes(), "nodes created at resolution", r.dx(), "cm")
+        self.assertEqual(r.hasMoved(), True, "dynamics: node was expected to move, but did not")
         r.simulate(2.4, True)
-        # print(r.getNumberOfNodes() - r.getOldNumberOfNodes(), "nodes created at resolution", r.dx(), "cm")
-        self.assertEqual(r.getNumberOfNodes() - r.getOldNumberOfNodes(), 6, "dynamics: node movement during first step")
-        # extra node for end of basal zone
+        self.assertEqual(r.getNumberOfNodes() - r.getOldNumberOfNodes(), 6, "dynamics: unexcpected number of new nodes")
 
 
 if __name__ == '__main__':

@@ -36,59 +36,19 @@ std::string RootParameter::toString() const
     return str.str();
 }
 
+
+
 /**
  * Default constructor sets up hashmaps for class introspection
  */
-RootTypeParameter::RootTypeParameter(Organism* plant) :OrganTypeParameter(plant)
+RootTypeParameter::RootTypeParameter(Organism* p) :OrganTypeParameter(p)
 {
     // base class default values
     name = "undefined";
     organType = Organism::ot_root;
     subType = -1;
-    f_tf = new Tropism(plant);
-    // set up class introspection
-    dparam["lb"] = &lb;
-    param_sd["lb"] = &lbs;
-    description["lb"] = "Basal zone [cm]";
-    dparam["la"] = &la;
-    param_sd["la"] = &las;
-    description["la"] = "Apical zone [cm]";
-    dparam["ln"] = &ln;
-    param_sd["ln"] = &lns;
-    description["ln"] = "Inter-lateral distance [cm]";
-    dparam["nob"] = &nob;
-    param_sd["nob"] = &nobs;
-    description["nob"] = "Maximal number of laterals [1]";
-    dparam["r"] = &r;
-    param_sd["r"] = &rs;
-    description["r"] = "Initial growth rate [cm day-1]";
-    dparam["a"] = &a;
-    param_sd["a"] = &as;
-    description["a"] = "Root radius [cm]";
-    dparam["colorR"] = &colorR;
-    description["colorR"] = "Root color, red component [0.-1.]";
-    dparam["colorG"] = &colorG;
-    description["colorG"] = "Root color, green component [0.-1.]";
-    dparam["colorB"] = &colorB;
-    description["colorB"] = "Root color, blue component [0.-1.]";
-    iparam["tropismT"] = &tropismT;
-    description["tropismT"] = "Type of root tropism (plagio = 0, gravi = 1, exo = 2, hydro, chemo = 3)";
-    dparam["tropismN"] = &tropismN;
-    description["tropismN"] = "Number of trials of root tropism";
-    dparam["tropismS"] = &tropismS;
-    description["tropismS"] = "Mean value of expected change of root tropism [1/cm]";
-    dparam["dx"] = &dx;
-    description["dx"] = "Axial resolution [cm] (maximal segment size)";
-    dparam["theta"] = &theta;
-    param_sd["theta"] = &thetas;
-    description["theta"] = "Angle between root and parent root [rad]";
-    dparam["rlt"] = &rlt;
-    param_sd["rlt"] = &rlts;
-    description["rlt"] = "Root life time [day]";
-    iparam["gf"] = &gf;
-    description["gf"] = "Growth function (negative exponential = 1, linear = 2)";
-    description["successor"] = "Sub type of lateral roots";
-    description["successorP"] = "Probability of each sub type to occur";
+    f_tf = new Tropism(p);
+    bindParmaters();
 }
 
 /**
@@ -106,17 +66,17 @@ RootTypeParameter::~RootTypeParameter()
 /**
  * @copydoc OrganTypeParameter::copy()
  */
-OrganTypeParameter* RootTypeParameter::copy(Organism* plant)
+OrganTypeParameter* RootTypeParameter::copy(Organism* p)
 {
-    RootTypeParameter* rtp = new RootTypeParameter(plant);
-    rtp = this;// calls default copy constructor
-    rtp->plant = plant;
-    f_tf = f_tf->copy(plant);
-    f_gf = f_gf->copy();
-    f_se = f_se->copy();
-    f_sa = f_sa->copy();
-    f_sbp = f_sbp->copy();
-    return rtp;
+    RootTypeParameter* r = new RootTypeParameter(*this); // copy constructor breaks class introspection
+    r->plant = p;
+    r->bindParmaters(); // fix class introspection
+    r->f_tf = f_tf->copy(p); // copy call back classes
+    r->f_gf = f_gf->copy();
+    r->f_se = f_se->copy();
+    r->f_sa = f_sa->copy();
+    r->f_sbp = f_sbp->copy();
+    return r;
 }
 
 /**
@@ -127,7 +87,7 @@ OrganTypeParameter* RootTypeParameter::copy(Organism* plant)
  */
 OrganParameter* RootTypeParameter::realize()
 {
-    // std::cout << "realize()\n" << std::flush;
+    //& std::cout << "RootTypeParameter::realize(): subType " << subType << "\n" << std::flush;
     double lb_ = std::max(lb + plant->randn()*lbs, 0.); // length of basal zone
     double la_ = std::max(la + plant->randn()*las, 0.); // length of apical zone
     std::vector<double> ln_; // stores the inter-distances
@@ -280,7 +240,6 @@ tinyxml2::XMLElement* RootTypeParameter::writeXML(tinyxml2::XMLDocument& doc, bo
  * CRootBox parameter write
  * todo Depricated: use writeXML instead
  */
-
 void RootTypeParameter::write(std::ostream & cout) const {
     cout << "# Root type parameter for " << name << "\n";
     cout << "type\t" << subType << "\n" << "name\t" << name << "\n" << "lb\t"<< lb <<"\t"<< lbs << "\n" << "la\t"<< la <<"\t"<< las << "\n"
@@ -346,6 +305,61 @@ void RootTypeParameter::read(std::istream & cin) {
         successorP.push_back(ds);
     }
     cin >> s >> theta >> thetas >> s >> rlt >> rlts >> s >> gf >> s;
+}
+
+/**
+ * Sets up class introspection by linking parameter names to their class members,
+ * additionally adds a description for each parameter, for toString and writeXML
+ */
+void RootTypeParameter::bindParmaters()
+{
+    iparam["organType"] = &organType; //parameters from OrganTypeparameters
+    iparam["subType"] = &subType;
+    description["name"]  = "Name of the sub type of the organ, e.g. small lateral";
+    description["organType"]  = "Organ type (unspecified organ = 0, seed = 1, root = 2, stem = 3, leaf = 4)";
+    description["subType"]  = "Unique identifier of this sub type";
+    dparam["lb"] = &lb; // parameters from RootTypeParameter
+    param_sd["lb"] = &lbs;
+    description["lb"] = "Basal zone [cm]";
+    dparam["la"] = &la;
+    param_sd["la"] = &las;
+    description["la"] = "Apical zone [cm]";
+    dparam["ln"] = &ln;
+    param_sd["ln"] = &lns;
+    description["ln"] = "Inter-lateral distance [cm]";
+    dparam["nob"] = &nob;
+    param_sd["nob"] = &nobs;
+    description["nob"] = "Maximal number of laterals [1]";
+    dparam["r"] = &r;
+    param_sd["r"] = &rs;
+    description["r"] = "Initial growth rate [cm day-1]";
+    dparam["a"] = &a;
+    param_sd["a"] = &as;
+    description["a"] = "Root radius [cm]";
+    dparam["colorR"] = &colorR;
+    description["colorR"] = "Root color, red component [0.-1.]";
+    dparam["colorG"] = &colorG;
+    description["colorG"] = "Root color, green component [0.-1.]";
+    dparam["colorB"] = &colorB;
+    description["colorB"] = "Root color, blue component [0.-1.]";
+    iparam["tropismT"] = &tropismT;
+    description["tropismT"] = "Type of root tropism (plagio = 0, gravi = 1, exo = 2, hydro, chemo = 3)";
+    dparam["tropismN"] = &tropismN;
+    description["tropismN"] = "Number of trials of root tropism";
+    dparam["tropismS"] = &tropismS;
+    description["tropismS"] = "Mean value of expected change of root tropism [1/cm]";
+    dparam["dx"] = &dx;
+    description["dx"] = "Axial resolution [cm] (maximal segment size)";
+    dparam["theta"] = &theta;
+    param_sd["theta"] = &thetas;
+    description["theta"] = "Angle between root and parent root [rad]";
+    dparam["rlt"] = &rlt;
+    param_sd["rlt"] = &rlts;
+    description["rlt"] = "Root life time [day]";
+    iparam["gf"] = &gf;
+    description["gf"] = "Growth function (negative exponential = 1, linear = 2)";
+    description["successor"] = "Sub type of lateral roots";
+    description["successorP"] = "Probability of each sub type to occur";
 }
 
 } // end namespace CRootBox

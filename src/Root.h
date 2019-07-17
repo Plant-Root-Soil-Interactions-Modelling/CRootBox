@@ -21,7 +21,7 @@ class RootState;
 class Root :public Organ
 {
 
-    friend RootState;  //defined below
+    friend RootState;
 
 public:
 
@@ -60,50 +60,13 @@ public:
 
 protected:
 
-    bool firstCall = true; ///< firstCall of createSegments in simulate
-
     void createSegments(double l, bool silence); ///< creates segments of length l, called by Root::simulate()
     virtual Vector3d getIncrement(const Vector3d& p, double sdx); ///< called by createSegments, to determine growth direction
     virtual void createLateral(bool silence); ///< creates a new lateral, called by Root::simulate()
     Vector3d heading(); ///< current growth direction of the root
 
+    bool firstCall = true; ///< firstCall of createSegments in simulate
     const double smallDx = 1e-6; ///< threshold value, smaller segments will be skipped (otherwise root tip direction can become NaN)
-
-};
-
-
-
-/**
- * Stores a state of the root that can be restored at a later point
- * (for RootSystem::push and RootSystem::pop)
- */
-class RootState {
-
-public:
-
-    RootState() { };
-
-    RootState(const Root& r);
-
-    void restore(Root& r);
-
-private:
-
-    /* parameters that are given per root that may change with time */
-    bool alive = 1; ///< true: alive, false: dead
-    bool active = 1; ///< true: active, false: root stopped growing
-    double age = 0; ///< current age [days]
-    double length = 0; ///< actual length [cm] of the root. might differ from getLength(age) in case of impeded root growth
-    int old_non = 1; ///< number of old nodes, the sign is positive if the last node was updated, otherwise its negative
-
-    /* down the root branch*/
-    std::vector<RootState> laterals = std::vector<RootState>(0); ///< the lateral roots of this root
-
-    /* last node */
-    Vector3d lNode = Vector3d(0.,0.,0.);
-    int lNodeId = 0;
-    double lneTime = 0.;
-    size_t non = 0;
 
 };
 

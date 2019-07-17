@@ -77,19 +77,23 @@ SegmentAnalyser (SegmentAnalyser::*cut1)(const SDF_HalfPlane& plane) const = &Se
  * Default arguments: no idea how to do it by hand, magic everywhere...
  */
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getOrgans_overloads, getOrgans, 0, 1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getParameters_overloads, getParameters, 1, 3);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getParameter_overloads, getParameter, 1, 3);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSummed_overloads, getSummed, 1, 2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNumberOfSegments_overloads, getNumberOfSegments, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getPolylines_overloads, getPolylines, 0, 1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getPolylinesIds_overloads, getPolylinesIds, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getPolylinesCTs_overloads, getPolylinesCTs, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegments_overloads, getSegments, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentCTs_overloads, getSegmentCTs, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentOrigins_overloads, getSegmentOrigins, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNewSegments_overloads, getNewSegments, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNewSegmentCTs_overloads, getNewSegmentCTs, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNewSegmentOrigins_overloads, getNewSegmentOrigins, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openFile_overloads,openFile,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate1_overloads,simulate,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate3_overloads,simulate,3,4);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getValue_overloads,getValue,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(tropismObjective_overloads,tropismObjective,5,6);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNumberOfRoots_overloads,getNumberOfRoots,0,1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentCTs_overloads, getSegmentCTs, 0, 1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegments_overloads, getSegments, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(toString_overloads, toString, 0, 1);
 
 /**
@@ -317,7 +321,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
      */
     class_<Organ, Organ*>("Organ", init<Organism*, Organ*, int, int, double>())
         .def(init<int, OrganParameter*, bool, bool, double, double, bool, int>())
-        .def("copy",&Organ::copy, return_value_policy<reference_existing_object>())
+        .def("copy",&Organ::copy, return_value_policy<reference_existing_object>()) // manage_new_object
         .def("organType",&Organ::organType)
         .def("simulate",&Organ::simulate, simulate1_overloads())
         .def("setParent",&Organ::setParent)
@@ -355,29 +359,51 @@ BOOST_PYTHON_MODULE(py_rootbox)
      */
     class_<Organism, Organism*>("Organism", init<>())
         .def(init<Organism&>())
+        .def("organTypeNumber", &Organism::organTypeNumber)
+        .def("organTypeName", &Organism::organTypeName)
         .def("getOrganTypeParameter", getOrganTypeParameter1, return_value_policy<reference_existing_object>())
         .def("getOrganTypeParameter", getOrganTypeParameter2)
         .def("setOrganTypeParameter", &Organism::setOrganTypeParameter)
+
         .def("addOrgan", &Organism::addOrgan)
         .def("initialize", &Organism::initialize)
         .def("simulate", &Organism::simulate, simulate1_overloads())
         .def("getSimTime", &Organism::getSimTime)
+
         .def("getOrgans", &Organism::getOrgans, getOrgans_overloads())
-        .def("getParameters", &Organism::getParameters, getParameters_overloads())
+        .def("getParameter", &Organism::getParameter, getParameter_overloads())
         .def("getSummed", &Organism::getSummed, getSummed_overloads())
-        .def("getPolylines", &Organism::getPolylines, getPolylines_overloads())
-        .def("getPolylinesIds", &Organism::getPolylinesIds, getPolylinesIds_overloads())
-        .def("getPolylinesCTs", &Organism::getPolylinesCTs, getPolylinesCTs_overloads())
+
         .def("getNumberOfOrgans", &Organism::getNumberOfOrgans)
         .def("getNumberOfNodes", &Organism::getNumberOfNodes)
+        .def("getNumberOfSegments", &Organism::getNumberOfSegments, getNumberOfSegments_overloads())
+        .def("getPolylines", &Organism::getPolylines, getPolylines_overloads())
+        .def("getPolylinesCTs", &Organism::getPolylinesCTs, getPolylinesCTs_overloads())
         .def("getNodes", &Organism::getNodes)
         .def("getNodesCTs", &Organism::getNodeCTs)
-        .def("getSegments", &Organism::getSegments)
-        .def("getSegmentCTs", &Organism::getSegmentCTs)
-        .def("getSegmentOrigins", &Organism::getSegmentOrigins)
+        .def("getSegments", &Organism::getSegments, getSegments_overloads())
+        .def("getSegmentCTs", &Organism::getSegmentCTs, getSegmentCTs_overloads())
+        .def("getSegmentOrigins", &Organism::getSegmentOrigins,  getSegmentOrigins_overloads())
+
+        .def("getNumberOfNewNodes", &Organism::getNumberOfNewNodes)
+        .def("getNumberOfNewOrgans", &Organism::getNumberOfNewOrgans)
+        .def("getUpdatedNodeIndices", &Organism::getUpdatedNodeIndices)
+        .def("getUpdatedNodes", &Organism::getUpdatedNodes)
+        .def("getNewNodes", &Organism::getNewNodes)
+        .def("getNewSegments", &Organism::getNewSegments,  getNewSegments_overloads())
+        .def("getNewSegmentOrigins", &Organism::getNewSegmentOrigins,  getNewSegmentOrigins_overloads())
+        .def("getNewSegmentCTs", &Organism::getNewSegmentCTs,  getNewSegmentCTs_overloads())
+
+        .def("readParameters", &Organism::readParameters) // todo overloads
+        .def("writeParameters", &Organism::writeParameters)  // todo overloads
         .def("writeRSML", &Organism::writeRSML)
+        .def("getRSMLSkip", &Organism::getRSMLSkip)
+        .def("setRSMLSkip", &Organism::setRSMLSkip)
+        .def("getRSMLProperties", &Organism::getRSMLProperties, return_value_policy<copy_non_const_reference>())
+
         .def("getOrganIndex", &Organism::getOrganIndex)
         .def("getNodeIndex", &Organism::getNodeIndex)
+
         .def("setSeed", &Organism::setSeed)
         .def("rand", &Organism::rand)
         .def("randn", &Organism::randn)
@@ -466,7 +492,6 @@ BOOST_PYTHON_MODULE(py_rootbox)
      * RootParameter.h
      */
     class_<RootTypeParameter, RootTypeParameter*, bases<OrganTypeParameter>>("RootTypeParameter", init<Organism*>())
-                .def("realize",&RootTypeParameter::realize, return_value_policy<reference_existing_object>())
                 .def("getLateralType",&RootTypeParameter::getLateralType)
                 .def("getK",&RootTypeParameter::getK)
                 .def_readwrite("type", &RootTypeParameter::subType)
@@ -541,7 +566,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
      * Root.h
      */
     class_<Root, Root*, bases<Organ>>("Root", init<Organism*, int, Vector3d, double, Root*, double, int>())
-            .def(init<int, OrganParameter*, bool, bool, double, double, Vector3d, double, int, bool, int >())
+            .def(init<int, OrganParameter*, bool, bool, double, double, Vector3d, double, int, bool, int >()) // with_custodian_and_ward<M,N> ?? dont know how to use it
             .def("calcCreationTime", &Root::calcCreationTime)
             .def("calcLength", &Root::calcLength)
             .def("calcAge", &Root::calcAge)
@@ -582,35 +607,18 @@ BOOST_PYTHON_MODULE(py_rootbox)
              .def("simulate",simulate3, simulate3_overloads())
              .def("getSimTime", &RootSystem::getSimTime)
              .def("getNumberOfNodes", &RootSystem::getNumberOfNodes)
-             .def("getNumberOfSegments", &RootSystem::getNumberOfSegments)
-             .def("getNumberOfRoots", &RootSystem::getNumberOfRoots, getNumberOfRoots_overloads())
              .def("getRoots", &RootSystem::getRoots)
+             .def("getNumberOfSegments", &RootSystem::getNumberOfSegments, getNumberOfSegments_overloads())
+             .def("getNumberOfRoots", &RootSystem::getNumberOfRoots, getNumberOfRoots_overloads())
              .def("getBaseRoots", &RootSystem::getBaseRoots)
-             .def("getNodes", &RootSystem::getNodes)
-             .def("getSegments", &RootSystem::getSegments, getSegments_overloads())
              .def("getShootSegments", &RootSystem::getShootSegments)
              .def("getSegmentOrigins", &RootSystem::getSegmentOrigins)
-             .def("getNETimes",&RootSystem::getSegmentCTs, getSegmentCTs_overloads())
              .def("getRootTips", &RootSystem::getRootTips)
              .def("getRootBases", &RootSystem::getRootBases)
-             .def("write", &RootSystem::write)
              .def("getNumberOfNewNodes",&RootSystem::getNumberOfNewNodes)
-             .def("getNumberOfNewRoots",&RootSystem::getNumberOfNewRoots)
-             .def("getUpdatedNodeIndices",&RootSystem::getUpdatedNodeIndices)
-             .def("getUpdatedNodes",&RootSystem::getUpdatedNodes)
-             .def("getNewNodes",&RootSystem::getNewNodes)
-             .def("getNewSegments",&RootSystem::getNewSegments)
-             .def("getNewSegmentsOrigin",&RootSystem::getNewSegmentsOrigin)
-             .def("getNewSegmentsTimes",&RootSystem::getNewSegmentsTimes)
              .def("push",&RootSystem::push)
              .def("pop",&RootSystem::pop)
-             .def("setSeed",&RootSystem::setSeed)
-             .def("rand",&RootSystem::rand)
-             .def("randn",&RootSystem::randn)
-//             .def("setPoreGeometry",&RootSystem::setPoreGeometry)
-//             .def("setPoreConductivity",&RootSystem::setPoreConductivity)
-//             .def("setPoreLocalAxes",&RootSystem::setPoreLocalAxes)
-//             .def("applyPoreConductivities",&RootSystem::applyPoreConductivities)
+             .def("write", &RootSystem::write)
              ;
     enum_<RootSystem::TropismTypes>("TropismType")
             .value("plagio", RootSystem::TropismTypes::tt_plagio)

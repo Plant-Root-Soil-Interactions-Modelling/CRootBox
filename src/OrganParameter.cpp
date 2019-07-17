@@ -40,9 +40,9 @@ OrganTypeParameter::OrganTypeParameter(Organism* plant): plant(plant)
  *
  * @return A new organ type parameter object, with same values as this
  */
-OrganTypeParameter* OrganTypeParameter::copy(Organism* plant)
+OrganTypeParameter* OrganTypeParameter::copy(Organism* p)
 {
-    OrganTypeParameter* o = new OrganTypeParameter(plant); // dparam, iparam, and param_sd must be handled in the constructor
+    OrganTypeParameter* o = new OrganTypeParameter(p);     // copy constructor would break class introspection
     o->name == name;
     o->organType = organType;
     o->subType = subType;
@@ -165,17 +165,7 @@ std::string OrganTypeParameter::toString(bool verbose) const
 void OrganTypeParameter::readXML(tinyxml2::XMLElement* element)
 {
     std::string type = element->Attribute("type");
-    std::vector<std::string> typenames = { "organ", "seed", "root", "stem", "leaf" };
-    int ot = 0;
-    try {
-        while (type.compare(typenames.at(ot))!=0) {
-            ot++;
-        }
-    } catch (const std::exception& e) {
-        std::cout << "OrganTypeParameter::readXML: unknown type\n";
-        throw(e);
-    }
-    this->organType = ot;
+    this->organType =  Organism::organTypeNumber(type);
     subType = element->IntAttribute("subType");
     name = element->Attribute("name");
 
@@ -225,16 +215,8 @@ void OrganTypeParameter::readXML(std::string name)
  */
 tinyxml2::XMLElement* OrganTypeParameter::writeXML(tinyxml2::XMLDocument& doc, bool comments) const
 {
-    std::string typeName;
-    switch (organType) {
-    case 0: typeName = "organ"; break;
-    case 1: typeName = "seed"; break;
-    case 2: typeName = "root"; break;
-    case 3: typeName = "stem"; break;
-    case 4: typeName = "leaf"; break;
-    }
-    tinyxml2::XMLElement* organ = doc.NewElement("organ");
-    organ->SetAttribute("type", typeName.c_str());
+    std::string typeName = Organism::organTypeName(organType);
+    tinyxml2::XMLElement* organ = doc.NewElement(typeName.c_str());
     organ->SetAttribute("name", name.c_str());
     organ->SetAttribute("subType", subType);
     for (auto& ip : iparam) { // int valued parameters
@@ -248,7 +230,7 @@ tinyxml2::XMLElement* OrganTypeParameter::writeXML(tinyxml2::XMLDocument& doc, b
                 p->SetAttribute("dev", d);
             }
             organ->InsertEndChild(p);
-            if (description.count(key)) { // descriptions
+            if (comments && description.count(key)) { // descriptions
                 std::string str = description.at(key);
                 tinyxml2::XMLComment* c = doc.NewComment(str.c_str());
                 organ->InsertEndChild(c);
@@ -260,12 +242,12 @@ tinyxml2::XMLElement* OrganTypeParameter::writeXML(tinyxml2::XMLDocument& doc, b
         if (!(key.compare("subType")==0 || key.compare("organType")==0)) { // already written in organ attributes
             tinyxml2::XMLElement* p = doc.NewElement("parameter");
             p->SetAttribute("name", key.c_str());
-            p->SetAttribute ("value", *dp.second);
+            p->SetAttribute ("value", float(*dp.second)); // float output is much nicer
             if (param_sd.count(key)) { // deviations
                 p->SetAttribute("dev", *(param_sd.at(key)));
             }
             organ->InsertEndChild(p);
-            if (description.count(key)) { // descriptions
+            if (comments && description.count(key)) { // descriptions
                 std::string str = description.at(key);
                 tinyxml2::XMLComment* c = doc.NewComment(str.c_str());
                 organ->InsertEndChild(c);

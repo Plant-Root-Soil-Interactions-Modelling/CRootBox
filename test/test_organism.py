@@ -37,7 +37,7 @@ class TestOrganism(unittest.TestCase):
     def test_copy(self):
         self.hand_example()
         human2 = rb.Organism(self.human1)  # copy constructor
-        self.assertIsNot(self.human1, human2, "copy: no a copy")
+        self.assertIsNot(self.human1, human2, "copy: not a copy")
         self.assertEqual(self.human1.rand(), human2.rand(), "copy: random generator seed was not copied")
         # todo check organs
         # check otps
@@ -62,10 +62,11 @@ class TestOrganism(unittest.TestCase):
         self.human1.addOrgan(self.hand)
         self.human1.writeRSML("organism.rsml")
         pl, props, funcs = read_rsml("organism.rsml")
-        # print(pl)
-
-    def test_random(self):
-        pass
+        pl2 = [[[0.0, 0.0, 0.0], [0.0, 0.0, 1.5], [0.0, -1.0, 1.6], [0.0, 1.0, 1.6]], [[0.0, -1.0, 1.6], [0.0, -2.0, 2.5]],
+               [[0.0, 1.0, 1.6], [0.0, 1.7, 2.5]], [[0.0, 0.0, 0.0], [0.0, 0.0, 1.5], [0.0, -1.0, 1.6], [0.0, 1.0, 1.6]],
+               [[0.0, -1.0, 1.6], [0.0, -2.0, 2.5]], [[0.0, 1.0, 1.6], [0.0, 1.7, 2.5]]]
+        self.assertEqual(pl, pl2, "rsml: polylines are not equal")
+        # todo test everything
 
 
 if __name__ == '__main__':

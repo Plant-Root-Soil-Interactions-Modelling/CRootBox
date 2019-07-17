@@ -34,15 +34,17 @@ public:
      * @param sigma_        standard deviation of angular change [1/cm]
      */
     Tropism(Organism* plant, double n_,double sigma_): plant(plant), n(n_), sigma(sigma_), geometry(nullptr) { }
-
     virtual ~Tropism() {};
+    virtual Tropism* copy(Organism* plant); ///< copy object, factory method
 
+    /* parameters */
     void setGeometry(SignedDistanceFunction* geom) { geometry = geom; } ///< sets a confining geometry
-    void setTropismParameter(double n_,double sigma_) { n=n_; sigma=sigma_; }
+    void setTropismParameter(double n_,double sigma_) { n=n_; sigma=sigma_; } ///< sets the tropism parameters
 
     virtual Vector2d getHeading(const Vector3d& pos, Matrix3d old,  double dx, const Organ* o = nullptr);
+    ///< constrained heading, dices n times and takes the best shot (according to the objective function)
     virtual Vector2d getUCHeading(const Vector3d& pos, Matrix3d old, double dx, const Organ* o);
-    ///< Get unconfined heading (called by getHeading), dices n times and takes the best shot (according to the objective function)
+    ///< Get unconfined heading (called by getHeading)
 
     /**
      * The objective function of the random optimization of getHeading(). Overwrite this function to implement a tropism.
@@ -58,8 +60,6 @@ public:
      */
     virtual double tropismObjective(const Vector3d& pos, Matrix3d old, double a, double b, double dx, const Organ* o = nullptr) { std::cout << "TropismFunction::tropismObjective() not overwritten\n"; return 0; }
     ///< The objective function of the random optimization of getHeading().
-
-    virtual Tropism* copy(Organism* plant); ///< copy object, factory method
 
     static Vector3d getPosition(const Vector3d& pos, Matrix3d old, double a, double b, double dx);
     ///< Auxiliary function: Applies angles a and b and goes dx [cm] into the new direction

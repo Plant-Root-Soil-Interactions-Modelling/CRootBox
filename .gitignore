@@ -4,15 +4,39 @@
 .settings/
 Debug/
 py_rootbox.so
-examples/Coupling_PSP/__pycache__/
 
-# CMake clutter
+# build system clutter
 build-*
 Testing
-CMakeCache.txt
-CMakeFiles/
-*.cmake
-*.a
 
 # auto-saved files
 *~
+
+# hidden files
+.cproject
+.project
+
+# latex clutter
+*.pdf
+*.aux
+*.blg
+*.log
+*.bbl
+*.dvi
+*.idx
+*.out
+*.tdo
+*.toc
+
+# something pythoon related
+*.pyc
+__pycache__
+
+# CMake
+*.cmake
+CMakeFiles
+Makefile
+*~
+
+
+
