@@ -46,6 +46,8 @@ OrganTypeParameter* (Organism::*getOrganTypeParameter1)(int otype, int subType) 
 std::vector<OrganTypeParameter*> (Organism::*getOrganTypeParameter2)(int otype) const = &Organism::getOrganTypeParameter;
 void (OrganTypeParameter::*readXML1)(std::string name) = &OrganTypeParameter::readXML;
 void (OrganTypeParameter::*writeXML1)(std::string name) const = &OrganTypeParameter::writeXML;
+void (OrganTypeParameter::*bindDoubleParameter)(std::string name, double* d, std::string descr, double* dev) = &OrganTypeParameter::bindParameter;
+void (OrganTypeParameter::*bindIntParameter)(std::string name, int* i, std::string descr, double* dev) = &OrganTypeParameter::bindParameter;
 
 void (Organ::*addNode1)(Vector3d n, double t) = &Organ::addNode;
 void (Organ::*addNode2)(Vector3d n, int id, double t)= &Organ::addNode;
@@ -95,6 +97,10 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getValue_overloads,getValue,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(tropismObjective_overloads,tropismObjective,5,6);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNumberOfRoots_overloads,getNumberOfRoots,0,1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(toString_overloads, toString, 0, 1);
+// BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(bindParameter_overloads, bindParameter, 2, 4);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(readParameters_overloads, readParameters, 1, 2);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(writeParameters_overloads, writeParameters, 1, 3);
+
 
 /**
  * Virtual functions
@@ -308,6 +314,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def("getParameter",&OrganTypeParameter::getParameter)
         .def("writeXML",writeXML1)
         .def("readXML",readXML1)
+//        .def("bindIntParameter",bindIntParameter, bindParameter_overloads())
+//        .def("bindDoubleParameter",bindDoubleParameter, bindParameter_overloads()) // not working, can't ass double*
         .def_readwrite("name",&OrganTypeParameter::name)
         .def_readwrite("organType",&OrganTypeParameter::organType)
         .def_readwrite("subType",&OrganTypeParameter::subType)
@@ -394,8 +402,8 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def("getNewSegmentOrigins", &Organism::getNewSegmentOrigins,  getNewSegmentOrigins_overloads())
         .def("getNewSegmentCTs", &Organism::getNewSegmentCTs,  getNewSegmentCTs_overloads())
 
-        .def("readParameters", &Organism::readParameters) // todo overloads
-        .def("writeParameters", &Organism::writeParameters)  // todo overloads
+        .def("readParameters", &Organism::readParameters, readParameters_overloads())
+        .def("writeParameters", &Organism::writeParameters, writeParameters_overloads())
         .def("writeRSML", &Organism::writeRSML)
         .def("getRSMLSkip", &Organism::getRSMLSkip)
         .def("setRSMLSkip", &Organism::setRSMLSkip)

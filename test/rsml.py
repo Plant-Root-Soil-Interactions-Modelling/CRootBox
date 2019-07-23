@@ -1,7 +1,13 @@
 import xml.etree.ElementTree as ET
 import matplotlib.pyplot as plt
-import numpy as np  #
+import numpy as np
 import math
+
+""" 
+    RSML reader by Daniel Leitner 2019
+    usage:
+    polylines, properties, functions = read_rsml("RootSystem.rsml")
+"""
 
 
 def parse_rsml(organ :ET, polylines :list, properties :dict, functions :dict, parent :int) -> (list, dict, dict):
@@ -109,7 +115,7 @@ def plot_segs(nodes, segs):
 
 
 if __name__ == '__main__':
-    polylines, properties, functions = read_rsml("root_grid/RootSystem.rsml")
+    polylines, properties, functions = read_rsml("RootSystem.rsml")
     print("Properties:")
     for key, v in properties.items() :
         print("\t", key, len(properties[key]))

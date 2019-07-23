@@ -311,19 +311,24 @@ void Organ::writeRSML(tinyxml2::XMLDocument& doc, tinyxml2::XMLElement* parent) 
         tinyxml2::XMLElement* geometry = doc.NewElement("geometry");
         organ->InsertEndChild(geometry);
         tinyxml2::XMLElement* polyline = doc.NewElement("polyline");
-        int o = 0; // (this->parent!=nullptr); // baseRoot = 0, others = 1
+        int o = (this->parent!=nullptr); // baseRoot = 0, others = 1
         for (int i = o; i<getNumberOfNodes(); i+=nn) {
             auto n = getNode(i);
             tinyxml2::XMLElement* p = doc.NewElement("point");
-            p->SetAttribute("x", n.x);
-            p->SetAttribute("y", n.y);
-            p->SetAttribute("z", n.z);
+            p->SetAttribute("x", float(n.x));
+            p->SetAttribute("y", float(n.y));
+            p->SetAttribute("z", float(n.z));
             polyline->InsertEndChild(p);
         }
         geometry->InsertEndChild(polyline);
         // properties
         tinyxml2::XMLElement* properties = doc.NewElement("properties");
-        // TODO check what it should do, before implementation
+        auto prop_names = plant->getRSMLProperties();
+        for (const auto& pname : prop_names) {
+            tinyxml2::XMLElement* p = doc.NewElement(pname.c_str());
+            p->SetAttribute("value", float(this->getParameter(pname)));
+            properties->InsertEndChild(p);
+        }
         organ->InsertEndChild(properties);
         /* laterals roots */
         for (size_t i = 0; i<children.size(); i+=nn) {

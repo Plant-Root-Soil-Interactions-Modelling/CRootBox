@@ -3,7 +3,7 @@
         <version>1</version>
         <unit>cm</unit>
         <resolution>1</resolution>
-        <last-modified>17-7-2019</last-modified>
+        <last-modified>23-7-2019</last-modified>
         <software>OrganicBox</software>
     </metadata>
     <scene>
@@ -13,46 +13,61 @@
                     <polyline>
                         <point x="0" y="0" z="0"/>
                         <point x="0" y="0" z="1.5"/>
-                        <point x="0" y="-1" z="1.6000000000000001"/>
-                        <point x="0" y="1" z="1.6000000000000001"/>
+                        <point x="0" y="-1" z="1.6"/>
+                        <point x="0" y="1" z="1.6"/>
                     </polyline>
                 </geometry>
-                <properties/>
+                <properties>
+                    <organType value="0"/>
+                    <subType value="0"/>
+                    <length value="15"/>
+                    <age value="0"/>
+                </properties>
                 <root ID="1">
                     <geometry>
                         <polyline>
-                            <point x="0" y="-1" z="1.6000000000000001"/>
+                            <point x="0" y="-1" z="1.6"/>
                             <point x="0" y="-2" z="2.5"/>
                         </polyline>
                     </geometry>
-                    <properties/>
+                    <properties>
+                        <organType value="0"/>
+                        <subType value="0"/>
+                        <length value="0"/>
+                        <age value="-4"/>
+                    </properties>
                     <functions>
                         <function domain="polyline" name="node_creation_time">
                             <sample value="4"/>
                             <sample value="4"/>
                         </function>
                         <function domain="polyline" name="node_index">
+                            <sample value="2"/>
                             <sample value="4"/>
-                            <sample value="6"/>
                         </function>
                     </functions>
                 </root>
                 <root ID="2">
                     <geometry>
                         <polyline>
-                            <point x="0" y="1" z="1.6000000000000001"/>
+                            <point x="0" y="1" z="1.6"/>
                             <point x="0" y="1.7" z="2.5"/>
                         </polyline>
                     </geometry>
-                    <properties/>
+                    <properties>
+                        <organType value="0"/>
+                        <subType value="0"/>
+                        <length value="0"/>
+                        <age value="-3"/>
+                    </properties>
                     <functions>
                         <function domain="polyline" name="node_creation_time">
                             <sample value="3"/>
                             <sample value="3"/>
                         </function>
                         <function domain="polyline" name="node_index">
+                            <sample value="3"/>
                             <sample value="5"/>
-                            <sample value="7"/>
                         </function>
                     </functions>
                 </root>
@@ -64,10 +79,10 @@
                         <sample value="0"/>
                     </function>
                     <function domain="polyline" name="node_index">
+                        <sample value="0"/>
+                        <sample value="1"/>
                         <sample value="2"/>
                         <sample value="3"/>
-                        <sample value="4"/>
-                        <sample value="5"/>
                     </function>
                 </functions>
             </root>
@@ -76,46 +91,61 @@
                     <polyline>
                         <point x="0" y="0" z="0"/>
                         <point x="0" y="0" z="1.5"/>
-                        <point x="0" y="-1" z="1.6000000000000001"/>
-                        <point x="0" y="1" z="1.6000000000000001"/>
+                        <point x="0" y="-1" z="1.6"/>
+                        <point x="0" y="1" z="1.6"/>
                     </polyline>
                 </geometry>
-                <properties/>
+                <properties>
+                    <organType value="0"/>
+                    <subType value="0"/>
+                    <length value="15"/>
+                    <age value="0"/>
+                </properties>
                 <root ID="1">
                     <geometry>
                         <polyline>
-                            <point x="0" y="-1" z="1.6000000000000001"/>
+                            <point x="0" y="-1" z="1.6"/>
                             <point x="0" y="-2" z="2.5"/>
                         </polyline>
                     </geometry>
-                    <properties/>
+                    <properties>
+                        <organType value="0"/>
+                        <subType value="0"/>
+                        <length value="0"/>
+                        <age value="-4"/>
+                    </properties>
                     <functions>
                         <function domain="polyline" name="node_creation_time">
                             <sample value="4"/>
                             <sample value="4"/>
                         </function>
                         <function domain="polyline" name="node_index">
+                            <sample value="2"/>
                             <sample value="4"/>
-                            <sample value="6"/>
                         </function>
                     </functions>
                 </root>
                 <root ID="2">
                     <geometry>
                         <polyline>
-                            <point x="0" y="1" z="1.6000000000000001"/>
+                            <point x="0" y="1" z="1.6"/>
                             <point x="0" y="1.7" z="2.5"/>
                         </polyline>
                     </geometry>
-                    <properties/>
+                    <properties>
+                        <organType value="0"/>
+                        <subType value="0"/>
+                        <length value="0"/>
+                        <age value="-3"/>
+                    </properties>
                     <functions>
                         <function domain="polyline" name="node_creation_time">
                             <sample value="3"/>
                             <sample value="3"/>
                         </function>
                         <function domain="polyline" name="node_index">
+                            <sample value="3"/>
                             <sample value="5"/>
-                            <sample value="7"/>
                         </function>
                     </functions>
                 </root>
@@ -127,10 +157,10 @@
                         <sample value="0"/>
                     </function>
                     <function domain="polyline" name="node_index">
+                        <sample value="0"/>
+                        <sample value="1"/>
                         <sample value="2"/>
                         <sample value="3"/>
-                        <sample value="4"/>
-                        <sample value="5"/>
                     </function>
                 </functions>
             </root>

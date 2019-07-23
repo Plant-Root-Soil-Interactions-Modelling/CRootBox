@@ -55,6 +55,9 @@ public:
     virtual tinyxml2::XMLElement* writeXML(tinyxml2::XMLDocument& doc, bool comments = true) const; ///< writes a organ root parameter set
     void writeXML(std::string name) const; ///< writes a organ root parameter set
 
+    void bindParameter(std::string name, int* i, std::string descr = "", double* dev = nullptr); ///< binds integer to parameter name
+    void bindParameter(std::string name, double* d, std::string descr = "", double* dev = nullptr); ///< binds double to parameter name
+
     std::string name = "organ";
     int organType = 0;
     int subType = 0;

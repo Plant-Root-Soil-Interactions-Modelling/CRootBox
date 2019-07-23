@@ -130,7 +130,7 @@ void Organism::setOrganTypeParameter(OrganTypeParameter* p)
         // did not exist, nothing to delete
     }
     organParam[otype][subtype] = p;
-    // std::cout << "setting organ type " << otype << " sub type " << subtype << "\n";
+    // std::cout << "setting organ type " << otype << ", sub type " << subtype << ", name "<< p->name << "\n";
 }
 
 /**
@@ -500,9 +500,9 @@ std::string Organism::toString() const
  * Polymorphic XML parameter file reader:
  * adds all organ parameter types of a XML file to the organism's parameters
  *
- * Sets of organ type parameters are created by OrganTypeParameter::copy.
- * For this each OrganTypeParameter must have already one prototype
- * in the organ type parameters Organism::organParam.
+ * Each OrganTypeParameter must have already one prototype defined
+ * in the organ type parameters Organism::organParam, since
+ * the organ type parameters are created by OrganTypeParameter::copy.
  *
  * @param name      file name
  * @param basetag   name of the base tag (e.g. "organism", or "plant")
@@ -516,7 +516,7 @@ void Organism::readParameters(std::string name, std::string basetag)
         auto p = base->FirstChildElement();
         while(p) {
             std::string tagname = p->Name();
-            std::cout << "Organism::readParameter: reading tag "<< tagname << std::endl << std::flush;
+            // std::cout << "Organism::readParameter: reading tag "<< tagname << std::endl << std::flush;
             int ot = Organism::organTypeNumber(tagname);
             OrganTypeParameter* otp = organParam[ot].begin()->second->copy(this);
             otp->readXML(p);

@@ -164,11 +164,10 @@ std::string OrganTypeParameter::toString(bool verbose) const
  */
 void OrganTypeParameter::readXML(tinyxml2::XMLElement* element)
 {
-    std::string type = element->Attribute("type");
+    std::string type = element->Name();
     this->organType =  Organism::organTypeNumber(type);
     subType = element->IntAttribute("subType");
     name = element->Attribute("name");
-
     auto p = element->FirstChildElement("parameter");
     while(p) {
         std::string key = p->Attribute("name");
@@ -221,7 +220,7 @@ tinyxml2::XMLElement* OrganTypeParameter::writeXML(tinyxml2::XMLDocument& doc, b
     organ->SetAttribute("subType", subType);
     for (auto& ip : iparam) { // int valued parameters
         std::string key = ip.first;
-        if (!(key.compare("subType")==0 || key.compare("organType")==0)) { // already written in organ attributes
+        if (!(key.compare("subType")==0 || key.compare("organType")==0)) { // already written in organ attribuvarialbetes
             tinyxml2::XMLElement* p = doc.NewElement("parameter");
             p->SetAttribute("name", key.c_str());
             p->SetAttribute("value", *ip.second);
@@ -269,6 +268,48 @@ void OrganTypeParameter::writeXML(std::string name) const
     tinyxml2::XMLElement* organ = this->writeXML(doc, true);
     doc.InsertEndChild(organ);
     doc.SaveFile(name.c_str());
+}
+
+/**
+ *  Binds a parameter name to its int member variable,
+ *  the values can then be accessed with OrganTypeParameter::getParameter,
+ *  and are used in OrganTypeParameter::toString, and OrganTypeParameter::writeXML.
+ *
+ *  @param name         the parameter name
+ *  @param i            a pointer to the integer member variable
+ *  @param descr        a parameter description
+ *  @param dev          optionally, a deviation of the parameter like standard deviation.
+ */
+void OrganTypeParameter::bindParameter(std::string name, int* i, std::string descr, double* dev)
+{
+    iparam[name] = i;
+    if (!descr.empty()) {
+        description[name] = descr;
+    }
+    if (dev!=nullptr) {
+        param_sd[name] = dev;
+    }
+}
+
+/**
+ *  Binds a parameter name to its double member variable,
+ *  the values can then be accessed with OrganTypeParameter::getParameter,
+ *  and are used in OrganTypeParameter::toString, and  OrganTypeParameter::writeXML.
+ *
+ *  @param name         the parameter name
+ *  @param i            a pointer to the integer member variable
+ *  @param descr        a parameter description
+ *  @param dev          optionally, a deviation of the parameter like standard deviation.
+ */
+void OrganTypeParameter::bindParameter(std::string name, double* d, std::string descr, double* dev)
+{
+    dparam[name] = d;
+    if (!descr.empty()) {
+        description[name] = descr;
+    }
+    if (dev!=nullptr) {
+        param_sd[name] = dev;
+    }
 }
 
 } // namespace
