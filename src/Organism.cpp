@@ -101,11 +101,11 @@ std::vector<OrganTypeParameter*> Organism::getOrganTypeParameter(int ot) const
 OrganTypeParameter* Organism::getOrganTypeParameter(int ot, int subtype) const
 {
     try {
-//                std::cout << "reading organ type " << ot << " sub type " << subtype <<": ";
-//                for (auto& p : organParam[ot]) {
-//                    std::cout << p.first;
-//                }
-//                std::cout << "\n" << std::flush;
+        //                std::cout << "reading organ type " << ot << " sub type " << subtype <<": ";
+        //                for (auto& p : organParam[ot]) {
+        //                    std::cout << p.first;
+        //                }
+        //                std::cout << "\n" << std::flush;
         return organParam[ot].at(subtype);
     } catch(const std::out_of_range& oor) {
         std::cout << "Organism::getOrganTypeParameter: Organ type parameter of sub type " << subtype << " was not set \n" << std::flush;
@@ -323,11 +323,7 @@ std::vector<Vector2i> Organism::getSegments(int ot) const
 {
     auto organs = getOrgans(ot);
     std::vector<Vector2i> segs = std::vector<Vector2i>(0);
-    int nos = 0;
-    for (const auto& o : organs) {
-        nos += o->getNumberOfSegments();
-    }
-    segs.reserve(nos); // for speed up
+    segs.reserve(this->getNumberOfSegments(ot)); // for speed up
     for (const auto& o : organs) {
         auto s = o->getSegments();
         segs.insert(segs.end(), s.begin(), s.end()); // append s; todo check if it works..
@@ -363,6 +359,7 @@ std::vector<Organ*> Organism::getSegmentOrigins(int ot) const
 {
     auto organs = getOrgans(ot);
     std::vector<Organ*> segs = std::vector<Organ*>(0);
+    segs.reserve(this->getNumberOfSegments(ot)); // for speed up
     for (const auto& o : organs) {
         auto s = o->getSegments();
         for (int i=0; i<s.size(); i++) {
@@ -422,20 +419,21 @@ std::vector<Vector3d> Organism::getNewNodes() const
 /**
  * Creates a vector of new created segments that were created during the last time step
  *
+ * If the organ is not represented as a polyline (overwritten Organ::getSegment), this method will not work
+ *
  * @param ot        the expected organ type, where -1 denotes all organ types (default)
  * @return          a vector of newly created segments
  */
 std::vector<Vector2i> Organism::getNewSegments(int ot) const
 {
     auto organs = this->getOrgans(ot);
-    std::vector<Vector2i> si(this->getNumberOfNewNodes());
-    int c=0;
-    for (const auto& o : organs) {
-        int onon = std::abs(o->getOldNumberOfNodes());
+    std::vector<Vector2i> si(0);
+    si.reserve(this->getNumberOfNewNodes());
+    for (const auto& o :organs) {
+        int onon = o->getOldNumberOfNodes();
         for (size_t i=onon-1; i<o->getNumberOfNodes()-1; i++) {
             Vector2i v(o->getNodeId(i),o->getNodeId(i+1));
-            si.at(c) = v;
-            c++;
+            si.push_back(v);
         }
     }
     return si;
@@ -446,43 +444,46 @@ std::vector<Vector2i> Organism::getNewSegments(int ot) const
  * for each newly created segment of organ type @param ot,
  * corresponding to the segments obtained by Organism::getNewSegments(ot)
  *
+ * If the organ is not represented as a polyline (overwritten Organ::getSegment), this method will not work
+ *
  * @param ot        the expected organ type, where -1 denotes all organ types (default)
  * @return          a vector of pointers to organs
  */
 std::vector<Organ*> Organism::getNewSegmentOrigins(int ot) const
 {
     auto organs = this->getOrgans(ot);
-    std::vector<Organ*> si(this->getNumberOfNewNodes());
-    int c=0;
-    for (auto& r:organs) {
-        int onon = std::abs(r->getOldNumberOfNodes());
-        for (size_t i=onon-1; i<r->getNumberOfNodes()-1; i++) {
-            si.at(c) = r;
-            c++;
+    std::vector<Organ*> so(0);
+    so.reserve(this->getNumberOfNewNodes());
+    for (auto& o :organs) {
+        int onon = o->getOldNumberOfNodes();
+        for (size_t i=onon-1; i<o->getNumberOfNodes()-1; i++) {
+            so.push_back(o);
         }
     }
-    return si;
+    return so;
 }
 
 /**
  * Creates a vector of segment creation times for each newly created segment of organ type @param ot,
  * corresponding to the segments obtained by Organism::getNewSegments(ot)
  *
+ * If the organ is not represented as a polyline (overwritten Organ::getSegment), this method will not work
+ *
  * @param ot        the expected organ type, where -1 denotes all organ types (default)
  * @return          a vector of segment creation times
  */
 std::vector<double> Organism::getNewSegmentCTs(int ot) const
 {
-    auto organs = this->getOrgans();
-    std::vector<double> nodeCTs(this->getNumberOfNewNodes());
-    for (const auto& r : organs) {
-        int onon = std::abs(r->getOldNumberOfNodes());
-        for (size_t i=onon; i<r->getNumberOfNodes(); i++) { // loop over all new nodes
-            nodeCTs.at(r->getNodeId(i)-this->oldNumberOfNodes) = r->getNodeCT(i); // pray that ids are correct
-
+    auto organs = this->getOrgans(ot);
+    std::vector<double> sct(0);
+    sct.reserve(this->getNumberOfNewNodes());
+    for (const auto& o : organs) {
+        int onon = o->getOldNumberOfNodes();
+        for (size_t i=onon-1; i<o->getNumberOfNodes()-1; i++) { // loop over all new nodes
+            sct.push_back(o->getNodeCT(i+1));
         }
     }
-    return nodeCTs;
+    return sct;
 }
 
 /**
@@ -492,7 +493,7 @@ std::string Organism::toString() const
 {
     std::stringstream str;
     str << "Organism with "<< baseOrgans.size() <<" base organs, " << getNumberOfNodes()
-                            << " nodes, and a total of " << getNumberOfOrgans() << " organs, after " << getSimTime() << " days";
+                                << " nodes, and a total of " << getNumberOfOrgans() << " organs, after " << getSimTime() << " days";
     return str.str();
 }
 

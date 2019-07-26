@@ -130,48 +130,49 @@ class TestRootSystem(unittest.TestCase):
         baseI = rs.getRootBases()
         uneq = np.sum(nodes[baseI, :] != bases) + np.sum(nodes[tipI, :] != tips)
         self.assertEqual(uneq, 0, "polylines: tips or base nodes do not agree")
+
 #
 #     def test_adjacency_matrix(self):
 #         """ builds an adjacency matrix, and checks if everything is connected"""
 #         pass
 #
-#     def test_dynamics(self):
-#         """ incremental root system growth like needed for coupling"""
-#         name = "Zea_mays_4_Leitner_2014"
-#         rs = rb.RootSystem()
-#         rs.openFile(name)
-#         rs.initialize()
-#         simtime = 60  # days
-#         dt = 0.1
-#         N = round(simtime / dt)
-#         nodes = vv2a(rs.getNodes())  # contains the initial nodes of tap, basal and shootborne roots
-#         seg = np.array([], dtype = np.int64).reshape(0, 2)
-#         for i in range(0, N):
-#             rs.simulate(dt, False)
-# #             print("Number of nodes", rs.getNumberOfNodes())  # equals the number of new segments
-# #             print("Number of roots", getNumberOfRoots(True))
-# #             print("Number of new nodes", rs.getNumberOfNewNodes())  # equals the number of new segments
-# #             print("Number of new roots", rs.getNumberOfNewOrgans())
-#             uni = v2ai(rs.getUpdatedNodeIndices())
-#             unodes = vv2a(rs.getUpdatedNodes())
-# #             print("Number of node updates", len(unodes), len(uni))
-#             nodes[uni] = unodes  # do the update
-#             newnodes2 = rs.getNewNodes()
-#             newnodes = vv2a(newnodes2)
-#             newsegs = seg2a(rs.getNewSegments())
-#             if len(newnodes) != 0:
-#                 nodes = np.vstack((nodes, newnodes))
-#             if len(newsegs) != 0:
-#                 seg = np.vstack((seg, newsegs))
-#         nodes_ = vv2a(rs.getNodes());
-#         seg_ = seg2a(rs.getSegments());
-#         uneq = np.sum(nodes_ != nodes) / 3
-#         self.assertEqual(uneq, 0, "incremental growth: node lists are not equal")
-#         seg = np.sort(seg, axis = 0)  # per default along the last axis
-#         seg_ = np.sort(seg_, axis = 0)
-#         uneq = np.sum(seg_ != seg) / 2
-#         self.assertEqual(uneq, 0, "incremental growth: segment lists are not equal")
-#
+    def test_dynamics(self):
+        """ incremental root system growth like needed for coupling"""
+        name = "Zea_mays_4_Leitner_2014"
+        rs = rb.RootSystem()
+        rs.openFile(name)
+        rs.initialize()
+        simtime = 60  # days
+        dt = 0.1
+        N = round(simtime / dt)
+        nodes = vv2a(rs.getNodes())  # contains the initial nodes of tap, basal and shootborne roots
+        seg = np.array([], dtype = np.int64).reshape(0, 2)
+        for i in range(0, N):
+            rs.simulate(dt, False)
+#             print("Number of nodes", rs.getNumberOfNodes())  # equals the number of new segments
+#             print("Number of roots", getNumberOfRoots(True))
+#             print("Number of new nodes", rs.getNumberOfNewNodes())  # equals the number of new segments
+#             print("Number of new roots", rs.getNumberOfNewOrgans())
+            uni = v2ai(rs.getUpdatedNodeIndices())
+            unodes = vv2a(rs.getUpdatedNodes())
+#            print("Number of node updates", len(unodes), len(uni))
+            nodes[uni] = unodes  # do the update
+            newnodes2 = rs.getNewNodes()
+            newnodes = vv2a(newnodes2)
+            newsegs = seg2a(rs.getNewSegments())
+            if len(newnodes) != 0:
+                nodes = np.vstack((nodes, newnodes))
+            if len(newsegs) != 0:
+                seg = np.vstack((seg, newsegs))
+        nodes_ = vv2a(rs.getNodes());
+        seg_ = seg2a(rs.getSegments());
+        uneq = np.sum(nodes_ != nodes) / 3
+        self.assertEqual(uneq, 0, "incremental growth: node lists are not equal")
+        seg = np.sort(seg, axis = 0)  # per default along the last axis
+        seg_ = np.sort(seg_, axis = 0)
+        uneq = np.sum(seg_ != seg) / 2
+        self.assertEqual(uneq, 0, "incremental growth: segment lists are not equal")
+
 #     def test_rsml(self):
 #         """ checks rsml functionality with Python rsml reader """
 #         name = "Anagallis_femina_Leitner_2010"

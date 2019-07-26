@@ -126,7 +126,7 @@ Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const
             }
 
             if (i>alphaN) {
-                std::cout << "Could not respect geometry boundaries \n";
+                // std::cout << "Could not respect geometry boundaries \n";
                 a = bestA;
                 b = bestB;
                 break;
