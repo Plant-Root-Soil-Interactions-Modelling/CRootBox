@@ -190,41 +190,6 @@ std::vector<Vector2i> Organ::getSegments() const
 }
 
 /**
- * Return the global node indices that were moved during the last time step, the corresponding
- * node coordinates can be obtained from Organ::getMovedNodes().
- *
- * The default implementation works for growing polylines, were only the last node can move.
- * For other growing geometries this method must be overwritten.
- *
- * @return A vector of global node indices of moved nodes
- */
-std::vector<int> Organ::getMovedNodeIds() const
-{
-    if (moved) {
-        int id = getNodeId(oldNumberOfNodes-1);
-        return std::vector<int> { id };
-    } else {
-        return std::vector<int>(0); // empty
-    }
-}
-
-/**
- * Return the new node coordinates of nodes that were moved during the last time step, they correspond
- * to the global node indices from Organ::getMovedNodeIds().
- *
- * The default implementation works for growing polylines, were only the last node can move.
- * For other growing geometries this method must be overwritten.
- *
- * @return A vector of node coordinates, with the new node positions
- */
-std::vector<Vector3d> Organ::getMovedNodes() const
-{
-    Vector3d n = getNode(oldNumberOfNodes-1);
-    return std::vector<Vector3d> { n };
-}
-
-
-/**
  * Returns the organs as sequential list, copies only organs with more than one node.
  *
  * @param ot        the expected organ type, where -1 denotes all organ types (default).

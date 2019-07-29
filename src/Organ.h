@@ -65,13 +65,11 @@ public:
     double getNodeCT(int i) const { return nodeCTs.at(i); } ///< creation time of the i-th node
     void addNode(Vector3d n, double t); //< adds a node to the root
     void addNode(Vector3d n, int id, double t); //< adds a node to the root
-    virtual int getNumberOfSegments() { return nodes.size()-1; } ///<  per default, the organ is represented by a polyline, i.e. getNumberOfNodes()-1
-    virtual std::vector<Vector2i> getSegments() const; ///< per default, the organ is represented by a polyline
+    int getNumberOfSegments() { return nodes.size()-1; } ///<  per default, the organ is represented by a polyline, i.e. getNumberOfNodes()-1
+    std::vector<Vector2i> getSegments() const; ///< per default, the organ is represented by a polyline
 
     /* last time step */
     bool hasMoved() { return moved; }; ///< have any nodes moved during the last simulate call
-    virtual std::vector<int> getMovedNodeIds() const; ///< global node indices of nodes that have been moved during last time step
-    virtual std::vector<Vector3d> getMovedNodes() const; ///< the new node positions corresponding to to the indices from getMovedNodeIds
     int getOldNumberOfNodes() { return oldNumberOfNodes; } ///< the number of nodes before the last simulate call
 
     /* for post processing */

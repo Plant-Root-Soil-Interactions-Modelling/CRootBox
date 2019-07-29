@@ -120,6 +120,7 @@ class TestRootSystem(unittest.TestCase):
         rs.initialize()
         rs.simulate(7)  # days young
         polylines = rs.getPolylines()  # Use polyline representation of the roots
+        # todo getPolylinesCTs
         bases = np.zeros((len(polylines), 3))
         tips = np.zeros((len(polylines), 3))
         for i, r in enumerate(polylines):
@@ -138,36 +139,53 @@ class TestRootSystem(unittest.TestCase):
 #
     def test_dynamics(self):
         """ incremental root system growth like needed for coupling"""
-        name = "Zea_mays_4_Leitner_2014"
+
+        # test currently does not run for Anagallis
+
+        name = "Anagallis_femina_Leitner_2010"  # "Anagallis_femina_Leitner_2010"  # "Anagallis_femina_Leitner_2010"  # "Zea_mays_4_Leitner_2014"
         rs = rb.RootSystem()
         rs.openFile(name)
         rs.initialize()
         simtime = 60  # days
-        dt = 0.1
+        dt = 1
         N = round(simtime / dt)
         nodes = vv2a(rs.getNodes())  # contains the initial nodes of tap, basal and shootborne roots
         seg = np.array([], dtype = np.int64).reshape(0, 2)
+        cts = v2a(rs.getSegmentCTs())
+        nonm = 0
         for i in range(0, N):
             rs.simulate(dt, False)
-#             print("Number of nodes", rs.getNumberOfNodes())  # equals the number of new segments
-#             print("Number of roots", getNumberOfRoots(True))
-#             print("Number of new nodes", rs.getNumberOfNewNodes())  # equals the number of new segments
-#             print("Number of new roots", rs.getNumberOfNewOrgans())
-            uni = v2ai(rs.getUpdatedNodeIndices())
+            uni = v2ai(rs.getUpdatedNodeIndices())  # MOVED NODES
             unodes = vv2a(rs.getUpdatedNodes())
-#            print("Number of node updates", len(unodes), len(uni))
             nodes[uni] = unodes  # do the update
-            newnodes2 = rs.getNewNodes()
+            nonm += uni.shape[0]
+            newnodes2 = rs.getNewNodes()  # NEW NODES
             newnodes = vv2a(newnodes2)
-            newsegs = seg2a(rs.getNewSegments())
+            newsegs = seg2a(rs.getNewSegments())  # NEW SEGS
+            newcts = v2a(rs.getNewSegmentCTs())
             if len(newnodes) != 0:
                 nodes = np.vstack((nodes, newnodes))
             if len(newsegs) != 0:
                 seg = np.vstack((seg, newsegs))
-        nodes_ = vv2a(rs.getNodes());
-        seg_ = seg2a(rs.getSegments());
+                cts = np.vstack((cts, newcts))
+
+        nodes_ = vv2a(rs.getNodes())
+        nodeCTs_ = v2a(rs.getNodeCTs())
+        seg_ = seg2a(rs.getSegments())
+        sct_ = v2a(rs.getSegmentCTs())
+#         print("Creation times range from ", np.min(cts), " to ", np.max(cts), "len", cts.shape)
+#         print("Creation times range from ", np.min(sct_), " to ", np.max(sct_), "len", sct_.shape)
+#         print("seg:", seg_[0])
+#         print(nodes_[seg[0][0]], nodes_[seg[0][1]])
+#         print(nodeCTs_[seg[0][0]], nodeCTs_[seg[0][1]])
+#         print("---")
+        self.assertEqual(nodes_.shape, nodes.shape, "incremental growth: node lists are not equal")
+        ind = np.argwhere(nodes_[:, 1] != nodes[:, 1])
+        for i in ind:
+            print(i, nodes_[i], "!=", nodes[i])
         uneq = np.sum(nodes_ != nodes) / 3
         self.assertEqual(uneq, 0, "incremental growth: node lists are not equal")
+        self.assertEqual(seg_.shape, seg.shape, "incremental growth: segment lists are not equal")
         seg = np.sort(seg, axis = 0)  # per default along the last axis
         seg_ = np.sort(seg_, axis = 0)
         uneq = np.sum(seg_ != seg) / 2

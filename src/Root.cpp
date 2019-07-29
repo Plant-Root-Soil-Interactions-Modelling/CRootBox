@@ -86,6 +86,7 @@ void Root::simulate(double dt, bool verbose)
     firstCall = true;
     moved = false;
     oldNumberOfNodes = nodes.size();
+
     const RootParameter& p = *param(); // rename
 
     if (alive) { // dead roots wont grow
@@ -136,12 +137,12 @@ void Root::simulate(double dt, bool verbose)
                     // basal zone
                     if ((dl>0)&&(length<p.lb)) { // length is the current length of the root
                         if (length+dl<=p.lb) {
-                            createSegments(dl,verbose);
+                            createSegments(dl,dt,verbose);
                             length+=dl;
                             dl=0;
                         } else {
                             double ddx = p.lb-length;
-                            createSegments(ddx,verbose);
+                            createSegments(ddx,dt,verbose);
                             dl-=ddx; // ddx already has been created
                             length=p.lb;
                         }
@@ -156,12 +157,12 @@ void Root::simulate(double dt, bool verbose)
                                     createLateral(verbose);
                                 }
                                 if (length+dl<=s) { // finish within inter-lateral distance i
-                                    createSegments(dl,verbose);
+                                    createSegments(dl,dt,verbose);
                                     length+=dl;
                                     dl=0;
                                 } else { // grow over inter-lateral distance i
                                     double ddx = s-length;
-                                    createSegments(ddx,verbose);
+                                    createSegments(ddx,dt,verbose);
                                     dl-=ddx;
                                     length=s;
                                 }
@@ -173,12 +174,12 @@ void Root::simulate(double dt, bool verbose)
                     }
                     // apical zone
                     if (dl>0) {
-                        createSegments(dl,verbose);
+                        createSegments(dl,dt,verbose);
                         length+=dl;
                     }
                 } else { // no laterals
                     if (dl>0) {
-                        createSegments(dl,verbose);
+                        createSegments(dl,dt,verbose);
                         length+=dl;
                     }
                 } // if lateralgetLengths
@@ -238,7 +239,6 @@ double Root::calcAge(double length)
  */
 RootTypeParameter* Root::getRootTypeParameter() const
 {
-    // std::cout << "getRootTypeParameter " << param_->subType << "\n";
     return (RootTypeParameter*)plant->getOrganTypeParameter(Organism::ot_root, param_->subType);
 }
 
@@ -290,9 +290,15 @@ Vector3d Root::heading()
  *  @param l        total length of the segments that are created [cm]
  *  @param verbose  turns console output on or off
  */
-void Root::createSegments(double l, bool verbose)
+void Root::createSegments(double l, double dt, bool verbose)
 {
-    assert(l>=0);
+    if (l==0) {
+        return;
+    }
+    if (l<0) {
+        std::cout << "Root::createSegments: negative length encountered \n";
+    }
+
     // shift first node to axial resolution
     int nn = nodes.size();
     if (firstCall) { // first call of createSegments (in Root::simulate)
@@ -307,7 +313,13 @@ void Root::createSegments(double l, bool verbose)
                 Vector3d newdxv = getIncrement(n2, sdx);
                 nodes[nn - 1] = Vector3d(n2.plus(newdxv));
                 double et = this->calcCreationTime(length+newdx);
-                nodeCTs[nn-1] = std::max(et,plant->getSimTime()); // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
+//                if (et>1.e8) {
+//                    std::cout << "Root::createSegments could not calculate ct in movement "
+//                        << this->param()->getK() << ", "<< length+newdx << "\n" << std::flush;
+//                }
+                et = std::max(et,plant->getSimTime());
+                et = std::min(et,plant->getSimTime()+dt);
+                nodeCTs[nn-1] = et; // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
                 moved = true;
                 l -= newdx;
                 if (l<=0) { // ==0 should be enough
@@ -332,7 +344,7 @@ void Root::createSegments(double l, bool verbose)
             sdx = l-n*dx();
             if (sdx<smallDx) { // quit if l is too small
                 if (verbose) {
-                    std::cout << "skipped small segment (<"<< smallDx << ") \n";
+                    std::cout << "skipped small segment ("<< sdx <<" < "<< smallDx << ") \n";
                 }
                 return;
             }
@@ -341,7 +353,12 @@ void Root::createSegments(double l, bool verbose)
         Vector3d newdx = getIncrement(nodes.back(), sdx);
         Vector3d newnode = Vector3d(nodes.back().plus(newdx));
         double et = this->calcCreationTime(length+sl);
+        //        if (et>1.e8) {
+        //            std::cout << "Root::createSegments could not calculate ct "
+        //                << this->param()->getK() << ", "<< length+sl << "\n" << std::flush;
+        //        }
         et = std::max(et,plant->getSimTime());
+        et = std::min(et,plant->getSimTime()+dt);
         // in case of impeded growth the node emergence time is not exact anymore,
         // but might break down to temporal resolution
         addNode(newnode,et);

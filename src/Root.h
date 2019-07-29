@@ -41,7 +41,7 @@ public:
     double getParameter(std::string name) const override; ///< returns an organ parameter
 
     /* From analytical equations */
-    double calcCreationTime(double lenght); ///< analytical creation (=emergence) time of a node at a length
+    double calcCreationTime(double length); ///< analytical creation (=emergence) time of a node at a length
     double calcLength(double age); ///< analytical length of the root
     double calcAge(double length); ///< analytical age of the root
 
@@ -60,7 +60,7 @@ public:
 
 protected:
 
-    void createSegments(double l, bool silence); ///< creates segments of length l, called by Root::simulate()
+    void createSegments(double l, double dt, bool silence); ///< creates segments of length l, called by Root::simulate()
     virtual Vector3d getIncrement(const Vector3d& p, double sdx); ///< called by createSegments, to determine growth direction
     virtual void createLateral(bool silence); ///< creates a new lateral, called by Root::simulate()
     Vector3d heading(); ///< current growth direction of the root

@@ -331,6 +331,7 @@ void RootTypeParameter::bindParmaters()
     bindParameter("dx", &dx, "Axial resolution [cm] (maximal segment size)");
     bindParameter("theta", &theta, "Angle between root and parent root [rad]", &thetas);
     bindParameter("rlt", &rlt, "Root life time [day]", &rlts);
+    bindParameter("gf", &gf, "Growth function number [1]", &rlts);
     // other parameters (descriptions only)
     description["name"]  = "Name of the sub type of the organ, e.g. small lateral";
     description["successor"] = "Sub type of lateral roots";

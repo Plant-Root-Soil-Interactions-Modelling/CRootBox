@@ -284,7 +284,10 @@ std::vector<Vector3d> Organism::getNodes() const
         nv.at(o->getNodeId(0)) = o->getNode(0);
     }
     for (const auto& o : organs) { // copy all organ nodes
-        for (size_t i=0; i<o->getNumberOfNodes(); i++) {
+        for (size_t i=1; i<o->getNumberOfNodes(); i++) {
+            // start from 1, since all base nodes are stored twice as base and along root
+            // TODO currently in RootBox the coordinates along the root might be moved,
+            // while base node stays the same (some id, different coordinates, not good), TODO
             nv.at(o->getNodeId(i)) = o->getNode(i);
         }
     }
@@ -377,7 +380,7 @@ std::vector<int> Organism::getUpdatedNodeIndices() const
     auto organs = this->getOrgans();
     std::vector<int> ni = std::vector<int>(0);
     for (const auto& o : organs) {
-        if (o->hasMoved()>0){
+        if (o->hasMoved()) {
             ni.push_back(o->getNodeId(o->getOldNumberOfNodes()-1));
         }
     }
@@ -392,7 +395,7 @@ std::vector<Vector3d> Organism::getUpdatedNodes() const
     auto organs = this->getOrgans();
     std::vector<Vector3d> nv = std::vector<Vector3d>(0);
     for (const auto& o : organs) {
-        if (o->hasMoved()>0){
+        if (o->hasMoved()) {
             nv.push_back(o->getNode(o->getOldNumberOfNodes()-1));
         }
     }
@@ -427,11 +430,11 @@ std::vector<Vector3d> Organism::getNewNodes() const
 std::vector<Vector2i> Organism::getNewSegments(int ot) const
 {
     auto organs = this->getOrgans(ot);
-    std::vector<Vector2i> si(0);
+    std::vector<Vector2i> si = std::vector<Vector2i>(0);
     si.reserve(this->getNumberOfNewNodes());
     for (const auto& o :organs) {
         int onon = o->getOldNumberOfNodes();
-        for (size_t i=onon-1; i<o->getNumberOfNodes()-1; i++) {
+        for (size_t i=onon-1; i<o->getNumberOfNodes()-1; i++) { // loop over new segments
             Vector2i v(o->getNodeId(i),o->getNodeId(i+1));
             si.push_back(v);
         }
@@ -452,11 +455,11 @@ std::vector<Vector2i> Organism::getNewSegments(int ot) const
 std::vector<Organ*> Organism::getNewSegmentOrigins(int ot) const
 {
     auto organs = this->getOrgans(ot);
-    std::vector<Organ*> so(0);
+    std::vector<Organ*> so = std::vector<Organ*>(0);
     so.reserve(this->getNumberOfNewNodes());
     for (auto& o :organs) {
         int onon = o->getOldNumberOfNodes();
-        for (size_t i=onon-1; i<o->getNumberOfNodes()-1; i++) {
+        for (size_t i=onon-1; i<o->getNumberOfNodes()-1; i++) { // loop over new segments
             so.push_back(o);
         }
     }
@@ -469,17 +472,19 @@ std::vector<Organ*> Organism::getNewSegmentOrigins(int ot) const
  *
  * If the organ is not represented as a polyline (overwritten Organ::getSegment), this method will not work
  *
+ * TODO segs might be unfinished, they move to axial resolution
+ *
  * @param ot        the expected organ type, where -1 denotes all organ types (default)
  * @return          a vector of segment creation times
  */
 std::vector<double> Organism::getNewSegmentCTs(int ot) const
 {
     auto organs = this->getOrgans(ot);
-    std::vector<double> sct(0);
+    std::vector<double> sct = std::vector<double>(0);
     sct.reserve(this->getNumberOfNewNodes());
     for (const auto& o : organs) {
         int onon = o->getOldNumberOfNodes();
-        for (size_t i=onon-1; i<o->getNumberOfNodes()-1; i++) { // loop over all new nodes
+        for (size_t i=onon-1; i<o->getNumberOfNodes()-1; i++) { // loop over new segments
             sct.push_back(o->getNodeCT(i+1));
         }
     }

@@ -13,7 +13,7 @@ dx	1
 successors	1	2
 successorP	1	1
 theta	1.39626	0.139626
-rlt	1000000000	100000000
+rlt	1000000000	0
 gf	1
 # Parameter set for type
 type	2
@@ -30,5 +30,5 @@ dx	1
 successors	0
 successorP	0
 theta	1.50098	0.150098
-rlt	1000000000	100000000
+rlt	1000000000	0
 gf	1

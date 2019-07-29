@@ -1,15 +1,15 @@
-<organ type="root" name="lateral" subType="2">
-    <parameter name="gf" value="1"/>
-    <!--Growth function (negative exponential = 1, linear = 2)-->
+<root name="lateral" subType="2">
+    <parameter name="gf" value="1" dev="0"/>
+    <!--Growth function number [1]-->
     <parameter name="tropismT" value="1"/>
     <!--Type of root tropism (plagio = 0, gravi = 1, exo = 2, hydro, chemo = 3)-->
-    <parameter name="a" value="0.10000000000000001" dev="0"/>
+    <parameter name="a" value="1" dev="0"/>
     <!--Root radius [cm]-->
-    <parameter name="colorB" value="0.20000000000000001"/>
+    <parameter name="colorB" value="0.2"/>
     <!--Root color, blue component [0.-1.]-->
-    <parameter name="colorG" value="0.20000000000000001"/>
+    <parameter name="colorG" value="0.2"/>
     <!--Root color, green component [0.-1.]-->
-    <parameter name="colorR" value="0.59999999999999998"/>
+    <parameter name="colorR" value="0.60000002"/>
     <!--Root color, red component [0.-1.]-->
     <parameter name="dx" value="0.25"/>
     <!--Axial resolution [cm] (maximal segment size)-->
@@ -23,16 +23,16 @@
     <!--Maximal number of laterals [1]-->
     <parameter name="r" value="1" dev="0"/>
     <!--Initial growth rate [cm day-1]-->
-    <parameter name="rlt" value="1000000000" dev="0"/>
+    <parameter name="rlt" value="1e+09" dev="0"/>
     <!--Root life time [day]-->
     <parameter name="theta" value="1.22" dev="0"/>
     <!--Angle between root and parent root [rad]-->
     <parameter name="tropismN" value="1"/>
     <!--Number of trials of root tropism-->
-    <parameter name="tropismS" value="0.20000000000000001"/>
+    <parameter name="tropismS" value="0.2"/>
     <!--Mean value of expected change of root tropism [1/cm]-->
     <parameter name="successor">4 5 6 </parameter>
     <!--Sub type of lateral roots-->
     <parameter name="successorP">0.4 0.1 0.5 </parameter>
     <!--Probability of each sub type to occur-->
-</organ>
+</root>
