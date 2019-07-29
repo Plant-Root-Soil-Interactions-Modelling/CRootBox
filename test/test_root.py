@@ -1,6 +1,7 @@
 import unittest
 import py_rootbox as rb
 import numpy as np
+from rb_tools import *
 
 
 def rootAge(l, r, k):  # root age at a certain length
@@ -26,34 +27,17 @@ class TestRoot(unittest.TestCase):
         """ an example used in the tests below, a main root with laterals """
         self.plant = rb.Organism()  # Root has no dependency on RootSystem anymore
         p0 = rb.RootTypeParameter(self.plant)
+        p0.name, p0.type, p0.la, p0.lb, p0.nob, p0.ln, p0.r, p0.dx = "taproot", 1, 1, 10, 20, (89. / 19.), 1, 0.5
+        p0.successor = a2i([2])  # to rb.std_int_double_()
+        p0.successorP = a2v([1.])  # rb.std_vector_double_()
         p1 = rb.RootTypeParameter(self.plant)
-        p0.name = "taproot"
-        p0.type = 1
-        p0.lb = 1
-        p0.la = 10
-        p0.nob = 20
-        p0.ln = 89. / 19.
-        p0.r = 1
-        p0.dx = 0.5
-        l = rb.std_vector_int_()  # set up successors
-        l.append(2)
-        p0.successor = l
-        l = rb.std_vector_double_()
-        l.append(1)
-        p0.successorP = l
-        p1.name = "lateral"
-        p1.type = 2
-        p1.la = 25
-        p1.ln = 0
-        p1.r = 2
-        p1.dx = 0.1
-        self.p0 = p0
-        self.p1 = p1
+        p1.name, p1.type, p1.la, p1.ln, p1.r, p1.dx = "lateral", 2, 25, 0, 2, 0.1
+        self.p0, self.p1 = p0, p1  # Python will garbage collect them away, if not stored
         self.plant.setOrganTypeParameter(self.p0)  # the organism manages the type parameters
         self.plant.setOrganTypeParameter(self.p1)
         self.param0 = self.p0.realize()  # set up root by hand (without a root system)
-        self.param0 .la = 0  # its important parent has zero length, otherwise creation times are messed up
-        self.param0 .lb = 0
+        self.param0.la = 0  # its important parent has zero length, otherwise creation times are messed up
+        self.param0.lb = 0
         # param0 is stored, because otherwise garbage collection deletes it, an program will crash <---
         parentroot = rb.Root(1, self.param0, True, True, 0., 0., rb.Vector3d(0, 0, -1), 0, 0, False, 0)
         parentroot.setOrganism(self.plant)
@@ -185,7 +169,7 @@ class TestRoot(unittest.TestCase):
         r.simulate(1e-1, True)
         self.assertEqual(r.hasMoved(), True, "dynamics: node was expected to move, but did not")
         r.simulate(2.4, True)
-        self.assertEqual(r.getNumberOfNodes() - r.getOldNumberOfNodes(), 6, "dynamics: unexcpected number of new nodes")
+        self.assertEqual(r.getNumberOfNodes() - r.getOldNumberOfNodes(), 5, "dynamics: unexcpected number of new nodes")
 
 
 if __name__ == '__main__':

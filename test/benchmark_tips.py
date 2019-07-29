@@ -64,7 +64,6 @@ def simOnce(name, simtime, lbins, lrange, zbins, zrange, dx, dt):
     rs.initialize()
 
     N = round(simtime / dt)
-    print("simOnce")
     for i in range(0, N):
         rs.simulate(dt, True);
     # analysis
@@ -113,12 +112,12 @@ def simOnce(name, simtime, lbins, lrange, zbins, zrange, dx, dt):
 dx = 0.5
 dt = 5
 
-runs = 1000
+runs = 100
 # name = "Lupinus_albus_Leitner_2014"
-# name = "Zea_mays_1_Leitner_2010"
+name = "Zea_mays_1_Leitner_2010"
 # name = "Anagallis_femina_Leitner_2010"
-name = "Triticum_aestivum_a_Bingham_2011"
-simtime = 5
+# name = "Triticum_aestivum_a_Bingham_2011"
+simtime = 60
 
 # Histogram params
 lbins = 40

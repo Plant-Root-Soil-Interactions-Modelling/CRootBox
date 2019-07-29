@@ -4,34 +4,39 @@ from rsml import *
 from rb_tools import *
 
 
+def rootAge(l, r, k):  # root age at a certain length
+    return -np.log(1 - l / k) * k / r
+
+
+def rootLength(t, r, k):  # root length at a certain age
+    return k * (1 - np.exp(-r * t / k))
+
+
+def rootLateralLength(t, et, r, k):  # length of first order laterals (without second order laterals)
+    i, l = 0, 0
+    while et[i] < t:
+        age = t - et[i]
+        l += rootLength(age, r, k)
+        i += 1
+    return l
+
+
 class TestRootSystem(unittest.TestCase):
 
     def root_example_rtp(self):
-        """ an example used in the tests below, a main root with laterals """
+        """ an example used in the tests below, 100 basals with laterals """
         self.rs = rb.RootSystem()
+        maxB, firstB, delayB = 100, 10., 3
+        rsp = rb.RootSystemParameter()
+        rsp.set(-3., firstB, delayB, maxB, 0, 1.e9, 1.e9, 1.e9, 0., 0.)
+        self.rs.setRootSystemParameter(rsp)
         p0 = rb.RootTypeParameter(self.rs)
-        p0.name = "taproot"
-        p0.type = 1
-        p0.lb = 1
-        p0.la = 10
-        p0.nob = 20
-        p0.ln = 89. / 19.
-        p0.r = 1
-        p0.dx = 0.5
-        l = rb.std_vector_int_()  # set up successors
-        l.append(2)
-        p0.successor = l
-        l = rb.std_vector_double_()
-        l.append(1)
-        p0.successorP = l
+        p0.name, p0.type, p0.la, p0.nob, p0.ln, p0.r, p0.dx = "taproot", 1, 10, 20, 89. / 19., 1, 0.5
+        p0.successor = a2i([2])  # to rb.std_int_double_()
+        p0.successorP = a2v([1.])  # rb.std_vector_double_()
         p1 = rb.RootTypeParameter(self.rs)
-        p1.name = "lateral"
-        p1.type = 2
-        p1.la = 25
-        p1.ln = 0
-        p1.r = 2
-        p1.dx = 0.1
-        self.p0, self.p1 = p0, p1  # Python will garbage collect them away, if not stored
+        p1.name, p1.type, p1.la, p1.ln, p1.r, p1.dx = "lateral", 2, 25, 0, 2, 0.1
+        self.p0, self.p1, self.rsp = p0, p1, rsp  # Python will garbage collect them away, if not stored
         self.rs.setOrganTypeParameter(self.p0)  # the organism manages the type parameters
         self.rs.setOrganTypeParameter(self.p1)
 
@@ -44,8 +49,7 @@ class TestRootSystem(unittest.TestCase):
             nl.append(self.root.getParameter("length"))
             non.append(self.root.getNumberOfNodes())
             meanDX.append(nl[-1] / non[-1])
-            # length from geometry
-            poly = np.zeros((non[-1], 3))  #
+            poly = np.zeros((non[-1], 3))  # length from polyline geometry
             for i in range(0, non[-1]):
                 v = self.root.getNode(i)
                 poly[i, 0] = v.x
@@ -54,9 +58,9 @@ class TestRootSystem(unittest.TestCase):
             d = np.diff(poly, axis = 0)
             sd = np.sqrt((d ** 2).sum(axis = 1))
             nl2.append(sum(sd))
-        for i in range(0, len(dt)):
-            self.assertAlmostEqual(l[i], nl[i], 10, "numeric and analytic lengths do not agree")
-            self.assertAlmostEqual(l[i], nl2[i], 10, "numeric and analytic lengths do not agree")
+        for i in range(0, len(dt)):  # Check lengthes
+            self.assertAlmostEqual(l[i], nl[i], 10, "numeric and analytic lengths do not agree (parameter length)")
+            self.assertAlmostEqual(l[i], nl2[i], 10, "numeric and analytic lengths do not agree (poly length)")
             self.assertLessEqual(meanDX[i], 0.5, "axial resolution dx is too large")
             self.assertLessEqual(0.25, meanDX[i], "axial resolution dx is unexpected small")
 
@@ -69,15 +73,24 @@ class TestRootSystem(unittest.TestCase):
         self.rs.writeParameters("test_parameters.xml", "RootBox", False)  # include comments
         rs1 = rb.RootSystem
         # rs1.readParameters("test_parameters.xml", "RootBox")
+        # TODO
 
-#     def test_length_no_laterals(self):
-#         """ run a simulation with a fibrous root system and compares to analytic lengths"""
-#         name = "Anagallis_femina_Leitner_2010"
-#         rs = rb.RootSystem()
-#         rs.openFile(name)
-#         rs.initialize()
-#         rs.simulate(7)
-#         # todo
+    def test_length_no_laterals(self):
+        """ run a simulation with a fibrous root system and compares to analytic lengths"""
+        self.root_example_rtp()
+        times = np.array([0., 7., 15., 30., 60.])
+        dt = np.diff(times)
+        times = times[1:]
+        # Analytical solution
+        etB = np.array(range(self.rsp.maxB)) * self.rsp.delayB + np.ones(self.rsp.maxB) * self.rsp.firstB  # basal root emergence times
+        bl = np.zeros(times.size)  # summed root lengths
+        for j, t in enumerate(times):
+            i = 0  # basal root counter
+            while t - etB[i] > 0:
+                bl[j] += rootLength(t - etB[i], self.p0.r, self.p0.getK())
+                i += 1
+
+        # todo
 
 #     def test_length_with_laterals(self):
 #         """ run a simulation with a fibrous root system and compares to analytic lengths"""
@@ -142,7 +155,7 @@ class TestRootSystem(unittest.TestCase):
 
         # test currently does not run for Anagallis
 
-        name = "Anagallis_femina_Leitner_2010"  # "Anagallis_femina_Leitner_2010"  # "Anagallis_femina_Leitner_2010"  # "Zea_mays_4_Leitner_2014"
+        name = "maize_p2"  # "maize_p2"  # "Anagallis_femina_Leitner_2010"  # "Zea_mays_4_Leitner_2014"
         rs = rb.RootSystem()
         rs.openFile(name)
         rs.initialize()
