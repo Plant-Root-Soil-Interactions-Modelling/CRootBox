@@ -213,7 +213,7 @@ double Root::calcCreationTime(double length)
 }
 
 /**
- * Analytical length of the root at a given age
+ * Analytical length of the single root at a given age
  *
  * @param age          age of the root [day]
  * @return             root length [cm]
@@ -225,9 +225,10 @@ double Root::calcLength(double age)
 }
 
 /**
- * Analytical age of the root at a given length
+ * Analytical age of the single root at a given length
  *
  * @param length   length of the root [cm]
+ * @return local age [day]
  */
 double Root::calcAge(double length)
 {

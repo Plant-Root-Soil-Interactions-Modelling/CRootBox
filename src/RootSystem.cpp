@@ -180,8 +180,8 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
         }
         double delay = rs.firstB;
         for (int i=0; i<maxB; i++) {
-            Root* basalroot = new Root(this, basaltype, iheading ,delay, nullptr, 0, 0);
-            basalroot->addNode(taproot->getNode(0), taproot->getNodeId(0),delay);
+            Root* basalroot = new Root(this, basaltype, iheading, delay, nullptr, 0, 0);
+            basalroot->addNode(taproot->getNode(0), taproot->getNodeId(0), delay);
             baseOrgans.push_back(basalroot);
             delay += rs.delayB;
         }
