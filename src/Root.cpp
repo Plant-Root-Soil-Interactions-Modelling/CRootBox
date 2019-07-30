@@ -276,7 +276,9 @@ void Root::createLateral(bool verbose)
 Vector3d Root::heading()
 {
     if (nodes.size()>1) {
-        return nodes.back().minus(nodes.at(nodes.size()-2)); // getHeading(b-a)
+        auto h = nodes.back().minus(nodes.at(nodes.size()-2)); // a->b = b-a
+        h.normalize();
+        return h;
     } else {
         return iHeading;
     }
@@ -374,13 +376,7 @@ void Root::createSegments(double l, double dt, bool verbose)
  */
 Vector3d Root::getIncrement(const Vector3d& p, double sdx)
 {
-    Vector3d h; // current heading
-    if (nodes.size() > 1) {
-        h = nodes.back().minus(nodes.at(nodes.size() - 2));
-        h.normalize();
-    } else {
-        h = iHeading;
-    }
+    Vector3d h = heading();
     Matrix3d ons = Matrix3d::ons(h);
     Vector2d ab = getRootTypeParameter()->f_tf->getHeading(p, ons, sdx, this);
     Vector3d sv = ons.times(Vector3d::rotAB(ab.x,ab.y));

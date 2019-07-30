@@ -229,9 +229,11 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
  */
 void RootSystem::initCallbacks()
 {
+    std::cout << "initCallbacks()" << "\n";
     // Create tropisms and growth functions per root type
     for (auto& p_otp :organParam[Organism::ot_root]) {
         RootTypeParameter* rtp = (RootTypeParameter*)p_otp.second;
+        std::cout << "for sub type "<< rtp->subType << "\n";
         Tropism* tropism = this->createTropismFunction(rtp->tropismT, rtp->tropismN, rtp->tropismS);
         tropism->setGeometry(geometry);
         delete rtp->f_tf; // delete old tropism
@@ -349,6 +351,7 @@ void RootSystem::simulate(double dt, double maxinc_, ProportionalElongation* se,
  * @return          the tropism class containing with the callback functions
  */
 Tropism* RootSystem::createTropismFunction(int tt, double N, double sigma) {
+    std::cout << "Creating (" << tt << ", " << N << ", " << sigma <<")\n";
     switch (tt) {
     case tt_plagio: return new Plagiotropism(this,N,sigma);
     case tt_gravi: return new Gravitropism(this,N,sigma);

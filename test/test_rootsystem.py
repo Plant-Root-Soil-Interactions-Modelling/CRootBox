@@ -67,8 +67,8 @@ class TestRootSystem(unittest.TestCase):
     def test_root_type_parameters(self):
         """ root type parameters xml read and write """
         self.root_example_rtp()
-        print(self.p0.__str__(False))
-        print(self.p1.__str__(False))
+#         print(self.p0.__str__(False))
+#         print(self.p1.__str__(False))
         print(rb.Organism.organTypeName(self.p0.organType))
         self.rs.writeParameters("test_parameters.xml", "RootBox", False)  # include comments
         rs1 = rb.RootSystem
@@ -90,16 +90,18 @@ class TestRootSystem(unittest.TestCase):
                 bl[j] += rootLength(t - etB[i], self.p0.r, self.p0.getK())
                 i += 1
 
-        # todo
+        # TODO
 
-#     def test_length_with_laterals(self):
-#         """ run a simulation with a fibrous root system and compares to analytic lengths"""
+    def test_length_with_laterals(self):
+        """ run a simulation with a fibrous root system and compares to analytic lengths"""
 #         name = "Anagallis_femina_Leitner_2010"
 #         rs = rb.RootSystem()
 #         rs.openFile(name)
 #         rs.initialize()
 #         rs.simulate(7)
 #         # todo
+        pass
+    # TODO
 
     def test_copy(self):
         """ checks if the root system can be copied, and if randomness works """
@@ -126,7 +128,7 @@ class TestRootSystem(unittest.TestCase):
         self.assertEqual(rs3.rand(), n2, "copy: simulation not deterministic")
 
     def test_polylines(self):
-        """checks if the polyliens have the right tips and bases """
+        """checks if the polylines have the right tips and bases """
         name = "Brassica_napus_a_Leitner_2010"
         rs = rb.RootSystem()
         rs.openFile(name)
@@ -152,10 +154,7 @@ class TestRootSystem(unittest.TestCase):
 #
     def test_dynamics(self):
         """ incremental root system growth like needed for coupling"""
-
-        # test currently does not run for Anagallis
-
-        name = "maize_p2"  # "maize_p2"  # "Anagallis_femina_Leitner_2010"  # "Zea_mays_4_Leitner_2014"
+        name = "Anagallis_femina_Leitner_2010"  # "maize_p2"  # "Anagallis_femina_Leitner_2010"  # "Zea_mays_4_Leitner_2014"
         rs = rb.RootSystem()
         rs.openFile(name)
         rs.initialize()
@@ -204,17 +203,17 @@ class TestRootSystem(unittest.TestCase):
         uneq = np.sum(seg_ != seg) / 2
         self.assertEqual(uneq, 0, "incremental growth: segment lists are not equal")
 
-#     def test_rsml(self):
-#         """ checks rsml functionality with Python rsml reader """
-#         name = "Anagallis_femina_Leitner_2010"
-#         rs = rb.RootSystem()
-#         rs.openFile(name)
-#         rs.initialize()
-#         simtime = 60
-#         rs.simulate(simtime)
-#         rs.writeRSML(name + ".rsml")
-#         pl, props, funcs = read_rsml(name + ".rsml")
-#         # todo
+    def test_rsml(self):
+        """ checks rsml functionality with Python rsml reader """
+        name = "Anagallis_femina_Leitner_2010"
+        rs = rb.RootSystem()
+        rs.openFile(name)
+        rs.initialize()
+        simtime = 60
+        rs.simulate(simtime)
+        rs.writeRSML(name + ".rsml")
+        pl, props, funcs = read_rsml(name + ".rsml")
+        # todo
 
 #     def test_stack(self):
 #         """ checks if push and pop are working """

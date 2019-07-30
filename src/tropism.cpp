@@ -92,6 +92,7 @@ Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,cons
  */
 Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const Organ* o)
 {
+    std::cout << "n " << n << ", " << sigma << "\n";
     Vector2d h = this->getUCHeading(pos, old, dx, o);
     double a = h.x;
     double b = h.y;
@@ -106,7 +107,7 @@ Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const
         int j=0;    // counts change in beta
 
         while (d>0) { // not valid
-
+            std::cout <<  "Tropism::getHeading point no valid \n";
             i++;
             j=0;
             while ((d>0) && j<betaN) { // change beta
@@ -126,7 +127,7 @@ Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const
             }
 
             if (i>alphaN) {
-                // std::cout << "Could not respect geometry boundaries \n";
+                std::cout << "Could not respect geometry boundaries \n";
                 a = bestA;
                 b = bestB;
                 break;
