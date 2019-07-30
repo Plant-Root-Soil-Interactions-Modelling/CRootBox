@@ -48,13 +48,13 @@ Vector3d Tropism::getPosition(const Vector3d& pos, Matrix3d old, double a, doubl
 Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,const Organ* o)
 {
     double a = sigma*plant->randn()*sqrt(dx);
-    double b = rand()*2*M_PI;
+    double b = plant->rand()*2*M_PI;
     double v;
 
     double n_=n*sqrt(dx);
     if (n_>0) {
         double dn = n_-floor(n_);
-        if (rand()<dn) {
+        if (plant->rand()<dn) {
             n_ = ceil(n_);
         } else {
             n_ = floor(n_);
@@ -63,7 +63,7 @@ Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,cons
         double bestB = b;
         double bestV = this->tropismObjective(pos,old,a,b,dx,o);
         for (int i=0; i<n_; i++) {
-            b = rand()*2*M_PI;
+            b = plant->rand()*2*M_PI;
             a = sigma*plant->randn()*sqrt(dx);
             v = this->tropismObjective(pos,old,a,b,dx,o);
             if (v<bestV) {
@@ -92,7 +92,7 @@ Vector2d Tropism::getUCHeading(const Vector3d& pos, Matrix3d old, double dx,cons
  */
 Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const Organ* o)
 {
-    std::cout << "n " << n << ", " << sigma << "\n";
+    // std::cout << "n " << n << ", " << sigma << "\n";
     Vector2d h = this->getUCHeading(pos, old, dx, o);
     double a = h.x;
     double b = h.y;
@@ -107,12 +107,11 @@ Vector2d Tropism::getHeading(const Vector3d& pos, Matrix3d old, double dx, const
         int j=0;    // counts change in beta
 
         while (d>0) { // not valid
-            std::cout <<  "Tropism::getHeading point no valid \n";
             i++;
             j=0;
             while ((d>0) && j<betaN) { // change beta
 
-                b = 2*M_PI*rand(); // dice
+                b = 2*M_PI*plant->rand(); // dice
                 d = geometry->getDist(this->getPosition(pos,old,a,b,dx));
                 if (d<dmin) {
                     dmin = d;

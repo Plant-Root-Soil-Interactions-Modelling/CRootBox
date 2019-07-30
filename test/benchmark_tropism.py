@@ -5,8 +5,8 @@ from rsml import *
 
 fig, axes = plt.subplots(4, 4)
 
-N = [0, 1, 5, 10]
-sigma = [0, 0.3, 0.5, 0.7]
+N = [0, 1, 2, 4]
+sigma = [0, 0.2, 0.4, 0.6]
 
 c = 0
 for i, n in enumerate(N):
@@ -24,13 +24,14 @@ for i, n in enumerate(N):
         p0.tropismT = 1
         p0.tropismN = n
         p0.tropismS = s
-        p0.dx = 2
+        p0.dx = 0.5
         rs.setOrganTypeParameter(p0)
 
         rs.initialize()
         rs.simulate(50)
 
         axes[i][j].set_title("n: " + str(n) + ", sigma: " + str(s))  #
+        axes[i][j].axis('equal')
 
         nodes = vv2a(rs.getNodes())
         segs = seg2a(rs.getSegments())
