@@ -119,7 +119,7 @@ void Root::simulate(double dt, bool verbose)
             if (active) {
 
                 // length increment
-                double age_ = calcAge(length); // root age
+                double age_ = calcAge(length); // root age as if grown unimpeded (lower than real age)
                 double dt_; // time step
                 if (age<dt) { // the root emerged in this time step, adjust time step
                     dt_= age;
@@ -191,7 +191,7 @@ void Root::simulate(double dt, bool verbose)
 }
 
 /**
- * Analytical creation (=emergence) time of a point along the root
+ * Analytical creation (=emergence) time of a point along the already grown root
  *
  * @param length   length along the root, where the point is located [cm]
  * @return         the analytic time when this point was reached by the growing root [day]
@@ -200,6 +200,7 @@ double Root::calcCreationTime(double length)
 {
     assert(length >= 0 && "Root::getCreationTime() negative length");
     double rootage = calcAge(length);
+    rootage = std::min(rootage, age);
     assert(rootage >= 0 && "Root::getCreationTime() negative root age");
     if (parent!=nullptr) {
         double pl = parentBaseLength+((RootParameter*)parent->getParam())->la;
@@ -315,12 +316,6 @@ void Root::createSegments(double l, double dt, bool verbose)
                 Vector3d newdxv = getIncrement(n2, sdx);
                 nodes[nn - 1] = Vector3d(n2.plus(newdxv));
                 double et = this->calcCreationTime(length+newdx);
-//                if (et>1.e8) {
-//                    std::cout << "Root::createSegments could not calculate ct in movement "
-//                        << this->param()->getK() << ", "<< length+newdx << "\n" << std::flush;
-//                }
-                et = std::max(et,plant->getSimTime());
-                et = std::min(et,plant->getSimTime()+dt);
                 nodeCTs[nn-1] = et; // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
                 moved = true;
                 l -= newdx;
@@ -355,12 +350,6 @@ void Root::createSegments(double l, double dt, bool verbose)
         Vector3d newdx = getIncrement(nodes.back(), sdx);
         Vector3d newnode = Vector3d(nodes.back().plus(newdx));
         double et = this->calcCreationTime(length+sl);
-        //        if (et>1.e8) {
-        //            std::cout << "Root::createSegments could not calculate ct "
-        //                << this->param()->getK() << ", "<< length+sl << "\n" << std::flush;
-        //        }
-        et = std::max(et,plant->getSimTime());
-        et = std::min(et,plant->getSimTime()+dt);
         // in case of impeded growth the node emergence time is not exact anymore,
         // but might break down to temporal resolution
         addNode(newnode,et);

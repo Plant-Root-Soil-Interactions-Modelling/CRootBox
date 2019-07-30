@@ -1,12 +1,21 @@
+"""
+Shows basal tropism paramter influence on basal roots  
+with 4x4 subfigures, different axial resolutions, should lead
+to similar results  
+"""
+
 import py_rootbox as rb
 import matplotlib.pyplot as plt
 from rb_tools import *
 from rsml import *
+from cmath import pi
 
-fig, axes = plt.subplots(4, 4)
-
+dx = 0.5
+theta = 70 / 180 * pi
 N = [0, 1, 2, 4]
 sigma = [0, 0.2, 0.4, 0.6]
+
+fig, axes = plt.subplots(4, 4)
 
 c = 0
 for i, n in enumerate(N):
@@ -21,10 +30,13 @@ for i, n in enumerate(N):
         rs.setRootSystemParameter(rsp)
         p0 = rb.RootTypeParameter(rs)
         p0.name, p0.type, p0.la, p0.nob, p0.ln, p0.r, p0.dx = "taproot", 1, 10, 20, 89. / 19., 1, 0.5
-        p0.tropismT = 1
+
+        p0.tropismT = 1  # GRAVI
         p0.tropismN = n
         p0.tropismS = s
-        p0.dx = 0.5
+        p0.dx = dx
+        p0.theta = theta
+
         rs.setOrganTypeParameter(p0)
 
         rs.initialize()

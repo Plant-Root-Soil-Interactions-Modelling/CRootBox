@@ -8,8 +8,9 @@
  */
 
 #include <cmath>
-#include <assert.h>
 #include <sstream>
+// #undef NDEBUG // <- turn assert always ON
+#include <assert.h>
 
 namespace CRootBox {
 

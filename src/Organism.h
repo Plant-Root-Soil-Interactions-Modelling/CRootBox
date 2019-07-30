@@ -85,7 +85,7 @@ public:
     void writeParameters(std::string name, std::string basetag = "organism", bool comments = true) const; ///< write all organ type parameters into a xml file
     virtual void writeRSML(std::string name) const; ///< writes a RSML file
     int getRSMLSkip() const { return rsmlSkip; } ///< skips points in the RSML output (default = 0)
-    void setRSMLSkip(int skip) { assert(rsmlSkip>=0); rsmlSkip = skip;  } ///< skips points in the RSML output (default = 0)
+    void setRSMLSkip(int skip) { assert(rsmlSkip>=0 && "rsmlSkip must be >= 0" ); rsmlSkip = skip;  } ///< skips points in the RSML output (default = 0)
     std::vector<std::string>& getRSMLProperties() { return rsmlProperties; } ///< reference to the vector<string> of RSML property names, default is { "organType", "subType","length", "age"  }
 
     /* id management */
