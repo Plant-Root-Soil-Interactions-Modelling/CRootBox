@@ -170,7 +170,6 @@ void Organ::addNode(Vector3d n, double t)
 /**
  * By default the organ is represented by a polyline,
  * i.e. the segments of the nodes {n1, n2, n3, n4}, are { [i1,i2], [i2,i3], [i3,i4] }, where i1-i4 are node indices.
- * For other type of geometries this member function must be overwritten.
  *
  * @return A vector of line segments, where each line segment is described as two global node indices.
  * If there are less than two nodes an empty vector is returned.

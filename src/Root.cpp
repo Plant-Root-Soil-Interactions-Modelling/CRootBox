@@ -203,14 +203,7 @@ double Root::calcCreationTime(double length)
     double rootage = calcAge(length);
     rootage = std::min(rootage, age);
     assert(rootage >= 0 && "Root::getCreationTime() negative root age");
-    if (parent!=nullptr) {
-        double pl = parentBaseLength+((RootParameter*)parent->getParam())->la;
-        double page=((Root*)parent)->calcCreationTime(pl);
-        assert(page>=0 && "Root::getCreationTime() parent root age is negative");
-        return rootage+page;
-    } else {
-        return rootage+nodeCTs[0];
-    }
+    return rootage+nodeCTs[0];
 }
 
 /**

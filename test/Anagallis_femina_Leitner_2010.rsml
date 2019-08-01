@@ -570,8 +570,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="2.3428882148995953"/>
-                                <sample value="2.5954173548998267"/>
+                                <sample value="2.3428882148995949"/>
+                                <sample value="2.5954173548998263"/>
                                 <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -735,8 +735,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="3.2585481274669177"/>
-                                <sample value="3.5148939476712355"/>
+                                <sample value="3.2585481274669181"/>
+                                <sample value="3.514893947671236"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -783,8 +783,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="3.6297757555536174"/>
-                                <sample value="3.8986121908367894"/>
+                                <sample value="3.629775755553617"/>
+                                <sample value="3.898612190836789"/>
                                 <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -1044,8 +1044,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="6.0194999850279407"/>
-                                <sample value="6.315433243049136"/>
+                                <sample value="6.0194999850279416"/>
+                                <sample value="6.3154332430491369"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -1236,8 +1236,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="8.4560022381782929"/>
-                                <sample value="8.7620160057408754"/>
+                                <sample value="8.4560022381782911"/>
+                                <sample value="8.7620160057408736"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -1284,8 +1284,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="9.1275383923741114"/>
-                                <sample value="9.4044203112021201"/>
+                                <sample value="9.1275383923741096"/>
+                                <sample value="9.4044203112021183"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -1515,7 +1515,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="144"/>
@@ -1803,7 +1803,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="59.999999999999986"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="174"/>
@@ -2889,8 +2889,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="7.4635427646865287"/>
-                                <sample value="7.6759607296181525"/>
+                                <sample value="7.4635427646865278"/>
+                                <sample value="7.6759607296181516"/>
                                 <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -3024,7 +3024,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000014"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="289"/>
@@ -3033,8 +3033,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="9.773591591378473"/>
-                                <sample value="10.079976634711501"/>
+                                <sample value="9.7735915913784712"/>
+                                <sample value="10.0799766347115"/>
                                 <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -3081,8 +3081,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="10.327905526846752"/>
-                                <sample value="10.612077896838311"/>
+                                <sample value="10.327905526846751"/>
+                                <sample value="10.61207789683831"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -3120,7 +3120,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="299"/>
@@ -3360,7 +3360,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="324"/>
@@ -3369,9 +3369,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="16.204677943947136"/>
-                                <sample value="16.51067377470283"/>
-                                <sample value="60"/>
+                                <sample value="16.204677943947139"/>
+                                <sample value="16.510673774702834"/>
+                                <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="323"/>
@@ -3813,7 +3813,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000014"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="370"/>
@@ -3822,9 +3822,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="34.102389397615376"/>
-                                <sample value="34.343637423212996"/>
-                                <sample value="60.000000000000014"/>
+                                <sample value="34.102389397615369"/>
+                                <sample value="34.343637423212989"/>
+                                <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="369"/>
@@ -4144,8 +4144,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="3.6705013529274875"/>
-                                <sample value="3.928934079224601"/>
+                                <sample value="3.6705013529274879"/>
+                                <sample value="3.9289340792246015"/>
                                 <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -4192,8 +4192,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="4.0923724140867836"/>
-                                <sample value="4.3771220564666198"/>
+                                <sample value="4.0923724140867845"/>
+                                <sample value="4.3771220564666207"/>
                                 <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -4501,8 +4501,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="8.6587806777146152"/>
-                                <sample value="8.9261791964960011"/>
+                                <sample value="8.658780677714617"/>
+                                <sample value="8.9261791964960029"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -4549,8 +4549,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="9.9604655597959528"/>
-                                <sample value="10.196894087527056"/>
+                                <sample value="9.9604655597959546"/>
+                                <sample value="10.196894087527058"/>
                                 <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -4859,8 +4859,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="2.8508437618831604"/>
-                                <sample value="3.2255086890093789"/>
+                                <sample value="2.8508437618831608"/>
+                                <sample value="3.2255086890093798"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -4955,8 +4955,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="3.6960856496714594"/>
-                                <sample value="4.0008483386198588"/>
+                                <sample value="3.6960856496714598"/>
+                                <sample value="4.0008483386198597"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -5072,8 +5072,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="4.6339772964876076"/>
-                                <sample value="4.8542815431484074"/>
+                                <sample value="4.6339772964876085"/>
+                                <sample value="4.8542815431484083"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -5120,8 +5120,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="5.2567294484777136"/>
-                                <sample value="5.5215248259987817"/>
+                                <sample value="5.2567294484777145"/>
+                                <sample value="5.5215248259987826"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -5429,8 +5429,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="12.718758096900883"/>
-                                <sample value="12.980316328570789"/>
+                                <sample value="12.718758096900881"/>
+                                <sample value="12.980316328570787"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -5525,8 +5525,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="18.480876122058753"/>
-                                <sample value="18.754011235662698"/>
+                                <sample value="18.480876122058756"/>
+                                <sample value="18.754011235662702"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -5853,8 +5853,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="4.8179490334785875"/>
-                                <sample value="5.1124338955129183"/>
+                                <sample value="4.8179490334785866"/>
+                                <sample value="5.1124338955129174"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -5970,8 +5970,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="6.0716030183802534"/>
-                                <sample value="6.3417051738641579"/>
+                                <sample value="6.0716030183802525"/>
+                                <sample value="6.341705173864157"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -6204,8 +6204,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="9.381416873350588"/>
-                                <sample value="9.6388202505494576"/>
+                                <sample value="9.3814168733505863"/>
+                                <sample value="9.6388202505494558"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -6796,7 +6796,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="650"/>
@@ -6805,8 +6805,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="6.058586964587537"/>
-                                <sample value="6.3393470268392047"/>
+                                <sample value="6.0585869645875361"/>
+                                <sample value="6.3393470268392038"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -7441,7 +7441,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="716"/>
@@ -7450,9 +7450,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="16.629908282975236"/>
-                                <sample value="16.89526712883282"/>
-                                <sample value="60"/>
+                                <sample value="16.62990828297524"/>
+                                <sample value="16.895267128832824"/>
+                                <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="715"/>
@@ -7519,9 +7519,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="18.871834544657343"/>
-                                <sample value="19.154679365148191"/>
-                                <sample value="60"/>
+                                <sample value="18.871834544657347"/>
+                                <sample value="19.154679365148194"/>
+                                <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="720"/>
@@ -7615,8 +7615,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="23.621123237927034"/>
-                                <sample value="23.894916733530273"/>
+                                <sample value="23.621123237927037"/>
+                                <sample value="23.894916733530277"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -7847,8 +7847,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="3.4115162412616868"/>
-                                <sample value="3.6834073083555317"/>
+                                <sample value="3.4115162412616864"/>
+                                <sample value="3.6834073083555312"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -7991,8 +7991,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="4.3729366880383811"/>
-                                <sample value="4.6132668241653381"/>
+                                <sample value="4.372936688038382"/>
+                                <sample value="4.613266824165339"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -8087,9 +8087,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="5.3928075593577081"/>
-                                <sample value="5.6407494220821626"/>
-                                <sample value="60"/>
+                                <sample value="5.3928075593577089"/>
+                                <sample value="5.6407494220821635"/>
+                                <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="775"/>
@@ -8635,7 +8635,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="831"/>
@@ -8644,7 +8644,7 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="4.0067370106783171"/>
+                                <sample value="4.006737010678318"/>
                                 <sample value="4.2989664997968262"/>
                                 <sample value="60.000000000000007"/>
                             </function>
@@ -8692,8 +8692,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="4.6752056489940959"/>
-                                <sample value="4.9458448159704993"/>
+                                <sample value="4.675205648994095"/>
+                                <sample value="4.9458448159704984"/>
                                 <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -8740,9 +8740,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="5.9210383158161957"/>
-                                <sample value="6.2071950547978147"/>
-                                <sample value="60.000000000000007"/>
+                                <sample value="5.9210383158161948"/>
+                                <sample value="6.207195054797813"/>
+                                <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="839"/>
@@ -8939,8 +8939,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="4.3152205874523002"/>
-                                <sample value="4.5630745970803694"/>
+                                <sample value="4.3152205874523011"/>
+                                <sample value="4.5630745970803703"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -9365,7 +9365,7 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="7.7112504166552975"/>
+                                <sample value="7.7112504166552984"/>
                                 <sample value="8.0344084028680083"/>
                                 <sample value="60"/>
                             </function>
@@ -9404,7 +9404,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="901"/>
@@ -9596,7 +9596,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="921"/>
@@ -9818,8 +9818,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="11.488962717702668"/>
-                                <sample value="11.779561987080349"/>
+                                <sample value="11.48896271770267"/>
+                                <sample value="11.779561987080351"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -10022,7 +10022,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="963"/>
@@ -10031,9 +10031,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="13.567392410535939"/>
-                                <sample value="13.813563258786372"/>
-                                <sample value="60"/>
+                                <sample value="13.567392410535941"/>
+                                <sample value="13.813563258786374"/>
+                                <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="962"/>
@@ -10070,7 +10070,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="968"/>
@@ -10079,8 +10079,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="14.278303301920399"/>
-                                <sample value="14.593452653114589"/>
+                                <sample value="14.278303301920401"/>
+                                <sample value="14.593452653114591"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -10127,8 +10127,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="14.894370418763295"/>
-                                <sample value="15.190711082777462"/>
+                                <sample value="14.894370418763296"/>
+                                <sample value="15.190711082777463"/>
                                 <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -10292,9 +10292,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="16.836661035274965"/>
-                                <sample value="17.131043681103506"/>
-                                <sample value="60"/>
+                                <sample value="16.836661035274961"/>
+                                <sample value="17.131043681103503"/>
+                                <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="988"/>
@@ -10436,9 +10436,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="19.259029435830332"/>
-                                <sample value="19.494251577374378"/>
-                                <sample value="60"/>
+                                <sample value="19.259029435830328"/>
+                                <sample value="19.494251577374374"/>
+                                <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="1003"/>
@@ -10736,7 +10736,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1035"/>
@@ -10853,7 +10853,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1046"/>
@@ -10997,7 +10997,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1061"/>
@@ -11093,7 +11093,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1071"/>
@@ -11381,7 +11381,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1101"/>
@@ -12015,7 +12015,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1148"/>
@@ -12354,9 +12354,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="11.249816082839189"/>
-                                <sample value="11.508500095666564"/>
-                                <sample value="60"/>
+                                <sample value="11.249816082839187"/>
+                                <sample value="11.508500095666562"/>
+                                <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="1178"/>
@@ -12498,8 +12498,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="13.258076590400004"/>
-                                <sample value="13.559903381377909"/>
+                                <sample value="13.258076590400005"/>
+                                <sample value="13.559903381377911"/>
                                 <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -12615,9 +12615,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="14.365198579794781"/>
-                                <sample value="14.599606542716254"/>
-                                <sample value="60"/>
+                                <sample value="14.365198579794779"/>
+                                <sample value="14.599606542716252"/>
+                                <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="1205"/>
@@ -12711,8 +12711,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="15.977667960359591"/>
-                                <sample value="16.276112972542517"/>
+                                <sample value="15.977667960359593"/>
+                                <sample value="16.276112972542521"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -13272,7 +13272,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1273"/>
@@ -13425,9 +13425,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="32.250675633567944"/>
-                                <sample value="32.455602078789887"/>
-                                <sample value="60"/>
+                                <sample value="32.250675633567937"/>
+                                <sample value="32.45560207878988"/>
+                                <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="1287"/>
@@ -13512,7 +13512,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999986"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1298"/>
@@ -13521,9 +13521,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="36.431717571587413"/>
-                                <sample value="36.694530383763144"/>
-                                <sample value="60"/>
+                                <sample value="36.431717571587406"/>
+                                <sample value="36.694530383763137"/>
+                                <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="1297"/>
@@ -13986,8 +13986,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="5.232933388457111"/>
-                                <sample value="5.4968810724769694"/>
+                                <sample value="5.2329333884571101"/>
+                                <sample value="5.4968810724769686"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -14103,8 +14103,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="6.1649367038097562"/>
-                                <sample value="6.448537532308559"/>
+                                <sample value="6.1649367038097553"/>
+                                <sample value="6.4485375323085581"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -14364,8 +14364,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="8.8773844921056284"/>
-                                <sample value="9.1769562473034743"/>
+                                <sample value="8.8773844921056302"/>
+                                <sample value="9.176956247303476"/>
                                 <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -14547,7 +14547,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60.000000000000014"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1393"/>
@@ -14595,7 +14595,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1398"/>
@@ -14877,7 +14877,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1425"/>
@@ -14886,8 +14886,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="20.075283163218401"/>
-                                <sample value="20.373559758039686"/>
+                                <sample value="20.075283163218398"/>
+                                <sample value="20.373559758039683"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -14973,7 +14973,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1435"/>
@@ -14994,7 +14994,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1437"/>
@@ -15003,9 +15003,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="27.647773288141089"/>
-                                <sample value="27.897522256261873"/>
-                                <sample value="60.000000000000007"/>
+                                <sample value="27.647773288141085"/>
+                                <sample value="27.897522256261869"/>
+                                <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="1434"/>
@@ -15275,8 +15275,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="6.4992919019136464"/>
-                                <sample value="6.8197669504797309"/>
+                                <sample value="6.4992919019136455"/>
+                                <sample value="6.81976695047973"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -15623,7 +15623,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1494"/>
@@ -15632,8 +15632,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="10.839614700346939"/>
-                                <sample value="11.109765514936168"/>
+                                <sample value="10.839614700346937"/>
+                                <sample value="11.109765514936164"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -15671,7 +15671,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999986"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1499"/>
@@ -15824,8 +15824,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="15.421320917170203"/>
-                                <sample value="15.679856577251599"/>
+                                <sample value="15.421320917170201"/>
+                                <sample value="15.679856577251597"/>
                                 <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -16335,9 +16335,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="7.7974812217948068"/>
-                                <sample value="8.0675858036555361"/>
-                                <sample value="60"/>
+                                <sample value="7.797481221794806"/>
+                                <sample value="8.0675858036555343"/>
+                                <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="1559"/>
@@ -16692,8 +16692,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="10.90706848817638"/>
-                                <sample value="11.190934644905704"/>
+                                <sample value="10.907068488176382"/>
+                                <sample value="11.190934644905706"/>
                                 <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -16932,8 +16932,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="13.921862542541675"/>
-                                <sample value="14.197296530408536"/>
+                                <sample value="13.921862542541676"/>
+                                <sample value="14.197296530408538"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -17040,7 +17040,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1632"/>
@@ -17145,8 +17145,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="17.033999611900231"/>
-                                <sample value="17.356424418809286"/>
+                                <sample value="17.033999611900235"/>
+                                <sample value="17.35642441880929"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -17205,7 +17205,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1649"/>
@@ -17445,7 +17445,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1673"/>
@@ -17791,7 +17791,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1702"/>
@@ -17800,8 +17800,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="8.7240908041370933"/>
-                                <sample value="8.9580028590948366"/>
+                                <sample value="8.724090804137095"/>
+                                <sample value="8.9580028590948384"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -17848,8 +17848,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="9.4775740441774801"/>
-                                <sample value="9.7338508082289046"/>
+                                <sample value="9.4775740441774783"/>
+                                <sample value="9.733850808228901"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -17944,8 +17944,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="13.31563753757468"/>
-                                <sample value="13.56781601470761"/>
+                                <sample value="13.315637537574682"/>
+                                <sample value="13.567816014707612"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -18205,7 +18205,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1741"/>
@@ -18598,8 +18598,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="13.119436896036602"/>
-                                <sample value="13.380871494581884"/>
+                                <sample value="13.1194368960366"/>
+                                <sample value="13.380871494581882"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -18733,7 +18733,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1796"/>
@@ -18742,9 +18742,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="16.240258138957564"/>
-                                <sample value="16.502289539707952"/>
-                                <sample value="60"/>
+                                <sample value="16.240258138957568"/>
+                                <sample value="16.502289539707956"/>
+                                <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="1795"/>
@@ -18790,8 +18790,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="17.811198459470809"/>
-                                <sample value="18.08643300779568"/>
+                                <sample value="17.811198459470813"/>
+                                <sample value="18.086433007795684"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -18829,7 +18829,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60.000000000000014"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1806"/>
@@ -18877,7 +18877,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60.000000000000014"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1811"/>
@@ -19287,7 +19287,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000014"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1847"/>
@@ -19296,9 +19296,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="8.4381426331447731"/>
-                                <sample value="8.6890187450332608"/>
-                                <sample value="60.000000000000014"/>
+                                <sample value="8.4381426331447713"/>
+                                <sample value="8.689018745033259"/>
+                                <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="1846"/>
@@ -19584,9 +19584,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="10.900440181352296"/>
-                                <sample value="11.156146416638235"/>
-                                <sample value="60.000000000000007"/>
+                                <sample value="10.900440181352298"/>
+                                <sample value="11.156146416638236"/>
+                                <sample value="60.000000000000014"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="1876"/>
@@ -19680,8 +19680,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="12.100111058978182"/>
-                                <sample value="12.408856874221792"/>
+                                <sample value="12.100111058978181"/>
+                                <sample value="12.40885687422179"/>
                                 <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -19824,9 +19824,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="13.784652538516061"/>
-                                <sample value="14.021845363423429"/>
-                                <sample value="60.000000000000007"/>
+                                <sample value="13.784652538516063"/>
+                                <sample value="14.021845363423431"/>
+                                <sample value="60.000000000000014"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="1901"/>
@@ -19872,8 +19872,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="14.588907951528117"/>
-                                <sample value="14.834718217985079"/>
+                                <sample value="14.588907951528119"/>
+                                <sample value="14.834718217985081"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -19920,8 +19920,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="15.411716588095665"/>
-                                <sample value="15.704758954145328"/>
+                                <sample value="15.411716588095667"/>
+                                <sample value="15.70475895414533"/>
                                 <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -20364,7 +20364,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000014"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1958"/>
@@ -20651,8 +20651,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="9.2004794513420887"/>
-                                <sample value="9.4761570677996509"/>
+                                <sample value="9.2004794513420904"/>
+                                <sample value="9.4761570677996527"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -20690,7 +20690,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1982"/>
@@ -20699,8 +20699,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="9.6563511972079663"/>
-                                <sample value="9.9571732362398357"/>
+                                <sample value="9.6563511972079681"/>
+                                <sample value="9.9571732362398375"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -20738,7 +20738,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="1987"/>
@@ -20747,8 +20747,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="9.9736726483493285"/>
-                                <sample value="10.304097500767995"/>
+                                <sample value="9.9736726483493268"/>
+                                <sample value="10.304097500767993"/>
                                 <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -20939,8 +20939,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="11.528187226163784"/>
-                                <sample value="11.798704315986114"/>
+                                <sample value="11.528187226163785"/>
+                                <sample value="11.798704315986116"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -21074,7 +21074,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2022"/>
@@ -21083,8 +21083,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="12.884208578907623"/>
-                                <sample value="13.128072189787158"/>
+                                <sample value="12.884208578907625"/>
+                                <sample value="13.12807218978716"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -21131,9 +21131,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="13.315507459395844"/>
-                                <sample value="13.534445146067219"/>
-                                <sample value="60"/>
+                                <sample value="13.315507459395842"/>
+                                <sample value="13.534445146067217"/>
+                                <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="2026"/>
@@ -21179,9 +21179,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="13.800201553901219"/>
-                                <sample value="14.027718689912655"/>
-                                <sample value="59.999999999999993"/>
+                                <sample value="13.800201553901221"/>
+                                <sample value="14.027718689912657"/>
+                                <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="2031"/>
@@ -21218,7 +21218,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="59.999999999999986"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2037"/>
@@ -21506,7 +21506,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="59.999999999999986"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2067"/>
@@ -21515,9 +21515,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="18.718873656001904"/>
-                                <sample value="18.996882379656174"/>
-                                <sample value="60"/>
+                                <sample value="18.7188736560019"/>
+                                <sample value="18.996882379656171"/>
+                                <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="2066"/>
@@ -21602,7 +21602,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="59.999999999999986"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2077"/>
@@ -21746,7 +21746,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999986"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2092"/>
@@ -21755,8 +21755,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="23.212007391883787"/>
-                                <sample value="23.477239139005189"/>
+                                <sample value="23.212007391883791"/>
+                                <sample value="23.477239139005192"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -22247,7 +22247,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999986"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2143"/>
@@ -22854,8 +22854,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="10.240111062405395"/>
-                                <sample value="10.526636293509974"/>
+                                <sample value="10.240111062405393"/>
+                                <sample value="10.526636293509972"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -23250,7 +23250,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2236"/>
@@ -23596,8 +23596,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="10.651992636147346"/>
-                                <sample value="10.919278389093101"/>
+                                <sample value="10.651992636147348"/>
+                                <sample value="10.919278389093103"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -23740,8 +23740,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="11.527560987750816"/>
-                                <sample value="11.776685523858385"/>
+                                <sample value="11.527560987750814"/>
+                                <sample value="11.776685523858383"/>
                                 <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -23980,9 +23980,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="13.737826763081046"/>
-                                <sample value="14.046194616388661"/>
-                                <sample value="59.999999999999993"/>
+                                <sample value="13.737826763081047"/>
+                                <sample value="14.046194616388663"/>
+                                <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="2306"/>
@@ -24028,8 +24028,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="14.312576305128298"/>
-                                <sample value="14.582241983581895"/>
+                                <sample value="14.312576305128299"/>
+                                <sample value="14.582241983581897"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -24328,7 +24328,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="59.999999999999986"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2343"/>
@@ -24337,9 +24337,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="20.090277406019162"/>
-                                <sample value="20.375675002023193"/>
-                                <sample value="60"/>
+                                <sample value="20.090277406019158"/>
+                                <sample value="20.37567500202319"/>
+                                <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="2342"/>
@@ -24837,8 +24837,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="13.690443149359139"/>
-                                <sample value="13.960284127084703"/>
+                                <sample value="13.690443149359137"/>
+                                <sample value="13.960284127084702"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -25077,8 +25077,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="19.22726519928954"/>
-                                <sample value="19.501248973571563"/>
+                                <sample value="19.227265199289544"/>
+                                <sample value="19.501248973571567"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -25125,8 +25125,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="21.505265628914195"/>
-                                <sample value="21.80399598713316"/>
+                                <sample value="21.505265628914191"/>
+                                <sample value="21.803995987133156"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -25476,8 +25476,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="15.135748689535866"/>
-                                <sample value="15.379382263241254"/>
+                                <sample value="15.135748689535868"/>
+                                <sample value="15.379382263241256"/>
                                 <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -25620,8 +25620,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="16.75845883524779"/>
-                                <sample value="17.016495573481958"/>
+                                <sample value="16.758458835247787"/>
+                                <sample value="17.016495573481954"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -25668,8 +25668,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="17.604756409762444"/>
-                                <sample value="17.824048297388007"/>
+                                <sample value="17.604756409762448"/>
+                                <sample value="17.824048297388011"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -25956,8 +25956,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="27.563687511746188"/>
-                                <sample value="27.807553296963771"/>
+                                <sample value="27.563687511746185"/>
+                                <sample value="27.807553296963768"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -26323,7 +26323,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60.000000000000014"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2537"/>
@@ -26332,9 +26332,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="16.847459281013531"/>
-                                <sample value="17.146800809140959"/>
-                                <sample value="60.000000000000007"/>
+                                <sample value="16.847459281013535"/>
+                                <sample value="17.146800809140963"/>
+                                <sample value="60.000000000000014"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="2536"/>
@@ -27038,8 +27038,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="18.681119137154592"/>
-                                <sample value="18.968963813289168"/>
+                                <sample value="18.681119137154596"/>
+                                <sample value="18.968963813289172"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -27242,7 +27242,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999986"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2627"/>
@@ -27263,7 +27263,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999986"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2629"/>
@@ -27272,9 +27272,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="23.976916856266577"/>
-                                <sample value="24.251907398625885"/>
-                                <sample value="59.999999999999993"/>
+                                <sample value="23.97691685626658"/>
+                                <sample value="24.251907398625889"/>
+                                <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="2626"/>
@@ -27626,7 +27626,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2663"/>
@@ -27635,8 +27635,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="19.165473409292243"/>
-                                <sample value="19.419262193277142"/>
+                                <sample value="19.16547340929224"/>
+                                <sample value="19.419262193277138"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -28044,8 +28044,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="19.240899712631755"/>
-                                <sample value="19.472333805967075"/>
+                                <sample value="19.240899712631759"/>
+                                <sample value="19.472333805967079"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -28227,7 +28227,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2721"/>
@@ -28275,7 +28275,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000014"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2726"/>
@@ -28284,9 +28284,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="22.78594685726971"/>
-                                <sample value="23.057286815576887"/>
-                                <sample value="60"/>
+                                <sample value="22.785946857269714"/>
+                                <sample value="23.057286815576891"/>
+                                <sample value="60.000000000000007"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="2725"/>
@@ -29081,7 +29081,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2804"/>
@@ -29294,7 +29294,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000014"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2825"/>
@@ -29303,9 +29303,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="32.546962103273678"/>
-                                <sample value="32.904651713896222"/>
-                                <sample value="60"/>
+                                <sample value="32.546962103273685"/>
+                                <sample value="32.904651713896229"/>
+                                <sample value="60.000000000000014"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="2824"/>
@@ -29438,7 +29438,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2840"/>
@@ -29486,7 +29486,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2845"/>
@@ -29555,7 +29555,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2851"/>
@@ -29564,8 +29564,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="34.882315981704409"/>
-                                <sample value="35.166910015917601"/>
+                                <sample value="34.882315981704402"/>
+                                <sample value="35.166910015917594"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -29603,7 +29603,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000014"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2856"/>
@@ -29651,7 +29651,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2861"/>
@@ -29660,8 +29660,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="35.739483904546496"/>
-                                <sample value="35.997731546172673"/>
+                                <sample value="35.739483904546489"/>
+                                <sample value="35.997731546172666"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -29843,7 +29843,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2881"/>
@@ -29891,7 +29891,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2886"/>
@@ -29939,7 +29939,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000014"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2891"/>
@@ -30200,7 +30200,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000014"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2917"/>
@@ -30269,7 +30269,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2923"/>
@@ -30317,7 +30317,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000007"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2928"/>
@@ -30365,7 +30365,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="60.000000000000014"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2933"/>
@@ -30374,9 +30374,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="47.252366912136623"/>
-                                <sample value="47.528088871970795"/>
-                                <sample value="60"/>
+                                <sample value="47.25236691213663"/>
+                                <sample value="47.528088871970802"/>
+                                <sample value="60.000000000000014"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="2932"/>
@@ -30530,7 +30530,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60.000000000000007"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2949"/>
@@ -30833,7 +30833,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2969"/>
@@ -30842,9 +30842,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="33.875794091096026"/>
-                                <sample value="34.081268615411759"/>
-                                <sample value="60"/>
+                                <sample value="33.875794091096019"/>
+                                <sample value="34.081268615411751"/>
+                                <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="2968"/>
@@ -30977,7 +30977,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999986"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2984"/>
@@ -30998,7 +30998,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="59.999999999999986"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="2986"/>
@@ -31007,9 +31007,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="34.97977282322686"/>
-                                <sample value="35.280130524774975"/>
-                                <sample value="60"/>
+                                <sample value="34.979772823226853"/>
+                                <sample value="35.280130524774968"/>
+                                <sample value="59.999999999999986"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="2983"/>
@@ -31190,7 +31190,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999986"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="3005"/>
@@ -31238,7 +31238,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="3010"/>
@@ -31247,9 +31247,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="36.832351931851747"/>
-                                <sample value="37.061775154308606"/>
-                                <sample value="59.999999999999993"/>
+                                <sample value="36.832351931851754"/>
+                                <sample value="37.061775154308613"/>
+                                <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="3009"/>
@@ -31295,9 +31295,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="37.047038008881707"/>
-                                <sample value="37.338705650203117"/>
-                                <sample value="59.999999999999993"/>
+                                <sample value="37.047038008881714"/>
+                                <sample value="37.338705650203124"/>
+                                <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="3014"/>
@@ -31430,7 +31430,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="60"/>
+                                    <sample value="59.999999999999993"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="3030"/>
@@ -31439,9 +31439,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="38.799743021366702"/>
-                                <sample value="39.05753420478932"/>
-                                <sample value="60"/>
+                                <sample value="38.799743021366695"/>
+                                <sample value="39.057534204789313"/>
+                                <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="3029"/>
@@ -31727,8 +31727,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="42.25180817154277"/>
-                                <sample value="42.53616203299304"/>
+                                <sample value="42.251808171542777"/>
+                                <sample value="42.536162032993047"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -31775,9 +31775,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="42.840357227704743"/>
-                                <sample value="43.098340143943801"/>
-                                <sample value="60"/>
+                                <sample value="42.840357227704736"/>
+                                <sample value="43.098340143943794"/>
+                                <sample value="59.999999999999993"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="3064"/>
@@ -31862,7 +31862,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="3075"/>
@@ -31967,8 +31967,8 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="46.647756270873842"/>
-                                <sample value="46.87503975666511"/>
+                                <sample value="46.647756270873849"/>
+                                <sample value="46.875039756665117"/>
                                 <sample value="60"/>
                             </function>
                             <function domain="polyline" name="node_index">
@@ -32006,7 +32006,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="3090"/>
@@ -32102,7 +32102,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999999999993"/>
+                                    <sample value="60"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="3100"/>
@@ -32198,7 +32198,7 @@
                             </properties>
                             <functions>
                                 <function domain="polyline" name="node_creation_time">
-                                    <sample value="59.999999455377647"/>
+                                    <sample value="59.99999945537764"/>
                                 </function>
                                 <function domain="polyline" name="node_index">
                                     <sample value="3110"/>
@@ -32207,9 +32207,9 @@
                         </root>
                         <functions>
                             <function domain="polyline" name="node_creation_time">
-                                <sample value="54.640616237761236"/>
-                                <sample value="54.848715335894667"/>
-                                <sample value="59.999979076991082"/>
+                                <sample value="54.640616237761229"/>
+                                <sample value="54.84871533589466"/>
+                                <sample value="59.999979076991075"/>
                             </function>
                             <function domain="polyline" name="node_index">
                                 <sample value="3109"/>

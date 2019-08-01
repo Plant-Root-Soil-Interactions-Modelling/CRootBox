@@ -88,7 +88,6 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegments_overloads, getSegments, 0, 1)
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentCTs_overloads, getSegmentCTs, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentOrigins_overloads, getSegmentOrigins, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNewSegments_overloads, getNewSegments, 0, 1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNewSegmentCTs_overloads, getNewSegmentCTs, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNewSegmentOrigins_overloads, getNewSegmentOrigins, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(openFile_overloads,openFile,1,2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(simulate1_overloads,simulate,1,2);
@@ -395,10 +394,12 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def("getNumberOfNewOrgans", &Organism::getNumberOfNewOrgans)
         .def("getUpdatedNodeIndices", &Organism::getUpdatedNodeIndices)
         .def("getUpdatedNodes", &Organism::getUpdatedNodes)
+        .def("getUpdatedNodeCTs", &Organism::getUpdatedNodeCTs)
+
         .def("getNewNodes", &Organism::getNewNodes)
+        .def("getNewNodeCTs", &Organism::getNewNodeCTs)
         .def("getNewSegments", &Organism::getNewSegments,  getNewSegments_overloads())
         .def("getNewSegmentOrigins", &Organism::getNewSegmentOrigins,  getNewSegmentOrigins_overloads())
-        .def("getNewSegmentCTs", &Organism::getNewSegmentCTs,  getNewSegmentCTs_overloads())
 
         .def("readParameters", &Organism::readParameters, readParameters_overloads())
         .def("writeParameters", &Organism::writeParameters, writeParameters_overloads())

@@ -75,10 +75,11 @@ public:
     int getNumberOfNewOrgans() const { return getNumberOfOrgans() - oldNumberOfOrgans; }  ///< The number of new roots created in the previous time step
     std::vector<int> getUpdatedNodeIndices() const; ///< Indices of nodes that were updated in the previous time step
     std::vector<Vector3d> getUpdatedNodes() const; ///< New coordinates of the updated nodes
+    std::vector<double> getUpdatedNodeCTs() const; ///< New coordinates of the updated nodes
     std::vector<Vector3d> getNewNodes() const; ///< Nodes created in the previous time step
+    std::vector<double> getNewNodeCTs() const; ///< Nodes created in the previous time step
     std::vector<Vector2i> getNewSegments(int ot=-1) const; ///< Segments created in the previous time step
     std::vector<Organ*> getNewSegmentOrigins(int ot=-1) const; ///< Copies a pointer to the root containing the new segments
-    std::vector<double> getNewSegmentCTs(int ot=-1) const;  ///< Node emergence times created, created in the previous time step
 
     /* io */
     virtual std::string toString() const; ///< Quick info for debugging

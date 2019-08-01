@@ -294,6 +294,10 @@ std::vector<Vector3d> Organism::getNodes() const
 /**
  * The organim's node creation times of a specific organ type corresponding to Organism::getNodes.
  *
+ * At a branching point, there are two creation times attached to one node,
+ * the creation time of the base node, and the emergence time of the lateral root.
+ * This method copies the node creation time of time of the base root.
+ *
  * @return          a vector of node creation times
  */
 std::vector<double> Organism::getNodeCTs() const
@@ -305,7 +309,7 @@ std::vector<double> Organism::getNodeCTs() const
     }
     for (const auto& o : organs) { // copy all organ creation times
         for (size_t i=1; i<o->getNumberOfNodes(); i++) {
-            // each branching node id has two cts, one along the base root, one as the emergence time of the lateral root
+            // we start at 1 because we don't copy the emergence time of the lateral root
             cts.at(o->getNodeId(i)) = o->getNodeCT(i);
         }
     }
@@ -371,7 +375,9 @@ std::vector<Organ*> Organism::getSegmentOrigins(int ot) const
 }
 
 /**
- * @return the indices of the nodes that were moved during the last time step
+ * @return the indices of the nodes that were moved during the last time step,
+ * update the node coordinates using Organism::getUpdatedNodes(),
+ * and creation times using Organism::getUpdatedNodeCTs(,
  */
 std::vector<int> Organism::getUpdatedNodeIndices() const
 {
@@ -386,7 +392,8 @@ std::vector<int> Organism::getUpdatedNodeIndices() const
 }
 
 /**
- * @return the new coordinates of the nodes that were updated during the last time step
+ * @return the new coordinates of nodes that were updated during the last time step,
+ * corresponding to Organism::getUpdatedNodeIndices
  */
 std::vector<Vector3d> Organism::getUpdatedNodes() const
 {
@@ -395,6 +402,22 @@ std::vector<Vector3d> Organism::getUpdatedNodes() const
     for (const auto& o : organs) {
         if (o->hasMoved()) {
             nv.push_back(o->getNode(o->getOldNumberOfNodes()-1));
+        }
+    }
+    return nv;
+}
+
+/**
+ * @return the new creation times of nodes that were updated during the last time step,
+ * corresponding to Organism::getUpdatedNodeIndices
+ */
+std::vector<double> Organism::getUpdatedNodeCTs() const
+{
+    auto organs = this->getOrgans();
+    std::vector<double> nv = std::vector<double>(0);
+    for (const auto& o : organs) {
+        if (o->hasMoved()) {
+            nv.push_back(o->getNodeCT(o->getOldNumberOfNodes()-1));
         }
     }
     return nv;
@@ -418,9 +441,29 @@ std::vector<Vector3d> Organism::getNewNodes() const
 }
 
 /**
- * Creates a vector of new created segments that were created during the last time step
+ * @return a vector of the creation times of the nodes created in the last time step,
+ * initially start with a Organism::getNodeCTs() call
  *
- * If the organ is not represented as a polyline (overwritten Organ::getSegment), this method will not work
+ * At a branching point we copy the creation time of the base root @see Organism::getNodeCTs()
+ */
+std::vector<double> Organism::getNewNodeCTs() const
+{
+    auto organs = this->getOrgans();
+    std::vector<double> nv(this->getNumberOfNewNodes());
+    for (const auto& o : organs) {
+        int onon = o->getOldNumberOfNodes();
+        if (onon==0) { // make sure to never copy the root emergence time
+            onon = 1;
+        }
+        for (size_t i=onon; i<o->getNumberOfNodes(); i++) { // loop over all new nodes
+            nv.at(o->getNodeId(i)-this->oldNumberOfNodes) = o->getNodeCT(i);
+        }
+    }
+    return nv;
+}
+
+/**
+ * Creates a vector of new created segments that were created during the last time step
  *
  * @param ot        the expected organ type, where -1 denotes all organ types (default)
  * @return          a vector of newly created segments
@@ -445,8 +488,6 @@ std::vector<Vector2i> Organism::getNewSegments(int ot) const
  * for each newly created segment of organ type @param ot,
  * corresponding to the segments obtained by Organism::getNewSegments(ot)
  *
- * If the organ is not represented as a polyline (overwritten Organ::getSegment), this method will not work
- *
  * @param ot        the expected organ type, where -1 denotes all organ types (default)
  * @return          a vector of pointers to organs
  */
@@ -462,31 +503,6 @@ std::vector<Organ*> Organism::getNewSegmentOrigins(int ot) const
         }
     }
     return so;
-}
-
-/**
- * Creates a vector of segment creation times for each newly created segment of organ type @param ot,
- * corresponding to the segments obtained by Organism::getNewSegments(ot)
- *
- * If the organ is not represented as a polyline (overwritten Organ::getSegment), this method will not work
- *
- * TODO segs might be unfinished, they move to axial resolution
- *
- * @param ot        the expected organ type, where -1 denotes all organ types (default)
- * @return          a vector of segment creation times
- */
-std::vector<double> Organism::getNewSegmentCTs(int ot) const
-{
-    auto organs = this->getOrgans(ot);
-    std::vector<double> sct = std::vector<double>(0);
-    sct.reserve(this->getNumberOfNewNodes());
-    for (const auto& o : organs) {
-        int onon = o->getOldNumberOfNodes();
-        for (size_t i=onon-1; i<o->getNumberOfNodes()-1; i++) { // loop over new segments
-            sct.push_back(o->getNodeCT(i+1));
-        }
-    }
-    return sct;
 }
 
 /**
