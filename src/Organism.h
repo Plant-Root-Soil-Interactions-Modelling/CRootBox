@@ -23,6 +23,7 @@ class OrganTypeParameter;
  * Manages the OrganTypeParameters
  * Offers an interface for the simulation loop (initialize, simulate, ...)
  * Collects node and line segment geometry from the organ tree
+ * Collect parameters from the organs
  * Can collect information about the last time step
  * Supports RSML
  * Holds global node index and organ index counter
@@ -62,7 +63,7 @@ public:
     int getNumberOfNodes() const { return nodeId+1; } ///< number of nodes of the organism
     virtual int getNumberOfSegments(int ot=-1) const; ///< number of segments of the organism
     std::vector<std::vector<Vector3d>> getPolylines(int ot=-1) const; ///< nodes per organ
-    std::vector<std::vector<double>> getPolylinesCTs(int ot=-1) const; ///< node creation times per organ
+    std::vector<std::vector<double>> getPolylineCTs(int ot=-1) const; ///< node creation times per organ
     virtual std::vector<Vector3d> getNodes() const; ///< nodes of the organ
     virtual std::vector<double> getNodeCTs() const; ///< node creation times, corresponding to Organism::getNodes
     virtual std::vector<Vector2i> getSegments(int ot=-1) const; ///< line segment containing two node indices, corresponding to Organism::getNodes

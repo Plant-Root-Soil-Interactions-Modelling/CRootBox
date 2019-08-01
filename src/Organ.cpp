@@ -253,6 +253,8 @@ double Organ::getParameter(std::string name) const {
     if (name=="alive") { return isAlive(); }
     if (name=="active") { return isActive(); }
     if (name=="nubmerOfChildren") { return children.size(); }
+    // numberOfNodes
+    // numberOfSegments
     return this->getOrganTypeParameter()->getParameter(name); // ask the type parameter
 }
 

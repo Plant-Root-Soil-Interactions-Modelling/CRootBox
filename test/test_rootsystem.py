@@ -23,8 +23,8 @@ def rootLateralLength(t, et, r, k):  # length of first order laterals (without s
 
 class TestRootSystem(unittest.TestCase):
 
-    def root_example_rtp(self):
-        """ an example used in the tests below, 100 basals with laterals """
+    def rs_example_rtp(self):
+        """ an example used in some of the tests below, 100 basals with laterals """
         self.rs = rb.RootSystem()
         maxB, firstB, delayB = 100, 10., 3
         rsp = rb.RootSystemParameter()
@@ -40,33 +40,49 @@ class TestRootSystem(unittest.TestCase):
         self.rs.setOrganTypeParameter(self.p0)  # the organism manages the type parameters
         self.rs.setOrganTypeParameter(self.p1)
 
-    def root_length_test(self, dt, l, subDt):
-        """ simulates a single root and checks length against its analytic length """
-        nl, nl2, non, meanDX = [], [], [], []
+    def rs_length_test(self, dt, l, subDt):
+        """ simulates a root system and checks basal lengths against its analytic lengths @param l at times @param t"""
+        self.rs.initialize()  
+        nl = []
         for t in dt:
             for i in range(0, subDt):
-                self.root.simulate(t / subDt)
-            nl.append(self.root.getParameter("length"))
-            non.append(self.root.getNumberOfNodes())
-            meanDX.append(nl[-1] / non[-1])
-            poly = np.zeros((non[-1], 3))  # length from polyline geometry
-            for i in range(0, non[-1]):
-                v = self.root.getNode(i)
-                poly[i, 0] = v.x
-                poly[i, 1] = v.y
-                poly[i, 2] = v.z
-            d = np.diff(poly, axis = 0)
-            sd = np.sqrt((d ** 2).sum(axis = 1))
-            nl2.append(sum(sd))
+                self.rs.simulate(t / subDt)
+            ll = v2a(self.rs.getParameter("length"))
+            types = v2a(self.rs.getParameter("type"))
+            sl = 0 # summed length of basal roots
+            for i, l_ in enumerate(ll):
+                if (types[i] == 4): # basal type
+                    sl += l_                    
+            nl.append(float(sl))
         for i in range(0, len(dt)):  # Check lengthes
             self.assertAlmostEqual(l[i], nl[i], 10, "numeric and analytic lengths do not agree (parameter length)")
-            self.assertAlmostEqual(l[i], nl2[i], 10, "numeric and analytic lengths do not agree (poly length)")
-            self.assertLessEqual(meanDX[i], 0.5, "axial resolution dx is too large")
-            self.assertLessEqual(0.25, meanDX[i], "axial resolution dx is unexpected small")
 
+    def rs_ct_test(self, dt, ct, subDt):
+        """ simulates a root system and checks creation times analytic @param ct at times @param t"""
+        self.rs.initialize()  
+        nl = []
+        for t in dt:
+            for i in range(0, subDt):
+                self.rs.simulate(t / subDt)            
+            # creation times 
+            cts1 = v2a(self.rs.getParameter("creationTime"))            
+            poly_ct = self.rs.getPolylineCTs()
+            cts2 = []
+            for p in poly_ct: 
+                cts2.append(p[0])        
+            self.assertEqual(cts1.shape[0], len(cts2), "creation times: sizes are wrong")
+            for i in range(0, len(cts2)):  
+                self.assertAlmostEqual(float(cts1[i]), float(cts2[i]), 10, "numeric and analytic lengths do not agree (parameter length)")
+            types = v2a(self.rs.getParameter("type"))    
+
+            # cts2.sort()    
+            # cts1 = np.sort(cts1, axis=0)
+            
+                
+                
     def test_root_type_parameters(self):
         """ root type parameters xml read and write """
-        self.root_example_rtp()
+        self.rs_example_rtp()
 #         print(self.p0.__str__(False))
 #         print(self.p1.__str__(False))
         print(rb.Organism.organTypeName(self.p0.organType))
@@ -77,11 +93,10 @@ class TestRootSystem(unittest.TestCase):
 
     def test_length_no_laterals(self):
         """ run a simulation with a fibrous root system and compares to analytic lengths"""
-        self.root_example_rtp()
+        self.rs_example_rtp()
         times = np.array([0., 7., 15., 30., 60.])
         dt = np.diff(times)
         times = times[1:]
-        # Analytical solution
         etB = np.array(range(self.rsp.maxB)) * self.rsp.delayB + np.ones(self.rsp.maxB) * self.rsp.firstB  # basal root emergence times
         bl = np.zeros(times.size)  # summed root lengths
         for j, t in enumerate(times):
@@ -89,8 +104,22 @@ class TestRootSystem(unittest.TestCase):
             while t - etB[i] > 0:
                 bl[j] += rootLength(t - etB[i], self.p0.r, self.p0.getK())
                 i += 1
+        self.rs_length_test(dt,bl,1)     
+        self.rs_length_test(dt,bl,100)
 
-        # TODO
+    def test_times_no_laterals(self):
+        """ run a simulation with a fibrous root system and checks creation times """
+        self.rs_example_rtp()
+        times = np.array([0., 7., 15., 30., 60.])
+        dt = np.diff(times)
+        times = times[1:]
+        ctB = np.array(range(self.rsp.maxB)) * self.rsp.delayB + np.ones(self.rsp.maxB) * self.rsp.firstB  # basal root emergence times               
+        # numeric solution 
+        self.rs_ct_test(dt,ctB,1)     
+#         self.rs_ct_test(dt,ctB,100)
+
+
+
 
     def test_length_with_laterals(self):
         """ run a simulation with a fibrous root system and compares to analytic lengths"""

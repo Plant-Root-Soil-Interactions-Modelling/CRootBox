@@ -256,7 +256,7 @@ std::vector<std::vector<Vector3d>> Organism::getPolylines(int ot) const
  * @param ot        the expected organ type, where -1 denotes all organ types (default)
  * @return          for each organ a vector of nodes
  */
-std::vector<std::vector<double>> Organism::getPolylinesCTs(int ot) const
+std::vector<std::vector<double>> Organism::getPolylineCTs(int ot) const
 {
     auto organs = getOrgans(ot);
     std::vector<std::vector<double>> nodes = std::vector<std::vector<double>>(organs.size());

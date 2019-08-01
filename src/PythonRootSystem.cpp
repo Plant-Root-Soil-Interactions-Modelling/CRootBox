@@ -83,7 +83,7 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getParameter_overloads, getParameter, 1, 
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSummed_overloads, getSummed, 1, 2);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getNumberOfSegments_overloads, getNumberOfSegments, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getPolylines_overloads, getPolylines, 0, 1);
-BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getPolylinesCTs_overloads, getPolylinesCTs, 0, 1);
+BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getPolylineCTs_overloads, getPolylineCTs, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegments_overloads, getSegments, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentCTs_overloads, getSegmentCTs, 0, 1);
 BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(getSegmentOrigins_overloads, getSegmentOrigins, 0, 1);
@@ -384,7 +384,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def("getNumberOfNodes", &Organism::getNumberOfNodes)
         .def("getNumberOfSegments", &Organism::getNumberOfSegments, getNumberOfSegments_overloads())
         .def("getPolylines", &Organism::getPolylines, getPolylines_overloads())
-        .def("getPolylinesCTs", &Organism::getPolylinesCTs, getPolylinesCTs_overloads())
+        .def("getPolylineCTs", &Organism::getPolylineCTs, getPolylineCTs_overloads())
         .def("getNodes", &Organism::getNodes)
         .def("getNodeCTs", &Organism::getNodeCTs)
         .def("getSegments", &Organism::getSegments, getSegments_overloads())

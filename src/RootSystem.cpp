@@ -535,7 +535,7 @@ void RootSystem::writeVTP(std::ostream & os) const
 {
     this->getRoots(); // update roots (if necessary)
     const auto& nodes = getPolylines();
-    const auto& times = getPolylinesCTs();
+    const auto& times = getPolylineCTs();
 
     os << "<?xml version=\"1.0\"?>";
     os << "<VTKFile type=\"PolyData\" version=\"0.1\" byte_order=\"LittleEndian\">\n";

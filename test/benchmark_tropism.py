@@ -1,5 +1,5 @@
 """
-Shows basal tropism paramter influence on basal roots  
+Shows the influence of tropism paramter on basal roots  
 with 4x4 subfigures, different axial resolutions, should lead
 to similar results  
 """

@@ -52,7 +52,7 @@ class TestOrganism(unittest.TestCase):
             self.assertIsNot(p1[i], p2[i], "copy: OrganTypeParameters is not copied")
 
     def test_organ_type_parameters(self):
-        """ test ability to set, get, read, and write parameters """
+        """ test ability to set, get, read, and write type parameters """
         human1 = rb.Organism()  # same example as in test_constructor ...
         otp1 = rb.OrganTypeParameter(human1)
         otp1.name = "nose"
@@ -111,6 +111,15 @@ class TestOrganism(unittest.TestCase):
         self.assertEqual(nodes.shape, (6, 3), "geometry: number of nodes unexpected")
         segs = seg2a(self.human1.getSegments())
         self.assertEqual(np.sum(np.sum(segs.flat != np.array([[0, 1], [1, 2], [2, 3], [2, 4], [3, 5]]).flat)), 0, "geometry: segments ids are unexcpected")
+
+    def test_parameter(self):
+        """ test if getParameter works """
+        self.hand_example()
+        self.add_nodes()
+        organs = self.human1.getOrgans()
+        age = v2a(self.human1.getParameter("age"))
+        self.assertEqual(len(organs), age.shape[0] , "parameter: organ size unequal to parameter size")
+        self.assertEqual(age[2], -3, "parameter: wrong ages")
 
     def test_rsml(self):
         """ checks rmsl functionality with Python rsml reader """
