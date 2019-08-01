@@ -4,9 +4,9 @@ from rb_tools import *
 rs = rb.RootSystem()
 
 # Open plant and root parameter from a file
-name = "Zea_mays_4_Leitner_2014" # "Anagallis_femina_Leitner_2010" 
+name = "Zea_mays_4_Leitner_2014"  # "Anagallis_femina_Leitner_2010"
 
-rs.openFile(name) 
+rs.openFile(name)
 
 # maxB = 5
 # firstB = 7.
@@ -16,14 +16,14 @@ rs.openFile(name)
 # rs.setRootSystemParameter(rsp)
 
 # Initialize
-rs.initialize() 
+rs.initialize()
 
 # Simulate
-rs.simulate(60, True) 
+rs.simulate(60, True)
 
 ana = rb.SegmentAnalyser(rs)
-l = ana.getSummed(rb.ScalarType.length)
-print("Total root length",l,"cm")
+l = ana.getSummed("length")
+print("Total root length", l, "cm")
 
 # Export final result (as vtp)
-rs.write("results/example_P1.vtp")  
+rs.write("results/example_P1.vtp")

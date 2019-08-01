@@ -84,7 +84,7 @@ class TestRootSystem(unittest.TestCase):
             for i in range(0, len(basal_ct)):
                 self.assertAlmostEqual(float(basal_ct[i]), float(ct[i]), 10,
                                        "creation times: numeric and analytic creation times for basal roots")
-            # tip times. as long the tips are active, tip creation time equals simulation time
+            # tip times: as long the tips are active, tip creation time equals simulation time
             poly_ct = self.rs.getPolylineCTs()
             cts2 = []
             for p in poly_ct:
@@ -116,7 +116,6 @@ class TestRootSystem(unittest.TestCase):
         dt = np.diff(times)
         times = times[1:]
         ctB = np.array(range(self.rsp.maxB)) * self.rsp.delayB + np.ones(self.rsp.maxB) * self.rsp.firstB  # basal root emergence times
-        # numeric solution
         self.rs_ct_test(dt, ctB, 1)
         self.rs_ct_test(dt, ctB, 100)
 
@@ -223,6 +222,7 @@ class TestRootSystem(unittest.TestCase):
         nodeCTs_ = v2a(rs.getNodeCTs())
         seg_ = seg2a(rs.getSegments())
         sct_ = v2a(rs.getSegmentCTs())
+#         print("non moved total", nonm, "non ", len(nodes_))
 #         print("Creation times range from ", np.min(cts), " to ", np.max(cts), "len", cts.shape)
 #         print("Creation times range from ", np.min(sct_), " to ", np.max(sct_), "len", sct_.shape)
 #         print("seg:", seg_[0])
@@ -230,9 +230,9 @@ class TestRootSystem(unittest.TestCase):
 #         print(nodeCTs_[seg[0][0]], nodeCTs_[seg[0][1]])
 #         print("---")
         self.assertEqual(nodes_.shape, nodes.shape, "incremental growth: node lists are not equal")
-        ind = np.argwhere(nodes_[:, 1] != nodes[:, 1])
-        for i in ind:
-            print(i, nodes_[i], "!=", nodes[i])
+#         ind = np.argwhere(nodes_[:, 1] != nodes[:, 1])
+#         for i in ind:
+#             print(i, nodes_[i], "!=", nodes[i])
         uneq = np.sum(nodes_ != nodes) / 3
         self.assertEqual(uneq, 0, "incremental growth: node lists are not equal")
         self.assertEqual(seg_.shape, seg.shape, "incremental growth: segment lists are not equal")

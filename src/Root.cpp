@@ -52,6 +52,7 @@ Root::Root(Organism* rs, int type, Vector3d heading, double delay,  Root* parent
     length = 0;
     // initial node
     if (parent!=nullptr) { // the first node of the base roots must be created in RootSystem::initialize()
+        assert(pni+1 == parent->getNumberOfNodes() && "at object creation always at last node");
         addNode(parent->getNode(pni), parent->getNodeId(pni), parent->getNodeCT(pni)+delay);
     }
 }
@@ -263,7 +264,6 @@ void Root::createLateral(bool verbose)
 {
     int lt = getRootTypeParameter()->getLateralType(nodes.back());
     if (lt>0) {
-        firstCall = false;
         double ageLN = this->calcAge(length); // age of root when lateral node is created
         double ageLG = this->calcAge(length+param()->la); // age of the root, when the lateral starts growing (i.e when the apical zone is developed)
         double delay = ageLG-ageLN; // time the lateral has to wait
@@ -298,6 +298,7 @@ Vector3d Root::heading()
 void Root::createSegments(double l, double dt, bool verbose)
 {
     if (l==0) {
+        std::cout << "Root::createSegments: zero length encountered \n";
         return;
     }
     if (l<0) {
@@ -309,15 +310,15 @@ void Root::createSegments(double l, double dt, bool verbose)
     int nn = nodes.size();
     if (firstCall) { // first call of createSegments (in Root::simulate)
         firstCall = false;
-        if (nn>1) {
-            auto n2 = nodes.at(nn-2);
-            auto n1 = nodes.at(nn-1);
+        if ((nn>1) && (children.empty() || (nn-1 != ((Root*)children.back())->parentNI)) ) { // don't move a child base node
+            Vector3d n2 = nodes[nn-2];
+            Vector3d n1 = nodes[nn-1];
             double olddx = n1.minus(n2).length(); // length of last segment
             if (olddx<dx()*0.99) { // shift node instead of creating a new node
                 shiftl = std::min(dx()-olddx, l);
                 double sdx = olddx + shiftl; // length of new segment
                 Vector3d newdxv = getIncrement(n2, sdx);
-                nodes[nn - 1] = Vector3d(n2.plus(newdxv));
+                nodes[nn-1] = Vector3d(n2.plus(newdxv));
                 double et = this->calcCreationTime(length+shiftl);
                 nodeCTs[nn-1] = et; // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
                 moved = true;

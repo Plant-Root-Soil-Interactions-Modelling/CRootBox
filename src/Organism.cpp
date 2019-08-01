@@ -284,10 +284,7 @@ std::vector<Vector3d> Organism::getNodes() const
         nv.at(o->getNodeId(0)) = o->getNode(0);
     }
     for (const auto& o : organs) { // copy all organ nodes
-        for (size_t i=1; i<o->getNumberOfNodes(); i++) {
-            // start from 1, since all base nodes are stored twice as base and along root
-            // TODO currently in RootBox the coordinates along the root might be moved,
-            // while base node stays the same (some id, different coordinates, not good), TODO
+        for (size_t i = 1; i<o->getNumberOfNodes(); i++) { // since all base nodes are stored twice as base and along root
             nv.at(o->getNodeId(i)) = o->getNode(i);
         }
     }
@@ -307,7 +304,8 @@ std::vector<double> Organism::getNodeCTs() const
         cts.at(o->getNodeId(0)) = o->getNodeCT(0);
     }
     for (const auto& o : organs) { // copy all organ creation times
-        for (size_t i=0; i<o->getNumberOfNodes(); i++) {
+        for (size_t i=1; i<o->getNumberOfNodes(); i++) {
+            // each branching node id has two cts, one along the base root, one as the emergence time of the lateral root
             cts.at(o->getNodeId(i)) = o->getNodeCT(i);
         }
     }
