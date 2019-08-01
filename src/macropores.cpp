@@ -8,7 +8,7 @@ namespace CRootBox {
  *
  *  creates a MacroPoreRoot, instead of a normal one
  */
-void Root::createLateral(bool verbose)
+void MacroPoreRoot::createLateral(bool verbose)
 {
     int lt = getRootTypeParameter()->getLateralType(nodes.back());
     if (lt>0) {

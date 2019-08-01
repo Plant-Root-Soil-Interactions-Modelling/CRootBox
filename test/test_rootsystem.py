@@ -28,10 +28,11 @@ class TestRootSystem(unittest.TestCase):
         self.rs = rb.RootSystem()
         maxB, firstB, delayB = 100, 10., 3
         rsp = rb.RootSystemParameter()
-        rsp.set(-3., firstB, delayB, maxB, 0, 1.e9, 1.e9, 1.e9, 0., 0.)
+        rsp.set(3., firstB, delayB, maxB, 0, 1.e9, 1.e9, 1.e9, 0., 0.)
         self.rs.setRootSystemParameter(rsp)
         p0 = rb.RootTypeParameter(self.rs)
         p0.name, p0.type, p0.la, p0.nob, p0.ln, p0.r, p0.dx = "taproot", 1, 10, 20, 89. / 19., 1, 0.5
+        p0.lb = 2
         p0.successor = a2i([2])  # to rb.std_int_double_()
         p0.successorP = a2v([1.])  # rb.std_vector_double_()
         p1 = rb.RootTypeParameter(self.rs)
@@ -42,54 +43,55 @@ class TestRootSystem(unittest.TestCase):
 
     def rs_length_test(self, dt, l, subDt):
         """ simulates a root system and checks basal lengths against its analytic lengths @param l at times @param t"""
-        self.rs.initialize()  
+        self.rs.initialize()
         nl = []
         for t in dt:
             for i in range(0, subDt):
                 self.rs.simulate(t / subDt)
             ll = v2a(self.rs.getParameter("length"))
             types = v2a(self.rs.getParameter("type"))
-            sl = 0 # summed length of basal roots
+            sl = 0  # summed length of basal roots
             for i, l_ in enumerate(ll):
-                if (types[i] == 4): # basal type
-                    sl += l_                    
+                if (types[i] == 4):  # basal type
+                    sl += l_
             nl.append(float(sl))
         for i in range(0, len(dt)):  # Check lengthes
             self.assertAlmostEqual(l[i], nl[i], 10, "numeric and analytic lengths do not agree (parameter length)")
 
     def rs_ct_test(self, dt, ct, subDt):
         """ simulates a root system and checks creation times analytic @param ct at times @param t"""
-        self.rs.initialize()  
+        self.rs.initialize()
         nl = []
         for t in dt:
             for i in range(0, subDt):
-                self.rs.simulate(t / subDt)            
-            # creation times 
-            cts1 = v2a(self.rs.getParameter("creationTime"))            
+                self.rs.simulate(t / subDt)
+            # creation times
+            cts1 = v2a(self.rs.getParameter("creationTime"))
             poly_ct = self.rs.getPolylineCTs()
             cts2 = []
-            for p in poly_ct: 
-                cts2.append(p[0])        
+            for p in poly_ct:
+                cts2.append(p[0])
             self.assertEqual(cts1.shape[0], len(cts2), "creation times: sizes are wrong")
-            for i in range(0, len(cts2)):  
-                self.assertAlmostEqual(float(cts1[i]), float(cts2[i]), 10, "numeric and analytic lengths do not agree (parameter length)")
-            types = v2a(self.rs.getParameter("type"))    
-
-            # cts2.sort()    
-            # cts1 = np.sort(cts1, axis=0)
-            
-                
-                
-    def test_root_type_parameters(self):
-        """ root type parameters xml read and write """
-        self.rs_example_rtp()
-#         print(self.p0.__str__(False))
-#         print(self.p1.__str__(False))
-        print(rb.Organism.organTypeName(self.p0.organType))
-        self.rs.writeParameters("test_parameters.xml", "RootBox", False)  # include comments
-        rs1 = rb.RootSystem
-        # rs1.readParameters("test_parameters.xml", "RootBox")
-        # TODO
+            for i in range(0, len(cts2)):
+                self.assertAlmostEqual(float(cts1[i]), float(cts2[i]), 10,
+                                       "creation times: numeric creation times of polylines and parameter do not agree")
+            types = v2a(self.rs.getParameter("type"))
+            basal_ct = []
+            for i, ct_ in enumerate(cts1):
+                if types[i] == 4:
+                    basal_ct.append(float(ct_))
+            basal_ct.sort()
+            for i in range(0, len(basal_ct)):
+                self.assertAlmostEqual(float(basal_ct[i]), float(ct[i]), 10,
+                                       "creation times: numeric and analytic creation times for basal roots")
+            # tip times. as long the tips are active, tip creation time equals simulation time
+            poly_ct = self.rs.getPolylineCTs()
+            cts2 = []
+            for p in poly_ct:
+                cts2.append(p[-1])
+            simtime = self.rs.getSimTime()
+            for i in range(0, len(cts2)):
+                self.assertAlmostEqual(float(cts2[i]), simtime, 10, "creation times: tip has wrong creation time")
 
     def test_length_no_laterals(self):
         """ run a simulation with a fibrous root system and compares to analytic lengths"""
@@ -104,8 +106,8 @@ class TestRootSystem(unittest.TestCase):
             while t - etB[i] > 0:
                 bl[j] += rootLength(t - etB[i], self.p0.r, self.p0.getK())
                 i += 1
-        self.rs_length_test(dt,bl,1)     
-        self.rs_length_test(dt,bl,100)
+        self.rs_length_test(dt, bl, 1)
+        self.rs_length_test(dt, bl, 100)
 
     def test_times_no_laterals(self):
         """ run a simulation with a fibrous root system and checks creation times """
@@ -113,13 +115,10 @@ class TestRootSystem(unittest.TestCase):
         times = np.array([0., 7., 15., 30., 60.])
         dt = np.diff(times)
         times = times[1:]
-        ctB = np.array(range(self.rsp.maxB)) * self.rsp.delayB + np.ones(self.rsp.maxB) * self.rsp.firstB  # basal root emergence times               
-        # numeric solution 
-        self.rs_ct_test(dt,ctB,1)     
-#         self.rs_ct_test(dt,ctB,100)
-
-
-
+        ctB = np.array(range(self.rsp.maxB)) * self.rsp.delayB + np.ones(self.rsp.maxB) * self.rsp.firstB  # basal root emergence times
+        # numeric solution
+        self.rs_ct_test(dt, ctB, 1)
+        self.rs_ct_test(dt, ctB, 100)
 
     def test_length_with_laterals(self):
         """ run a simulation with a fibrous root system and compares to analytic lengths"""
@@ -164,7 +163,6 @@ class TestRootSystem(unittest.TestCase):
         rs.initialize()
         rs.simulate(7)  # days young
         polylines = rs.getPolylines()  # Use polyline representation of the roots
-        # todo getPolylinesCTs
         bases = np.zeros((len(polylines), 3))
         tips = np.zeros((len(polylines), 3))
         for i, r in enumerate(polylines):
@@ -175,6 +173,17 @@ class TestRootSystem(unittest.TestCase):
         baseI = rs.getRootBases()
         uneq = np.sum(nodes[baseI, :] != bases) + np.sum(nodes[tipI, :] != tips)
         self.assertEqual(uneq, 0, "polylines: tips or base nodes do not agree")
+
+    def test_root_type_parameters(self):
+        """ root type parameters xml read and write """
+        self.rs_example_rtp()
+#         print(self.p0.__str__(False))
+#         print(self.p1.__str__(False))
+        print(rb.Organism.organTypeName(self.p0.organType))
+        self.rs.writeParameters("test_parameters.xml", "RootBox", False)  # include comments
+        rs1 = rb.RootSystem
+        # rs1.readParameters("test_parameters.xml", "RootBox")
+        # TODO
 
 #
 #     def test_adjacency_matrix(self):

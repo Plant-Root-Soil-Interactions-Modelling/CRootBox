@@ -94,7 +94,7 @@ void Root::simulate(double dt, bool verbose)
         // increase age
         if (age+dt>p.rlt) { // root life time
             dt=p.rlt-age; // remaining life span
-            alive = false; // this root is dead todo remaining is not simulated
+            alive = false; // this root is dead
         }
         age+=dt;
 
@@ -134,7 +134,7 @@ void Root::simulate(double dt, bool verbose)
 
                 // create geometry
                 if (p.nob>0) { // root has children
-                    // basal zone
+                    /* basal zone */
                     if ((dl>0)&&(length<p.lb)) { // length is the current length of the root
                         if (length+dl<=p.lb) {
                             createSegments(dl,dt,verbose);
@@ -147,7 +147,7 @@ void Root::simulate(double dt, bool verbose)
                             length=p.lb;
                         }
                     }
-                    // branching zone
+                    /* branching zone */
                     if ((dl>0)&&(length>=p.lb)) {
                         double s = p.lb; // summed length
                         for (size_t i=0; ((i<p.ln.size()) && (dl>0)); i++) {
@@ -172,7 +172,7 @@ void Root::simulate(double dt, bool verbose)
                             createLateral(verbose);
                         }
                     }
-                    // apical zone
+                    /* apical zone */
                     if (dl>0) {
                         createSegments(dl,dt,verbose);
                         length+=dl;
@@ -263,6 +263,7 @@ void Root::createLateral(bool verbose)
 {
     int lt = getRootTypeParameter()->getLateralType(nodes.back());
     if (lt>0) {
+        firstCall = false;
         double ageLN = this->calcAge(length); // age of root when lateral node is created
         double ageLG = this->calcAge(length+param()->la); // age of the root, when the lateral starts growing (i.e when the apical zone is developed)
         double delay = ageLG-ageLN; // time the lateral has to wait
@@ -304,6 +305,7 @@ void Root::createSegments(double l, double dt, bool verbose)
     }
 
     // shift first node to axial resolution
+    double shiftl = 0; // length produced by shift
     int nn = nodes.size();
     if (firstCall) { // first call of createSegments (in Root::simulate)
         firstCall = false;
@@ -312,14 +314,14 @@ void Root::createSegments(double l, double dt, bool verbose)
             auto n1 = nodes.at(nn-1);
             double olddx = n1.minus(n2).length(); // length of last segment
             if (olddx<dx()*0.99) { // shift node instead of creating a new node
-                double newdx = std::min(dx()-olddx, l);
-                double sdx = olddx + newdx; // length of new segment
+                shiftl = std::min(dx()-olddx, l);
+                double sdx = olddx + shiftl; // length of new segment
                 Vector3d newdxv = getIncrement(n2, sdx);
                 nodes[nn - 1] = Vector3d(n2.plus(newdxv));
-                double et = this->calcCreationTime(length+newdx);
+                double et = this->calcCreationTime(length+shiftl);
                 nodeCTs[nn-1] = et; // in case of impeded growth the node emergence time is not exact anymore, but might break down to temporal resolution
                 moved = true;
-                l -= newdx;
+                l -= shiftl;
                 if (l<=0) { // ==0 should be enough
                     return;
                 }
@@ -350,10 +352,10 @@ void Root::createSegments(double l, double dt, bool verbose)
         sl += sdx;
         Vector3d newdx = getIncrement(nodes.back(), sdx);
         Vector3d newnode = Vector3d(nodes.back().plus(newdx));
-        double et = this->calcCreationTime(length+sl);
+        double et = this->calcCreationTime(length+shiftl+sl);
         // in case of impeded growth the node emergence time is not exact anymore,
         // but might break down to temporal resolution
-        addNode(newnode,et);
+        addNode(newnode, et);
     }
 }
 
