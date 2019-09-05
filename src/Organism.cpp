@@ -1,13 +1,14 @@
 // -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 #include "Organism.h"
 
-#include "OrganParameter.h"
 #include "Organ.h"
 
 #include <stdexcept>
 #include <iostream>
 #include <ctime>
 #include <numeric>
+
+#include "organparameter.h"
 
 namespace CRootBox {
 
@@ -82,9 +83,9 @@ Organism::~Organism()
  *
  * @param ot    the organ type
  */
-std::vector<OrganTypeParameter*> Organism::getOrganTypeParameter(int ot) const
+std::vector<OrganRandomParameter*> Organism::getOrganTypeParameter(int ot) const
 {
-    std::vector<OrganTypeParameter*>  otps = std::vector<OrganTypeParameter*>(0);
+    std::vector<OrganRandomParameter*>  otps = std::vector<OrganRandomParameter*>(0);
     for (auto& otp : organParam[ot]) {
         otps.push_back(otp.second);
     }
@@ -98,7 +99,7 @@ std::vector<OrganTypeParameter*> Organism::getOrganTypeParameter(int ot) const
  * @param subType  the sub type (e.g. root type)
  * @return         the respective type parameter
  */
-OrganTypeParameter* Organism::getOrganTypeParameter(int ot, int subtype) const
+OrganRandomParameter* Organism::getOrganTypeParameter(int ot, int subtype) const
 {
     try {
         //                std::cout << "reading organ type " << ot << " sub type " << subtype <<": ";
@@ -119,7 +120,7 @@ OrganTypeParameter* Organism::getOrganTypeParameter(int ot, int subtype) const
  *
  *  @param p    the organ type parameter
  */
-void Organism::setOrganTypeParameter(OrganTypeParameter* p)
+void Organism::setOrganTypeParameter(OrganRandomParameter* p)
 {
     assert(p->plant == this && "OrganTypeParameter::plant should be this organism");
     int otype = p->organType;
@@ -538,7 +539,7 @@ void Organism::readParameters(std::string name, std::string basetag)
             std::string tagname = p->Name();
             // std::cout << "Organism::readParameter: reading tag "<< tagname << std::endl << std::flush;
             int ot = Organism::organTypeNumber(tagname);
-            OrganTypeParameter* otp = organParam[ot].begin()->second->copy(this);
+            OrganRandomParameter* otp = organParam[ot].begin()->second->copy(this);
             otp->readXML(p);
             setOrganTypeParameter(otp);
             p = p->NextSiblingElement();

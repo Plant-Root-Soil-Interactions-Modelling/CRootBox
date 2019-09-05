@@ -3,10 +3,15 @@
 #define ROOTPARAMETER_H_
 
 #include "mymath.h"
-#include "OrganParameter.h"
 #include "soil.h"
 #include "growth.h"
+#include "organparameter.h"
 #include "tropism.h"
+
+/**
+ * This file describes the classes RootSpecificParameter and RootRandomParameter.
+ * RootSpecificParameter are drawn from the RootRandomParameter class
+ */
 
 namespace CRootBox {
 
@@ -15,14 +20,14 @@ class Organism;
 /**
  * Parameters of a specific root, its created by RootTypeParameter:realize()
  */
-class RootParameter :public OrganParameter
+class RootSpecificParameter :public OrganSpecificParameter
 {
 
 public:
 
-    RootParameter(): RootParameter(-1,0.,0.,std::vector<double>(0),0,0.,0.,0.,0.) { } ///< Default constructor
-    RootParameter(int type, double lb, double la, const std::vector<double>& ln, int nob, double r, double a, double theta, double rlt):
-        OrganParameter(),  lb(lb), la(la), nob(nob), r(r), a(a), theta(theta), rlt(rlt), ln(ln) { subType = type; } ///< Constructor setting all parameters
+    RootSpecificParameter(): RootSpecificParameter(-1,0.,0.,std::vector<double>(0),0,0.,0.,0.,0.) { } ///< Default constructor
+    RootSpecificParameter(int type, double lb, double la, const std::vector<double>& ln, int nob, double r, double a, double theta, double rlt):
+        OrganSpecificParameter(),  lb(lb), la(la), nob(nob), r(r), a(a), theta(theta), rlt(rlt), ln(ln) { subType = type; } ///< Constructor setting all parameters
 
     /*
      * RootBox parameters per single root
@@ -45,19 +50,19 @@ public:
 
 
 /**
- * RootTypeParameter: contains a parameter set describing a root type
+ * Contains a parameter set describing a root type
  */
-class RootTypeParameter :public OrganTypeParameter
+class RootRandomParameter :public OrganRandomParameter
 {
 
 public:
 
-    RootTypeParameter(Organism* plant); ///< default constructor
-    virtual ~RootTypeParameter();
+    RootRandomParameter(Organism* plant); ///< default constructor
+    virtual ~RootRandomParameter();
 
-    OrganTypeParameter* copy(Organism* plant_) override;
+    OrganRandomParameter* copy(Organism* plant_) override;
 
-    OrganParameter* realize() override; ///< Creates a specific root from the root parameter set
+    OrganSpecificParameter* realize() override; ///< Creates a specific root from the root parameter set
     int getLateralType(const Vector3d& pos); ///< Choose (dice) lateral type based on root parameter set
     double getK() const { return std::max(nob-1,double(0))*ln+la+lb; }  ///< returns the mean maximal root length [cm]
 

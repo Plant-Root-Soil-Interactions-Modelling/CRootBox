@@ -3,22 +3,28 @@
 #define ROOTSYSTEMPARAMETER_H_
 
 #include "mymath.h"
-#include "OrganParameter.h"
+#include "organparameter.h"
+
+/**
+ * This file describes the classes SeedSpecificParameter and SeedRandomParameter.
+ * SeedSpecificParameter are drawn from the SeedRandomParameter class
+ */
 
 namespace CRootBox {
 
 /**
- * RootSystemParameter: contains all plant specific parameters like planting depth and describing the emergence times of basal and shoot borne roots
+ * SeedSpecificParameter contains all plant specific parameters like planting depth and describing
+ * the emergence times of basal and shoot borne roots
  *
- * This model is very limited in the moment, and we have to replace it, if we come up with something better
+ * The model currently rather limited in, and we might replace it, if we come up with something better
  */
-class RootSystemParameter :public OrganParameter
+class SeedSpecificParameter :public OrganSpecificParameter
 {
 
 public:
 
-    RootSystemParameter(); ///< Default constructor
-    virtual ~RootSystemParameter() { };
+    SeedSpecificParameter(); ///< Default constructor
+    virtual ~SeedSpecificParameter() { };
 
     virtual void set(double pd, double fB, double dB, int mB, int nC, double fSB, double dSB, double dRC, double nz, double simtime); ///< Sets all the parameters
 
@@ -43,6 +49,12 @@ public:
     //Simulation parameters
     double simtime;    ///< recommended final simulation time
 };
+
+
+
+
+
+
 
 } // namespace
 

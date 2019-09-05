@@ -2,9 +2,9 @@
 #include "Organ.h"
 
 #include "Organism.h"
-#include "OrganParameter.h"
-
 #include <iostream>
+
+#include "organparameter.h"
 
 namespace CRootBox {
 
@@ -22,7 +22,7 @@ namespace CRootBox {
  * @param moved     indicates if nodes were moved in the previous time step (default = false)
  * @param oldNON    the number of nodes of the previous time step (default = 0)
  */
-Organ::Organ(int id, const OrganParameter* param, bool alive, bool active, double age, double length, bool moved, int oldNON):
+Organ::Organ(int id, const OrganSpecificParameter* param, bool alive, bool active, double age, double length, bool moved, int oldNON):
         plant(nullptr),
         parent(nullptr),
         id(id),
@@ -78,7 +78,7 @@ Organ* Organ::copy(Organism* p)
     Organ* o = new Organ(*this); // shallow copy
     o->parent=nullptr;
     o->plant = p;
-    o->param_ = new OrganParameter(*param_); // copy parameters
+    o->param_ = new OrganSpecificParameter(*param_); // copy parameters
     for (size_t i=0; i< children.size(); i++) {
         o->children[i] = children[i]->copy(p); // copy lateral
         o->children[i]->setParent(this);
@@ -101,7 +101,7 @@ int Organ::organType() const
  * @return The organ type parameter is retrieved from the plant organism.
  * The Organism class manages all organs type parameters.
  */
-OrganTypeParameter* Organ::getOrganTypeParameter() const
+OrganRandomParameter* Organ::getOrganTypeParameter() const
 {
     return plant->getOrganTypeParameter(this->organType(), param_->subType);
 }

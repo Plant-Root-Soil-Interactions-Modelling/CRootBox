@@ -1,5 +1,5 @@
 // -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
-#include "RootParameter.h"
+#include "rootparameter.h"
 
 #include "Organism.h"
 
@@ -13,7 +13,7 @@ namespace CRootBox {
 /**
  * @return Mean maximal root length of this root type
  */
-double RootParameter::getK() const {
+double RootSpecificParameter::getK() const {
     double l = std::accumulate(ln.begin(), ln.end(), 0.);
     return l+la+lb;
 }
@@ -21,7 +21,7 @@ double RootParameter::getK() const {
 /**
  * @copydoc OrganParameter::toString()
  */
-std::string RootParameter::toString() const
+std::string RootSpecificParameter::toString() const
 {
     std::stringstream str;
     str << "subType\t" << subType << std::endl;
@@ -41,7 +41,7 @@ std::string RootParameter::toString() const
 /**
  * Default constructor sets up hashmaps for class introspection
  */
-RootTypeParameter::RootTypeParameter(Organism* p) :OrganTypeParameter(p)
+RootRandomParameter::RootRandomParameter(Organism* p) :OrganRandomParameter(p)
 {
     // base class default values
     name = "undefined";
@@ -54,7 +54,7 @@ RootTypeParameter::RootTypeParameter(Organism* p) :OrganTypeParameter(p)
 /**
  * Destructor: delete all callback functions
  */
-RootTypeParameter::~RootTypeParameter()
+RootRandomParameter::~RootRandomParameter()
 {
     delete f_tf;
     delete f_gf;
@@ -66,9 +66,9 @@ RootTypeParameter::~RootTypeParameter()
 /**
  * @copydoc OrganTypeParameter::copy()
  */
-OrganTypeParameter* RootTypeParameter::copy(Organism* p)
+OrganRandomParameter* RootRandomParameter::copy(Organism* p)
 {
-    RootTypeParameter* r = new RootTypeParameter(*this); // copy constructor breaks class introspection
+    RootRandomParameter* r = new RootRandomParameter(*this); // copy constructor breaks class introspection
     r->plant = p;
     r->bindParmaters(); // fix class introspection
     r->f_tf = f_tf->copy(p); // copy call back classes
@@ -85,7 +85,7 @@ OrganTypeParameter* RootTypeParameter::copy(Organism* p)
  * Creates a specific root from the root type parameters.
  * @return Specific root parameters derived from the root type parameters
  */
-OrganParameter* RootTypeParameter::realize()
+OrganSpecificParameter* RootRandomParameter::realize()
 {
     //& std::cout << "RootTypeParameter::realize(): subType " << subType << "\n" << std::flush;
     double lb_ = std::max(lb + plant->randn()*lbs, 0.); // length of basal zone
@@ -100,7 +100,7 @@ OrganParameter* RootTypeParameter::realize()
     double a_ = std::max(a + plant->randn()*as, 0.); // radius
     double theta_ = std::max(theta + plant->randn()*thetas, 0.); // initial elongation
     double rlt_ = std::max(rlt + plant->randn()*rlts, 0.); // root life time
-    OrganParameter* p = new RootParameter(subType,lb_,la_,ln_,nob_,r_,a_,theta_,rlt_);
+    OrganSpecificParameter* p = new RootSpecificParameter(subType,lb_,la_,ln_,nob_,r_,a_,theta_,rlt_);
     return p;
 }
 
@@ -110,7 +110,7 @@ OrganParameter* RootTypeParameter::realize()
  * @param pos       spatial position (for coupling to a soil model)
  * @return          root sub type of the lateral root
  */
-int RootTypeParameter::getLateralType(const Vector3d& pos)
+int RootRandomParameter::getLateralType(const Vector3d& pos)
 {
     assert(successor.size()==successorP.size()
         && "RootTypeParameter::getLateralType: Successor sub type and probability vector does not have the same size");
@@ -140,10 +140,10 @@ int RootTypeParameter::getLateralType(const Vector3d& pos)
  *
  * We need to add the parameters that are not in the hashmaps (i.e. successor, and successorP)
  */
-std::string RootTypeParameter::toString(bool verbose) const {
+std::string RootRandomParameter::toString(bool verbose) const {
 
     if (verbose) {
-        std::string s = OrganTypeParameter::toString(true);
+        std::string s = OrganRandomParameter::toString(true);
         std::stringstream str;
         str << "successor\t";
         for (int i=0; i<successor.size(); i++) {
@@ -157,7 +157,7 @@ std::string RootTypeParameter::toString(bool verbose) const {
         str << "\t" << description.at("successorP") << std::endl;
         return s.insert(s.length()-4, str.str());
     } else {
-        return OrganTypeParameter::toString(false);
+        return OrganRandomParameter::toString(false);
     }
 
 }
@@ -169,9 +169,9 @@ std::string RootTypeParameter::toString(bool verbose) const {
  *
  * If the parameter successor or successorP are not in the element, they are set to zero size.
  */
-void RootTypeParameter::readXML(tinyxml2::XMLElement* element)
+void RootRandomParameter::readXML(tinyxml2::XMLElement* element)
 {
-    OrganTypeParameter::readXML(element);
+    OrganRandomParameter::readXML(element);
     tinyxml2::XMLElement* p = element->FirstChildElement("parameter");
     successor.resize(0);
     successorP.resize(0);
@@ -204,9 +204,9 @@ void RootTypeParameter::readXML(tinyxml2::XMLElement* element)
  *
  * We need to add the parameters that are not in the hashmaps (i.e. successor, and successorP)
  */
-tinyxml2::XMLElement* RootTypeParameter::writeXML(tinyxml2::XMLDocument& doc, bool comments) const
+tinyxml2::XMLElement* RootRandomParameter::writeXML(tinyxml2::XMLDocument& doc, bool comments) const
 {
-    tinyxml2::XMLElement* element = OrganTypeParameter::writeXML(doc, comments);
+    tinyxml2::XMLElement* element = OrganRandomParameter::writeXML(doc, comments);
     tinyxml2::XMLElement* p = doc.NewElement("parameter");
     p->SetAttribute("name", "successor");
     std::stringstream str;
@@ -240,7 +240,7 @@ tinyxml2::XMLElement* RootTypeParameter::writeXML(tinyxml2::XMLDocument& doc, bo
  * CRootBox parameter write
  * todo Depricated: use writeXML instead
  */
-void RootTypeParameter::write(std::ostream & cout) const {
+void RootRandomParameter::write(std::ostream & cout) const {
     cout << "# Root type parameter for " << name << "\n";
     cout << "type\t" << subType << "\n" << "name\t" << name << "\n" << "lb\t"<< lb <<"\t"<< lbs << "\n" << "la\t"<< la <<"\t"<< las << "\n"
         << "ln\t" << ln << "\t" << lns << "\n" << "nob\t"<< nob <<"\t"<< nobs << "\n" << "r\t"<< r <<"\t"<< rs << "\n" <<
@@ -263,7 +263,7 @@ void RootTypeParameter::write(std::ostream & cout) const {
  * CRootBox parameter reader
  * todo Depricated: use readXML instead
  */
-void RootTypeParameter::read(std::istream & cin) {
+void RootRandomParameter::read(std::istream & cin) {
     char ch[256]; // dummy
     cin.getline(ch,256);
     std::string s; // dummy
@@ -312,7 +312,7 @@ void RootTypeParameter::read(std::istream & cin) {
  * Sets up class introspection by linking parameter names to their class members,
  * additionally adds a description for each parameter, for toString and writeXML
  */
-void RootTypeParameter::bindParmaters()
+void RootRandomParameter::bindParmaters()
 {
     bindParameter("organType", &organType, "Organ type (unspecified organ = 0, seed = 1, root = 2, stem = 3, leaf = 4)");
     bindParameter("subType", &subType, "Unique identifier of this sub type");

@@ -1,5 +1,5 @@
 // -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
-#include "OrganParameter.h"
+#include "organparameter.h"
 
 #include "Organism.h"
 
@@ -12,7 +12,7 @@ namespace CRootBox {
 /**
  * @return Quick info about the object for debugging
  */
-std::string OrganParameter::toString() const
+std::string OrganSpecificParameter::toString() const
 {
     std::stringstream str;
     str << "subType\t" << subType << std::endl;
@@ -24,7 +24,7 @@ std::string OrganParameter::toString() const
  *
  * @param plant     the organism managing this organ type parameter
  */
-OrganTypeParameter::OrganTypeParameter(Organism* plant): plant(plant)
+OrganRandomParameter::OrganRandomParameter(Organism* plant): plant(plant)
 {
     iparam["organType"] = &organType; // set up class introspection
     iparam["subType"] = &subType;
@@ -40,9 +40,9 @@ OrganTypeParameter::OrganTypeParameter(Organism* plant): plant(plant)
  *
  * @return A new organ type parameter object, with same values as this
  */
-OrganTypeParameter* OrganTypeParameter::copy(Organism* p)
+OrganRandomParameter* OrganRandomParameter::copy(Organism* p)
 {
-    OrganTypeParameter* o = new OrganTypeParameter(p);     // copy constructor would break class introspection
+    OrganRandomParameter* o = new OrganRandomParameter(p);     // copy constructor would break class introspection
     o->name == name;
     o->organType = organType;
     o->subType = subType;
@@ -57,9 +57,9 @@ OrganTypeParameter* OrganTypeParameter::copy(Organism* p)
  *
  * @return The organ specific parameter set (each organ has exactly one set)
  */
-OrganParameter* OrganTypeParameter::realize()
+OrganSpecificParameter* OrganRandomParameter::realize()
 {
-    OrganParameter* op = new OrganParameter();
+    OrganSpecificParameter* op = new OrganSpecificParameter();
     op->subType = subType;
     return op;
 }
@@ -73,7 +73,7 @@ OrganParameter* OrganTypeParameter::realize()
  *
  * @return A single parameter value, if unknown NaN
  */
-double OrganTypeParameter::getParameter(std::string name) const
+double OrganRandomParameter::getParameter(std::string name) const
 {
     if ((name.length()>4) && (name.substr(name.length()-4)=="_dev")) {// looking for standard deviation?
         std::string n = name.substr(0,name.length()-4);
@@ -98,7 +98,7 @@ double OrganTypeParameter::getParameter(std::string name) const
  *
  * @param verbose     if true, all parameters names, values, and descriptions are written
  */
-std::string OrganTypeParameter::toString(bool verbose) const
+std::string OrganRandomParameter::toString(bool verbose) const
 {
     std::stringstream str;
     if (verbose) {
@@ -162,7 +162,7 @@ std::string OrganTypeParameter::toString(bool verbose) const
  *
  * @param element  The XML element containing the parameter tags
  */
-void OrganTypeParameter::readXML(tinyxml2::XMLElement* element)
+void OrganRandomParameter::readXML(tinyxml2::XMLElement* element)
 {
     std::string type = element->Name();
     this->organType =  Organism::organTypeNumber(type);
@@ -189,7 +189,7 @@ void OrganTypeParameter::readXML(tinyxml2::XMLElement* element)
  *
  * @param name      file name
  */
-void OrganTypeParameter::readXML(std::string name)
+void OrganRandomParameter::readXML(std::string name)
 {
     tinyxml2::XMLDocument doc;
     doc.LoadFile(name.c_str());
@@ -212,7 +212,7 @@ void OrganTypeParameter::readXML(std::string name)
  *
  * @return the xml tag representing this organ type parameter
  */
-tinyxml2::XMLElement* OrganTypeParameter::writeXML(tinyxml2::XMLDocument& doc, bool comments) const
+tinyxml2::XMLElement* OrganRandomParameter::writeXML(tinyxml2::XMLDocument& doc, bool comments) const
 {
     std::string typeName = Organism::organTypeName(organType);
     tinyxml2::XMLElement* organ = doc.NewElement(typeName.c_str());
@@ -262,7 +262,7 @@ tinyxml2::XMLElement* OrganTypeParameter::writeXML(tinyxml2::XMLDocument& doc, b
  *
  * @param name      file name
  */
-void OrganTypeParameter::writeXML(std::string name) const
+void OrganRandomParameter::writeXML(std::string name) const
 {
     tinyxml2::XMLDocument doc;
     tinyxml2::XMLElement* organ = this->writeXML(doc, true);
@@ -280,7 +280,7 @@ void OrganTypeParameter::writeXML(std::string name) const
  *  @param descr        a parameter description
  *  @param dev          optionally, a deviation of the parameter like standard deviation.
  */
-void OrganTypeParameter::bindParameter(std::string name, int* i, std::string descr, double* dev)
+void OrganRandomParameter::bindParameter(std::string name, int* i, std::string descr, double* dev)
 {
     iparam[name] = i;
     if (!descr.empty()) {
@@ -301,7 +301,7 @@ void OrganTypeParameter::bindParameter(std::string name, int* i, std::string des
  *  @param descr        a parameter description
  *  @param dev          optionally, a deviation of the parameter like standard deviation.
  */
-void OrganTypeParameter::bindParameter(std::string name, double* d, std::string descr, double* dev)
+void OrganRandomParameter::bindParameter(std::string name, double* d, std::string descr, double* dev)
 {
     dparam[name] = d;
     if (!descr.empty()) {

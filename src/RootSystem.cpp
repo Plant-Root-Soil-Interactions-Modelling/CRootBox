@@ -1,7 +1,7 @@
 // -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 #include "RootSystem.h"
 
-#include "OrganParameter.h"
+#include "organparameter.h"
 #include "Organism.h"
 
 namespace CRootBox {
@@ -24,19 +24,19 @@ RootSystem::RootSystem(const RootSystem& rs): Organism(rs), rsparam(rs.rsparam),
 /**
  * @return the i-th root parameter of sub type @param type.
  */
-RootTypeParameter* RootSystem::getRootTypeParameter(int type) const
+RootRandomParameter* RootSystem::getRootTypeParameter(int type) const
 {
-    return (RootTypeParameter*) getOrganTypeParameter(Organism::ot_root, type);
+    return (RootRandomParameter*) getOrganTypeParameter(Organism::ot_root, type);
 }
 
 /**
  * @return all root type parameters in a vector
  */
-std::vector<RootTypeParameter*> RootSystem::getRootTypeParameter() const
+std::vector<RootRandomParameter*> RootSystem::getRootTypeParameter() const
 {
-    std::vector<RootTypeParameter*>  otps = std::vector<RootTypeParameter*>(0);
+    std::vector<RootRandomParameter*>  otps = std::vector<RootRandomParameter*>(0);
     for (auto& otp : organParam[Organism::ot_root]) {
-        otps.push_back((RootTypeParameter*)otp.second);
+        otps.push_back((RootRandomParameter*)otp.second);
     }
     return otps;
 }
@@ -44,7 +44,7 @@ std::vector<RootTypeParameter*> RootSystem::getRootTypeParameter() const
 /**
  * Sets the root system parameters @param rsp
  */
-void RootSystem::setRootSystemParameter(const RootSystemParameter& rsp)
+void RootSystem::setRootSystemParameter(const SeedSpecificParameter& rsp)
 {
     rsparam = rsp;
 }
@@ -52,7 +52,7 @@ void RootSystem::setRootSystemParameter(const RootSystemParameter& rsp)
 /**
  * @return the root system parameter
  */
-RootSystemParameter* RootSystem::getRootSystemParameter() {
+SeedSpecificParameter* RootSystem::getRootSystemParameter() {
     return &rsparam;
 }
 
@@ -104,7 +104,7 @@ void RootSystem::openFile(std::string name, std::string subdir)
         fis.close();
     } else { // create a tap root system
         std::cout << "No root system parameters found, using default tap root system \n";
-        rsparam = RootSystemParameter();
+        rsparam = SeedSpecificParameter();
     }
 }
 
@@ -118,7 +118,7 @@ int RootSystem::readParameters(std::istream& is)
 {
     int c = 0;
     while (is.good()) {
-        RootTypeParameter* p = new RootTypeParameter(this);
+        RootRandomParameter* p = new RootRandomParameter(this);
         p->read(is);
         p->organType = Organism::ot_root;
         setOrganTypeParameter(p);
@@ -135,7 +135,7 @@ int RootSystem::readParameters(std::istream& is)
 void RootSystem::writeParameters(std::ostream& os) const
 {
     for (auto& otp :organParam[Organism::ot_root]) {
-        ((RootTypeParameter*)otp.second)->write(os);
+        ((RootRandomParameter*)otp.second)->write(os);
     }
 }
 
@@ -157,7 +157,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
 
     // Create root system from the root system parameter
     const double maxT = 365.; // maximal simulation time
-    const RootSystemParameter& rs = rsparam; // rename
+    const SeedSpecificParameter& rs = rsparam; // rename
     Vector3d iheading(0,0,-1);
 
     // Taproot
@@ -170,7 +170,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
     if (rs.maxB>0) {
         if (pmap.find(basaltype)==pmap.end()) { // if the type is not defined, copy tap root
             std::cout << "Basal root type #" << basaltype << " was not defined, using tap root parameters instead\n" << std::flush;
-            RootTypeParameter* brtp = (RootTypeParameter*)getRootTypeParameter(1)->copy(this); // TODO
+            RootRandomParameter* brtp = (RootRandomParameter*)getRootTypeParameter(1)->copy(this); // TODO
             brtp->subType = basaltype;
             setOrganTypeParameter(brtp);
         }
@@ -190,7 +190,7 @@ void RootSystem::initialize(int basaltype, int shootbornetype)
     if ((rs.nC>0) && (rs.delaySB<maxT)) { // if the type is not defined, copy basal root
         if (pmap.find(shootbornetype)==pmap.end()) {
             std::cout << "Shootborne root type #" << shootbornetype << " was not defined, using tap root parameters instead\n";
-            RootTypeParameter* srtp =  (RootTypeParameter*)getRootTypeParameter(1)->copy(this);
+            RootRandomParameter* srtp =  (RootRandomParameter*)getRootTypeParameter(1)->copy(this);
             srtp->subType = shootbornetype;
             setOrganTypeParameter(srtp);
         }
@@ -231,7 +231,7 @@ void RootSystem::initCallbacks()
 {
     // Create tropisms and growth functions per root type
     for (auto& p_otp :organParam[Organism::ot_root]) {
-        RootTypeParameter* rtp = (RootTypeParameter*)p_otp.second;
+        RootRandomParameter* rtp = (RootRandomParameter*)p_otp.second;
         Tropism* tropism = this->createTropismFunction(rtp->tropismT, rtp->tropismN, rtp->tropismS);
         tropism->setGeometry(geometry);
         delete rtp->f_tf; // delete old tropism
@@ -256,7 +256,7 @@ void RootSystem::setTropism(Tropism* tf_, int rt)
         getRootTypeParameter(rt)->f_tf=tf_;
     } else { // set for all root types (default)
         for (auto& p_otp :organParam[Organism::ot_root]) {
-            RootTypeParameter* rtp = (RootTypeParameter*)p_otp.second;
+            RootRandomParameter* rtp = (RootRandomParameter*)p_otp.second;
             rtp->f_tf = tf_;
         }
     }

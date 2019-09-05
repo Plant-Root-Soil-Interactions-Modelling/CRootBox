@@ -8,9 +8,9 @@
 #include "soil.h"
 #include "tropism.h"
 #include "Organism.h"
+#include "rootparameter.h"
 #include "Root.h"
-#include "RootParameter.h"
-#include "RootSystemParameter.h"
+#include "seedparameter.h"
 
 namespace CRootBox {
 
@@ -40,10 +40,10 @@ public:
     virtual ~RootSystem() { }; ///< everything is in ~Organism
 
     /* Parameter input output */
-    RootTypeParameter* getRootTypeParameter(int type) const;///< returns the i-th root parameter set (i=1..n)
-    std::vector<RootTypeParameter*> getRootTypeParameter() const; ///< all root type parameters as a vector
-    void setRootSystemParameter(const RootSystemParameter& rsp); ///< sets the root system parameters
-    RootSystemParameter* getRootSystemParameter(); ///< gets the root system parameters
+    RootRandomParameter* getRootTypeParameter(int type) const;///< returns the i-th root parameter set (i=1..n)
+    std::vector<RootRandomParameter*> getRootTypeParameter() const; ///< all root type parameters as a vector
+    void setRootSystemParameter(const SeedSpecificParameter& rsp); ///< sets the root system parameters
+    SeedSpecificParameter* getRootSystemParameter(); ///< gets the root system parameters
     void openFile(std::string filename, std::string subdir="modelparameter/"); ///< reads root parameter and plant parameter
     int readParameters(std::istream & cin); ///< reads root parameters from an input stream
     void writeParameters(std::ostream & os) const; ///< writes root parameters
@@ -89,7 +89,7 @@ public:
 
 private:
 
-    RootSystemParameter rsparam; ///< Plant parameter
+    SeedSpecificParameter rsparam; ///< Plant parameter
     SignedDistanceFunction* geometry = new SignedDistanceFunction(); ///< Confining geometry (unconfined by default)
     SoilLookUp* soil = nullptr; ///< callback for hydro, or chemo tropism (needs to set before initialize()) TODO should be a part of tf, or rtparam
 

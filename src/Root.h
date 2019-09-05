@@ -5,7 +5,7 @@
 #include "mymath.h"
 #include "Organ.h"
 #include "Organism.h"
-#include "RootParameter.h"
+#include "rootparameter.h"
 
 namespace CRootBox {
 
@@ -25,7 +25,7 @@ class Root :public Organ
 
 public:
 
-    Root(int id, const OrganParameter* param, bool alive, bool active, double age, double length,
+    Root(int id, const OrganSpecificParameter* param, bool alive, bool active, double age, double length,
         Vector3d iheading, double pbl, int pni, bool moved= false, int oldNON = 0); // ///< creates everything from scratch
     Root(Organism* rs, int type, Vector3d pheading, double delay, Root* parent, double pbl, int pni); ///< used within simulation
     virtual ~Root() { }; ///< no need to do anything, children are deleted in ~Organ()
@@ -46,8 +46,8 @@ public:
     double calcAge(double length); ///< analytical age of the root
 
     /* Abbreviations */
-    RootTypeParameter* getRootTypeParameter() const;  ///< root type parameter of this root
-    const RootParameter* param() const; ///< root parameter
+    RootRandomParameter* getRootTypeParameter() const;  ///< root type parameter of this root
+    const RootSpecificParameter* param() const; ///< root parameter
     double dx() const { return getRootTypeParameter()->dx; } ///< returns the axial resolution
 
     /* IO */

@@ -10,8 +10,8 @@
 
 namespace CRootBox {
 
-class OrganParameter;
-class OrganTypeParameter;
+class OrganSpecificParameter;
+class OrganRandomParameter;
 class Organism;
 
 /**
@@ -31,7 +31,7 @@ class Organ
 {
 public:
 
-    Organ(int id, const OrganParameter* param, bool alive, bool active, double age, double length,
+    Organ(int id, const OrganSpecificParameter* param, bool alive, bool active, double age, double length,
         bool moved= false, int oldNON = 0); ///< creates everything from scratch
     Organ(Organism* plant, Organ* parent, int organtype, int subtype, double delay); ///< used within simulation
     virtual ~Organ();
@@ -51,8 +51,8 @@ public:
 
     /* parameters */
     int getId() const { return id; } ///< unique organ id
-    const OrganParameter* getParam() const { return param_; } ///< organ parameters
-    OrganTypeParameter* getOrganTypeParameter() const;  ///< organ type parameter
+    const OrganSpecificParameter* getParam() const { return param_; } ///< organ parameters
+    OrganRandomParameter* getOrganTypeParameter() const;  ///< organ type parameter
     bool isAlive() const { return alive; } ///< checks if alive
     bool isActive() const { return active; } ///< checks if active
     double getAge() const { return age; } ///< return age of the organ
@@ -90,7 +90,7 @@ protected:
 
     /* Parameters that are constant over the organ life time */
     const int id; ///< unique organ id
-    const OrganParameter* param_; ///< the parameter set of this organ
+    const OrganSpecificParameter* param_; ///< the parameter set of this organ
 
     /* Parameters are changing over time */
     bool alive = true; ///< true: alive, false: dead

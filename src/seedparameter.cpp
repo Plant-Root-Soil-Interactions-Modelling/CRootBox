@@ -1,7 +1,6 @@
 // -*- mode: C++; tab-width: 4; indent-tabs-mode: nil; c-basic-offset: 4 -*-
-#include "RootSystemParameter.h"
-
 #include <cmath>
+#include "seedparameter.h"
 
 namespace CRootBox {
 
@@ -12,7 +11,7 @@ namespace CRootBox {
 /**
  * Default constructor: No basal roots, not shoot borne roots, planting depth 3 [cm]
  */
-RootSystemParameter::RootSystemParameter() {
+SeedSpecificParameter::SeedSpecificParameter() {
     set(3.,1.e9,0.,0, //pd, fB, dB, mB,
         0,1.e9,1.e9,0.,0.,30.);  // nC, fSB, dSB, dRC, nz
 }
@@ -20,7 +19,7 @@ RootSystemParameter::RootSystemParameter() {
 /**
  * depricated todo no RootSystemTypeParameter yet
  */
-void RootSystemParameter::read(std::istream & cin) {
+void SeedSpecificParameter::read(std::istream & cin) {
     double plantingdepth;
     std::string s; // dummy
     cin  >>  s >> plantingdepth;
@@ -31,7 +30,7 @@ void RootSystemParameter::read(std::istream & cin) {
 /**
  * depricated todo no RootSystemTypeParameter yet
  */
-void RootSystemParameter::write(std::ostream & cout) const {
+void SeedSpecificParameter::write(std::ostream & cout) const {
     double pd = -seedPos.z;
     cout <<  "plantingdepth\t" << pd << "\n" <<  "firstB\t" << firstB << "\n" <<  "delayB\t" << delayB << "\n"
         <<  "maxB\t" << maxB << "\n" <<  "nC\t" << nC << "\n" <<  "firstSB\t" << firstSB << "\n"
@@ -52,7 +51,7 @@ void RootSystemParameter::write(std::ostream & cout) const {
  * @param nz          Distance between the root crowns along the shoot [cm]
  * @param simtime     Recommended final simulation time (e.g. used in the web interface)
  */
-void RootSystemParameter::set(double pd, double fB, double dB, int mB, int nC, double fSB, double dSB, double dRC, double nz, double simtime) {
+void SeedSpecificParameter::set(double pd, double fB, double dB, int mB, int nC, double fSB, double dSB, double dRC, double nz, double simtime) {
     seedPos=Vector3d(0,0,-pd);
     firstB=fB;
     delayB=dB;

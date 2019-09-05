@@ -7,6 +7,11 @@
 
 #include "../external/tinyxml2/tinyxml2.h"
 
+/**
+ * This file describes the classes OrganSpecificParameter and RootRandomParameter.
+ * OrganSpecificParameter are drawn from the RootRandomParameter class
+ */
+
 namespace CRootBox {
 
 class Organism; // forward declaration
@@ -14,10 +19,10 @@ class Organism; // forward declaration
 /**
  * Parameters for a specific organ
  */
-class OrganParameter {
+class OrganSpecificParameter {
 public:
 
-    virtual ~OrganParameter() { };
+    virtual ~OrganSpecificParameter() { };
 
     int subType = -1; ///< sub type of the organ
 
@@ -35,16 +40,16 @@ public:
  *
  * The factory function copy() has to be overwritten for each specialization.
  */
-class OrganTypeParameter
+class OrganRandomParameter
 {
 public:
 
-    OrganTypeParameter(Organism* plant); ///< default constructor
-    virtual ~OrganTypeParameter() { };
+    OrganRandomParameter(Organism* plant); ///< default constructor
+    virtual ~OrganRandomParameter() { };
 
-    virtual OrganTypeParameter* copy(Organism* plant); ///< copies the root type parameter into a new plant
+    virtual OrganRandomParameter* copy(Organism* plant); ///< copies the root type parameter into a new plant
 
-    virtual OrganParameter* realize(); ///< creates a specific organ from the root parameter set
+    virtual OrganSpecificParameter* realize(); ///< creates a specific organ from the root parameter set
 
     virtual double getParameter(std::string name) const; // get a scalar parameter
 

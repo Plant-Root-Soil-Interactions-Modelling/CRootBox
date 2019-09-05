@@ -20,7 +20,7 @@ namespace CRootBox {
  * @param moved     indicates if nodes were moved in the previous time step (default = false)
  * @param oldNON    the number of nodes of the previous time step (default = 0)
  */
-Root::Root(int id, const OrganParameter* param, bool alive, bool active, double age, double length,
+Root::Root(int id, const OrganSpecificParameter* param, bool alive, bool active, double age, double length,
     Vector3d iheading, double pbl, int pni, bool moved, int oldNON)
 :Organ(id, param, alive, active, age, length, moved,  oldNON ), parentBaseLength(pbl), parentNI(pni)
 { }
@@ -68,7 +68,7 @@ Organ* Root::copy(Organism* rs)
     Root* r = new Root(*this); // shallow copy
     r->parent = nullptr;
     r->plant = rs;
-    r->param_ = new RootParameter(*param()); // copy parameters
+    r->param_ = new RootSpecificParameter(*param()); // copy parameters
     for (size_t i=0; i< children.size(); i++) {
         r->children[i] = children[i]->copy(rs); // copy laterals
         r->children[i]->setParent(this);
@@ -88,7 +88,7 @@ void Root::simulate(double dt, bool verbose)
     moved = false;
     oldNumberOfNodes = nodes.size();
 
-    const RootParameter& p = *param(); // rename
+    const RootSpecificParameter& p = *param(); // rename
 
     if (alive) { // dead roots wont grow
 
@@ -233,17 +233,17 @@ double Root::calcAge(double length)
 /**
  * @return The RootTypeParameter from the plant
  */
-RootTypeParameter* Root::getRootTypeParameter() const
+RootRandomParameter* Root::getRootTypeParameter() const
 {
-    return (RootTypeParameter*)plant->getOrganTypeParameter(Organism::ot_root, param_->subType);
+    return (RootRandomParameter*)plant->getOrganTypeParameter(Organism::ot_root, param_->subType);
 }
 
 /**
  * @return Parameters of the specific root
  */
-const RootParameter* Root::param() const
+const RootSpecificParameter* Root::param() const
 {
-    return (const RootParameter*)param_;
+    return (const RootSpecificParameter*)param_;
 }
 
 /**

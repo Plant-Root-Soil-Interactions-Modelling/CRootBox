@@ -5,11 +5,11 @@
 # file(GLOB all_sources *.cpp) # i changed that to exclude PythonRootSystem.cpp
 add_library(CRootBox
             Organ.cpp
-            OrganParameter.cpp
+            organparameter.cpp
             Organism.cpp
             analysis.cpp
-            RootParameter.cpp
-			RootSystemParameter.cpp            
+            rootparameter.cpp
+			seedparameter.cpp            
             Root.cpp
             RootSystem.cpp
             sdf.cpp
@@ -38,12 +38,12 @@ if (PythonLibs_FOUND)
   # make shared library for Pyhton binding
   add_library(py_rootbox SHARED
               Organ.cpp
-              OrganParameter.cpp
+              organparameter.cpp
               Organism.cpp  
               PythonRootSystem.cpp
               analysis.cpp
-              RootParameter.cpp
-			  RootSystemParameter.cpp              
+              rootparameter.cpp
+			  seedparameter.cpp              
               Root.cpp
               RootSystem.cpp
               sdf.cpp
