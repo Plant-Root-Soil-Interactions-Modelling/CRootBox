@@ -3,97 +3,95 @@ import py_rootbox as rb
 from rsml import *
 
 
-class TestRootParameter(unittest.TestCase):
+class TestShootParameter(unittest.TestCase):
 
-    def root_example(self):
+    def shoot_example(self):
         """ example root parameters used below """
         self.plant = rb.Organism()
-        self.rtp = rb.SeedTypeParameter(self.plant)
-        self.rtp.la = 1.5
-        self.rtp.lb = 5.5
-        self.rtp.ln = 1.25
-        self.rtp.lns = 0.12
-        self.rtp.nob = 8
-        self.rtp.subType = 1
+        self.srp = rb.SeedRandomParameter(self.plant)
+        self.srp.firstB = 10
+        self.srp.delayB = 7
+        self.srp.nC = 5
+        self.srp.firstSB = 21
+        self.srp.delaySB = 4
+        self.srp.delayRC = 15
+        self.srp.nz = 1.
+        self.srp.subType = 0
 
     def test_constructors(self):
         """ tests constructor and copy """
         plant = rb.Organism()
-        otp = rb.RootTypeParameter(plant)
-        otp.theta = 123
-        otp.thetas = 456
-        otp.gf = 789
-        otp2 = otp.copy(plant)
-        self.assertIsNot(otp, otp2, "copy: organ type parameter set is not copied")
-        self.assertEqual(otp2.name, otp.name, "copy: value unexpected")
-        self.assertEqual(otp2.organType, otp.organType, "copy: value unexpected")
-        self.assertEqual(otp2.subType, otp.subType, "copy: value unexpected")
-        self.assertEqual(otp2.a, otp.a, "copy: value unexpected")
-        self.assertEqual(otp2.theta, otp.theta, "copy: value unexpected")
-        self.assertEqual(otp2.thetas, otp.thetas, "copy: value unexpected")
-        self.assertEqual(otp2.gf, otp.gf, "copy: value unexpected")
+        srp = rb.SeedRandomParameter(plant)
+        srp.firstB = 123
+        srp.firstBs = 456
+        srp.nz = 789
+        srp2 = srp.copy(plant)
+        self.assertIsNot(srp, srp2, "copy: organ type parameter set is not copied")
+        self.assertEqual(srp2.name, srp.name, "copy: value unexpected")
+        self.assertEqual(srp2.organType, srp.organType, "copy: value unexpected")
+        self.assertEqual(srp2.subType, srp.subType, "copy: value unexpected")
+        self.assertEqual(srp2.firstB, srp.firstB, "copy: value unexpected")
+        self.assertEqual(srp2.firstBs, srp.firstBs, "copy: value unexpected")
+        self.assertEqual(srp2.nz, srp.nz, "copy: value unexpected")
 
     def test_parameter(self):
         """ tests getParameter() """
-        rtp = rb.RootTypeParameter(rb.Organism())
-        rtp.lns = 0.123
-        rtp.la = 12
-        ot = rtp.getParameter("organType")  # test defaults
-        st = rtp.getParameter("subType")
-        gf = rtp.getParameter("gf")
-        ln = rtp.getParameter("ln")
-        lns = rtp.getParameter("ln_dev")
-        la = rtp.getParameter("la_mean")  # we can always add "_mean" to avoid naming conflicts
-        self.assertEqual(ot, 2., "getParameter: value unexpected")
+        plant = rb.Organism()
+        srp = rb.SeedRandomParameter(plant)
+        srp.firstB = 0.123
+        srp.delaySBs = 12
+        ot = srp.getParameter("organType")  # test defaults
+        st = srp.getParameter("subType")
+        nz = srp.getParameter("nz")
+        firstB = srp.getParameter("firstB")
+        delaySBs = srp.getParameter("delaySB_dev")
+        firstB2 = srp.getParameter("firstB_mean")  # we can always add "_mean" to avoid naming conflicts
+        self.assertEqual(ot, 1., "getParameter: value unexpected")
         self.assertEqual(st, -1., "getParameter: value unexpected")
-        self.assertEqual(gf, 1., "getParameter: value unexpected")
-        self.assertEqual(ln, 1., "getParameter: value unexpected")
-        self.assertEqual(lns, 0.123, "getParameter: value unexpected")
-        self.assertEqual(la, 12, "getParameter: value unexpected")
-        rtp.theta = 123  # change values
-        rtp.thetas = 456
-        theta = rtp.getParameter("theta")
-        thetas = rtp.getParameter("theta_dev")
-        self.assertEqual(theta, 123, "getParameter: value unexpected")
-        self.assertEqual(thetas, 456, "getParameter: value unexpected")
+        self.assertEqual(nz, 1., "getParameter: value unexpected")
+        self.assertEqual(firstB, 0.123, "getParameter: value unexpected")
+        self.assertEqual(firstB, firstB2, "getParameter: value unexpected")
+        self.assertEqual(delaySBs, 12, "getParameter: value unexpected")
+        srp.firstB = 123  # change values
+        srp.delaySBs = 456
+        firstB = srp.getParameter("firstB")
+        delaySBs = srp.getParameter("delaySB_dev")
+        self.assertEqual(firstB, 123, "getParameter: value unexpected")
+        self.assertEqual(delaySBs, 456, "getParameter: value unexpected")
 
     def test_toString(self):
         """ tests __str__ output """
-        self.rtp = rb.RootTypeParameter(rb.Organism())
-        self.add_successors()
-        rtp = self.rtp  # rename
-        rtp.name = "the root"
-        self.assertEqual(rtp.__str__(False), "Name: the root, organType: 2, subType, -1", "toString: value unexpected")
-        # print(rtp)
+        self.srp = rb.SeedRandomParameter(rb.Organism())
+        srp = self.srp  # rename
+        srp.name = "the seed"
+        # print(srp.__str__(False))
+        # print(srp)
+        self.assertEqual(srp.__str__(False), "Name: the seed, organType: 1, subType, -1", "toString: value unexpected")
 
     def test_xml(self):
         """ write the organ as xml, and rereads it """
-        self.root_example()
-        self.add_successors()
-        otp = self.rtp  # rename
-        otp.name = "lateral"
-        otp.subType = 2
-        otp.writeXML("root.xml")
-        otp2 = rb.RootTypeParameter(self.plant)
-        otp2.readXML("root.xml")
+        self.shoot_example()
+        otp = self.srp  # rename
+        otp.name = "best_seed"
+        otp.subType = 0
+        otp.writeXML("seed.xml")
+        otp2 = rb.SeedRandomParameter(self.plant)
+        otp2.readXML("seed.xml")
         self.assertEqual(otp2.name, otp.name, "xml: value unexpected")
         self.assertEqual(otp2.organType, otp.organType, "xml: value unexpected")
         self.assertEqual(otp2.subType, otp.subType, "xml: value unexpected")
-        self.assertEqual(otp2.nob, otp.nob, "xml: value unexpected")  # value
-        self.assertEqual(otp2.lns, otp.lns, "xml: value unexpected")  # dev
-        for i in range(0, 3):
-            self.assertEqual(otp2.successor[i], otp.successor[i], "xml: value unexpected")
-        for i in range(0, 3):
-            self.assertEqual(otp2.successorP[i], otp.successorP[i], "xml: value unexpected")
+        self.assertEqual(otp2.firstB, otp.firstB, "xml: value unexpected")  # value
+        self.assertEqual(otp2.delayRC, otp.delayRC, "xml: value unexpected")  # value
+        self.assertEqual(otp2.firstBs, otp.firstBs, "xml: value unexpected")  # dev
+        self.assertEqual(otp2.delayRCs, otp.delayRCs, "xml: value unexpected")  # dev
 
     def test_realize(self):
         """ calls realize """
-        self.root_example()
-        p = self.rtp.realize()
-        self.assertEqual(p.__class__.__name__, "RootParameter", "realize: unexpected class type")
-        self.assertEqual(p.subType, 1, "realize: unexpected sub type")
-        self.assertEqual(p.a, 0.1, "realize: unexpected value")
-        self.assertEqual(len(p.ln) + 1, self.rtp.nob, "realize: internodal distances +1 should be  number of laterals")
+        self.shoot_example()
+        p = self.srp.realize()
+        self.assertEqual(p.__class__.__name__, "SeedSpecificParameter", "realize: unexpected class type")
+        self.assertEqual(p.subType, 0, "realize: unexpected sub type")
+        self.assertEqual(p.firstB, 10, "realize: unexpected value")
 
 
 if __name__ == '__main__':

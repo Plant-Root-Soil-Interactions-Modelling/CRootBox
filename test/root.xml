@@ -31,8 +31,10 @@
     <!--Number of trials of root tropism-->
     <parameter name="tropismS" value="0.2"/>
     <!--Mean value of expected change of root tropism [1/cm]-->
-    <parameter name="successor">4 5 6 </parameter>
+    <parameter name="successor" number="0" type="4" percentage="0.40000001"/>
     <!--Sub type of lateral roots-->
-    <parameter name="successorP">0.4 0.1 0.5 </parameter>
-    <!--Probability of each sub type to occur-->
+    <parameter name="successor" number="1" type="5" percentage="0.1"/>
+    <!--Sub type of lateral roots-->
+    <parameter name="successor" number="2" type="6" percentage="0.5"/>
+    <!--Sub type of lateral roots-->
 </root>

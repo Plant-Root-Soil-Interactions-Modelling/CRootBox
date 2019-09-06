@@ -581,7 +581,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
             .def("__str__",&SeedRandomParameter::toString, toString_overloads())
             ;
     class_<SeedSpecificParameter, SeedSpecificParameter*, bases<OrganSpecificParameter>>("SeedSpecificParameter", init<>())
-          .def(init<Vector3d , double, int, int, int, double, double, double, double, double>())
+          .def(init<int, Vector3d , double, int, int, int, double, double, double, double, double>())
           .def_readwrite("seedPos", &SeedSpecificParameter::seedPos)
           .def_readwrite("firstB", &SeedSpecificParameter::firstB)
           .def_readwrite("delayB", &SeedSpecificParameter::delayB)

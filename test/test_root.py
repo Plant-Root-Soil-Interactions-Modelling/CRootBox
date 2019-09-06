@@ -138,7 +138,7 @@ class TestRoot(unittest.TestCase):
 
     def test_geometry(self):
         """ tests if nodes can be retrieved from the organ """
-        # make plot for plausibility
+        # TODO make plot for plausibility
 
     def test_parameter(self):
         """ tests some parameters on sequential organ list """

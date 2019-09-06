@@ -27,8 +27,8 @@ class TestRootSystem(unittest.TestCase):
         """ an example used in some of the tests below, 100 basals with laterals """
         self.rs = rb.RootSystem()
         maxB, firstB, delayB = 100, 10., 3
-        seedPos = rb.Vector3d(0.,0.,-3.)
-        rsp = rb.SeedSpecificParameter(seedPos, firstB, delayB, maxB, 0, 1.e9, 1.e9, 1.e9, 0., 0.)
+        seedPos = rb.Vector3d(0., 0., -3.)
+        rsp = rb.SeedSpecificParameter(0, seedPos, firstB, delayB, maxB, 0, 1.e9, 1.e9, 1.e9, 0., 0.)
         self.rs.setRootSystemParameter(rsp)
         p0 = rb.RootRandomParameter(self.rs)
         p0.name, p0.type, p0.la, p0.nob, p0.ln, p0.r, p0.dx = "taproot", 1, 10, 20, 89. / 19., 1, 0.5
@@ -40,6 +40,7 @@ class TestRootSystem(unittest.TestCase):
         self.p0, self.p1, self.rsp = p0, p1, rsp  # Python will garbage collect them away, if not stored
         self.rs.setOrganRandomParameter(self.p0)  # the organism manages the type parameters
         self.rs.setOrganRandomParameter(self.p1)
+        # print(self.rs.getRootSystemParameter())
 
     def rs_length_test(self, dt, l, subDt):
         """ simulates a root system and checks basal lengths against its analytic lengths @param l at times @param t"""

@@ -97,7 +97,7 @@ class TestRootParameter(unittest.TestCase):
         for i in range(0, 3):
             self.assertEqual(otp2.successor[i], otp.successor[i], "xml: value unexpected")
         for i in range(0, 3):
-            self.assertEqual(otp2.successorP[i], otp.successorP[i], "xml: value unexpected")
+            self.assertAlmostEqual(otp2.successorP[i], otp.successorP[i], 7, "xml: value unexpected")
 
     def test_realize(self):
         """ calls realize """

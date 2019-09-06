@@ -161,7 +161,8 @@ void RootSystem::writeParameters(std::ostream& os) const
  */
 void RootSystem::initialize(int basaltype, int shootbornetype)
 {
-	if (seed!=nullptr) {
+	if (seed==nullptr) {
+	    std::cout << "RootSystem::initialize: Warning! no seed was set, taking default values\n";
 		seed = (SeedSpecificParameter*)randomSeed.realize(); // go with default values
 	}
 

@@ -19,7 +19,6 @@ std::string SeedSpecificParameter::toString() const
     str << "firstB\t" << firstB << std::endl << "delayB\t" << delayB << std::endl << "maxB\t" << maxB << std::endl;
     str << "nC\t" << nC << std::endl << "firstSB\t" << firstSB << std::endl << "delaySB\t" << delaySB << std::endl;
     str << "delayRC\t" << delayRC << std::endl << "nz\t" << nz << std::endl << "simtime\t" << simtime << std::endl;
-
     return str.str();
 }
 
@@ -34,7 +33,7 @@ SeedRandomParameter::SeedRandomParameter(Organism* p) :OrganRandomParameter(p)
     name = "undefined";
     organType = Organism::ot_seed;
     subType = -1;
-    bindParmaters();
+    bindParameters();
 }
 
 /**
@@ -44,7 +43,7 @@ OrganRandomParameter* SeedRandomParameter::copy(Organism* p)
 {
 	SeedRandomParameter* s = new SeedRandomParameter(*this); // copy constructor breaks class introspection
     s->plant = p;
-    s->bindParmaters(); // fix class introspection
+    s->bindParameters(); // fix class introspection
     return s;
 }
 
@@ -66,7 +65,7 @@ OrganSpecificParameter* SeedRandomParameter::realize()
     double dRC = std::max(delayRC + plant->randn()*delayRCs, 0.);
     double nz_ = std::max(delaySB + plant->randn()*delaySBs, 0.);
     double st = std::max(simtime + plant->randn()*simtimes, 0.);
-    OrganSpecificParameter* p = new SeedSpecificParameter( sP, fB, dB, mB, nC_, fSB, dSB,dRC, nz_, st);
+    OrganSpecificParameter* p = new SeedSpecificParameter(subType, sP, fB, dB, mB, nC_, fSB, dSB,dRC, nz_, st);
     return p;
 }
 
@@ -99,7 +98,7 @@ void SeedRandomParameter::write(std::ostream & cout) const
  * Sets up class introspection by linking parameter names to their class members,
  * additionally adds a description for each parameter, for toString and writeXML
  */
-void SeedRandomParameter::bindParmaters()
+void SeedRandomParameter::bindParameters()
 {
     bindParameter("organType", &organType, "Organ type (unspecified organ = 0, seed = 1, root = 2, stem = 3, leaf = 4)");
     bindParameter("subType", &subType, "Unique identifier of this sub type");
@@ -110,11 +109,11 @@ void SeedRandomParameter::bindParmaters()
     bindParameter("delayB", &delayB, "Time delay between the basal roots [day]", &delayBs);
     bindParameter("maxB", &maxB, "Maximal number of basal roots [1]", &maxBs);
     bindParameter("nC", &nC, "Maximal number of roots per root crown [1]", &nCs);
-    bindParameter("firstSB", &firstSB, "Root color, red component [0.-1.]", &firstSBs);
-    bindParameter("delaySB", &delaySB, "Root color, green component [0.-1.]", &delaySBs);
-    bindParameter("delayRC", &delayRC, "Root color, blue component [0.-1.]", &delayRCs);
-    bindParameter("nz", &nz, "Distance between the root crowns along the shoot", &nzs );
-    bindParameter("simtime", &simtime, "Recommended final simulation time", &simtimes );
+    bindParameter("firstSB", &firstSB, "First emergence of a shoot borne root [day]", &firstSBs);
+    bindParameter("delaySB", &delaySB, "Time delay between the shoot borne roots [day]", &delaySBs);
+    bindParameter("delayRC", &delayRC, "Delay between the root crowns [day]", &delayRCs);
+    bindParameter("nz", &nz, "Distance between the root crowns along the shoot [cm]", &nzs );
+    bindParameter("simtime", &simtime, "Recommended final simulation time  [day]", &simtimes );
     // other parameters (descriptions only)
     description["name"]  = "Name of the sub type of the organ, e.g. small lateral";
 }

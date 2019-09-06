@@ -178,22 +178,14 @@ void RootRandomParameter::readXML(tinyxml2::XMLElement* element)
     while(p) {
         std::string key = p->Attribute("name");
         if (key.compare("successor")==0)  {
-            std::string s = std::string(p->GetText());
-            std::stringstream iss(s);
-            int i;
-            while (iss >> i) {
-                successor.push_back(i);
-            }
-        }
-        if (key.compare("successorP")==0)  {
-            std::string s = std::string(p->GetText());
-            std::stringstream iss(s);
-            double d;
-            while (iss >> d) {
-                successorP.push_back(d);
-            }
+            successor.push_back(p->IntAttribute("type"));
+            successorP.push_back(p->DoubleAttribute("percentage"));
         }
         p = p->NextSiblingElement("parameter");
+    }
+    double p_ = std::accumulate(successorP.begin(), successorP.end(), 0.);
+    if (p_<1) {
+        std::cout << "RootRandomParameter::readXML: Warning! percentages to not add up to 1. \n";
     }
     assert(successor.size()==successorP.size() &&
         "RootTypeParameter::readXML: Successor sub type and probability vector does not have the same size" );
@@ -206,32 +198,26 @@ void RootRandomParameter::readXML(tinyxml2::XMLElement* element)
  */
 tinyxml2::XMLElement* RootRandomParameter::writeXML(tinyxml2::XMLDocument& doc, bool comments) const
 {
+    assert(successor.size()==successorP.size() &&
+        "RootTypeParameter::writeXML: Successor sub type and probability vector does not have the same size" );
     tinyxml2::XMLElement* element = OrganRandomParameter::writeXML(doc, comments);
-    tinyxml2::XMLElement* p = doc.NewElement("parameter");
-    p->SetAttribute("name", "successor");
-    std::stringstream str;
-    for (auto s: successor) {
-        str << s << " ";
+    for (int i = 0; i<successor.size(); i++) {
+        tinyxml2::XMLElement* p = doc.NewElement("parameter");
+        p->SetAttribute("name", "successor");
+        p->SetAttribute("number", i);
+        p->SetAttribute("type", successor[i]);
+        p->SetAttribute("percentage", float(successorP[i]));
+        element->InsertEndChild(p);
+        if (comments) {
+            std::string str = description.at("successor");
+            tinyxml2::XMLComment* c = doc.NewComment(str.c_str());
+            element->InsertEndChild(c);
+        }
+
     }
-    p->SetText(str.str().c_str());
-    element->InsertEndChild(p);
-    if (comments) {
-        std::string str = description.at("successor");
-        tinyxml2::XMLComment* c = doc.NewComment(str.c_str());
-        element->InsertEndChild(c);
-    }
-    tinyxml2::XMLElement* p2 = doc.NewElement("parameter");
-    p2->SetAttribute("name", "successorP");
-    std::stringstream str2;
-    for (auto s: successorP) {
-        str2 << s << " ";
-    }
-    p2->SetText(str2.str().c_str());
-    element->InsertEndChild(p2);
-    if (comments) {
-        std::string str = description.at("successorP");
-        tinyxml2::XMLComment* c = doc.NewComment(str.c_str());
-        element->InsertEndChild(c);
+    double p_ = std::accumulate(successorP.begin(), successorP.end(), 0.);
+    if (p_<1) {
+        std::cout << "RootRandomParameter::writeXML: Warning! percentages to not add up to 1. \n";
     }
     return element;
 }
@@ -245,7 +231,7 @@ tinyxml2::XMLElement* RootRandomParameter::writeXML(tinyxml2::XMLDocument& doc, 
  */
 void RootRandomParameter::read(std::istream & cin)
 {
-	std::cout << "RootRandomParameter::read is deprecated, use readXML instead \n";
+    std::cout << "RootRandomParameter::read is deprecated, use readXML instead \n";
     char ch[256]; // dummy
     cin.getline(ch,256);
     std::string s; // dummy
@@ -295,7 +281,7 @@ void RootRandomParameter::read(std::istream & cin)
  * todo Depricated: use writeXML instead
  */
 void RootRandomParameter::write(std::ostream & cout) const {
-	std::cout << "RootRandomParameter::write is deprecated, use writeXML instead \n";
+    std::cout << "RootRandomParameter::write is deprecated, use writeXML instead \n";
     cout << "# Root type parameter for " << name << "\n";
     cout << "type\t" << subType << "\n" << "name\t" << name << "\n" << "lb\t"<< lb <<"\t"<< lbs << "\n" << "la\t"<< la <<"\t"<< las << "\n"
         << "ln\t" << ln << "\t" << lns << "\n" << "nob\t"<< nob <<"\t"<< nobs << "\n" << "r\t"<< r <<"\t"<< rs << "\n" <<
