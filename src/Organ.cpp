@@ -51,7 +51,7 @@ Organ::Organ(Organism* plant, Organ* parent, int ot, int st, double delay):
         plant(plant),
         parent(parent),
         id(plant->getOrganIndex()),  // unique id from the plant
-        param_(plant->getOrganTypeParameter(ot, st)->realize()), // draw specific parameters from random distributions
+        param_(plant->getOrganRandomParameter(ot, st)->realize()), // draw specific parameters from random distributions
         age(-delay)
 { }
 
@@ -101,9 +101,9 @@ int Organ::organType() const
  * @return The organ type parameter is retrieved from the plant organism.
  * The Organism class manages all organs type parameters.
  */
-OrganRandomParameter* Organ::getOrganTypeParameter() const
+OrganRandomParameter* Organ::getOrganRandomParameter() const
 {
-    return plant->getOrganTypeParameter(this->organType(), param_->subType);
+    return plant->getOrganRandomParameter(this->organType(), param_->subType);
 }
 
 /**
@@ -254,7 +254,7 @@ double Organ::getParameter(std::string name) const {
     if (name=="nubmerOfChildren") { return children.size(); }
     // numberOfNodes
     // numberOfSegments
-    return this->getOrganTypeParameter()->getParameter(name); // ask the type parameter
+    return this->getOrganRandomParameter()->getParameter(name); // ask the type parameter
 }
 
 /**

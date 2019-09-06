@@ -235,7 +235,7 @@ double Root::calcAge(double length)
  */
 RootRandomParameter* Root::getRootTypeParameter() const
 {
-    return (RootRandomParameter*)plant->getOrganTypeParameter(Organism::ot_root, param_->subType);
+    return (RootRandomParameter*)plant->getOrganRandomParameter(Organism::ot_root, param_->subType);
 }
 
 /**

@@ -10,8 +10,8 @@ class TestOrganism(unittest.TestCase):
     def hand_example(self):
         """ an example used in the tests below (same as test_organ), a hand with two fingers """
         self.human1 = rb.Organism()  # same example as in test_constructor ...
-        otp = rb.OrganTypeParameter(self.human1)
-        self.human1.setOrganTypeParameter(otp)
+        otp = rb.OrganRandomParameter(self.human1)
+        self.human1.setOrganRandomParameter(otp)
         op = otp.realize()
         self.hand = rb.Organ(self.human1.getOrganIndex(), op, True, True, 0, 15., False, 0)
         self.hand.setOrganism(self.human1)
@@ -46,46 +46,46 @@ class TestOrganism(unittest.TestCase):
         self.assertEqual(len(o2), 3, "copy: unexpected number of organs")
         for i in range(0, len(o1)):
             self.assertIsNot(o1[i], o2[i], "copy: organ is not copied")
-        p1 = self.human1.getOrganTypeParameter(0)
-        p2 = human2.getOrganTypeParameter(0)
+        p1 = self.human1.getOrganRandomParameter(0)
+        p2 = human2.getOrganRandomParameter(0)
         for i in range(0, len(p1)):
             self.assertIsNot(p1[i], p2[i], "copy: OrganTypeParameters is not copied")
 
     def test_organ_type_parameters(self):
         """ test ability to set, get, read, and write type parameters """
         human1 = rb.Organism()  # same example as in test_constructor ...
-        otp1 = rb.OrganTypeParameter(human1)
+        otp1 = rb.OrganRandomParameter(human1)
         otp1.name = "nose"
         otp1.subType = 1
-        otp2 = rb.OrganTypeParameter(human1)
+        otp2 = rb.OrganRandomParameter(human1)
         otp2.subType = 2
         otp2.name = "eye"
-        human1.setOrganTypeParameter(otp1)  # set
-        human1.setOrganTypeParameter(otp2)
-        otps = human1.getOrganTypeParameter(rb.OrganTypes.organ)
+        human1.setOrganRandomParameter(otp1)  # set
+        human1.setOrganRandomParameter(otp2)
+        otps = human1.getOrganRandomParameter(rb.OrganTypes.organ)
         self.assertEqual(otps[0].name, "nose", "otp: name not expected ")
         self.assertEqual(otps[1].name, "eye", "otp: name not expected ")
-        otp3 = rb.OrganTypeParameter(human1)
+        otp3 = rb.OrganRandomParameter(human1)
         otp3.organType = rb.OrganTypes.root
         otp3.subType = 1
         otp3.name = "rootyhand"
-        human1.setOrganTypeParameter(otp3)
+        human1.setOrganRandomParameter(otp3)
         human1.writeParameters("human.xml")
         human2 = rb.Organism()  # read again
-        prototype1 = rb.OrganTypeParameter(human2)
+        prototype1 = rb.OrganRandomParameter(human2)
         prototype1.organType = rb.OrganTypes.organ
-        prototype2 = rb.OrganTypeParameter(human2)
+        prototype2 = rb.OrganRandomParameter(human2)
         prototype2.organType = rb.OrganTypes.root
-        human2.setOrganTypeParameter(prototype1)  # set prototypes for reading, subTypes are overwritten if equal
-        human2.setOrganTypeParameter(prototype2)
+        human2.setOrganRandomParameter(prototype1)  # set prototypes for reading, subTypes are overwritten if equal
+        human2.setOrganRandomParameter(prototype2)
         human2.readParameters("human.xml")
-        otp1 = human2.getOrganTypeParameter(rb.OrganTypes.organ, 1)
-        otp2 = human2.getOrganTypeParameter(rb.OrganTypes.organ, 2)
+        otp1 = human2.getOrganRandomParameter(rb.OrganTypes.organ, 1)
+        otp2 = human2.getOrganRandomParameter(rb.OrganTypes.organ, 2)
         self.assertEqual(otp1.name, "nose", "otp: name not expected ")
         self.assertEqual(otp2.name, "eye", "otp: name not expected ")
         self.assertEqual(otp1.subType, 1, "otp: subType not expected ")
         self.assertEqual(otp2.subType, 2, "otp: subType not expected ")
-        rtp = human2.getOrganTypeParameter(rb.OrganTypes.root, 1)
+        rtp = human2.getOrganRandomParameter(rb.OrganTypes.root, 1)
         self.assertEqual(rtp.name, "rootyhand", "otp: name not expected ")
         self.assertEqual(rtp.subType, 1, "otp: subType not expected ")
 

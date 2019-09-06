@@ -43,9 +43,9 @@ public:
     virtual ~Organism(); ///< destructor
 
     /* organ parameter management */
-    OrganRandomParameter* getOrganTypeParameter(int otype, int subType) const; ///< returns the respective the type parameter
-    std::vector<OrganRandomParameter*> getOrganTypeParameter(int ot) const; ///< returns all type parameters of an organ type (e.g. root)
-    void setOrganTypeParameter(OrganRandomParameter* p); ///< sets an organ type parameter, subType and organType defined within p
+    OrganRandomParameter* getOrganRandomParameter(int otype, int subType) const; ///< returns the respective the type parameter
+    std::vector<OrganRandomParameter*> getOrganRandomParameter(int ot) const; ///< returns all type parameters of an organ type (e.g. root)
+    void setOrganRandomParameter(OrganRandomParameter* p); ///< sets an organ type parameter, subType and organType defined within p
 
     /* initialization and simulation */
     void addOrgan(Organ* o) { baseOrgans.push_back(o); } ///< adds an organ, takes ownership

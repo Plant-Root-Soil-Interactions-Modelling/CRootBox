@@ -7,8 +7,8 @@ class TestOrgan(unittest.TestCase):
     def hand_example(self):
         """ an example used in the tests below, a hand with two fingers """
         self.human1 = rb.Organism()  # same example as in test_constructor ...
-        otp = rb.OrganTypeParameter(self.human1)
-        self.human1.setOrganTypeParameter(otp)
+        otp = rb.OrganRandomParameter(self.human1)
+        self.human1.setOrganRandomParameter(otp)
         op = otp.realize()
         self.hand = rb.Organ(self.human1.getOrganIndex(), op, True, True, 0, 15., False, 0)
         self.hand.setOrganism(self.human1)
@@ -35,8 +35,8 @@ class TestOrgan(unittest.TestCase):
     def test_constructors(self):
         """ tests three different kinds of constructors """
         human1 = rb.Organism()
-        otp = rb.OrganTypeParameter(human1)
-        human1.setOrganTypeParameter(otp)
+        otp = rb.OrganRandomParameter(human1)
+        human1.setOrganRandomParameter(otp)
         op = otp.realize()
         # 1. constructor from scratch
         hand = rb.Organ(human1.getOrganIndex(), op, True, True, 0, 15., False, 0)

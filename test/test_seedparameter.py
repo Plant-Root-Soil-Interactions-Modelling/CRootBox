@@ -8,7 +8,7 @@ class TestRootParameter(unittest.TestCase):
     def root_example(self):
         """ example root parameters used below """
         self.plant = rb.Organism()
-        self.rtp = rb.RootRandomParameter(self.plant)
+        self.rtp = rb.SeedTypeParameter(self.plant)
         self.rtp.la = 1.5
         self.rtp.lb = 5.5
         self.rtp.ln = 1.25
@@ -16,23 +16,10 @@ class TestRootParameter(unittest.TestCase):
         self.rtp.nob = 8
         self.rtp.subType = 1
 
-    def add_successors(self):
-        """ add successor sub types to the example"""
-        l = rb.std_vector_int_()
-        l.append(4)
-        l.append(5)
-        l.append(6)
-        self.rtp.successor = l
-        l = rb.std_vector_double_()
-        l.append(0.4)
-        l.append(0.1)
-        l.append(0.5)
-        self.rtp.successorP = l
-
     def test_constructors(self):
         """ tests constructor and copy """
         plant = rb.Organism()
-        otp = rb.RootRandomParameter(plant)
+        otp = rb.RootTypeParameter(plant)
         otp.theta = 123
         otp.thetas = 456
         otp.gf = 789
@@ -48,7 +35,7 @@ class TestRootParameter(unittest.TestCase):
 
     def test_parameter(self):
         """ tests getParameter() """
-        rtp = rb.RootRandomParameter(rb.Organism())
+        rtp = rb.RootTypeParameter(rb.Organism())
         rtp.lns = 0.123
         rtp.la = 12
         ot = rtp.getParameter("organType")  # test defaults
@@ -72,7 +59,7 @@ class TestRootParameter(unittest.TestCase):
 
     def test_toString(self):
         """ tests __str__ output """
-        self.rtp = rb.RootRandomParameter(rb.Organism())
+        self.rtp = rb.RootTypeParameter(rb.Organism())
         self.add_successors()
         rtp = self.rtp  # rename
         rtp.name = "the root"
@@ -87,7 +74,7 @@ class TestRootParameter(unittest.TestCase):
         otp.name = "lateral"
         otp.subType = 2
         otp.writeXML("root.xml")
-        otp2 = rb.RootRandomParameter(self.plant)
+        otp2 = rb.RootTypeParameter(self.plant)
         otp2.readXML("root.xml")
         self.assertEqual(otp2.name, otp.name, "xml: value unexpected")
         self.assertEqual(otp2.organType, otp.organType, "xml: value unexpected")
@@ -103,7 +90,7 @@ class TestRootParameter(unittest.TestCase):
         """ calls realize """
         self.root_example()
         p = self.rtp.realize()
-        self.assertEqual(p.__class__.__name__, "RootSpecificParameter", "realize: unexpected class type")
+        self.assertEqual(p.__class__.__name__, "RootParameter", "realize: unexpected class type")
         self.assertEqual(p.subType, 1, "realize: unexpected sub type")
         self.assertEqual(p.a, 0.1, "realize: unexpected value")
         self.assertEqual(len(p.ln) + 1, self.rtp.nob, "realize: internodal distances +1 should be  number of laterals")

@@ -18,7 +18,7 @@ namespace CRootBox {
 class Organism;
 
 /**
- * Parameters of a specific root, its created by RootTypeParameter:realize()
+ * Parameters of a specific root, its created by RootRandomParameter:realize()
  */
 class RootSpecificParameter :public OrganSpecificParameter
 {

@@ -8,7 +8,7 @@ class TestOrganParameter(unittest.TestCase):
     def test_constructors(self):
         """ tests constructor and copy """
         plant = rb.Organism()
-        otp = rb.OrganTypeParameter(plant)
+        otp = rb.OrganRandomParameter(plant)
         self.assertEqual(otp.name, "organ", "copy: default value unexpected")
         self.assertEqual(otp.organType, 0, "copy: default value unexpected")
         self.assertEqual(otp.subType, 0, "copy: default value unexpected")
@@ -20,7 +20,7 @@ class TestOrganParameter(unittest.TestCase):
 
     def test_parameter(self):
         """ tests getParameter() """
-        otp = rb.OrganTypeParameter(rb.Organism())
+        otp = rb.OrganRandomParameter(rb.Organism())
         otp.organType = 1
         otp.subType = 2
         ot = otp.getParameter("organType")
@@ -30,7 +30,7 @@ class TestOrganParameter(unittest.TestCase):
 
     def test_toString(self):
         """ tests __str__ output """
-        otp = rb.OrganTypeParameter(rb.Organism())
+        otp = rb.OrganRandomParameter(rb.Organism())
         otp.name = "the great organ"
         otp.organType = 1
         otp.subType = 2
@@ -40,12 +40,12 @@ class TestOrganParameter(unittest.TestCase):
     def test_xml(self):
         """ write the organ type parameter as xml, and rereads it """
         plant = rb.Organism()
-        otp = rb.OrganTypeParameter(plant)
+        otp = rb.OrganRandomParameter(plant)
         otp.name = "the great organ"
         otp.organType = 1  # seed
         otp.subType = 2
         otp.writeXML("organ.xml")
-        otp2 = rb.OrganTypeParameter(plant)
+        otp2 = rb.OrganRandomParameter(plant)
         otp2.readXML("organ.xml")
         self.assertEqual(otp2.name, otp.name, "xml: value unexpected")
         self.assertEqual(otp2.organType, otp.organType, "xml: value unexpected")
@@ -53,10 +53,10 @@ class TestOrganParameter(unittest.TestCase):
 
     def test_realize(self):
         """ calls realize """
-        otp = rb.OrganTypeParameter(rb.Organism())
+        otp = rb.OrganRandomParameter(rb.Organism())
         otp.subType = 2
         p = otp.realize();
-        self.assertEqual(p.__class__.__name__, "OrganParameter", "realize: unexpected class type")
+        self.assertEqual(p.__class__.__name__, "OrganSpecificParameter", "realize: unexpected class type")
         self.assertEqual(p.subType, 2, "realize: unexpected sub type")
 
 

@@ -26,15 +26,15 @@ class TestRoot(unittest.TestCase):
     def root_example_rtp(self):
         """ an example used in the tests below, a main root with laterals """
         self.plant = rb.Organism()  # Root has no dependency on RootSystem anymore
-        p0 = rb.RootTypeParameter(self.plant)
+        p0 = rb.RootRandomParameter(self.plant)
         p0.name, p0.type, p0.la, p0.lb, p0.nob, p0.ln, p0.r, p0.dx = "taproot", 1, 1, 10, 20, (89. / 19.), 1, 0.5
         p0.successor = a2i([2])  # to rb.std_int_double_()
         p0.successorP = a2v([1.])  # rb.std_vector_double_()
-        p1 = rb.RootTypeParameter(self.plant)
+        p1 = rb.RootRandomParameter(self.plant)
         p1.name, p1.type, p1.la, p1.ln, p1.r, p1.dx = "lateral", 2, 25, 0, 2, 0.1
         self.p0, self.p1 = p0, p1  # Python will garbage collect them away, if not stored
-        self.plant.setOrganTypeParameter(self.p0)  # the organism manages the type parameters
-        self.plant.setOrganTypeParameter(self.p1)
+        self.plant.setOrganRandomParameter(self.p0)  # the organism manages the type parameters
+        self.plant.setOrganRandomParameter(self.p1)
         self.param0 = self.p0.realize()  # set up root by hand (without a root system)
         self.param0.la = 0  # its important parent has zero length, otherwise creation times are messed up
         self.param0.lb = 0

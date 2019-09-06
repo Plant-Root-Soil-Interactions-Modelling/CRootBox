@@ -52,7 +52,7 @@ public:
     /* parameters */
     int getId() const { return id; } ///< unique organ id
     const OrganSpecificParameter* getParam() const { return param_; } ///< organ parameters
-    OrganRandomParameter* getOrganTypeParameter() const;  ///< organ type parameter
+    OrganRandomParameter* getOrganRandomParameter() const;  ///< organ type parameter
     bool isAlive() const { return alive; } ///< checks if alive
     bool isActive() const { return active; } ///< checks if active
     double getAge() const { return age; } ///< return age of the organ

@@ -83,7 +83,7 @@ Organism::~Organism()
  *
  * @param ot    the organ type
  */
-std::vector<OrganRandomParameter*> Organism::getOrganTypeParameter(int ot) const
+std::vector<OrganRandomParameter*> Organism::getOrganRandomParameter(int ot) const
 {
     std::vector<OrganRandomParameter*>  otps = std::vector<OrganRandomParameter*>(0);
     for (auto& otp : organParam[ot]) {
@@ -99,7 +99,7 @@ std::vector<OrganRandomParameter*> Organism::getOrganTypeParameter(int ot) const
  * @param subType  the sub type (e.g. root type)
  * @return         the respective type parameter
  */
-OrganRandomParameter* Organism::getOrganTypeParameter(int ot, int subtype) const
+OrganRandomParameter* Organism::getOrganRandomParameter(int ot, int subtype) const
 {
     try {
         //                std::cout << "reading organ type " << ot << " sub type " << subtype <<": ";
@@ -120,7 +120,7 @@ OrganRandomParameter* Organism::getOrganTypeParameter(int ot, int subtype) const
  *
  *  @param p    the organ type parameter
  */
-void Organism::setOrganTypeParameter(OrganRandomParameter* p)
+void Organism::setOrganRandomParameter(OrganRandomParameter* p)
 {
     assert(p->plant == this && "OrganTypeParameter::plant should be this organism");
     int otype = p->organType;
@@ -541,7 +541,7 @@ void Organism::readParameters(std::string name, std::string basetag)
             int ot = Organism::organTypeNumber(tagname);
             OrganRandomParameter* otp = organParam[ot].begin()->second->copy(this);
             otp->readXML(p);
-            setOrganTypeParameter(otp);
+            setOrganRandomParameter(otp);
             p = p->NextSiblingElement();
         }
     } else {

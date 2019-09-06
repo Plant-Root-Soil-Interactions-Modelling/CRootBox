@@ -35,9 +35,9 @@ public:
     enum TropismTypes { tt_plagio = 0, tt_gravi = 1, tt_exo = 2, tt_hydro = 3 };  ///< root tropism types
     enum GrowthFunctionTypes { gft_negexp = 1, gft_linear = 2 }; // root growth function
 
-    RootSystem(): Organism(), rsparam() {  }; ///< empty root system
+    RootSystem(): Organism(),randomSeed(this) {  }; ///< empty root system
     RootSystem(const RootSystem& rs); ///< copy constructor
-    virtual ~RootSystem() { }; ///< everything is in ~Organism
+    virtual ~RootSystem() { if (seed!=nullptr) { delete seed; } };
 
     /* Parameter input output */
     RootRandomParameter* getRootTypeParameter(int type) const;///< returns the i-th root parameter set (i=1..n)
@@ -89,7 +89,8 @@ public:
 
 private:
 
-    SeedSpecificParameter rsparam; ///< Plant parameter
+    SeedRandomParameter randomSeed; // plant
+    SeedSpecificParameter* seed = nullptr; ///< Plant specific parameter
     SignedDistanceFunction* geometry = new SignedDistanceFunction(); ///< Confining geometry (unconfined by default)
     SoilLookUp* soil = nullptr; ///< callback for hydro, or chemo tropism (needs to set before initialize()) TODO should be a part of tf, or rtparam
 

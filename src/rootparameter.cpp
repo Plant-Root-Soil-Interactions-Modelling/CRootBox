@@ -237,33 +237,15 @@ tinyxml2::XMLElement* RootRandomParameter::writeXML(tinyxml2::XMLDocument& doc, 
 }
 
 /**
- * CRootBox parameter write
- * todo Depricated: use writeXML instead
- */
-void RootRandomParameter::write(std::ostream & cout) const {
-    cout << "# Root type parameter for " << name << "\n";
-    cout << "type\t" << subType << "\n" << "name\t" << name << "\n" << "lb\t"<< lb <<"\t"<< lbs << "\n" << "la\t"<< la <<"\t"<< las << "\n"
-        << "ln\t" << ln << "\t" << lns << "\n" << "nob\t"<< nob <<"\t"<< nobs << "\n" << "r\t"<< r <<"\t"<< rs << "\n" <<
-        "a\t" << a << "\t" << as << "\n" << "color\t"<< colorR <<"\t"<< colorG << "\t" << colorB << "\n"
-        << "tropism\t"<< tropismT <<"\t"<< tropismN << "\t" << tropismS << "\n" << "dx\t" << dx << "\n" << "successor\t" << successor.size() << "\t";
-    for (size_t i=0; i<successor.size(); i++) {
-        cout << successor[i] << "\t";
-    }
-    cout << "\n" << "successorP\t" << successorP.size() <<"\t";
-    for (size_t i=0; i<successorP.size(); i++) {
-        cout << successorP[i] << "\t";
-    }
-    cout << "\n" << "theta\t" << theta << "\t" << thetas << "\n" << "rlt\t" << rlt << "\t" << rlts << "\n" << "gf\t" << gf << "\n";
-}
-
-/**
  * @return Mean maximal root length of this roo    description["name"]  = "Name of the sub type of the organ, e.g. small lateral";
  * t type
  *
  * CRootBox parameter reader
  * todo Depricated: use readXML instead
  */
-void RootRandomParameter::read(std::istream & cin) {
+void RootRandomParameter::read(std::istream & cin)
+{
+	std::cout << "RootRandomParameter::read is deprecated, use readXML instead \n";
     char ch[256]; // dummy
     cin.getline(ch,256);
     std::string s; // dummy
@@ -306,6 +288,27 @@ void RootRandomParameter::read(std::istream & cin) {
         successorP.push_back(ds);
     }
     cin >> s >> theta >> thetas >> s >> rlt >> rlts >> s >> gf >> s;
+}
+
+/**
+ * CRootBox parameter write
+ * todo Depricated: use writeXML instead
+ */
+void RootRandomParameter::write(std::ostream & cout) const {
+	std::cout << "RootRandomParameter::write is deprecated, use writeXML instead \n";
+    cout << "# Root type parameter for " << name << "\n";
+    cout << "type\t" << subType << "\n" << "name\t" << name << "\n" << "lb\t"<< lb <<"\t"<< lbs << "\n" << "la\t"<< la <<"\t"<< las << "\n"
+        << "ln\t" << ln << "\t" << lns << "\n" << "nob\t"<< nob <<"\t"<< nobs << "\n" << "r\t"<< r <<"\t"<< rs << "\n" <<
+        "a\t" << a << "\t" << as << "\n" << "color\t"<< colorR <<"\t"<< colorG << "\t" << colorB << "\n"
+        << "tropism\t"<< tropismT <<"\t"<< tropismN << "\t" << tropismS << "\n" << "dx\t" << dx << "\n" << "successor\t" << successor.size() << "\t";
+    for (size_t i=0; i<successor.size(); i++) {
+        cout << successor[i] << "\t";
+    }
+    cout << "\n" << "successorP\t" << successorP.size() <<"\t";
+    for (size_t i=0; i<successorP.size(); i++) {
+        cout << successorP[i] << "\t";
+    }
+    cout << "\n" << "theta\t" << theta << "\t" << thetas << "\n" << "rlt\t" << rlt << "\t" << rlts << "\n" << "gf\t" << gf << "\n";
 }
 
 /**

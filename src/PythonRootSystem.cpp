@@ -42,8 +42,8 @@ Vector3d (Matrix3d::*times4)(const Vector3d&) const = &Matrix3d::times;
 
 std::string (SignedDistanceFunction::*writePVPScript)() const = &SignedDistanceFunction::writePVPScript; // because of default value
 
-OrganRandomParameter* (Organism::*getOrganTypeParameter1)(int otype, int subType) const = &Organism::getOrganTypeParameter;
-std::vector<OrganRandomParameter*> (Organism::*getOrganTypeParameter2)(int otype) const = &Organism::getOrganTypeParameter;
+OrganRandomParameter* (Organism::*getOrganRandomParameter1)(int otype, int subType) const = &Organism::getOrganRandomParameter;
+std::vector<OrganRandomParameter*> (Organism::*getOrganRandomParameter2)(int otype) const = &Organism::getOrganRandomParameter;
 void (OrganRandomParameter::*readXML1)(std::string name) = &OrganRandomParameter::readXML;
 void (OrganRandomParameter::*writeXML1)(std::string name) const = &OrganRandomParameter::writeXML;
 void (OrganRandomParameter::*bindDoubleParameter)(std::string name, double* d, std::string descr, double* dev) = &OrganRandomParameter::bindParameter;
@@ -301,26 +301,26 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def("__str__",&EquidistantGrid1D::toString)
         ;
     /*
-     * OrganParameter.h
+     * organparameter.h
      */
-    class_<OrganSpecificParameter, OrganSpecificParameter*>("OrganParameter")
+    class_<OrganSpecificParameter, OrganSpecificParameter*>("OrganSpecificParameter")
         .def_readwrite("subType",&OrganSpecificParameter::subType)
         .def("__str__",&OrganSpecificParameter::toString)
         ;
-    class_<OrganRandomParameter, OrganRandomParameter*>("OrganTypeParameter", init<Organism*>())
+    class_<OrganRandomParameter, OrganRandomParameter*>("OrganRandomParameter", init<Organism*>())
         .def("copy",&OrganRandomParameter::copy, return_value_policy<reference_existing_object>())
         .def("realize",&OrganRandomParameter::realize, return_value_policy<reference_existing_object>())
         .def("getParameter",&OrganRandomParameter::getParameter)
         .def("writeXML",writeXML1)
         .def("readXML",readXML1)
-//        .def("bindIntParameter",bindIntParameter, bindParameter_overloads())
-//        .def("bindDoubleParameter",bindDoubleParameter, bindParameter_overloads()) // not working, can't ass double*
+//        .def("bindIntParameter",bindIntParameter, bindParameter_overloads()) // not working, can't pass int*
+//        .def("bindDoubleParameter",bindDoubleParameter, bindParameter_overloads()) // not working, can't pass double*
         .def_readwrite("name",&OrganRandomParameter::name)
         .def_readwrite("organType",&OrganRandomParameter::organType)
         .def_readwrite("subType",&OrganRandomParameter::subType)
         .def("__str__",&OrganRandomParameter::toString, toString_overloads())
         ;
-    class_<std::vector<OrganRandomParameter*>>("std_vector_OrganTypeParameter_")
+    class_<std::vector<OrganRandomParameter*>>("std_vector_OrganRandomParameter_")
         .def(vector_indexing_suite<std::vector<OrganRandomParameter*>>() )
         ;
     /**
@@ -337,7 +337,7 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def("addChild",&Organ::addChild)
         .def("getId",&Organ::getId)
         .def("getParam",&Organ::getParam, return_value_policy<reference_existing_object>())
-        .def("getOrganTypeParameter",&Organ::getOrganTypeParameter, return_value_policy<reference_existing_object>())
+        .def("getOrganRandomParameter",&Organ::getOrganRandomParameter, return_value_policy<reference_existing_object>())
         .def("isAlive",&Organ::isAlive)
         .def("isActive",&Organ::isActive)
         .def("getAge",&Organ::getAge)
@@ -366,9 +366,9 @@ BOOST_PYTHON_MODULE(py_rootbox)
         .def(init<Organism&>())
         .def("organTypeNumber", &Organism::organTypeNumber)
         .def("organTypeName", &Organism::organTypeName)
-        .def("getOrganTypeParameter", getOrganTypeParameter1, return_value_policy<reference_existing_object>())
-        .def("getOrganTypeParameter", getOrganTypeParameter2)
-        .def("setOrganTypeParameter", &Organism::setOrganTypeParameter)
+        .def("getOrganRandomParameter", getOrganRandomParameter1, return_value_policy<reference_existing_object>())
+        .def("getOrganRandomParameter", getOrganRandomParameter2)
+        .def("setOrganRandomParameter", &Organism::setOrganRandomParameter)
 
         .def("addOrgan", &Organism::addOrgan)
         .def("initialize", &Organism::initialize)
@@ -496,9 +496,9 @@ BOOST_PYTHON_MODULE(py_rootbox)
             .def(vector_indexing_suite<std::vector<SegmentAnalyser>>() )
             ;
     /*
-     * RootParameter.h
+     * rootparameter.h
      */
-    class_<RootRandomParameter, RootRandomParameter*, bases<OrganRandomParameter>>("RootTypeParameter", init<Organism*>())
+    class_<RootRandomParameter, RootRandomParameter*, bases<OrganRandomParameter>>("RootRandomParameter", init<Organism*>())
                 .def("getLateralType",&RootRandomParameter::getLateralType)
                 .def("getK",&RootRandomParameter::getK)
                 .def_readwrite("type", &RootRandomParameter::subType)
@@ -536,10 +536,10 @@ BOOST_PYTHON_MODULE(py_rootbox)
                 .def_readwrite("f_sbp", &RootRandomParameter::f_sbp)
                 .def("__str__",&RootRandomParameter::toString, toString_overloads())
                 ;
-    class_<std::vector<RootRandomParameter*>>("std_vector_RootTypeParameter_")
+    class_<std::vector<RootRandomParameter*>>("std_vector_RootRandomParameter_")
         .def(vector_indexing_suite<std::vector<RootRandomParameter*>>() )
         ;
-    class_<RootSpecificParameter, RootSpecificParameter*, bases<OrganSpecificParameter> >("RootParameter", init<>())
+    class_<RootSpecificParameter, RootSpecificParameter*, bases<OrganSpecificParameter> >("RootSpecificParameter", init<>())
                 .def(init<int , double, double, const std::vector<double>&, int, double, double, double, double>())
                 .def_readwrite("subType", &RootSpecificParameter::subType)
                 .def_readwrite("lb", &RootSpecificParameter::lb)
@@ -554,21 +554,45 @@ BOOST_PYTHON_MODULE(py_rootbox)
                 .def("__str__",&RootSpecificParameter::toString)
                 ;
     /*
-     * RootSystemParameter.h
+     * seedparameter.h
      */
-    class_<SeedSpecificParameter, SeedSpecificParameter*, bases<OrganSpecificParameter>>("RootSystemParameter", init<>())
-                .def("set",&SeedSpecificParameter::set)
-                .def_readwrite("seedPos", &SeedSpecificParameter::seedPos)
-                .def_readwrite("firstB", &SeedSpecificParameter::firstB)
-                .def_readwrite("delayB", &SeedSpecificParameter::delayB)
-                .def_readwrite("maxB", &SeedSpecificParameter::maxB)
-                .def_readwrite("nC", &SeedSpecificParameter::nC)
-                .def_readwrite("firstSB", &SeedSpecificParameter::firstSB)
-                .def_readwrite("delaySB", &SeedSpecificParameter::delaySB)
-                .def_readwrite("delayRC", &SeedSpecificParameter::delayRC)
-                .def_readwrite("nz", &SeedSpecificParameter::nz)
-                .def("__str__",&SeedSpecificParameter::toString)
-                ;
+    class_<SeedRandomParameter, SeedRandomParameter*, bases<OrganRandomParameter>>("SeedRandomParameter", init<Organism*>())
+            .def_readwrite("type", &SeedRandomParameter::subType)
+            .def_readwrite("seedPos", &SeedRandomParameter::seedPos)
+            .def_readwrite("seedPoss", &SeedRandomParameter::seedPoss)
+            .def_readwrite("firstB", &SeedRandomParameter::firstB)
+            .def_readwrite("firstBs", &SeedRandomParameter::firstBs)
+            .def_readwrite("delayB", &SeedRandomParameter::delayB)
+            .def_readwrite("delayBs", &SeedRandomParameter::delayBs)
+            .def_readwrite("maxB", &SeedRandomParameter::maxB)
+            .def_readwrite("maxBs", &SeedRandomParameter::maxBs)
+            .def_readwrite("nC", &SeedRandomParameter::nC)
+            .def_readwrite("nCs", &SeedRandomParameter::nCs)
+            .def_readwrite("firstSB", &SeedRandomParameter::firstSB)
+            .def_readwrite("firstSBs", &SeedRandomParameter::firstSBs)
+            .def_readwrite("delaySB", &SeedRandomParameter::delaySB)
+            .def_readwrite("delaySBs", &SeedRandomParameter::delaySBs)
+            .def_readwrite("delayRC", &SeedRandomParameter::delayRC)
+            .def_readwrite("delayRCs", &SeedRandomParameter::delayRCs)
+            .def_readwrite("nz", &SeedRandomParameter::nz)
+            .def_readwrite("nzs", &SeedRandomParameter::nzs)
+            .def_readwrite("simtime", &SeedRandomParameter::simtime)
+            .def_readwrite("simtime", &SeedRandomParameter::simtimes)
+            .def("__str__",&SeedRandomParameter::toString, toString_overloads())
+            ;
+    class_<SeedSpecificParameter, SeedSpecificParameter*, bases<OrganSpecificParameter>>("SeedSpecificParameter", init<>())
+          .def(init<Vector3d , double, int, int, int, double, double, double, double, double>())
+          .def_readwrite("seedPos", &SeedSpecificParameter::seedPos)
+          .def_readwrite("firstB", &SeedSpecificParameter::firstB)
+          .def_readwrite("delayB", &SeedSpecificParameter::delayB)
+          .def_readwrite("maxB", &SeedSpecificParameter::maxB)
+          .def_readwrite("nC", &SeedSpecificParameter::nC)
+          .def_readwrite("firstSB", &SeedSpecificParameter::firstSB)
+          .def_readwrite("delaySB", &SeedSpecificParameter::delaySB)
+          .def_readwrite("delayRC", &SeedSpecificParameter::delayRC)
+          .def_readwrite("nz", &SeedSpecificParameter::nz)
+          .def("__str__",&SeedSpecificParameter::toString)
+          ;
     /**
      * Root.h
      */
