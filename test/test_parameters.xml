@@ -1,4 +1,18 @@
 <RootBox>
+    <seed name="undefined" subType="0">
+        <parameter name="delayB" value="3" dev="0"/>
+        <parameter name="delayRC" value="1e+09" dev="0"/>
+        <parameter name="delaySB" value="1e+09" dev="0"/>
+        <parameter name="firstB" value="10" dev="0"/>
+        <parameter name="firstSB" value="1e+09" dev="0"/>
+        <parameter name="maxB" value="100" dev="0"/>
+        <parameter name="nC" value="0" dev="0"/>
+        <parameter name="nz" value="1" dev="0"/>
+        <parameter name="seedPos.x" value="0" dev="0"/>
+        <parameter name="seedPos.y" value="0" dev="0"/>
+        <parameter name="seedPos.z" value="-3" dev="0"/>
+        <parameter name="simtime" value="30" dev="0"/>
+    </seed>
     <root name="taproot" subType="1">
         <parameter name="gf" value="1" dev="0"/>
         <parameter name="tropismT" value="1"/>
@@ -16,8 +30,7 @@
         <parameter name="theta" value="1.22" dev="0"/>
         <parameter name="tropismN" value="1"/>
         <parameter name="tropismS" value="0.2"/>
-        <parameter name="successor">2 </parameter>
-        <parameter name="successorP">1 </parameter>
+        <parameter name="successor" number="0" type="2" percentage="1"/>
     </root>
     <root name="lateral" subType="2">
         <parameter name="gf" value="1" dev="0"/>
@@ -36,7 +49,5 @@
         <parameter name="theta" value="1.22" dev="0"/>
         <parameter name="tropismN" value="1"/>
         <parameter name="tropismS" value="0.2"/>
-        <parameter name="successor"></parameter>
-        <parameter name="successorP"></parameter>
     </root>
 </RootBox>

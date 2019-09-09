@@ -26,10 +26,13 @@ class TestRootSystem(unittest.TestCase):
     def rs_example_rtp(self):
         """ an example used in some of the tests below, 100 basals with laterals """
         self.rs = rb.RootSystem()
-        maxB, firstB, delayB = 100, 10., 3
-        seedPos = rb.Vector3d(0., 0., -3.)
-        rsp = rb.SeedSpecificParameter(0, seedPos, firstB, delayB, maxB, 0, 1.e9, 1.e9, 1.e9, 0., 0.)
-        self.rs.setRootSystemParameter(rsp)
+        srp = rb.SeedRandomParameter(self.rs)
+        srp.subType = 0
+        srp.seedPos = rb.Vector3d(0., 0., -3.)
+        srp.maxB = 100
+        srp.firstB = 10
+        srp.delayB = 3
+        self.rs.setRootSystemParameter(srp)
         p0 = rb.RootRandomParameter(self.rs)
         p0.name, p0.type, p0.la, p0.nob, p0.ln, p0.r, p0.dx = "taproot", 1, 10, 20, 89. / 19., 1, 0.5
         p0.lb = 2
@@ -37,7 +40,7 @@ class TestRootSystem(unittest.TestCase):
         p0.successorP = a2v([1.])  # rb.std_vector_double_()
         p1 = rb.RootRandomParameter(self.rs)
         p1.name, p1.type, p1.la, p1.ln, p1.r, p1.dx = "lateral", 2, 25, 0, 2, 0.1
-        self.p0, self.p1, self.rsp = p0, p1, rsp  # Python will garbage collect them away, if not stored
+        self.p0, self.p1, self.srp = p0, p1, srp  # Python will garbage collect them away, if not stored
         self.rs.setOrganRandomParameter(self.p0)  # the organism manages the type parameters
         self.rs.setOrganRandomParameter(self.p1)
         # print(self.rs.getRootSystemParameter())
@@ -57,7 +60,7 @@ class TestRootSystem(unittest.TestCase):
                     sl += l_
             nl.append(float(sl))
         for i in range(0, len(dt)):  # Check lengthes
-            self.assertAlmostEqual(l[i], nl[i], 10, "numeric and analytic lengths do not agree (parameter length)")
+            self.assertAlmostEqual(l[i], nl[i], 10, "numeric and analytic-1 lengths do not agree (parameter length)")
 
     def rs_ct_test(self, dt, ct, subDt):
         """ simulates a root system and checks creation times analytic @param ct at times @param t"""
@@ -100,7 +103,8 @@ class TestRootSystem(unittest.TestCase):
         times = np.array([0., 7., 15., 30., 60.])
         dt = np.diff(times)
         times = times[1:]
-        etB = np.array(range(self.rsp.maxB)) * self.rsp.delayB + np.ones(self.rsp.maxB) * self.rsp.firstB  # basal root emergence times
+        maxB = int(self.srp.maxB)
+        etB = np.array(range(maxB)) * self.srp.delayB + np.ones(maxB) * self.srp.firstB  # basal root emergence times
         bl = np.zeros(times.size)  # summed root lengths
         for j, t in enumerate(times):
             i = 0  # basal root counter
@@ -116,7 +120,8 @@ class TestRootSystem(unittest.TestCase):
         times = np.array([0., 7., 15., 30., 60.])
         dt = np.diff(times)
         times = times[1:]
-        ctB = np.array(range(self.rsp.maxB)) * self.rsp.delayB + np.ones(self.rsp.maxB) * self.rsp.firstB  # basal root emergence times
+        maxB = int(self.srp.maxB)
+        ctB = np.array(range(maxB)) * self.srp.delayB + np.ones(maxB) * self.srp.firstB  # basal root emergence times
         self.rs_ct_test(dt, ctB, 1)
         self.rs_ct_test(dt, ctB, 100)
 
@@ -256,4 +261,7 @@ class TestRootSystem(unittest.TestCase):
 
 
 if __name__ == '__main__':
+#     test = TestRootSystem()
+#     test.test_copy()
+#     print("fin.")
     unittest.main()

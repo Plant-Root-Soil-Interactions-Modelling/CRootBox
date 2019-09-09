@@ -18,11 +18,11 @@ void Seed::initialize()
     Vector3d iheading(0,0,-1);
 
     // Taproot
-    Root* taproot = new Root(this, 1, iheading ,0, nullptr, 0, 0); // tap root has root type 1
+    Root* taproot = new Root(plant, 1, iheading ,0, nullptr, 0, 0); // tap root has root type 1
     taproot->addNode(rs->seedPos,0);
     this->addChild(taproot);
 
-    auto& pmap = plant->getOrganRandomParameter(Organism::ot_root);
+    auto pmap = plant->getOrganRandomParameter(Organism::ot_root);
     // Basal roots
     int bt = getParamSubType(Organism::ot_root, "basal");
     if (bt>0) {
@@ -43,7 +43,7 @@ void Seed::initialize()
         }
         double delay = rs->firstB;
         for (int i=0; i<maxB; i++) {
-            Root* basalroot = new Root(this, basalType, iheading, delay, nullptr, 0, 0);
+            Root* basalroot = new Root(plant, basalType, iheading, delay, nullptr, 0, 0);
             basalroot->addNode(taproot->getNode(0), taproot->getNodeId(0), delay);
             this->addChild(basalroot);
             delay += rs->delayB;
@@ -68,13 +68,13 @@ void Seed::initialize()
         numberOfRootCrowns = ceil((maxT-rs->firstSB)/rs->delayRC); // maximal number of root crowns
         double delay = rs->firstSB;
         for (int i=0; i<numberOfRootCrowns; i++) {
-            Root* shootborne0 = new Root(this, shootborneType, iheading ,delay, nullptr, 0, 0);
+            Root* shootborne0 = new Root(plant, shootborneType, iheading ,delay, nullptr, 0, 0);
             // TODO fix the initial radial heading
             shootborne0->addNode(sbpos,delay);
             this->addChild(shootborne0);
             delay += rs->delaySB;
             for (int j=1; j<rs->nC; j++) {
-                Root* shootborne = new Root(this, shootborneType, iheading ,delay, nullptr, 0, 0);
+                Root* shootborne = new Root(plant, shootborneType, iheading ,delay, nullptr, 0, 0);
                 // TODO fix the initial radial heading
                 shootborne->addNode(shootborne0->getNode(0), shootborne0->getNodeId(0),delay);
                 this->addChild(shootborne);
@@ -142,10 +142,20 @@ void Seed::initialize()
 //    }
 }
 
+/**
+ * Creates a shallow copy of the seeds child organs
+ */
+std::vector<Organ*> Seed::copyBaseOrgans()
+{
+    std::vector<Organ*> organs;
+    for (auto& o : children) {
+        organs.push_back(o->copy(plant));
+    }
+    return organs;
+}
 
 /*
- * 1. Searches for a parameter with name @param str, and returns its subtype
- * 2. If none is found searches, tests if subType exists, otherwise copies tap root
+ * Searches for a parameter with name @param str, and returns its subtype
  */
 int Seed::getParamSubType(int organtype, std::string str)
 {
@@ -157,9 +167,6 @@ int Seed::getParamSubType(int organtype, std::string str)
     }
     return -1;
 }
-
-
-
 
 /**
  * Quick info about the object for debugging (TODO)

@@ -35,15 +35,15 @@ public:
     enum TropismTypes { tt_plagio = 0, tt_gravi = 1, tt_exo = 2, tt_hydro = 3 };  ///< root tropism types
     enum GrowthFunctionTypes { gft_negexp = 1, gft_linear = 2 }; // root growth function
 
-    RootSystem(): Organism(),randomSeed(this) {  }; ///< empty root system
+    RootSystem(): Organism() {  }; ///< empty root system
     RootSystem(const RootSystem& rs); ///< copy constructor
-    virtual ~RootSystem() { if (seed!=nullptr) { delete seed; } };
+    virtual ~RootSystem() { };
 
     /* Parameter input output */
     RootRandomParameter* getRootTypeParameter(int type) const;///< returns the i-th root parameter set (i=1..n)
     std::vector<RootRandomParameter*> getRootTypeParameter() const; ///< all root type parameters as a vector
-    void setRootSystemParameter(const SeedSpecificParameter& rsp); ///< sets the root system parameters
-    SeedSpecificParameter* getRootSystemParameter(); ///< gets the root system parameters
+    void setRootSystemParameter(SeedRandomParameter& rsp); ///< sets the root system parameters
+    SeedRandomParameter* getRootSystemParameter(); ///< gets the root system parameters
     void openFile(std::string filename, std::string subdir="modelparameter/"); ///< reads root parameter and plant parameter
     int readParameters(std::istream & cin); ///< reads root parameters from an input stream
     void writeParameters(std::ostream & os) const; ///< writes root parameters
@@ -89,8 +89,7 @@ public:
 
 private:
 
-    SeedRandomParameter randomSeed; // plant
-    SeedSpecificParameter* seed = nullptr; ///< Plant specific parameter
+    SeedSpecificParameter seedParam;
     SignedDistanceFunction* geometry = new SignedDistanceFunction(); ///< Confining geometry (unconfined by default)
     SoilLookUp* soil = nullptr; ///< callback for hydro, or chemo tropism (needs to set before initialize()) TODO should be a part of tf, or rtparam
 

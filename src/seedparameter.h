@@ -22,7 +22,7 @@ class SeedSpecificParameter :public OrganSpecificParameter
 {
 
 public:
-    SeedSpecificParameter():SeedSpecificParameter(-1,Vector3d(0.,0.,-3), 1.e9, 1.e9, 0, 0., 1.e9, 1.e9, 1.e9, 1.,30.) { }; ///< Default constructor
+    SeedSpecificParameter():SeedSpecificParameter(0,Vector3d(0.,0.,-3), 1.e9, 1.e9, 0, 0., 1.e9, 1.e9, 1.e9, 1.,30.) { }; ///< Default constructor
     SeedSpecificParameter(int type, Vector3d seedPos, double fB, double dB, int mB, int nC, double fSB, double dSB, double dRC, double nz, double simtime):
     		    seedPos(seedPos), firstB(fB), delayB(dB), maxB(mB), nC(nC), firstSB(fSB), delaySB(dSB), delayRC(dRC), nz(nz), simtime(simtime) { subType = type; };
     virtual ~SeedSpecificParameter() { };

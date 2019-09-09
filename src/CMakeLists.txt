@@ -11,6 +11,7 @@ add_library(CRootBox
             rootparameter.cpp
 			seedparameter.cpp            
             Root.cpp
+            Seed.cpp
             RootSystem.cpp
             sdf.cpp
             tropism.cpp
@@ -45,6 +46,7 @@ if (PythonLibs_FOUND)
               rootparameter.cpp
 			  seedparameter.cpp              
               Root.cpp
+              Seed.cpp              
               RootSystem.cpp
               sdf.cpp
               tropism.cpp

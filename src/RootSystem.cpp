@@ -3,6 +3,7 @@
 
 #include "organparameter.h"
 #include "Organism.h"
+#include "Seed.h"
 
 namespace CRootBox {
 
@@ -15,7 +16,7 @@ namespace CRootBox {
  *
  * @param rs        root system that is copied
  */
-RootSystem::RootSystem(const RootSystem& rs): Organism(rs), randomSeed(rs.randomSeed), seed(rs.seed), geometry(rs.geometry), soil(rs.soil)
+RootSystem::RootSystem(const RootSystem& rs): Organism(rs), geometry(rs.geometry), soil(rs.soil)
 {
     std::cout << "Copying root system with "<<rs.baseOrgans.size()<< " base roots \n";
     roots.clear();
@@ -44,20 +45,18 @@ std::vector<RootRandomParameter*> RootSystem::getRootTypeParameter() const
 /**
  * Sets the root system parameters @param rsp
  */
-void RootSystem::setRootSystemParameter(const SeedSpecificParameter& rsp)
+void RootSystem::setRootSystemParameter(SeedRandomParameter& rsp)
 {
-	if (seed!=nullptr) {
-		delete seed;
-	}
-    seed = new SeedSpecificParameter(rsp);
+    assert(rsp.subType==0 && "RootSystem::setRootSystemParameter: In CRootBox must have subType 0");
+    this->setOrganRandomParameter(&rsp);
 }
 
 /**
  * @return the root system parameter
  */
-SeedSpecificParameter* RootSystem::getRootSystemParameter()
+SeedRandomParameter* RootSystem::getRootSystemParameter()
 {
-    return seed;
+    return (SeedRandomParameter*)this->getOrganRandomParameter(ot_seed,0 );
 }
 
 /**
@@ -104,17 +103,15 @@ void RootSystem::openFile(std::string name, std::string subdir)
     pp_name.append(name);
     pp_name.append(".pparam");
     fis.open(pp_name.c_str());
+    auto randomSeed = new SeedRandomParameter(this);
+    randomSeed->subType = 0;
     if (fis.good()) { // did it work?
-        randomSeed.read(fis); // reads the random parameters
-        if (seed!=nullptr) {
-        	delete seed;
-        }
-        seed = (SeedSpecificParameter*)randomSeed.realize();
+        randomSeed->read(fis); // reads the random parameters
         fis.close();
     } else { // create a tap root system
         std::cout << "No root system parameters found, using default tap root system \n";
-        seed = new SeedSpecificParameter();
     }
+    this->setRootSystemParameter(*randomSeed);
 }
 
 /**
@@ -125,7 +122,7 @@ void RootSystem::openFile(std::string name, std::string subdir)
  */
 int RootSystem::readParameters(std::istream& is)
 {
-	std::cout << "RootSystem::readParameters is deprecated, use readParameters(std::string filename) instead \n";
+	std::cout << "RootSystem::readParameters(std::istream) is deprecated, use readParameters(std::string filename) instead \n";
     int c = 0;
     while (is.good()) {
         RootRandomParameter* p = new RootRandomParameter(this);
@@ -161,81 +158,20 @@ void RootSystem::writeParameters(std::ostream& os) const
  */
 void RootSystem::initialize(int basaltype, int shootbornetype)
 {
-	if (seed==nullptr) {
-	    std::cout << "RootSystem::initialize: Warning! no seed was set, taking default values\n";
-		seed = (SeedSpecificParameter*)randomSeed.realize(); // go with default values
-	}
-
     reset(); // just in case
 
     // introduce an extra node at nodes[0]
     getNodeIndex(); // increase node index
 
-    // Create root system from the root system parameter
-    const double maxT = 365.; // maximal simulation time
-    const SeedSpecificParameter* rs = seed; // rename
-    Vector3d iheading(0,0,-1);
+    // create seed
+    Seed seed = Seed(this);
+    seed.initialize();
+    seedParam = SeedSpecificParameter(*seed.param()); // copy the specific parameters
+    // std::cout << "RootSystem::initialize:\n" <<  seedParam.toString() ;
+    baseOrgans = seed.copyBaseOrgans();
 
-    // Taproot
-    Root* taproot = new Root(this, 1, iheading ,0, nullptr, 0, 0); // tap root has root type 1
-    taproot->addNode(rs->seedPos,0);
-    baseOrgans.push_back(taproot);
-
-    auto& pmap = organParam[Organism::ot_root];
-    // Basal roots
-    if (rs->maxB>0) {
-        if (pmap.find(basaltype)==pmap.end()) { // if the type is not defined, copy tap root
-            std::cout << "Basal root type #" << basaltype << " was not defined, using tap root parameters instead\n" << std::flush;
-            RootRandomParameter* brtp = (RootRandomParameter*)getRootTypeParameter(1)->copy(this); // TODO
-            brtp->subType = basaltype;
-            setOrganRandomParameter(brtp);
-        }
-        int maxB = rs->maxB;
-        if (rs->delayB>0) { // limit if possible
-            maxB = std::min(maxB,int(ceil((maxT-rs->firstB)/rs->delayB))); // maximal for simtime maxT
-        }
-        double delay = rs->firstB;
-        for (int i=0; i<maxB; i++) {
-            Root* basalroot = new Root(this, basaltype, iheading, delay, nullptr, 0, 0);
-            basalroot->addNode(taproot->getNode(0), taproot->getNodeId(0), delay);
-            baseOrgans.push_back(basalroot);
-            delay += rs->delayB;
-        }
-    }
-    // Shoot borne roots
-    if ((rs->nC>0) && (rs->delaySB<maxT)) { // if the type is not defined, copy basal root
-        if (pmap.find(shootbornetype)==pmap.end()) {
-            std::cout << "Shootborne root type #" << shootbornetype << " was not defined, using tap root parameters instead\n";
-            RootRandomParameter* srtp =  (RootRandomParameter*)getRootTypeParameter(1)->copy(this);
-            srtp->subType = shootbornetype;
-            setOrganRandomParameter(srtp);
-        }
-        Vector3d sbpos = rs->seedPos;
-        sbpos.z=sbpos.z/2.; // half way up the mesocotyl
-        numberOfCrowns = ceil((maxT-rs->firstSB)/rs->delayRC); // maximal number of root crowns
-        double delay = rs->firstSB;
-        for (int i=0; i<numberOfCrowns; i++) {
-            Root* shootborne0 = new Root(this, shootbornetype, iheading ,delay, nullptr, 0, 0);
-            // TODO fix the initial radial heading
-            shootborne0->addNode(sbpos,delay);
-            baseOrgans.push_back(shootborne0);
-            delay += rs->delaySB;
-            for (int j=1; j<rs->nC; j++) {
-                Root* shootborne = new Root(this, shootbornetype, iheading ,delay, nullptr, 0, 0);
-                // TODO fix the initial radial heading
-                shootborne->addNode(shootborne0->getNode(0), shootborne0->getNodeId(0),delay);
-                baseOrgans.push_back(shootborne);
-                delay += rs->delaySB;
-            }
-            sbpos.z+=rs->nz;  // move up, for next root crown
-            delay = rs->firstSB + i*rs->delayRC; // reset age
-        }
-    } else {
-        numberOfCrowns=0;
-    }
     oldNumberOfNodes = baseOrgans.size();
-
-    initCallbacks(); //
+    initCallbacks();
 }
 
 /**
@@ -295,7 +231,7 @@ void RootSystem::simulate(double dt, bool verbose)
  */
 void RootSystem::simulate()
 {
-    this->simulate(seed->simtime);
+    this->simulate(seedParam.simtime);
 }
 
 /**
@@ -470,8 +406,8 @@ std::vector<Vector2i> RootSystem::getShootSegments() const
     int n1=0, n2=0;
     for (int i=0; i<numberOfCrowns-1; i++) { // connecting root crowns
         int brn = baseOrgans.size()-1;
-        n1 = baseOrgans.at(brn-i*seed->nC)->getNodeId(0);
-        n2 = baseOrgans.at(brn-(i+1)*seed->nC)->getNodeId(0);
+        n1 = baseOrgans.at(brn-i*seedParam.nC)->getNodeId(0);
+        n2 = baseOrgans.at(brn-(i+1)*seedParam.nC)->getNodeId(0);
         seg.push_back(Vector2i(n1,n2));
     }
     if (numberOfCrowns>0) { // connect to basal roots node (seed)
