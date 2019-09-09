@@ -141,7 +141,7 @@ class TestRootSystem(unittest.TestCase):
         seed = 100
         name = "Brassica_oleracea_Vansteenkiste_2014"
         rs = rb.RootSystem()  # the original
-        rs.openFile(name)
+        rs.readParameters("modelparameter/" + name + ".xml")
         rs.setSeed(seed)
         rs.initialize()
         rs2 = rb.RootSystem(rs)  # copy root system
@@ -153,7 +153,7 @@ class TestRootSystem(unittest.TestCase):
         n2 = rs.rand()
         self.assertEqual(rs2.rand(), n2, "copy: simulation not deterministic")
         rs3 = rb.RootSystem()  # rebuild same
-        rs3.openFile(name)
+        rs3.readParameters("modelparameter/" + name + ".xml")
         rs3.setSeed(seed)
         rs3.initialize()
         self.assertEqual(rs3.rand(), n1, "copy: random generator seed was not copied")
@@ -164,7 +164,7 @@ class TestRootSystem(unittest.TestCase):
         """checks if the polylines have the right tips and bases """
         name = "Brassica_napus_a_Leitner_2010"
         rs = rb.RootSystem()
-        rs.openFile(name)
+        rs.readParameters("modelparameter/" + name + ".xml")
         rs.initialize()
         rs.simulate(7)  # days young
         polylines = rs.getPolylines()  # Use polyline representation of the roots
@@ -185,7 +185,7 @@ class TestRootSystem(unittest.TestCase):
 #         print(self.p0.__str__(False))
 #         print(self.p1.__str__(False))
         print(rb.Organism.organTypeName(self.p0.organType))
-        self.rs.writeParameters("test_parameters.xml", "RootBox", False)  # include comments
+        self.rs.writeParameters("test_parameters.xml", "plant", False)  # include comments
         rs1 = rb.RootSystem
         # rs1.readParameters("test_parameters.xml", "RootBox")
         # TODO
@@ -199,7 +199,7 @@ class TestRootSystem(unittest.TestCase):
         """ incremental root system growth like needed for coupling"""
         name = "Anagallis_femina_Leitner_2010"  # "maize_p2"  # "Anagallis_femina_Leitner_2010"  # "Zea_mays_4_Leitner_2014"
         rs = rb.RootSystem()
-        rs.openFile(name)
+        rs.readParameters("modelparameter/" + name + ".xml")
         rs.initialize()
         simtime = 60  # days
         dt = 1
@@ -248,7 +248,7 @@ class TestRootSystem(unittest.TestCase):
         """ checks rsml functionality with Python rsml reader """
         name = "Anagallis_femina_Leitner_2010"
         rs = rb.RootSystem()
-        rs.openFile(name)
+        rs.readParameters("modelparameter/" + name + ".xml")
         rs.initialize()
         simtime = 60
         rs.simulate(simtime)

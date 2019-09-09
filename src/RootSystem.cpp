@@ -8,6 +8,19 @@
 namespace CRootBox {
 
 /**
+ * Sets up the xml reader Organism::readParameters
+ */
+RootSystem::RootSystem(): Organism()
+{
+   auto rrp = new RootRandomParameter(this);
+   rrp->subType = 0;
+   setOrganRandomParameter(rrp);
+   auto srp = new SeedRandomParameter(this);
+   srp->subType = 0;
+   setOrganRandomParameter(srp);
+}
+
+/**
  * Copy Constructor
  *
  * deep copies the root system
@@ -146,7 +159,6 @@ void RootSystem::writeParameters(std::ostream& os) const
         ((RootRandomParameter*)otp.second)->write(os);
     }
 }
-
 /**
  * Sets up the base roots according to the plant parameters,
  * a confining geometry, the tropism functions, and the growth functions.

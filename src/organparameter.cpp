@@ -220,7 +220,7 @@ tinyxml2::XMLElement* OrganRandomParameter::writeXML(tinyxml2::XMLDocument& doc,
     organ->SetAttribute("subType", subType);
     for (auto& ip : iparam) { // int valued parameters
         std::string key = ip.first;
-        if (!(key.compare("subType")==0 || key.compare("organType")==0)) { // already written in organ attribuvarialbetes
+        if (!(key.compare("subType")==0 || key.compare("organType")==0)) { // already written in organ attributes
             tinyxml2::XMLElement* p = doc.NewElement("parameter");
             p->SetAttribute("name", key.c_str());
             p->SetAttribute("value", *ip.second);

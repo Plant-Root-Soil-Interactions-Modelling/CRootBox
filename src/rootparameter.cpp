@@ -184,7 +184,7 @@ void RootRandomParameter::readXML(tinyxml2::XMLElement* element)
         p = p->NextSiblingElement("parameter");
     }
     double p_ = std::accumulate(successorP.begin(), successorP.end(), 0.);
-    if (p_<1) {
+    if  ((p_<1) && (p_!=0))  {
         std::cout << "RootRandomParameter::readXML: Warning! percentages to not add up to 1. \n";
     }
     assert(successor.size()==successorP.size() &&
@@ -216,8 +216,8 @@ tinyxml2::XMLElement* RootRandomParameter::writeXML(tinyxml2::XMLDocument& doc, 
 
     }
     double p_ = std::accumulate(successorP.begin(), successorP.end(), 0.);
-    if (p_<1) {
-        std::cout << "RootRandomParameter::writeXML: Warning! percentages to not add up to 1. \n";
+    if ((p_<1) && (p_!=0)) {
+        std::cout << "RootRandomParameter::writeXML: Warning! percentages do not add up to 1. = " << p_ << "\n";
     }
     return element;
 }

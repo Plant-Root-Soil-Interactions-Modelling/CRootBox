@@ -545,7 +545,7 @@ void Organism::readParameters(std::string name, std::string basetag)
             p = p->NextSiblingElement();
         }
     } else {
-        std::cout << "readXML(): could not open file\n" << std::flush;
+        std::cout << "readXML(): could not open file " << name << "\n" << std::flush;
     }
 }
 
@@ -561,7 +561,7 @@ void Organism::writeParameters(std::string name, std::string basetag, bool comme
 {
     tinyxml2::XMLDocument xmlDoc;
     tinyxml2:: XMLElement* xmlParams = xmlDoc.NewElement(basetag.c_str()); // RSML
-    for (int ot = 0; ot < numberOfOrganTypes; ot++) {  // delete organ type parameters
+    for (int ot = 0; ot < numberOfOrganTypes; ot++) {
         for (auto& otp : organParam[ot]) {
             xmlParams->InsertEndChild(otp.second->writeXML(xmlDoc, comments));
         }
