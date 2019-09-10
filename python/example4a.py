@@ -1,8 +1,9 @@
+"""hydrotropism in a thin layer"""
 import py_rootbox as rb
 
 rs = rb.RootSystem()
 name = "Anagallis_femina_Leitner_2010"
-rs.openFile(name)
+rs.readParameters("modelparameter/" + name + ".xml")
 
 # Manually set tropism to hydrotropism for the first ten root types
 sigma = [0.4, 1., 1., 1., 1. ] * 2
@@ -12,7 +13,7 @@ for p in rs.getRootTypeParameter():
         p.tropismN = 2  # strength of tropism
         p.tropismS = sigma[p.subType - 1]
 
-# Static soil property
+# Static soil property in a thin layer
 maxS = 0.7  # maximal
 minS = 0.1  # minimal
 slope = 5  # linear gradient between min and max (cm)

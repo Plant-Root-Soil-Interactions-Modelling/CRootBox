@@ -32,7 +32,7 @@ SeedRandomParameter::SeedRandomParameter(Organism* p) :OrganRandomParameter(p)
     // base class default values
     name = "undefined";
     organType = Organism::ot_seed;
-    subType = -1;
+    subType = 0;
     bindParameters();
 }
 

@@ -1,3 +1,4 @@
+"""everything from scratch (without parameter files)"""
 import py_rootbox as rb
 from rb_tools import *
 import math
@@ -5,8 +6,8 @@ import math
 rs = rb.RootSystem()
 
 # Root type parameter
-p0 = rb.RootTypeParameter(rs)  # with default values,
-p1 = rb.RootTypeParameter(rs)  # all standard deviations are 0
+p0 = rb.RootRandomParameter(rs)  # with default values,
+p1 = rb.RootRandomParameter(rs)  # all standard deviations are 0
 
 p0.name = "taproot"
 p0.subType = 1
@@ -32,16 +33,16 @@ p1.r = 2
 p1.dx = 0.1
 p1.tropismS = 0.3
 
-rs.setOrganTypeParameter(p0)
-rs.setOrganTypeParameter(p1)
+rs.setOrganRandomParameter(p0)
+rs.setOrganRandomParameter(p1)
 
 # Root system parameter (neglecting shoot borne)
-maxB = 100
-firstB = 10.
-delayB = 3.
-rsp = rb.RootSystemParameter()
-rsp.set(-3., firstB, delayB, maxB, 0, 1.e9, 1.e9, 1.e9, 0., 0.)
 
+rsp = rb.SeedRandomParameter(rs)
+rsp.seedPos = rb.Vector3d(0., 0., -3.)
+rsp.maxB = 100
+rsp.firstB = 10.
+rsp.delayB = 3.
 rs.setRootSystemParameter(rsp)
 
 rs.initialize()

@@ -1,7 +1,7 @@
 """small example"""
 import py_plantbox as rb
 
-# print("hallo")
+print("hallo")
 
 v = rb.Vector3d(1, 2, 3)
 print(v)

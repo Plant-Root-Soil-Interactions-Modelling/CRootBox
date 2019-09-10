@@ -21,7 +21,8 @@ class SignedDistanceFunction
 
 public:
 
-    virtual ~SignedDistanceFunction() {};
+    SignedDistanceFunction() { }
+    virtual ~SignedDistanceFunction()  = default;
 
     /**
      * Returns the signed distance to the next boundary
@@ -37,16 +38,16 @@ public:
     virtual std::string toString() const { return "SignedDistanceFunction"; }
 
     /**
-     * Writes a ParaView Phython script explicitly representing the implicit geometry
+     * Writes a ParaView Python script explicitly representing the implicit geometry
      *
      * @param cout      e.g. a file output stream
      * @param c         python object counter for the script (to avoid duplicate names)
      * \return          object counter
      */
     virtual int writePVPScript(std::ostream & cout, int c = 1) const { return c; };
-    ///< Writes a ParaView Phython script explicitly representing the implicit geometry
+    ///< Writes a ParaView Python script explicitly representing the implicit geometry
 
-    virtual std::string writePVPScript() const; ///< Writes the ParaView Phython script into a string
+    virtual std::string writePVPScript() const; ///< Writes the ParaView Python script into a string
 
     /**
      * Returns the (numerical) gradient of the sdf, overwrite with an analytical gradient (where appropriate)

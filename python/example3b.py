@@ -1,9 +1,11 @@
+"""analysis of results using signed distance functions"""
 import py_rootbox as rb
 import numpy as np
 import matplotlib.pyplot as plt
 
 rs = rb.RootSystem()
-rs.openFile("Brassica_oleracea_Vansteenkiste_2014")
+name = "Brassica_oleracea_Vansteenkiste_2014"
+rs.readParameters("modelparameter/" + name + ".xml")
 rs.initialize()
 rs.simulate(120)
 

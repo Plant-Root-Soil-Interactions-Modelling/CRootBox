@@ -1,3 +1,4 @@
+""""more complex geometries"""
 import py_rootbox as rb
 import math
 
@@ -5,7 +6,7 @@ rs = rb.RootSystem()
 
 # Open plant and root parameter from a file
 name = "Zea_mays_4_Leitner_2014"
-rs.openFile(name)
+rs.readParameters("modelparameter/" + name + ".xml")
 
 # 1. Creates a square rhizotron r*r, with height h, rotated around the x-axis
 r, h, alpha = 20, 4, 45

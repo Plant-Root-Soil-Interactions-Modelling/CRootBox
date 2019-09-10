@@ -1,3 +1,4 @@
+"""root system length over time, root tip distriubtion"""
 import py_rootbox as rb
 from rb_tools import *
 import numpy as np
@@ -5,7 +6,7 @@ import matplotlib.pyplot as plt
 
 rs = rb.RootSystem()
 name = "Brassica_oleracea_Vansteenkiste_2014"
-rs.openFile(name)
+rs.readParameters("modelparameter/" + name + ".xml")
 rs.initialize()
 
 simtime = 60.  # days
@@ -21,8 +22,8 @@ v2_ = np.zeros(N)
 v3_ = np.zeros(N)
 for i in range(0, N):
     rs.simulate(dt)
-    t = v2a(rs.getParameters("type"))
-    v = v2a(rs.getParameters(stype))
+    t = v2a(rs.getParameter("type"))
+    v = v2a(rs.getParameter(stype))
     v_[i] = np.sum(v)
     v1_[i] = np.sum(v[t == 1])
     v2_[i] = np.sum(v[t == 2])

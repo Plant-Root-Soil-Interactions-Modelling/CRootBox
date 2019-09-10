@@ -1,3 +1,4 @@
+"""multiple root systems"""
 import py_rootbox as rb
 
 name = "Zea_mays_4_Leitner_2014"
@@ -10,7 +11,7 @@ allRS = []
 for i in range(0, N):
     for j in range(0, N):
         rs = rb.RootSystem()
-        rs.openFile(name)
+        rs.readParameters("modelparameter/" + name + ".xml")
         rs.getRootSystemParameter().seedPos = rb.Vector3d(dist * i, dist * j, -3.)  # cm
         rs.initialize()
         allRS.append(rs)

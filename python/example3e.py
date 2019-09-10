@@ -1,10 +1,11 @@
+"""increase axial resolution (e.g. for animation)"""
 import py_rootbox as rb
 
 rs = rb.RootSystem()
 
 # Open plant and root parameter from a file
 name = "Anagallis_femina_Leitner_2010"
-rs.openFile(name)
+rs.readParameters("modelparameter/" + name + ".xml")
 
 # Set Geometry
 soilcore = rb.SDF_PlantContainer(5, 5, 40, False)
@@ -12,7 +13,7 @@ rs.setGeometry(soilcore)
 
 # Modify axial resolution
 for p in rs.getRootTypeParameter():
-        p.dx = 0.1  # adjust resolution
+    p.dx = 0.1  # adjust resolution
 
 # Simulate
 rs.initialize()

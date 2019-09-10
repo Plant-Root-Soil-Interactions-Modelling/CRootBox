@@ -1,10 +1,11 @@
+"""small example in a container"""
 import py_rootbox as rb
 
 rootsystem = rb.RootSystem()
 
 # Open plant and root parameter from a file
 name = "Anagallis_femina_Leitner_2010"
-rootsystem.openFile(name)
+rootsystem.readParameters("modelparameter/" + name + ".xml")
 
 # Create and set geometry
 

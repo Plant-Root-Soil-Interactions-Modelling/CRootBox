@@ -17,8 +17,10 @@ set(CMAKE_BUILD_TYPE Release)
 
 # add source directory to the include path
 include_directories(${PROJECT_SOURCE_DIR}/src)
+include_directories(${PROJECT_SOURCE_DIR}/external)
 
 # add subdirectories
 add_subdirectory(src)
 add_subdirectory(examples)
 add_subdirectory(python)
+add_subdirectory(lib)

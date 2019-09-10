@@ -1,3 +1,4 @@
+"""sensitivity analysis: insertion anlge on root tip distribution"""
 import py_rootbox as rb
 import math
 from multiprocessing import Pool
@@ -27,7 +28,7 @@ theta0_ = np.linspace(0, math.pi / 2, N)
 # One simulation
 def simulate(i):
     rs = rb.RootSystem()
-    rs.openFile(name)
+    rs.readParameters("modelparameter/" + name + ".xml")
     set_all_sd(rs, 0.)  # set all sd to zero
     rs.initialize()  # copy to tap to basal root parameters
 

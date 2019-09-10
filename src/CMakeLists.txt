@@ -4,15 +4,15 @@
 
 # file(GLOB all_sources *.cpp) # i changed that to exclude PythonRootSystem.cpp
 add_library(CRootBox
-            Organ.cpp
-            organparameter.cpp
-            Organism.cpp
-            analysis.cpp
+            organparameter.cpp            
             rootparameter.cpp
 			seedparameter.cpp            
+            Organ.cpp            
             Root.cpp
             Seed.cpp
+            Organism.cpp
             RootSystem.cpp
+            analysis.cpp
             sdf.cpp
             tropism.cpp
 			../external/tinyxml2/tinyxml2.cpp            
@@ -38,18 +38,18 @@ if (PythonLibs_FOUND)
 
   # make shared library for Pyhton binding
   add_library(py_rootbox SHARED
-              Organ.cpp
-              organparameter.cpp
-              Organism.cpp  
-              PythonRootSystem.cpp
-              analysis.cpp
-              rootparameter.cpp
-			  seedparameter.cpp              
-              Root.cpp
-              Seed.cpp              
-              RootSystem.cpp
-              sdf.cpp
-              tropism.cpp
+            organparameter.cpp            
+            rootparameter.cpp
+			seedparameter.cpp            
+            Organ.cpp            
+            Root.cpp
+            Seed.cpp
+            Organism.cpp
+            RootSystem.cpp
+            PythonRootSystem.cpp            
+            analysis.cpp
+            sdf.cpp
+            tropism.cpp
 			../external/tinyxml2/tinyxml2.cpp                 
             ../external/aabbcc/AABB.cc
             ../external/gauss_legendre/gauss_legendre.cpp

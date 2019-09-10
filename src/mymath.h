@@ -6,10 +6,8 @@
  * My own minimalistic non-generic fixed dimension
  * not operator overloading vector matrix classes
  */
-
 #include <cmath>
 #include <sstream>
-// #undef NDEBUG // <- turn assert always ON
 #include <assert.h>
 
 namespace CRootBox {
@@ -23,7 +21,6 @@ namespace CRootBox {
  */
 class Vector2i
 {
-
 public:
 
     Vector2i(): x(0), y(0) { } ///< Default constructor
@@ -51,7 +48,6 @@ inline bool operator!=(const Vector2i& lhs, const Vector2i& rhs){ return !(lhs =
  */
 class Vector2d
 {
-
 public:
 
     Vector2d(): x(0), y(0) { } ///< Default constructor
@@ -76,7 +72,6 @@ public:
  */
 class Vector3d
 {
-
 public:
 
     Vector3d(): x(0),y(0),z(0) { } ///< Default constructor
@@ -121,7 +116,6 @@ inline bool operator!=(const Vector3d& lhs, const Vector3d& rhs){ return !(lhs =
  */
 class Matrix3d
 {
-
 public:
 
     Matrix3d(): r0(1,0,0), r1(0,1,0), r2(0,0,1) { } ///< Default constructor (identity matrix)
