@@ -1,3 +1,13 @@
+# CRootBox became CPlantBox
+
+CRootBox is not longer developed, it grew into [CPlantBox](https://github.com/Plant-Root-Soil-Interactions-Modelling/CPlantBox). 
+
+CPlantBox is fully backward compatible CRootBox, offering a RootSystem only class, but can additionally simulate the plant shoot and leafs, enabeling even more complex functional plant models.
+
+For the a description of the root system modelling please refer to tutorial/latex/RootBox.
+
+
+
 # CRootBox
 
 The fastest way to try CRootBox is to read the tutorial and look at the examples in C++ or Python. 
