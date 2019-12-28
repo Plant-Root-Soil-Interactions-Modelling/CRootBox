@@ -25,17 +25,15 @@ set_target_properties(CRootBox PROPERTIES LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BIN
 # 2. Make py_rootbox library
 #
 
-# Find necessary packages for py_rootbox
-find_package(PythonLibs 3.7)
-find_package(PythonInterp 3.7)    # creates PYTHON_VERSION_MAJOR, PYTHON_VERSION_MINOR
+find_package(PythonLibs 3)
+find_package(PythonInterp 3) # creates PYTHON_VERSION_MAJOR, PYTHON_VERSION_MINOR
 
 # Only build the library if Python 3 was found
 if (PythonLibs_FOUND)
   include_directories( ${PYTHON_INCLUDE_DIRS} )
-  find_package( Boost COMPONENTS python${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} REQUIRED )
-# find_package( Boost COMPONENTS python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} REQUIRED ) # if above is not working
+  find_package( Boost COMPONENTS python-py${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR} REQUIRED )
   include_directories( ${Boost_INCLUDE_DIR} )
-
+  
   # make shared library for Pyhton binding
   add_library(py_rootbox SHARED
             organparameter.cpp            
